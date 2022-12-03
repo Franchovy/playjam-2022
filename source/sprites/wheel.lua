@@ -32,16 +32,28 @@ function Wheel:init(image)
 	
 	self.velocityX = 0
 	self.velocityY = 0
+	self.horizontalAcceleration = 0
+	self.isDead = false
 end
 
 local maxFallSpeed = 12
 local crankTicksPerCircle = 36
 local angle = 1
+local velocityDrag = 0
 
 
 -- Movement
 
 function Wheel:update()
+	
+	velocityDrag = self.velocityX * 0.2
+	
+	-- Update if player has died
+	
+	if self.y > 260 or self.isDead then
+		self.isDead = true
+		return
+	end
 	
 	-- Player Input
 	
@@ -55,7 +67,8 @@ function Wheel:update()
 	end
 	
 	-- Update velocity according to acceleration
-	self.velocityX = crankTicks
+	
+	self.velocityX = crankTicks * 2.5 + velocityDrag
 	self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
 	
 	-- Update position according to velocity
@@ -81,7 +94,6 @@ function Wheel:update()
 	if self.x > 150 then
 		gfx.setDrawOffset(-actualX + 150, 0)
 	end
-
 
 end
 

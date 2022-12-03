@@ -12,20 +12,36 @@ function Floor:init(image)
 	
 	----------------
 	-- Draw Graphics
-	local image = self:getImage()
 	
-	-- Set Graphics context
-	gfx.pushContext(image)
+	self:drawSelf()
+	
+	----------------
+	-- Set up Sprite
+	
+	self:setCollideRect(0, 0, self:getSize())
+	self:setCenter(0, 0)
+	self:add()
+end
+
+function Floor:drawSelf() 
+	-- Set Graphics context (local (x, y) relative to image)
+	gfx.pushContext(self:getImage())
 	
 	-- Perform draw operations
 	gfx.fillRect(0, 0, self:getSize())
 	
 	-- Close Graphics Context
 	gfx.popContext()
+end
+
+function Floor:setSize(width, height)
+	Floor.super.setSize(self, width, height)
+	self:setImage(gfx.image.new(width, height))
 	
-	----------------
-	-- Set up Sprite
-	
+	self:onSizeChanged()
+end
+
+function Floor:onSizeChanged()
 	self:setCollideRect(0, 0, self:getSize())
-	self:add()
+	self:drawSelf()
 end
