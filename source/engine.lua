@@ -28,5 +28,13 @@ buttons = {
 	isLeftButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonLeft) end,
 	isRightButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonRight) end,
 	isDownButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonDown) end,
-	isUpButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonUp) end
+	isUpButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonUp) end,
+	isLeftButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonLeft) end,
+	isRightButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonRight) end,
+	isDownButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonDown) end,
+	isUpButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonUp) end,
+	left = playdate.kButtonLeft,
+	right = playdate.kButtonRight,
+	down = playdate.kButtonDown,
+	up = playdate.kButtonUp,
 }

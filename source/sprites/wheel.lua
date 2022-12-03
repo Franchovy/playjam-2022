@@ -38,32 +38,29 @@ function Wheel:init(image)
 	self.velocityY = 0
 end
 
-local crankTicksPerCircle = 12
+local maxFallSpeed = 12
+local crankTicksPerCircle = 36
 local angle = 1
+
 
 -- Movement
 
 function Wheel:update()
-	-- Move according to vectors	
+	
+	-- Player Input
 	
 	local crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
-	
-	-- Update push vector based on crank ticks
-	
-	local rotation = crankTicks % 4
-	
-	angle = angle + crankTicks
-	if angle < 1 then angle = 6 end
-	if angle > 6 then angle = 1 end
+	local hasJumped = buttons.isUpButtonJustPressed()
 		
-	self:getImage():load("images/wheel"..angle)
+	-- Update push vector based on crank ticks
+		
+	if hasJumped then
+		self.velocityY = -10
+	end
 	
 	-- Update velocity according to acceleration
-	self.velocityX = self.velocityX + crankTicks * 6
-	
-	-- if not self:isTouchingFloor() then
-		self.velocityY = math.max(self.velocityY + gravity, maxFallSpeed)
-	-- end
+	self.velocityX = self.velocityX + crankTicks
+	self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
 	
 	-- Update position according to velocity
 	local actualX, actualY, collisions, length = self:moveWithCollisions(
@@ -71,33 +68,15 @@ function Wheel:update()
 		self.y + self.velocityY
 	)
 	
-	if #collisions > 0 then
-		-- Update forces based on collisions
-		local ownCollisions = table.each(
-				collisions,
-				function (collision) 
-					return collision.sprite ~= self and collision.type == collisionTypes.slide
-				end
-			)
-			
-		local filteredCollisions = table.filter(collisions)
-		
-		if #filteredCollisions > 0 then
-			local collisionData = filteredCollisions[1]
-			-- Update velocity to reflect real velocity
-			self.velocityX = collisionData.move.x		
-			self.velocityY = collisionData.move.y
-			
-			self:setIsTouchingFloor(collisionData.normal.y == -1.0)
-			
-			-- Translate X velocity into Y velocity
-			if collisionData.normal.y ~= 0 then
-				local speedToRotate = self.velocityX * 0.1
-				self.velocityY = self.velocityY - speedToRotate
-				self.velocityX = self.velocityX - speedToRotate
-			end
-		end
-	end
+	-- Update graphics
+	
+	angle = angle + self.velocityX / 10
+	if angle < 1 then angle = 6 end
+	if angle > 6 then angle = 1 end
+	local imageName = string.format("images/wheel%01d", math.floor(angle))
+	
+	self:getImage():load(imageName)
+	
 end
 
 local isTouchingFloor = false

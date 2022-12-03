@@ -1,0 +1,7 @@
+name=PlaydateSDKExampleProject
+author=Franchovy
+description=Rolly
+bundleID=io.widgetlib.roller
+version=1.0
+imagePath=SystemAssets/
+buildNumber=1

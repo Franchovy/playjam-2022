@@ -39,18 +39,19 @@ function initialize()
 		end
 	)
 
+	
 end
 
 function playdate.update()
-	
-	if playdate.buttonIsPressed( playdate.kButtonRight ) then
-		wheel:turnRight()
-	end
 	
 	-- Game Update
 	
 	playdate.timer.updateTimers()
 	gfx.sprite.update()
+	
+	-- Draw text (debug)
+	
+	gfx.drawText("Acceleration Mode", 20, 20)
 end
 
 -- Start Game
