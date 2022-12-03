@@ -1,11 +1,13 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "playdate",
-            "request": "launch",
-            "name": "Build and Run (Simulator)",
-            "preLaunchTask": "Build and Run (Simulator)"
-        }
-    ]
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch",
+      "program": "${workspaceFolder}/.vscode/run.js",
+      "preLaunchTask": "build",
+      "internalConsoleOptions": "neverOpen",
+      "env": { "PLAYDATE_OUTPUT" : "${config:playdate.output}" }
+    }
+  ]
 }
