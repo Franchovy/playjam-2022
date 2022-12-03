@@ -1,4 +1,6 @@
 import "engine.lua"
+import "scenemanager"
+import "scenes/lib"
 import "sprites/lib"
 
 
@@ -6,19 +8,9 @@ local wheel = nil
 local floors = {}
 local game = nil
 local soundFile = nil
+local sceneManager = nil
 
 function initialize()
-	-- Create Sprites
-
-	wheel = Wheel.new(gfx.image.new("images/wheel1"))
-	
-	-- Create Obstacle sprites
-	for i=0,28 do
-		table.insert(floors, Floor.new(gfx.image.new(40, 40)))
-	end
-
-	-- Create Sound fileplayer for background music
-	soundFile = sound.fileplayer.new("music/weezer")
 	
 	-- Create game state manager
 	game = Game()
@@ -35,19 +27,29 @@ gameState = {
 }
 
 function Game:init() 
+	-- Update game state
+	
 	self.state = gameState.lobby
 	
-	-- Draw Game Over text (without adding it to scene)
+	---------------
+	-- GRAPHICS
+
+	sceneManager = SceneManager()
 	
-	local image = gfx.image.new(200, 80)
-	self.gameOverTextImage = gfx.sprite.new(image)
+	-- Create Scene
+	sceneManager:setCurrentScene(GameScene)
 	
-	gfx.pushContext(image)
-	gfx.drawTextAligned("*Game Over*", image.width / 2, image.height / 2, textAlignment.center)
-	gfx.popContext()
+	-- Create Sprites
 	
-	self.gameOverTextImage:moveTo(200, 120)
-	self.gameOverTextImage:setIgnoresDrawOffset(true)
+	wheel = Wheel.new(gfx.image.new("images/wheel1"))
+	
+	-- Create Obstacle sprites
+	for i=0,28 do
+		table.insert(floors, Floor.new(gfx.image.new(40, 40)))
+	end
+	
+	-- Create Sound fileplayer for background music
+	soundFile = sound.fileplayer.new("music/weezer")
 	
 	-- Load background music
 	
@@ -58,7 +60,6 @@ end
 function Game:start()
 	-- Clear any previous displays
 	
-	self.gameOverTextImage:remove()
 	
 	-----------------
 	-- Audio
@@ -66,6 +67,12 @@ function Game:start()
 	
 	-----------------
 	-- Graphics
+	
+	-- If switching from GameOver
+	if sceneManager.currentScene.sceneType == sceneTypes.gameOver then
+		-- Perform transition
+		sceneManager:switchScene(GameScene)
+	end
 	
 	-- Set Screen position to start
 	gfx.setDrawOffset(0, 0)
@@ -117,8 +124,9 @@ function Game:ended()
 	--------------
 	-- Graphics
 	
-	self.gameOverTextImage:add()
-
+	-- Perform transition to game over scene
+	sceneManager:switchScene(GameOverScene)
+	
 	self.state = gameState.ended
 end
 
@@ -131,6 +139,7 @@ function playdate.update()
 
 	playdate.timer.updateTimers()
 	gfx.sprite.update()
+	--gfx.animation.blinker.updateAll()
 	
 	-- Update screen position
 	
