@@ -17,10 +17,6 @@ function Wheel:init(image)
 		self:getSize() - marginSize * 2, 
 		self:getSize() - marginSize * 2
 	)
-	self:setCenter(
-		0.5,
-		0.5 
-	)
 	self:add()
 	
 	-- Collisions Response
@@ -59,7 +55,7 @@ function Wheel:update()
 	end
 	
 	-- Update velocity according to acceleration
-	self.velocityX = self.velocityX + crankTicks
+	self.velocityX = crankTicks
 	self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
 	
 	-- Update position according to velocity
@@ -77,6 +73,16 @@ function Wheel:update()
 	
 	self:getImage():load(imageName)
 	
+	-- update screen position
+	
+	local drawOffset = gfx.getDrawOffset()
+	print(drawOffset)
+	
+	if self.x > 150 then
+		gfx.setDrawOffset(-actualX + 150, 0)
+	end
+
+
 end
 
 local isTouchingFloor = false

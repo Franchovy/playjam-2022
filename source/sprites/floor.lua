@@ -18,7 +18,7 @@ function Floor:init(image)
 	gfx.pushContext(image)
 	
 	-- Perform draw operations
-	self:drawWithContext()
+	gfx.fillRect(0, 0, self:getSize())
 	
 	-- Close Graphics Context
 	gfx.popContext()
@@ -27,11 +27,5 @@ function Floor:init(image)
 	-- Set up Sprite
 	
 	self:setCollideRect(0, 0, self:getSize())
-	
-	self:moveTo(200, 230)
 	self:add()
-end
-
-function Floor:drawWithContext()
-	
 end

@@ -11,22 +11,16 @@ function initialize()
 	-- Create Sprites
 	
 	wheel = Wheel.new(gfx.image.new("images/wheel1"))
-	floor = Floor.new(gfx.image.new(400, 20))
+	floor = Floor.new(gfx.image.new(800, 20))
 	obstacle = Floor.new(gfx.image.new(60, 60))
 	
 	-- Draw Sprites
 	
-	function floor:drawWithContext() 
-		gfx.fillRect(0, 0, image:getSize())
-	end
-	
-	function obstacle:drawWithContext() 
-		gfx.fillRect(0, 0, image:getSize())
-	end
-	
 	-- Position Sprites
 	
 	wheel:moveTo(80, 100)
+	floor:moveTo(400, 230)
+	obstacle:moveTo(500, 210)
 	
 	-- Setup background
 	local backgroundImage = gfx.image.new("images/background")
