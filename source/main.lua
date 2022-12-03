@@ -1,4 +1,6 @@
 import "engine.lua"
+import "scenemanager"
+import "scenes/lib"
 import "sprites/lib"
 
 
@@ -7,30 +9,12 @@ local floors = {}
 local coins = {} --new
 local game = nil
 local soundFile = nil
+local sceneManager = nil
 
 local textImageScore=nil --new
 
 function initialize()
-	-- Create Sprites
 
-	wheel = Wheel.new(gfx.image.new("images/wheel1"))
-
-
-	-- Create Obstacle sprites
-	for i=0,28 do
-		table.insert(floors, Floor.new(gfx.image.new(40, 40)))
-	end
-
-	-- Create Coin sprites
-	for i=1,10 do
-		table.insert(coins, Coin.new(gfx.image.new("images/coin")))
-	end
-
-	
-
-	-- Create Sound fileplayer for background music
-	soundFile = sound.fileplayer.new("music/weezer")
-	
 	-- Create game state manager
 	game = Game()
 	
@@ -46,20 +30,20 @@ gameState = {
 }
 
 function Game:init() 
+	-- Update game state
+	
 	self.state = gameState.lobby
 	
-	-- Draw Game Over text (without adding it to scene)
-	
-	local image = gfx.image.new(200, 80)
-	self.gameOverTextImage = gfx.sprite.new(image)
-	
-	gfx.pushContext(image)
-	gfx.drawTextAligned("*Game Over*", image.width / 2, image.height / 2, textAlignment.center)
-	gfx.popContext()
-	
-	self.gameOverTextImage:moveTo(200, 120)
-	self.gameOverTextImage:setIgnoresDrawOffset(true)
+	---------------
+	-- GRAPHICS
 
+	sceneManager = SceneManager()
+	
+	-- Create Scene
+	sceneManager:setCurrentScene(GameScene)
+	
+	-- Draw Score Text
+	
 	local imageScore = gfx.image.new(30, 30)
 	textImageScore = gfx.sprite.new(imageScore)
 	
@@ -70,7 +54,24 @@ function Game:init()
 	textImageScore:moveTo(imageScore.width/2, imageScore.height/2)
 	textImageScore:setIgnoresDrawOffset(true)
 	textImageScore:add()
+
+	-- Create Sprites
 	
+	wheel = Wheel.new(gfx.image.new("images/wheel1"))
+	
+	-- Create Coin sprites
+	for i=1,10 do
+		table.insert(coins, Coin.new(gfx.image.new("images/coin")))
+	end
+	
+	-- Create Obstacle sprites
+	for i=0,28 do
+		table.insert(floors, Floor.new(gfx.image.new(40, 40)))
+	end
+	
+	-- Create Sound fileplayer for background music
+	soundFile = sound.fileplayer.new("music/weezer")
+
 	-- Load background music
 	
 	soundFile:play(0)
@@ -80,7 +81,6 @@ end
 function Game:start()
 	-- Clear any previous displays
 	
-	self.gameOverTextImage:remove()
 	
 	-----------------
 	-- Audio
@@ -88,6 +88,12 @@ function Game:start()
 	
 	-----------------
 	-- Graphics
+	
+	-- If switching from GameOver
+	if sceneManager.currentScene.sceneType == sceneTypes.gameOver then
+		-- Perform transition
+		sceneManager:switchScene(GameScene)
+	end
 	
 	-- Set Screen position to start
 	gfx.setDrawOffset(0, 0)
@@ -144,8 +150,9 @@ function Game:ended()
 	--------------
 	-- Graphics
 	
-	self.gameOverTextImage:add()
-
+	-- Perform transition to game over scene
+	sceneManager:switchScene(GameOverScene)
+	
 	self.state = gameState.ended
 end
 
@@ -158,6 +165,7 @@ function playdate.update()
 
 	playdate.timer.updateTimers()
 	gfx.sprite.update()
+	--gfx.animation.blinker.updateAll()
 	
 	-- Update screen position
 	
@@ -183,9 +191,9 @@ function playdate.update()
 		if buttons.isAButtonPressed() then
 			game:start()
 		end
-		
-		return
 	end
+
+	-- Update image score
 
 	local imageScore = gfx.image.new(30, 30)
 
