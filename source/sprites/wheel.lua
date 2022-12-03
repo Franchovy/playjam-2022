@@ -9,6 +9,8 @@ end
 function Wheel:init(image)
 	Wheel.super.init(self, image)
 	self.type = "Wheel"
+
+	self.score=0--new
 	
 	local marginSize = 3
 	self:setCollideRect(
@@ -45,7 +47,7 @@ local angle = 1
 local velocityDrag = 0
 
 function Wheel:setIsDead() 
-	print("Set is dead")
+	--print("Set is dead") -new
 	if self.isDead then
 		self.hasJustDied = false
 	else 
@@ -96,6 +98,10 @@ function Wheel:update()
 				collision.other.type == "Floor" then
 				self:setIsDead()
 				self.sampleplayer.drop:play()
+			elseif collision.other.type ~= nil and --new
+				collision.other.type == "Coin" then
+					self:increaseScore()
+					collision.other:destroy()
 			end
 		end
 	)
@@ -127,4 +133,10 @@ function Wheel:onGameStart()
 	self.horizontalAcceleration = 0
 	self.isDead = false
 	self.hasJustDied = false
+end
+
+function Wheel:increaseScore() --new
+	self.score=self.score+1
+	--print("increaseScore")
+	print(self.score)
 end

@@ -4,18 +4,29 @@ import "sprites/lib"
 
 local wheel = nil
 local floors = {}
+local coins = {} --new
 local game = nil
 local soundFile = nil
+
+local textImageScore=nil --new
 
 function initialize()
 	-- Create Sprites
 
 	wheel = Wheel.new(gfx.image.new("images/wheel1"))
-	
+
+
 	-- Create Obstacle sprites
 	for i=0,28 do
 		table.insert(floors, Floor.new(gfx.image.new(40, 40)))
 	end
+
+	-- Create Coin sprites
+	for i=1,10 do
+		table.insert(coins, Coin.new(gfx.image.new("images/coin")))
+	end
+
+	
 
 	-- Create Sound fileplayer for background music
 	soundFile = sound.fileplayer.new("music/weezer")
@@ -48,6 +59,17 @@ function Game:init()
 	
 	self.gameOverTextImage:moveTo(200, 120)
 	self.gameOverTextImage:setIgnoresDrawOffset(true)
+
+	local imageScore = gfx.image.new(30, 30)
+	textImageScore = gfx.sprite.new(imageScore)
+	
+	gfx.pushContext(imageScore)
+	gfx.drawTextAligned(wheel.score, imageScore.width / 2, imageScore.height / 2, textAlignment.center)
+	gfx.popContext()
+	
+	textImageScore:moveTo(imageScore.width/2, imageScore.height/2)
+	textImageScore:setIgnoresDrawOffset(true)
+	textImageScore:add()
 	
 	-- Load background music
 	
@@ -90,6 +112,11 @@ function Game:start()
 		local newX = previousObstacleX + randX
 		previousObstacleX = newX
 		floors[i]:moveTo(newX, 240 - randY)
+	end
+
+	-- Coins, spread through level
+	for i=1,#coins do
+		coins[i]:moveTo(150*i,200)
 	end
 	
 	-- Setup background
@@ -136,7 +163,7 @@ function playdate.update()
 	
 	local drawOffset = gfx.getDrawOffset()
 	local relativeX = wheel.x + drawOffset
-	print(relativeX)
+	--print(relativeX) -new
 	if relativeX > 150 then
 		gfx.setDrawOffset(-wheel.x + 150, 0)
 	elseif relativeX < 80 then
@@ -159,6 +186,18 @@ function playdate.update()
 		
 		return
 	end
+
+	local imageScore = gfx.image.new(30, 30)
+
+	gfx.pushContext(imageScore)
+
+	gfx.drawTextAligned(wheel.score, imageScore.width / 2, imageScore.height / 2, textAlignment.center)
+	gfx.popContext()
+	
+	textImageScore:moveTo(imageScore.width/2, imageScore.height/2)
+	textImageScore:setIgnoresDrawOffset(true)
+	textImageScore:setImage(imageScore)
+
 end
 
 -- Start Game
