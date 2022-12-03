@@ -165,8 +165,6 @@ function playdate.update()
 		if buttons.isAButtonPressed() then
 			game:start()
 		end
-		
-		return
 	end
 end
 
