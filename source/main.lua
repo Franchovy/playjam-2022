@@ -4,6 +4,7 @@ import "sprites/lib"
 
 local wheel = nil
 local floors = {}
+local game = nil
 
 function initialize()
 	-- Create Sprites
@@ -11,29 +12,64 @@ function initialize()
 	wheel = Wheel.new(gfx.image.new("images/wheel1"))
 	
 	-- Create Obstacle sprites
-	for i=0,18 do
+	for i=0,28 do
 		table.insert(floors, Floor.new(gfx.image.new(40, 40)))
 	end
 
-	Game:start()
+	-- Create game state manager
+	game = Game()
+	
+	game:start()
 end
 
 class("Game").extends()
 
+gameState = {
+	lobby = 0,
+	playing = 1,
+	ended = 2,
+}
+
+function Game:init() 
+	self.state = gameState.lobby
+	
+	local image = gfx.image.new(200, 80)
+	self.gameOverTextImage = gfx.sprite.new(image)
+	
+	gfx.pushContext(image)
+	gfx.drawTextAligned("*Game Over*", image.width / 2, image.height / 2, textAlignment.center)
+	gfx.popContext()
+	
+	self.gameOverTextImage:moveTo(200, 120)
+	self.gameOverTextImage:setIgnoresDrawOffset(true)
+	
+end
+
 function Game:start()
+	-- Clear any previous displays
+	
+	self.gameOverTextImage:remove()
+	
+	-- Set Screen position to start
+	gfx.setDrawOffset(0, 0)
+	
+	-- Reset sprites
+	
+	wheel:onGameStart()
+	
 	-- Position Sprites
 
 	wheel:moveTo(80, 100)
 	
 	-- Actual Floor
-	floors[1]:setSize(1000, 20)
-	floors[1]:moveTo(10, 200)
+	--floors[1]:setSize(1000, 20)
+	floors[1]:moveTo(30, 200)
 	
 	-- Obstacles, spread through level
-	local previousObstacleX = 400
+	local previousObstacleX = 20
 	for i=2,#floors do
-		local randY = math.random(20, 180)
-		local randX = math.random(40, 420)
+		local randY = math.random(20, 140)
+		local randX = math.random(20, 420)
 		local newX = previousObstacleX + randX
 		previousObstacleX = newX
 		floors[i]:moveTo(newX, 240 - randY)
@@ -49,6 +85,16 @@ function Game:start()
 			gfx.clearClipRect()
 		end
 	)
+	
+	self.state = gameState.playing
+end
+
+
+function Game:ended()
+	
+	self.gameOverTextImage:add()
+
+	self.state = gameState.ended
 end
 
 function playdate.update()
@@ -60,10 +106,34 @@ function playdate.update()
 
 	playdate.timer.updateTimers()
 	gfx.sprite.update()
+	
+	-- Update screen position
+	
+	local drawOffset = gfx.getDrawOffset()
+	local relativeX = wheel.x + drawOffset
+	print(relativeX)
+	if relativeX > 150 then
+		gfx.setDrawOffset(-wheel.x + 150, 0)
+	elseif relativeX < 80 then
+		gfx.setDrawOffset(-wheel.x + 80, 0)
+	end
 
-	-- Draw text (debug)
-
-	gfx.drawText("Acceleration Mode", 20, 20)
+	-- Game State checking
+	
+	if wheel.hasJustDied then
+		game:ended()
+	end
+	
+	if game.state == gameState.ended then
+		-------------------
+		-- On game finished
+		
+		if buttons.isAButtonPressed() then
+			game:start()
+		end
+		
+		return
+	end
 end
 
 -- Start Game

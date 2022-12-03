@@ -30,10 +30,7 @@ function Wheel:init(image)
 	
 	-- Create Properties
 	
-	self.velocityX = 0
-	self.velocityY = 0
-	self.horizontalAcceleration = 0
-	self.isDead = false
+	self:onGameStart()
 end
 
 local maxFallSpeed = 12
@@ -41,6 +38,15 @@ local crankTicksPerCircle = 36
 local angle = 1
 local velocityDrag = 0
 
+function Wheel:setIsDead() 
+	print("Set is dead")
+	if self.isDead then
+		self.hasJustDied = false
+	else 
+		self.hasJustDied = true
+		self.isDead = true	
+	end
+end
 
 -- Movement
 
@@ -51,7 +57,7 @@ function Wheel:update()
 	-- Update if player has died
 	
 	if self.y > 260 or self.isDead then
-		self.isDead = true
+		self:setIsDead()
 		return
 	end
 	
@@ -77,6 +83,15 @@ function Wheel:update()
 		self.y + self.velocityY
 	)
 	
+	table.each(collisions,
+		function (collision)
+			if collision.other.type ~= nil and
+				collision.other.type == "Floor" then
+				self:setIsDead()
+			end
+		end
+	)
+	
 	-- Update graphics
 	
 	angle = angle + self.velocityX / 10
@@ -85,15 +100,6 @@ function Wheel:update()
 	local imageName = string.format("images/wheel%01d", math.floor(angle))
 	
 	self:getImage():load(imageName)
-	
-	-- update screen position
-	
-	local drawOffset = gfx.getDrawOffset()
-	print(drawOffset)
-	
-	if self.x > 150 then
-		gfx.setDrawOffset(-actualX + 150, 0)
-	end
 
 end
 
@@ -105,4 +111,12 @@ end
 
 function Wheel:isTouchingFloor()
 	return isTouchingFloor
+end
+
+function Wheel:onGameStart() 
+	self.velocityX = 0
+	self.velocityY = 0
+	self.horizontalAcceleration = 0
+	self.isDead = false
+	self.hasJustDied = false
 end

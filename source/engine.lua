@@ -29,12 +29,24 @@ buttons = {
 	isRightButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonRight) end,
 	isDownButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonDown) end,
 	isUpButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonUp) end,
+	isAButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonA) end,
+	isBButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonB) end,
 	isLeftButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonLeft) end,
 	isRightButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonRight) end,
 	isDownButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonDown) end,
 	isUpButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonUp) end,
+	isAButtonPressed = function() return playdate.buttonJustPressed(playdate.kButtonA) end,
+	isBButtonPressed = function() return playdate.buttonJustPressed(playdate.kButtonB) end,
 	left = playdate.kButtonLeft,
 	right = playdate.kButtonRight,
 	down = playdate.kButtonDown,
 	up = playdate.kButtonUp,
+	a = playdate.kButtonA,
+	b = playdate.kButtonB
+}
+
+textAlignment = {
+	center = playdate.kTextAlignmentCenter,
+	left = playdate.kTextAlignmentLeft,
+	right = playdate.kTextAlignmentRight
 }
