@@ -5,6 +5,7 @@ import "sprites/lib"
 local wheel = nil
 local floors = {}
 local game = nil
+local soundFile = nil
 
 function initialize()
 	-- Create Sprites
@@ -16,6 +17,9 @@ function initialize()
 		table.insert(floors, Floor.new(gfx.image.new(40, 40)))
 	end
 
+	-- Create Sound fileplayer for background music
+	soundFile = sound.fileplayer.new("music/weezer")
+	
 	-- Create game state manager
 	game = Game()
 	
@@ -33,6 +37,8 @@ gameState = {
 function Game:init() 
 	self.state = gameState.lobby
 	
+	-- Draw Game Over text (without adding it to scene)
+	
 	local image = gfx.image.new(200, 80)
 	self.gameOverTextImage = gfx.sprite.new(image)
 	
@@ -43,12 +49,23 @@ function Game:init()
 	self.gameOverTextImage:moveTo(200, 120)
 	self.gameOverTextImage:setIgnoresDrawOffset(true)
 	
+	-- Load background music
+	
+	soundFile:play(0)
+	soundFile:pause()
 end
 
 function Game:start()
 	-- Clear any previous displays
 	
 	self.gameOverTextImage:remove()
+	
+	-----------------
+	-- Audio
+	soundFile:play(0)
+	
+	-----------------
+	-- Graphics
 	
 	-- Set Screen position to start
 	gfx.setDrawOffset(0, 0)
@@ -91,6 +108,14 @@ end
 
 
 function Game:ended()
+	
+	--------------
+	-- Audio
+	
+	soundFile:play(0)
+	
+	--------------
+	-- Graphics
 	
 	self.gameOverTextImage:add()
 

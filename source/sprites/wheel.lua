@@ -28,6 +28,12 @@ function Wheel:init(image)
 		return collisionTypes.overlap
 	end
 	
+	-- Load sound assets
+	self.sampleplayer = {
+		jump = sound.sampleplayer.new("sfx/jump"),
+		drop = sound.sampleplayer.new("sfx/drop")
+	}
+	
 	-- Create Properties
 	
 	self:onGameStart()
@@ -70,6 +76,7 @@ function Wheel:update()
 		
 	if hasJumped then
 		self.velocityY = -10
+		self.sampleplayer.jump:play()
 	end
 	
 	-- Update velocity according to acceleration
@@ -88,6 +95,7 @@ function Wheel:update()
 			if collision.other.type ~= nil and
 				collision.other.type == "Floor" then
 				self:setIsDead()
+				self.sampleplayer.drop:play()
 			end
 		end
 	)

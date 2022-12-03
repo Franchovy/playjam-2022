@@ -14,6 +14,8 @@ import "params"
 geometry = playdate.geometry
 gfx = playdate.graphics
 timer = playdate.timer
+sprite = playdate.sprite
+sound = playdate.sound
 
 -- Shortcuts
 
