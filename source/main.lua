@@ -6,11 +6,11 @@ local wheel = nil
 local floor = nil
 local obstacle = nil
 
+
 function initialize()
-	
 	-- Create Sprites
 	
-	wheel = Wheel.new(gfx.image.new("images/wheel2"))
+	wheel = Wheel.new(gfx.image.new("images/wheel1"))
 	floor = Floor.new(gfx.image.new(400, 20))
 	obstacle = Floor.new(gfx.image.new(60, 60))
 	

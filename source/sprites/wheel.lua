@@ -17,7 +17,10 @@ function Wheel:init(image)
 		self:getSize() - marginSize * 2, 
 		self:getSize() - marginSize * 2
 	)
-	
+	self:setCenter(
+		0.5,
+		0.5 
+	)
 	self:add()
 	
 	-- Collisions Response
@@ -35,42 +38,32 @@ function Wheel:init(image)
 	self.velocityY = 0
 end
 
-local gravityVector = geometry.vector2D.new(0, 1)
-local normalVector = geometry.vector2D.new(0, 0)
-local pushVector = geometry.vector2D.new(0, 0)
-local resistanceVector = geometry.vector2D.new(0, 0)
-
 local crankTicksPerCircle = 12
+local angle = 1
+
 -- Movement
 
 function Wheel:update()
 	-- Move according to vectors	
 	
 	local crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
-	local angle = crankTicks * 2 * 3.14 / crankTicksPerCircle
 	
 	-- Update push vector based on crank ticks
 	
-	self:setRotation(angle)
+	local rotation = crankTicks % 4
 	
-	-- Todo: triangulate on normal | (v -> 0 (x), >| -> 90 (y), ^ -> 180 (-x), |< -> 270 (-y))
-	pushVector.x = crankTicks
-	
-	-- Calculate resistance (friction) vectors based on normals
-
-	resistanceVector.x = self.velocityX * -normalVector.y
-	resistanceVector.y = self.velocityY * -normalVector.x
+	angle = angle + crankTicks
+	if angle < 1 then angle = 6 end
+	if angle > 6 then angle = 1 end
 		
-	-- Update velocity according to acceleration
-	self.velocityX = self.velocityX + gravityVector.x + normalVector.x + pushVector.x - resistanceVector.x
-	self.velocityY = self.velocityY + gravityVector.y + normalVector.y + pushVector.y - resistanceVector.y
+	self:getImage():load("images/wheel"..angle)
 	
-	print("--------")
-	print("Vectors:")
-	print("g:"..gravityVector.x..","..gravityVector.y)
-	print("n:"..normalVector.x..","..normalVector.y)
-	print("p:"..pushVector.x..","..pushVector.y)
-	print("r:"..-resistanceVector.x..","..-resistanceVector.y)
+	-- Update velocity according to acceleration
+	self.velocityX = self.velocityX + crankTicks * 6
+	
+	-- if not self:isTouchingFloor() then
+		self.velocityY = math.max(self.velocityY + gravity, maxFallSpeed)
+	-- end
 	
 	-- Update position according to velocity
 	local actualX, actualY, collisions, length = self:moveWithCollisions(
@@ -95,8 +88,24 @@ function Wheel:update()
 			self.velocityX = collisionData.move.x		
 			self.velocityY = collisionData.move.y
 			
-			normalVector.x = (normalVector.x + collisionData.normal.x) / 2
-			normalVector.y = (normalVector.y + collisionData.normal.y) / 2
+			self:setIsTouchingFloor(collisionData.normal.y == -1.0)
+			
+			-- Translate X velocity into Y velocity
+			if collisionData.normal.y ~= 0 then
+				local speedToRotate = self.velocityX * 0.1
+				self.velocityY = self.velocityY - speedToRotate
+				self.velocityX = self.velocityX - speedToRotate
+			end
 		end
 	end
+end
+
+local isTouchingFloor = false
+
+function Wheel:setIsTouchingFloor(value) 
+	isTouchingFloor = value
+end
+
+function Wheel:isTouchingFloor()
+	return isTouchingFloor
 end
