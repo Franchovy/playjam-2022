@@ -4,13 +4,25 @@ import "sprites/lib"
 
 local wheel = nil
 local floor = nil
+local obstacle = nil
 
 function initialize()
 	
 	-- Create Sprites
 	
-	wheel = Wheel.new()
-	floor = Floor.new()
+	wheel = Wheel.new(gfx.image.new("images/wheel2"))
+	floor = Floor.new(gfx.image.new(400, 20))
+	obstacle = Floor.new(gfx.image.new(60, 60))
+	
+	-- Draw Sprites
+	
+	function floor:drawWithContext() 
+		gfx.fillRect(0, 0, image:getSize())
+	end
+	
+	function obstacle:drawWithContext() 
+		gfx.fillRect(0, 0, image:getSize())
+	end
 	
 	-- Position Sprites
 	

@@ -2,27 +2,36 @@ import "engine"
 
 class('Floor').extends(gfx.sprite)
 
-function Floor.new() 
-	return Floor()
+function Floor.new(image) 
+	return Floor(image)
 end
 
-function Floor:init()
-	Floor.super.init(self, gfx.image.new(400, 20))
+function Floor:init(image)
+	Floor.super.init(self, image)
 	self.type = "Floor"
 	
+	----------------
 	-- Draw Graphics
+	local image = self:getImage()
 	
 	-- Set Graphics context
-	
-	local image = self:getImage()
 	gfx.pushContext(image)
-	gfx.fillRect(0, 0, image:getSize())
+	
+	-- Perform draw operations
+	self:drawWithContext()
+	
 	-- Close Graphics Context
 	gfx.popContext()
 	
-	
+	----------------
 	-- Set up Sprite
+	
 	self:setCollideRect(0, 0, self:getSize())
+	
 	self:moveTo(200, 230)
 	self:add()
+end
+
+function Floor:drawWithContext()
+	
 end
