@@ -8,17 +8,18 @@ end
 
 function Floor:init()
 	Floor.super.init(self, gfx.image.new(400, 20))
-	self.type = spriteType.floor
+	self.type = "Floor"
 	
 	-- Draw Graphics
 	
 	-- Set Graphics context
-	local spriteImage = self:getImage()
-	gfx.pushContext(spriteImage)
-	-- Draw with Graphics Context
-	gfx.fillRect(0, 0, spriteImage:getSize())
+	
+	local image = self:getImage()
+	gfx.pushContext(image)
+	gfx.fillRect(0, 0, image:getSize())
 	-- Close Graphics Context
 	gfx.popContext()
+	
 	
 	-- Set up Sprite
 	self:setCollideRect(0, 0, self:getSize())
