@@ -14,7 +14,7 @@ fadedRects[100] = gfx.image.new(400, 240, gfx.kColorBlack)
 class('SceneManager').extends()
 
 function SceneManager:init()
-	self.transitionTime = 1000
+	self.transitionTime = 600
 	self.transitioning = false
 	self.currentScene = false
 end
@@ -76,7 +76,7 @@ function SceneManager:wipeTransition(startValue, endValue)
 	local transitionSprite = self:createTransitionSprite()
 	transitionSprite:setClipRect(0, 0, startValue, 240)
 
-	local transitionTimer = timer.new(self.transitionTime, startValue, endValue, easingFunctions.inOutCubic)
+	local transitionTimer = timer.new(self.transitionTime, startValue, endValue, easingFunctions.outBounce)
 	transitionTimer.updateCallback = function(timer)
 		transitionSprite:setClipRect(0, 0, timer.value, 240)
 	end
