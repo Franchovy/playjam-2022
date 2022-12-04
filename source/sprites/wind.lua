@@ -13,7 +13,6 @@ function Wind:init(image,windPower)
 	-- print(image)
 	
 	self:setCollideRect(0, 0, self:getSize())
-	self:add()
 end
 
 -- function Wind:destroy()
