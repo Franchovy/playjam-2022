@@ -62,7 +62,9 @@ textAlignment = {
 spriteTypes = {
 	coin = "Coin",
 	wheel = "Wheel",
-	floor = "Floor"
+	platform = "Platform",
+	killBlock = "KillBlock",
+	wind = "Wind"
 }
 
 sceneTypes = {

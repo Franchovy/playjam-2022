@@ -1,5 +1,6 @@
 import "wheel"
-import "floor"
+import "platform"
+import "killBlock"
 import "coin"
 import "wind"
 

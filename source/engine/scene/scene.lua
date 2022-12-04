@@ -38,7 +38,6 @@ end
 
 function Scene:update()
 	gfx.sprite.update(self)
-	print("Scene Update")
 end
 
 function Scene:dismiss()

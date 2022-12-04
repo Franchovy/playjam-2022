@@ -36,7 +36,7 @@ function Game:init()
 	sceneManager:setCurrentScene(GameScene)
 	
 	-- Create Sound fileplayer for background music
-	soundFile = sound.fileplayer.new("music/weezer")
+	soundFile = sound.fileplayer.new("music/music_main")
 
 	-- Load background music
 	

@@ -5,7 +5,8 @@ class('GameScene').extends(Scene)
 GameScene.type = sceneTypes.gameScene
 
 local wheel = nil
-local floors = {}
+local killBlocks = {}
+local platforms = {}
 local coins = {}
 
 local textImageScore=nil
@@ -36,14 +37,15 @@ function GameScene:load()
 	
 	-- Draw Score Text
 	
-	local imageScore = gfx.image.new(30, 30)
+	local scoreText = wheel:getScoreText()
+	local scoreTextWidth, scoreTextHeight = gfx.getTextSize(scoreText)
+	local imageScore = gfx.image.new(scoreTextWidth, scoreTextHeight)
 	textImageScore = gfx.sprite.new(imageScore)
 	
 	gfx.pushContext(imageScore)
-	gfx.drawTextAligned(wheel.score, imageScore.width / 2, imageScore.height / 2, textAlignment.center)
+	gfx.drawTextAligned(scoreText, 0, 0, textAlignment.left)
 	gfx.popContext()
 	
-	textImageScore:moveTo(imageScore.width/2, imageScore.height/2)
 	textImageScore:setIgnoresDrawOffset(true)
 	
 	-- Create Coin sprites
@@ -53,7 +55,12 @@ function GameScene:load()
 	
 	-- Create Obstacle sprites
 	for i=0,28 do
-		table.insert(floors, Floor.new(gfx.image.new(40, 40)))
+		table.insert(killBlocks, KillBlock.new(gfx.image.new(40, 40)))
+	end
+	
+	-- Create Platform sprites
+	for i=1,2 do
+		table.insert(platforms, Platform.new(gfx.image.new(4000, 20)))
 	end
 	
 	-- Create wind sprites
@@ -74,16 +81,38 @@ function GameScene:present()
 	-- Position Sprites
 	
 	wheel:moveTo(80, 100)
+	textImageScore:moveTo(42, 28)
 	
 	-- Obstacles, spread through level
-	local previousObstacleX = 20
-	for i=2,#floors do
+	local previousObstacleX = 500
+	for i=1,#killBlocks do
 		local randY = math.random(20, 140)
 		local randX = math.random(20, 420)
 		local newX = previousObstacleX + randX
 		previousObstacleX = newX
-		floors[i]:moveTo(newX, 240 - randY)
+		killBlocks[i]:moveTo(newX, 240 - randY)
 	end
+		
+	-- Wind, spread through level
+	local windSizeX=winds[1]:getSize()
+	local windSizeY=winds[1]:getSize()
+	local distanceBeetwenWinds=200
+	local firstWindPosX=300
+	for i=1,#winds/fullWind do 
+		for k=1,nbrRaw do
+			for j=1,fullWind/nbrRaw do
+				local x = firstWindPosX+(distanceBeetwenWinds+(fullWind/nbrRaw*windSizeX))*(i-1) +windSizeX*j
+				local y = 50+windSizeY*(k-1)
+				local index = (i-1)*fullWind+(fullWind/nbrRaw)*(k-1)+j
+				
+				winds[index]:moveTo(x,y)
+			end
+		end
+	end
+	
+	-- Floor Platform, only two for now
+	platforms[1]:moveTo(0, 230)
+	platforms[2]:moveTo(0, -10)
 	
 	-- Coins, spread through level
 	for i=1,#coins do
@@ -98,29 +127,14 @@ function GameScene:present()
 	for i=1,#coins do
 		coins[i]:add()
 	end
-	for i=1,#floors do
-		floors[i]:add()
+	for i=1,#killBlocks do
+		killBlocks[i]:add()
 	end
+	for i=1,#platforms do
+		platforms[i]:add()
+	end	
 	textImageScore:add()
 	wheel:add()
-	
-	-- Wind, spread through level
-	local windSizeX=winds[1]:getSize()
-	local windSizeY=winds[1]:getSize()
-	local distanceBeetwenWinds=200
-	local firstWindPosX=300
-	for i=1,#winds/fullWind do 
-		for k=1,nbrRaw do
-			for j=1,fullWind/nbrRaw do
-				print(fullWind/nbrRaw*windSizeX)
-				winds[(i-1)*fullWind+(fullWind/nbrRaw)*(k-1)+j]:moveTo(firstWindPosX+(distanceBeetwenWinds+(fullWind/nbrRaw*windSizeX))*(i-1) +windSizeX*j,50+windSizeY*(k-1))
-			end
-		end
-	end
-	
-	-- Actual Floor
-	--floors[1]:setSize(1000, 20)
-	floors[1]:moveTo(30, 200)
 
 end
 
@@ -147,15 +161,14 @@ function GameScene:update()
 	
 	-- Update image score
 	
-	local imageScore = gfx.image.new(30, 30)
+	local scoreText = wheel:getScoreText()
+	local scoreTextWidth, scoreTextHeight = gfx.getTextSize(scoreText)
+	local imageScore = gfx.image.new(scoreTextWidth, scoreTextHeight)
 	
 	gfx.pushContext(imageScore)
-	
-	gfx.drawTextAligned(wheel.score, imageScore.width / 2, imageScore.height / 2, textAlignment.center)
+	gfx.drawTextAligned(wheel:getScoreText(), 0, 0, textAlignment.left)
 	gfx.popContext()
 	
-	textImageScore:moveTo(imageScore.width/2, imageScore.height/2)
-	textImageScore:setIgnoresDrawOffset(true)
 	textImageScore:setImage(imageScore)
 end
 

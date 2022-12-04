@@ -26,17 +26,16 @@ function Wheel:init(image)
 	-- Collisions Response
 	
 	function self:collisionResponse (other)
-		if other.type == "Floor" then
+		if other.type == "Platform" then
 			return collisionTypes.slide
 		end
 		return collisionTypes.overlap
 	end
 	
 	-- Load sound assets
-	self.sampleplayer = {
-		jump = sound.sampleplayer.new("sfx/jump"),
-		drop = sound.sampleplayer.new("sfx/drop")
-	}
+	
+	sampleplayer:addSample("jump", "sfx/jump")
+	sampleplayer:addSample("drop", "sfx/drop")
 	
 	-- Create Properties
 	
@@ -56,6 +55,10 @@ function Wheel:setIsDead()
 		self.hasJustDied = true
 		self.isDead = true	
 	end
+end
+
+function Wheel:startGame()
+		
 end
 
 -- Movement
@@ -87,9 +90,8 @@ function Wheel:update()
 		
 	if hasJumped then
 		self.velocityY = -10
-		self.sampleplayer.jump:play()
+		sampleplayer:playSample("jump")
 	end
-
 	
 	-- Update velocity according to acceleration
 	
@@ -109,9 +111,14 @@ function Wheel:update()
 	table.each(collisions,
 		function (collision)
 			if collision.other.type ~= nil and
-				collision.other.type == "Floor" then
-				self:setIsDead()
-				self.sampleplayer.drop:play()
+				collision.other.type == "KillBlock" then
+					
+					-- Perform alpha collision check
+					if self:alphaCollision(collision.other) then
+						-- Kill player if touched
+						self:setIsDead()
+						sampleplayer:playSample("drop")
+					end
 			elseif collision.other.type ~= nil and --new
 				collision.other.type == "Coin" then
 					self:increaseScore()
@@ -145,6 +152,10 @@ function Wheel:resetValues()
 	self.isDead = false
 	self.hasJustDied = false
 	self.isAwaitingInput = false
+end
+
+function Wheel:getScoreText()
+	return "Score: ".. self.score
 end
 
 function Wheel:increaseScore() --new
