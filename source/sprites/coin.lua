@@ -1,6 +1,6 @@
 import "engine"
 
-class('Coin').extends(gfx.sprite)
+class('Coin').extends(Sprite)
 
 function Coin.new(image) 
 	return Coin(image)
@@ -13,14 +13,16 @@ function Coin:init(image)
 	
 	self:setCollideRect(0, 0, self:getSize())
 	
-	collisionHandler:addCollisionForObject(self, spriteTypes.player, collisionTypes.overlap)
+	collisionHandler:setCollidesForSprite(self, spriteTypes.player, collisionTypes.overlap)
+	
+	self:activateCollisionResponse()
 end
 
 function Coin:update()
 	
 	-- Collision check for players
 	
-	local collisions = collisionHandler:getCollisionsFor(self)
+	local collisions = collisionHandler:getCollisionsForSprite(self)
 	
 	for targetType, collisionType in collisions do
 		if targetType == spriteTypes.player then

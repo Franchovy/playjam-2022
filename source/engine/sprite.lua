@@ -6,12 +6,42 @@ local gfx <const> = playdate.graphics
 
 class("Sprite").extends(gfx.sprite)
 
--- Super override methods
+-- ===============
+-- ---------------
+-- Overrides
+
+function Sprite:init(image)
+	Sprite.super.init(self, image)
+	
+	self.type = "unset"
+end
 
 function Sprite.update()
-	gfx.sprite.update()
+	Sprite.super.update(self)
 	
 	collisionHandler:update()
+end
+
+--------------------
+-- Custom methods
+
+function Sprite:activateCollisionResponse() 
+	collisionHandler:activateCollisionsResponsesForSprite(self)
+end
+
+-- ========================= --
+-- Collision Handler Methods --
+
+function Sprite:getCollisions()
+	collisionHandler:getCollisionsForSprite(self)
+end
+
+function Sprite:activateCollisionsResponse()
+	collisionHandler:activateCollisionsResponsesForSprite(self)
+end
+
+function Sprite:setCollidesWith(otherType, collisionResponseType)
+	collisionHandler:setCollidesForSprite(self, otherType, collisionResponseType)
 end
 
 -----------------------------------------------

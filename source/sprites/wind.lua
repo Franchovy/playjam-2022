@@ -1,6 +1,6 @@
 import "engine"
 
-class('Wind').extends(gfx.sprite)
+class('Wind').extends(Sprite)
 
 function Wind.new(image,windPower) 
 	return Wind(image,windPower)

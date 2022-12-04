@@ -1,6 +1,6 @@
 import "engine"
 
-class('KillBlock').extends(gfx.sprite)
+class('KillBlock').extends(Sprite)
 
 function KillBlock.new(image) 
 	return KillBlock(image)

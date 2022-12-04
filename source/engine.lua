@@ -19,6 +19,25 @@ timer = playdate.timer
 sprite = playdate.sprite
 sound = playdate.sound
 
+
+-- ===============
+-- Custom Types
+
+spriteTypes = {
+	coin = "Coin",
+	wheel = "Wheel", --deprecated
+	player = "Wheel",
+	platform = "Platform",
+	killBlock = "KillBlock",
+	wind = "Wind"
+}
+
+sceneTypes = {
+	gameOver = "GameOverScene",
+	gameScene = "GameScene"
+}
+
+-- ===============
 -- Shortcuts
 
 easingFunctions = playdate.easingFunctions
@@ -55,20 +74,4 @@ textAlignment = {
 	center = playdate.kTextAlignmentCenter,
 	left = playdate.kTextAlignmentLeft,
 	right = playdate.kTextAlignmentRight
-}
-
--- Custom Types
-
-spriteTypes = {
-	coin = "Coin",
-	wheel = "Wheel", --deprecated
-	player = "Wheel",
-	platform = "Platform",
-	killBlock = "KillBlock",
-	wind = "Wind"
-}
-
-sceneTypes = {
-	gameOver = "GameOverScene",
-	gameScene = "GameScene"
 }

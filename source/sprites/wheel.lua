@@ -1,6 +1,6 @@
 import "engine"
 
-class("Wheel").extends(gfx.sprite)
+class("Wheel").extends(Sprite)
 
 function Wheel.new(image) 
 	return Wheel(image)
@@ -25,10 +25,12 @@ function Wheel:init(image)
 	
 	-- Collisions Response
 	
-	collisionHandler:setCollidesForObject(self, spriteTypes.platform, collisionTypes.slide)
-	collisionHandler:setCollidesForObject(self, spriteTypes.coin, collisionTypes.overlap)
-	collisionHandler:setCollidesForObject(self, spriteTypes.killBlock, collisionTypes.freeze)
-	collisionHandler:setCollidesForObject(self, spriteTypes.wind, collisionTypes.overlap)
+	self:setCollidesWith(spriteTypes.platform, collisionTypes.slide)
+	self:setCollidesWith(spriteTypes.coin, collisionTypes.overlap)
+	self:setCollidesWith(spriteTypes.killBlock, collisionTypes.freeze)
+	self:setCollidesWith(spriteTypes.wind, collisionTypes.overlap)
+	
+	self:activateCollisionResponse()
 	
 	-- Load sound assets
 	
@@ -104,26 +106,27 @@ function Wheel:update()
 		self.y + self.velocityY
 	)
 
-	--self:setInWind(false,0)
 	self.currentWindPower=0
 	
-	-- Update collisions
+	-- Collisions-based updates
 	
-	local collisions = collisionHandler:getCollisionsFor(self)
+	local collisions = collisionHandler:getCollisionsForSprite(self)
 	
 	for targetType, collision in pairs(collisions) do
 		if targetType == spriteTypes.platform then
-			-- Kill only if touching on the side
 			if self:alphaCollision(collision.other) then
-				-- Kill player if touched
+				-- Kill only if touching on the side
+				-- TODO: - Calculate using normal
 				self:setIsDead()
 			end
 		elseif targetType == spriteTypes.coin then
 			-- Win some points
 			self:increaseScore()
 		elseif targetType == spriteTypes.killBlock then
-			-- Die
-			self:setIsDead()
+			if self:alphaCollision(collision.other) then
+				-- Die
+				self:setIsDead()
+			end
 		end
 	end
 	
@@ -154,8 +157,6 @@ function Wheel:getScoreText()
 	return "Score: ".. self.score
 end
 
-function Wheel:increaseScore() --new
+function Wheel:increaseScore()
 	self.score=self.score+1
-	--print("increaseScore")
-	print(self.score)
 end

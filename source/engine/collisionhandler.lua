@@ -7,29 +7,22 @@ import "extensions"
 
 local gfx <const> = playdate.graphics
 
--- Publicly exposed properties
+---------------------------------------
+-- Configuration Handler (helper class)
 
-collisionHandler = {}
+class("ConfigurationHandler").extends()
 
-collisionResponseTypes = {
-	slide = gfx.sprite.kCollisionTypeSlide,
-	overlap = gfx.sprite.kCollisionTypeOverlap,
-	freeze = gfx.sprite.kCollisionTypeFreeze,
-	bounce = gfx.sprite.kCollisionTypeBounce,
-}
+-- Initializer
 
------------------------------------
--- Collision Configurations Handler
+function ConfigurationHandler:init() 
+	-- Set properties
+	
+	self.configuredSprites = {}
+end
 
-local configurations = {}
+-- Other Methods
 
--- Properties
-
-configurations.configuredSprites = {}
-
--- Methods
-
-function configurations:addConfiguration(object, targetType, collisionResponseType)
+function ConfigurationHandler:addConfiguration(object, targetType, collisionResponseType)
 	local configurationArray = nil
 	
 	if self.configuredSprites[object] ~= nil then
@@ -49,30 +42,59 @@ function configurations:addConfiguration(object, targetType, collisionResponseTy
 	self.configuredSprites[object] = configurationArray
 end
 
-function configurations:getConfigurationsForSprite(object)
-	return self.configuredSprites[object]
+function ConfigurationHandler:getConfigurationsForSprite(object)
+	local collisionConfigurations = {}
+	
+	-- Get current configurations set for this object
+	local configurations = self.configuredSprites[object]
+	
+	-- Transform into friendly syntax
+	for i=1,#configurations do
+		local _, targetType, collisionResponse = configurations[i]
+		
+		collisionConfigurations[i] = { targetType = targetType, collisionResponse = collisionResponse }
+	end
+	
+	-- Return collision configurations
+	return collisionConfigurations
 end
-
--- ===================== --
--- --------------------- --
-
--- Collision Handler
 
 --
 
--- Properties
+--
 
-local latestCollisions = {}
+-- ================= --
+-- Collision Handler --
 
--------------------------------------
--- Sprite automatic CollisionResponse
 
-function collisionHandler:setCollidesForSprite(object, targetType, collisionResponseType)
-	configurations:addConfiguration(object, targetType, collisionResponseType)
+class("CollisionsHandler").extends()
+
+-- Globally available instance 'collisionHandler'
+collisionHandler = CollisionHandler()
+
+---------------
+-- Initializer
+
+function CollisionHandler:init() 
+	self.latestCollisions = {}
+	self.configurationHandler = ConfigurationHandler()
+	
 end
 
-function collisionHandler:activateCollisionsResponsesForSprite(object)
-	local configurations = self:getCollisionConfigurationsForSprite(object)
+-------------------------------------
+-- Sprite collision response (slide, freeze, overlap, )
+
+function CollisionHandler:setCollidesForSprite(object, targetType, collisionResponseType)
+	self.configurationHandler:addConfiguration(object, targetType, collisionResponseType)
+end
+
+function CollisionHandler:activateCollisionsResponsesForSprite(object)
+	local configurations = self.configurationHandler:getCollisionConfigurationsForSprite(object)
+	
+	if configurations == nil then
+		error("ERROR: - No collision configurations were set.")
+		return
+	end
 	
 	-- Writes collision response function for this sprite
 	object.collisionResponse = function (object, other)
@@ -83,29 +105,41 @@ function collisionHandler:activateCollisionsResponsesForSprite(object)
 				return configurations.collisionResponseType
 			end
 		end
+		
+		return playdate.kCollisionTypeOverlap
 	end
 end
 -- Suggestion: return collision response function instead of setting it.
+
 
 ---------------------
 -- Collision handling
 
 -- Set 'latestCollisions', from Sprite:moveWithCollisions() or Sprite:checkCollisions()
-function collisionHandler:updateCollisionForSprite(object, collisions)
-	latestCollisions[object] = collisions
+function CollisionHandler:updateCollisionForSprite(object, collisions)
+	self.latestCollisions[object] = collisions
 end
 
 -- Clear 'latestCollisions' at the end of every Sprite.update()
-function collisionHandler:update()
+function CollisionHandler:update()
 	-- TODO: check for memory leak
-	latestCollisions = {}
+	self.latestCollisions = {}
 end
 
-
--- Returns collisions that have happened in the latest update in handy format: Dict { collision.other = collision } where 'collision' is the same as returned from sprite:moveWithCollisions or sprite:checkCollisions. [see doc]
-function collisionHandler:getCollisionsForSprite(object)
-	local configurations = self:getCollisionConfigurationsForSprite(object)
-	local latestCollisions = latestCollisions[object]
+-- Returns all the collisions that have happened in the latest 
+-- update in a handy format: { collision.other = collision } 
+-- (where 'collision' object is the same format as returned by 
+-- sprite:moveWithCollisions() or by sprite:checkCollisions(). 
+--
+function CollisionHandler:getCollisionsForSprite(object)
+	local configurations = self.configurationHandler:getConfigurationsForSprite(object)
+	
+	if configurations == nil then
+		error("ERROR: - No collision configurations were set for sprite.")
+		return
+	end
+	
+	local latestCollisions = self.latestCollisions[object]
 	local returnCollisions = {}
 	
 	-- When no collisions array exists, something went wrong.
@@ -126,46 +160,3 @@ function collisionHandler:getCollisionsForSprite(object)
 	
 	return returnCollisions
 end
-
-function collisionHandler:getCollisionConfigurationsForSprite(object)
-	local collisionConfigurations = {}
-	
-	-- Get current configurations set for this object
-	local configurations = configurations:getConfigurationsForSprite(object)
-	
-	-- Transform into friendly syntax
-	for i=1,#configurations do
-		local _, targetType, collisionResponse = configurations[i]
-		
-		collisionConfigurations[i] = { targetType = targetType, collisionResponse = collisionResponse }
-	end
-	
-	-- Return collision configurations
-	return collisionConfigurations
-end
-
--- WHEEL SPRITE COLLISIONS
-
--- table.each(collisions,
--- 	function (collision)
--- 		if collision.other.type ~= nil and
--- 			collision.other.type == "KillBlock" then
--- 				
--- 				-- Perform alpha collision check
--- 				if self:alphaCollision(collision.other) then
--- 					-- Kill player if touched
--- 					self:setIsDead()
--- 					sampleplayer:playSample("drop")
--- 				end
--- 		elseif collision.other.type ~= nil and --new
--- 			collision.other.type == "Coin" then
--- 				self:increaseScore()
--- 				collision.other:destroy()
--- 		elseif collision.other.type ~= nil and --new
--- 			collision.other.type == "Wind" then
--- 				self.currentWindPower=collision.other.windPower
--- 
--- 		end
--- 	end
--- )
-

@@ -1,6 +1,6 @@
 import "engine"
 
-class('Platform').extends(gfx.sprite)
+class('Platform').extends(Sprite)
 
 function Platform.new(image) 
 	return Platform(image)
