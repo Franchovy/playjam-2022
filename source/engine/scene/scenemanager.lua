@@ -60,7 +60,6 @@ function SceneManager:switchScene(scene, ...)
 end
 
 function SceneManager:loadNewScene()
-	self:cleanupScene()
 	self.currentScene = self.newScene(table.unpack(self.sceneArgs))
 	self.currentScene:load()
 end
@@ -78,6 +77,7 @@ function SceneManager:startTransition()
 
 	transitionTimer.timerEndedCallback = function()
 		-- transitionTimer = self:fadeTransition(1, 0)
+		self:cleanupScene()
 		self.currentScene:present()
 		transitionTimer = self:wipeTransition(400, 0)
 		transitionTimer.timerEndedCallback = function()

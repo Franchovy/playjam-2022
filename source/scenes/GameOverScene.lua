@@ -45,6 +45,8 @@ end
 function GameOverScene:update() 
 	Scene.update(self)
 	
+	print("Game over update")
+	
 	-- Update blinker display
 	
 	self.pressAIndicatorBlinker:update()
