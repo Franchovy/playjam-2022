@@ -24,7 +24,7 @@ function SceneManager:setCurrentScene(scene, ...)
 	local args = {...}
 	self.sceneArgs = args
 	
-	self:loadNewScene()
+	self.currentScene = self.newScene(table.unpack(self.sceneArgs))
 end
 
 function SceneManager:switchScene(scene, ...)

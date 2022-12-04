@@ -41,6 +41,10 @@ function Game:init()
 	
 	-- Create Scene
 	sceneManager:setCurrentScene(GameScene)
+
+	-- Create Player sprite
+
+	wheel = Wheel.new(gfx.image.new("images/wheel1"))
 	
 	-- Draw Score Text
 	
@@ -55,10 +59,6 @@ function Game:init()
 	textImageScore:setIgnoresDrawOffset(true)
 	textImageScore:add()
 
-	-- Create Sprites
-	
-	wheel = Wheel.new(gfx.image.new("images/wheel1"))
-	
 	-- Create Coin sprites
 	for i=1,10 do
 		table.insert(coins, Coin.new(gfx.image.new("images/coin")))
@@ -80,7 +80,6 @@ end
 
 function Game:start()
 	-- Clear any previous displays
-	
 	
 	-----------------
 	-- Audio
@@ -104,6 +103,7 @@ function Game:start()
 	
 	-- Position Sprites
 
+	wheel:add()
 	wheel:moveTo(80, 100)
 	
 	-- Actual Floor
