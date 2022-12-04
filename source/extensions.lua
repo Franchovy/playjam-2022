@@ -33,6 +33,14 @@ function table.removevalue(table, value)
    end
 end
 
+function table.find(table, value)
+	for _,v in pairs(items) do
+	  	if v == value then
+			return v
+	  	end
+	end	
+end
+
 -- Extensions on "math"
 
 function math.approach( value, target, step)

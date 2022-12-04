@@ -25,12 +25,10 @@ function Wheel:init(image)
 	
 	-- Collisions Response
 	
-	function self:collisionResponse (other)
-		if other.type == "Platform" then
-			return collisionTypes.slide
-		end
-		return collisionTypes.overlap
-	end
+	collisionHandler:setCollidesForObject(self, spriteTypes.platform, collisionTypes.slide)
+	collisionHandler:setCollidesForObject(self, spriteTypes.coin, collisionTypes.overlap)
+	collisionHandler:setCollidesForObject(self, spriteTypes.killBlock, collisionTypes.freeze)
+	collisionHandler:setCollidesForObject(self, spriteTypes.wind, collisionTypes.overlap)
 	
 	-- Load sound assets
 	
@@ -48,12 +46,13 @@ local angle = 1
 local velocityDrag = 0
 
 function Wheel:setIsDead() 
-	--print("Set is dead") -new
 	if self.isDead then
 		self.hasJustDied = false
 	else 
 		self.hasJustDied = true
 		self.isDead = true	
+		
+		sampleplayer:playSample("drop")
 	end
 end
 
@@ -108,28 +107,23 @@ function Wheel:update()
 	--self:setInWind(false,0)
 	self.currentWindPower=0
 	
-	table.each(collisions,
-		function (collision)
-			if collision.other.type ~= nil and
-				collision.other.type == "KillBlock" then
-					
-					-- Perform alpha collision check
-					if self:alphaCollision(collision.other) then
-						-- Kill player if touched
-						self:setIsDead()
-						sampleplayer:playSample("drop")
-					end
-			elseif collision.other.type ~= nil and --new
-				collision.other.type == "Coin" then
-					self:increaseScore()
-					collision.other:destroy()
-			elseif collision.other.type ~= nil and --new
-				collision.other.type == "Wind" then
-					self.currentWindPower=collision.other.windPower
-
-			end
+	-- Update collisions
+	
+	local collisions = collisionHandler:getCollisionsFor(self)
+	
+	for targetType, collisionType in collisions do
+		if targetType == spriteTypes.platform then
+			-- Kill only if touching on the side
+			if self:alphaCollision(collision.other) then
+			-- Kill player if touched
+			self:setIsDead()
+			
+		elseif targetType == spriteTypes.coin then
+			-- Win some points
+		elseif targetType == spriteTypes.killBlock then
+			-- Die
 		end
-	)
+	end
 	
 	-- Update graphics
 	
