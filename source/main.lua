@@ -5,13 +5,26 @@ import "sprites/lib"
 local wheel = nil
 local floors = {}
 local coins = {} --new
+local winds = {}
+local fullWind=8
+local nbrRaw=2
+
 local game = nil
 local soundFile = nil
 
 local textImageScore=nil --new
 
 function initialize()
+
 	-- Create Sprites
+
+	-- Create wind sprites
+	for i=1,fullWind*5 do
+		
+		table.insert(winds, Wind.new(gfx.image.new("images/wind"):scaledImage(2),-4))
+	end
+
+	
 
 	wheel = Wheel.new(gfx.image.new("images/wheel1"))
 
@@ -25,6 +38,8 @@ function initialize()
 	for i=1,10 do
 		table.insert(coins, Coin.new(gfx.image.new("images/coin")))
 	end
+
+	
 
 	
 
@@ -117,6 +132,30 @@ function Game:start()
 	-- Coins, spread through level
 	for i=1,#coins do
 		coins[i]:moveTo(150*i,200)
+	end
+	
+	-- Wind, spread through level
+	local windSizeX=winds[1]:getSize()
+	local windSizeY=winds[1]:getSize()
+	local distanceBeetwenWinds=200
+	local firstWindPosX=300
+	for i=1,#winds/fullWind do 
+		for k=1,nbrRaw do
+			for j=1,fullWind/nbrRaw do
+				print(fullWind/nbrRaw*windSizeX)
+				winds[(i-1)*fullWind+(fullWind/nbrRaw)*(k-1)+j]:moveTo(firstWindPosX+(distanceBeetwenWinds+(fullWind/nbrRaw*windSizeX))*(i-1) +windSizeX*j,50+windSizeY*(k-1))
+
+				--winds[(i-1)*fullWind+(fullWind/nbrRaw)*(k-1)+j]:moveTo(150*i +windSizeX*j,50+windSizeY*(k-1))
+			end
+		end
+		-- for j=1,fullWind/2 do
+			
+		-- 	winds[(i-1)*fullWind+(fullWind/2+j)]:moveTo(150*i +winds[1]:getSize()*j,50+windSizeY)
+		-- end
+		--for i=1,#winds/2 do
+			
+		-- 	winds[i+#winds/2]:moveTo(150+winds[i+#winds/2]:getSize()*i,50+winds[#winds/2+1]:getSize())
+		-- end
 	end
 	
 	-- Setup background

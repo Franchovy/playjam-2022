@@ -11,6 +11,9 @@ function Wheel:init(image)
 	self.type = "Wheel"
 
 	self.score=0--new
+
+	self.isInWind=false
+	self.currentWindPower=0
 	
 	local marginSize = 3
 	self:setCollideRect(
@@ -80,10 +83,11 @@ function Wheel:update()
 		self.velocityY = -10
 		self.sampleplayer.jump:play()
 	end
+
 	
 	-- Update velocity according to acceleration
 	
-	self.velocityX = crankTicks * 2.5 + velocityDrag
+	self.velocityX = crankTicks * 2.5 + velocityDrag +self.currentWindPower
 	self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
 	
 	-- Update position according to velocity
@@ -91,6 +95,9 @@ function Wheel:update()
 		self.x + self.velocityX, 
 		self.y + self.velocityY
 	)
+
+	--self:setInWind(false,0)
+	self.currentWindPower=0
 	
 	table.each(collisions,
 		function (collision)
@@ -102,6 +109,10 @@ function Wheel:update()
 				collision.other.type == "Coin" then
 					self:increaseScore()
 					collision.other:destroy()
+			elseif collision.other.type ~= nil and --new
+				collision.other.type == "Wind" then
+					self.currentWindPower=collision.other.windPower
+
 			end
 		end
 	)
