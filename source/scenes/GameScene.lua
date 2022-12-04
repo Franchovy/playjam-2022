@@ -59,7 +59,8 @@ function GameScene:present()
 	
 	-- Reset sprites
 	
-	wheel:onGameStart()
+	wheel:resetValues()
+	wheel:setAwaitingInput()
 	
 	-- Position Sprites
 	
