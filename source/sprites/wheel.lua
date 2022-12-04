@@ -22,7 +22,6 @@ function Wheel:init(image)
 		self:getSize() - marginSize * 2, 
 		self:getSize() - marginSize * 2
 	)
-	self:add()
 	
 	-- Collisions Response
 	
@@ -41,7 +40,7 @@ function Wheel:init(image)
 	
 	-- Create Properties
 	
-	self:onGameStart()
+	self:resetValues()
 end
 
 local maxFallSpeed = 12
@@ -63,7 +62,14 @@ end
 
 function Wheel:update()
 	
-	velocityDrag = self.velocityX * 0.2
+	if self.isAwaitingInput then
+		-- Activate only if the jump button is pressed
+		if buttons.isUpButtonPressed() then
+			self.isAwaitingInput = false
+		else 
+			return
+		end
+	end
 	
 	-- Update if player has died
 	
@@ -87,6 +93,7 @@ function Wheel:update()
 	
 	-- Update velocity according to acceleration
 	
+	velocityDrag = self.velocityX * 0.2
 	self.velocityX = crankTicks * 2.5 + velocityDrag +self.currentWindPower
 	self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
 	
@@ -125,25 +132,19 @@ function Wheel:update()
 	local imageName = string.format("images/wheel%01d", math.floor(angle))
 	
 	self:getImage():load(imageName)
-
 end
 
-local isTouchingFloor = false
-
-function Wheel:setIsTouchingFloor(value) 
-	isTouchingFloor = value
+function Wheel:setAwaitingInput() 
+	self.isAwaitingInput = true
 end
 
-function Wheel:isTouchingFloor()
-	return isTouchingFloor
-end
-
-function Wheel:onGameStart() 
+function Wheel:resetValues() 
 	self.velocityX = 0
 	self.velocityY = 0
 	self.horizontalAcceleration = 0
 	self.isDead = false
 	self.hasJustDied = false
+	self.isAwaitingInput = false
 end
 
 function Wheel:increaseScore() --new

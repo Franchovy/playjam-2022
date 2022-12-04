@@ -3,9 +3,11 @@ import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "CoreLibs/crank"
+import "CoreLibs/animation"
 import "CoreLibs/animator"
+import "CoreLibs/easing"
 
-
+import "engine/lib"
 import "extensions"
 import "params"
 
@@ -18,6 +20,8 @@ sprite = playdate.sprite
 sound = playdate.sound
 
 -- Shortcuts
+
+easingFunctions = playdate.easingFunctions
 
 collisionTypes = {
 	slide = gfx.sprite.kCollisionTypeSlide,
@@ -51,4 +55,17 @@ textAlignment = {
 	center = playdate.kTextAlignmentCenter,
 	left = playdate.kTextAlignmentLeft,
 	right = playdate.kTextAlignmentRight
+}
+
+-- Custom Types
+
+spriteTypes = {
+	coin = "Coin",
+	wheel = "Wheel",
+	floor = "Floor"
+}
+
+sceneTypes = {
+	gameOver = "GameOverScene",
+	gameScene = "GameScene"
 }

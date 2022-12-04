@@ -19,6 +19,20 @@ if t == nil then return {} end
 	return array
 end
 
+function table.removekey(table, key)
+   local element = table[key]
+   table[key] = nil
+   return element
+end
+
+function table.removevalue(table, value)
+   for k, v in pairs(t) do
+	   if v == value then
+		   table[k] = nil
+	   end
+   end
+end
+
 -- Extensions on "math"
 
 function math.approach( value, target, step)
