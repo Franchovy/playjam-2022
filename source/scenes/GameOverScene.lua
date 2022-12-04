@@ -1,50 +1,71 @@
 import "engine"
 
-class('GameOverScene').extends(gfx.sprite)
+class('GameOverScene').extends(Scene)
 
-GameOverScene.type = sceneTypes.gameOver
+--------------------
+-- Lifecycle Methods
 
 function GameOverScene:init()
+	Scene.init(self)
+	self.type = sceneTypes.gameOver
+end
+
+function GameOverScene:load()
+	Scene.load(self)
 	
-	-------------
 	-- Titles
 	
-	-- "Game Over" main title
-	self.gameOverTextSprite = self:addTextSprite("*Game Over*", 200, 120)
+	self.gameOverTextSprite = self:createTextSprite("*Game Over*", 200, 120)
+	self.tryAgainTextSprite = self:createTextSprite("Try again?", 200, 160)
+	self.pressAIndicatorTextSprite = self:createTextSprite("*Press A*", 200, 190)
 	
-	-- "Try again?" subtitle
-	self.tryAgainTextSprite = self:addTextSprite("Try again?", 200, 160)
-	
-	-- "Press A" indicator text
-	self.pressAIndicatorTextSprite = self:addTextSprite("*Press A*", 200, 190)
-	
-	-----------
 	-- Blinker
 	
-	-- Create Blinker for "Press A" indicator text
 	self.pressAIndicatorBlinker = gfx.animation.blinker.new()
-	-- Set start state to "off"
 	self.pressAIndicatorBlinker.default = false
 	self.pressAIndicatorBlinker.onDuration = 750
 	self.pressAIndicatorBlinker.offDuration = 600
+end
+
+function GameOverScene:present()
+	Scene.present(self)
+	
 	-- Start running blinker
+	
 	self.pressAIndicatorBlinker:startLoop()
 	
-	----------
-	-- Other
+	-- Add Sprites to screen
 	
-	-- Add self to screen
-	self:add()
+	self.tryAgainTextSprite:add()
+	self.pressAIndicatorTextSprite:add()
+	self.gameOverTextSprite:add()
+		
 end
 
 function GameOverScene:update() 
-	-- Update blinker display
-	self.pressAIndicatorBlinker:update()
+	Scene.update(self)
 	
+	-- Update blinker display
+	
+	self.pressAIndicatorBlinker:update()
 	self.pressAIndicatorTextSprite:setVisible(self.pressAIndicatorBlinker.on)
+	
 end
 
-function GameOverScene:addTextSprite(text, positionX, positionY, ignoresDrawOffset)
+function GameOverScene:dismiss()
+	Scene.dismiss(self)
+	
+end
+
+function GameOverScene:destroy()
+	Scene.destroy(self)
+	
+end
+
+----------------
+-- Other Methods
+
+function GameOverScene:createTextSprite(text, positionX, positionY, ignoresDrawOffset)
 	local textImage = gfx.image.new(
 		gfx.getTextSize(text)
 	)
@@ -58,8 +79,6 @@ function GameOverScene:addTextSprite(text, positionX, positionY, ignoresDrawOffs
 	local textSprite = gfx.sprite.new(textImage)
 	textSprite:moveTo(positionX, positionY)
 	textSprite:setIgnoresDrawOffset(true)	
-	
-	textSprite:add()
 	
 	return textSprite
 end

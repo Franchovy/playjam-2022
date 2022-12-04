@@ -12,7 +12,6 @@ function Coin:init(image)
 	print(image)
 	
 	self:setCollideRect(0, 0, self:getSize())
-	self:add()
 end
 
 function Coin:destroy()

@@ -5,8 +5,9 @@ import "CoreLibs/timer"
 import "CoreLibs/crank"
 import "CoreLibs/animation"
 import "CoreLibs/animator"
+import "CoreLibs/easing"
 
-
+import "engine/lib"
 import "extensions"
 import "params"
 

@@ -1,4 +1,10 @@
-import "engine"
+import "CoreLibs/object"
+import "CoreLibs/graphics"
+import "CoreLibs/sprites"
+import "CoreLibs/timer"
+import "CoreLibs/easing"
+
+local gfx <const> = playdate.graphics
 
 local fadedRects = {}
 for i=0,1,0.01 do
@@ -16,7 +22,7 @@ class('SceneManager').extends()
 function SceneManager:init()
 	self.transitionTime = 600
 	self.transitioning = false
-	self.currentScene = false
+	self.currentScene = nil
 end
 
 function SceneManager:setCurrentScene(scene, ...)
@@ -25,25 +31,38 @@ function SceneManager:setCurrentScene(scene, ...)
 	self.sceneArgs = args
 	
 	self.currentScene = self.newScene(table.unpack(self.sceneArgs))
+		
+	self.currentScene:load()
+	self.currentScene:present()
 end
 
 function SceneManager:switchScene(scene, ...)
 	if self.transitioning then
 		return
 	end
+	
+	-- Update current Scene
+	if self.currentScene ~= nil then 
+		-- Remove previous scene as sprite
+		self.currentScene:dismiss()
+	end
+	self.currentScene = scene
 
+	-- Set transition properties
 	self.transitioning = true
 
 	self.newScene = scene
 	local args = {...}
 	self.sceneArgs = args
-
+	
+	-- Start animated transition
 	self:startTransition()
 end
 
 function SceneManager:loadNewScene()
 	self:cleanupScene()
 	self.currentScene = self.newScene(table.unpack(self.sceneArgs))
+	self.currentScene:load()
 end
 
 function SceneManager:cleanupScene()
@@ -53,12 +72,13 @@ function SceneManager:cleanupScene()
 end
 
 function SceneManager:startTransition()
+	self:loadNewScene()
 	-- local transitionTimer = self:fadeTransition(0, 1)
 	local transitionTimer = self:wipeTransition(0, 400)
 
 	transitionTimer.timerEndedCallback = function()
-		self:loadNewScene()
 		-- transitionTimer = self:fadeTransition(1, 0)
+		self.currentScene:present()
 		transitionTimer = self:wipeTransition(400, 0)
 		transitionTimer.timerEndedCallback = function()
 			self.transitioning = false

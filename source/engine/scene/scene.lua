@@ -1,0 +1,52 @@
+import "CoreLibs/object"
+import "CoreLibs/graphics"
+import "CoreLibs/sprites"
+
+local gfx <const> = playdate.graphics
+
+class("Scene").extends(gfx.sprite)
+
+local allScenes = {}
+Scene.currentActiveScene = nil
+
+sceneState = {
+	initialized = "Not Yet Loaded",
+	isLoaded = "Loaded",
+	isPresented = "Presented",
+	isDismissed = "Dismissed"
+}
+
+function Scene:init()
+	gfx.sprite.init(self)
+	
+	table.insert(allScenes, self)
+	
+	self.state = sceneState.initialized
+end
+
+function Scene:load()
+	self.state = sceneState.isLoaded
+	print("Scene Load")
+end
+
+function Scene:present()
+	Scene.currentActiveScene = self
+	self.state = sceneState.isPresented
+	self:add()
+	print("Scene Present")
+end
+
+function Scene:update()
+	gfx.sprite.update(self)
+	print("Scene Update")
+end
+
+function Scene:dismiss()
+	self.state = sceneState.isDismissed
+	self:remove()
+	print("Scene Dismiss")
+end
+
+function Scene:destroy()
+	table.removevalue(self)
+end

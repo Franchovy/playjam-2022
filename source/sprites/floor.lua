@@ -20,7 +20,6 @@ function Floor:init(image)
 	
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)
-	self:add()
 end
 
 function Floor:drawSelf() 
