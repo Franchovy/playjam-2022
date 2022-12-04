@@ -42,12 +42,15 @@ sceneTypes = {
 
 easingFunctions = playdate.easingFunctions
 
+
 collisionTypes = {
 	slide = gfx.sprite.kCollisionTypeSlide,
 	overlap = gfx.sprite.kCollisionTypeOverlap,
 	freeze = gfx.sprite.kCollisionTypeFreeze,
 	bounce = gfx.sprite.kCollisionTypeBounce,
 }
+
+printTable(collisionTypes)
 
 buttons = {
 	isLeftButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonLeft) end,

@@ -8,13 +8,9 @@ end
 
 function Wind:init(image,windPower)
 	Wind.super.init(self, image)
-	self.type = "Wind"
+	self.type = spriteTypes.wind
+	
 	self.windPower=windPower
-	-- print(image)
 	
 	self:setCollideRect(0, 0, self:getSize())
 end
-
--- function Wind:destroy()
--- 	self:remove()
--- end

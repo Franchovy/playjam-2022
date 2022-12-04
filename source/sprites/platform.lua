@@ -8,7 +8,7 @@ end
 
 function Platform:init(image)
 	Platform.super.init(self, image)
-	self.type = "Platform"
+	self.type = spriteTypes.platform
 	
 	----------------
 	-- Draw Graphics

@@ -16,8 +16,9 @@ function Sprite:init(image)
 	self.type = "unset"
 end
 
+-- Global sprite update function
 function Sprite.update()
-	Sprite.super.update(self)
+	Sprite.super.update()
 	
 	collisionHandler:update()
 end
@@ -26,7 +27,7 @@ end
 -- Custom methods
 
 function Sprite:activateCollisionResponse() 
-	collisionHandler:activateCollisionsResponsesForSprite(self)
+	collisionHandler:activateCollisionResponsesForSprite(self)
 end
 
 -- ========================= --
@@ -36,8 +37,8 @@ function Sprite:getCollisions()
 	collisionHandler:getCollisionsForSprite(self)
 end
 
-function Sprite:activateCollisionsResponse()
-	collisionHandler:activateCollisionsResponsesForSprite(self)
+function Sprite:activateCollisionResponse()
+	collisionHandler:activateCollisionResponsesForSprite(self)
 end
 
 function Sprite:setCollidesWith(otherType, collisionResponseType)
@@ -48,34 +49,30 @@ end
 -- MoveWithCollisions, CheckCollisions override
 
 function Sprite:moveWithCollisions(goalX, goalY)
+	-- Case if (x,y) is passed in as a point
+	if goalY == nil then
+		goalX, goalY = goalX.x, goalX.y
+	end
+	
+	-- Super moveWithCollisions call
 	local actualX, actualY, collisions, length = gfx.sprite.moveWithCollisions(self, goalX, goalY)
 	
+	-- Update collisions
 	collisionHandler:updateCollisionForSprite(self, collisions)
 	
 	return actualX, actualY, collisions, length
 end
 
 function Sprite:checkCollisions(goalX, goalY)
+	-- Case if (x,y) is passed in as a point
+	if goalY == nil then
+		goalX, goalY = goalX.x, goalX.y
+	end
+	
+	-- Super moveWithCollisions call
 	local actualX, actualY, collisions, length = gfx.sprite.checkCollisions(self, goalX, goalY)
 	
-	collisionHandler:updateCollisionForSprite(self, collisions)
-	
-	return actualX, actualY, collisions, length
-end
-
--- Same functions with goal point
-
-function Sprite:moveWithCollisions(goalPoint)
-	local actualX, actualY, collisions, length = gfx.sprite.moveWithCollisions(self, goalPoint)
-	
-	collisionHandler:updateCollisionForSprite(self, collisions)
-	
-	return actualX, actualY, collisions, length
-end
-
-function Sprite:checkCollisions(goalPoint)
-	local actualX, actualY, collisions, length = gfx.sprite.checkCollisions(self, goalPoint)
-	
+	-- Update collisions
 	collisionHandler:updateCollisionForSprite(self, collisions)
 	
 	return actualX, actualY, collisions, length

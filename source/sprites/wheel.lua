@@ -8,7 +8,7 @@ end
 
 function Wheel:init(image)
 	Wheel.super.init(self, image)
-	self.type = "Wheel"
+	self.type = spriteTypes.player
 
 	self.score=0--new
 

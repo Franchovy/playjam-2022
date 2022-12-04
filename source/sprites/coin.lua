@@ -8,24 +8,18 @@ end
 
 function Coin:init(image)
 	Coin.super.init(self, image)
-	self.type = "Coin"
-	print(image)
+	self.type = spriteTypes.coin
 	
 	self:setCollideRect(0, 0, self:getSize())
-	
-	collisionHandler:setCollidesForSprite(self, spriteTypes.player, collisionTypes.overlap)
-	
-	self:activateCollisionResponse()
 end
 
 function Coin:update()
-	
 	-- Collision check for players
 	
-	local collisions = collisionHandler:getCollisionsForSprite(self)
+	local overlappingSprites = self:overlappingSprites()
 	
-	for targetType, collisionType in collisions do
-		if targetType == spriteTypes.player then
+	for _, other in pairs(overlappingSprites) do
+		if other.type == spriteTypes.player then
 			-- Die
 			self:destroy()
 		end

@@ -36,7 +36,7 @@ function ConfigurationHandler:addConfiguration(object, targetType, collisionResp
 	-- Add configuration to array
 	local configuration = { object, targetType, collisionResponseType }
 	
-	configurationArray[1] = configuration
+	table.insert(configurationArray, configuration)
 	
 	-- Set sprite configurations on self
 	self.configuredSprites[object] = configurationArray
@@ -49,10 +49,13 @@ function ConfigurationHandler:getConfigurationsForSprite(object)
 	local configurations = self.configuredSprites[object]
 	
 	-- Transform into friendly syntax
-	for i=1,#configurations do
-		local _, targetType, collisionResponse = configurations[i]
+	for i, v in ipairs(configurations) do
+		local _, targetType, collisionResponseType = table.unpack(v)
 		
-		collisionConfigurations[i] = { targetType = targetType, collisionResponse = collisionResponse }
+		collisionConfigurations[i] = { 
+			targetType = targetType, 
+			collisionResponseType = collisionResponseType 
+		}
 	end
 	
 	-- Return collision configurations
@@ -67,10 +70,7 @@ end
 -- Collision Handler --
 
 
-class("CollisionsHandler").extends()
-
--- Globally available instance 'collisionHandler'
-collisionHandler = CollisionHandler()
+class("CollisionHandler").extends()
 
 ---------------
 -- Initializer
@@ -81,6 +81,9 @@ function CollisionHandler:init()
 	
 end
 
+-- Globally available instance 'collisionHandler'
+collisionHandler = CollisionHandler()
+
 -------------------------------------
 -- Sprite collision response (slide, freeze, overlap, )
 
@@ -88,21 +91,20 @@ function CollisionHandler:setCollidesForSprite(object, targetType, collisionResp
 	self.configurationHandler:addConfiguration(object, targetType, collisionResponseType)
 end
 
-function CollisionHandler:activateCollisionsResponsesForSprite(object)
-	local configurations = self.configurationHandler:getCollisionConfigurationsForSprite(object)
-	
+function CollisionHandler:activateCollisionResponsesForSprite(object)
+	local configurations = self.configurationHandler:getConfigurationsForSprite(object)
 	if configurations == nil then
 		error("ERROR: - No collision configurations were set.")
 		return
 	end
 	
 	-- Writes collision response function for this sprite
-	object.collisionResponse = function (object, other)
+	object.collisionResponse = function(object, other)
 		for _, configuration in pairs(configurations) do
 			-- If 'other' matches configuration target type
 			if other.type == configuration.targetType then
 				-- Return programmed collision response
-				return configurations.collisionResponseType
+				return configuration.collisionResponseType
 			end
 		end
 		

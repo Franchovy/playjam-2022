@@ -8,7 +8,7 @@ end
 
 function KillBlock:init(image)
 	KillBlock.super.init(self, image)
-	self.type = "KillBlock"
+	self.type = spriteTypes.killBlock
 	
 	----------------
 	-- Draw Graphics
