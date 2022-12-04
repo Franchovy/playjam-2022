@@ -111,17 +111,19 @@ function Wheel:update()
 	
 	local collisions = collisionHandler:getCollisionsFor(self)
 	
-	for targetType, collisionType in collisions do
+	for targetType, collision in pairs(collisions) do
 		if targetType == spriteTypes.platform then
 			-- Kill only if touching on the side
 			if self:alphaCollision(collision.other) then
-			-- Kill player if touched
-			self:setIsDead()
-			
+				-- Kill player if touched
+				self:setIsDead()
+			end
 		elseif targetType == spriteTypes.coin then
 			-- Win some points
+			self:increaseScore()
 		elseif targetType == spriteTypes.killBlock then
 			-- Die
+			self:setIsDead()
 		end
 	end
 	

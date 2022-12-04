@@ -58,27 +58,90 @@ end
 
 -- Collision Handler
 
--- --
+--
 
--- Methods
+-- Properties
 
-function collisionHandler:setCollidesForObject(object, targetType, collisionResponseType)
+local latestCollisions = {}
+
+-------------------------------------
+-- Sprite automatic CollisionResponse
+
+function collisionHandler:setCollidesForSprite(object, targetType, collisionResponseType)
 	configurations:addConfiguration(object, targetType, collisionResponseType)
 end
 
-function collisionHandler:getCollisionsFor(object)
-	local collisions = {}
+function collisionHandler:activateCollisionsResponsesForSprite(object)
+	local configurations = self:getCollisionConfigurationsForSprite(object)
 	
-	local configurationsArray = configurations:getConfigurationsForSprite(object)
-	print(configurationsArray)
-	printTable(configurations)
-	for i=1,#configurationsArray do
-		local _, targetType, collisionResponseType = configurationsArray[i]
-		
-		collisions[i] = targetType, collisionResponseType
+	-- Writes collision response function for this sprite
+	object.collisionResponse = function (object, other)
+		for _, configuration in pairs(configurations) do
+			-- If 'other' matches configuration target type
+			if other.type == configuration.targetType then
+				-- Return programmed collision response
+				return configurations.collisionResponseType
+			end
+		end
+	end
+end
+-- Suggestion: return collision response function instead of setting it.
+
+---------------------
+-- Collision handling
+
+-- Set 'latestCollisions', from Sprite:moveWithCollisions() or Sprite:checkCollisions()
+function collisionHandler:updateCollisionForSprite(object, collisions)
+	latestCollisions[object] = collisions
+end
+
+-- Clear 'latestCollisions' at the end of every Sprite.update()
+function collisionHandler:update()
+	-- TODO: check for memory leak
+	latestCollisions = {}
+end
+
+
+-- Returns collisions that have happened in the latest update in handy format: Dict { collision.other = collision } where 'collision' is the same as returned from sprite:moveWithCollisions or sprite:checkCollisions. [see doc]
+function collisionHandler:getCollisionsForSprite(object)
+	local configurations = self:getCollisionConfigurationsForSprite(object)
+	local latestCollisions = latestCollisions[object]
+	local returnCollisions = {}
+	
+	-- When no collisions array exists, something went wrong.
+	if latestCollisions == nil then
+		error("ERROR - Sprite is missing collisions. Call 'Sprite.update' as well as '<your sprite>:moveWithCollisions()' or '<your sprite>:checkCollisions()' before making this call.")
+		return
 	end
 	
-	return collisions
+	-- Loop over collisions and return in nice format
+	for i=1,#latestCollisions do
+		local collision = latestCollisions[i]
+		for _, configuration in pairs(configurations) do
+			if collision.other.type == configuration.targetType then
+				returnCollisions[collision.other] = collision
+			end
+		end
+	end
+	
+	return returnCollisions
+end
+
+function collisionHandler:getCollisionConfigurationsForSprite(object)
+	local collisionConfigurations = {}
+	
+	-- Get current configurations set for this object
+	local configurations = configurations:getConfigurationsForSprite(object)
+	
+	-- Transform into friendly syntax
+	for i=1,#configurations do
+		local _, targetType, collisionResponse = configurations[i]
+		
+		collisionConfigurations[i] = { targetType = targetType, collisionResponse = collisionResponse }
+	end
+	
+	-- Return collision configurations
+	return collisionConfigurations
 end
 
 -- WHEEL SPRITE COLLISIONS

@@ -1,4 +1,5 @@
 import "sampleplayer"
 import "collisionHandler"
-import "scene/scene"
-import "scene/scenemanager"
+import "sprite"
+import "scene"
+import "scenemanager"

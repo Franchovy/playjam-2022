@@ -88,7 +88,7 @@ function playdate.update()
 	-- Game Update
 
 	playdate.timer.updateTimers()
-	gfx.sprite.update()
+	Sprite.update()
 
 	-- State Management
 	if notify.playerHasDied then

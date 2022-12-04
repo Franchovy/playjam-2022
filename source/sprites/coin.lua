@@ -12,6 +12,22 @@ function Coin:init(image)
 	print(image)
 	
 	self:setCollideRect(0, 0, self:getSize())
+	
+	collisionHandler:addCollisionForObject(self, spriteTypes.player, collisionTypes.overlap)
+end
+
+function Coin:update()
+	
+	-- Collision check for players
+	
+	local collisions = collisionHandler:getCollisionsFor(self)
+	
+	for targetType, collisionType in collisions do
+		if targetType == spriteTypes.player then
+			-- Die
+			self:destroy()
+		end
+	end
 end
 
 function Coin:destroy()

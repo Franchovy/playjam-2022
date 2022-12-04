@@ -61,7 +61,8 @@ textAlignment = {
 
 spriteTypes = {
 	coin = "Coin",
-	wheel = "Wheel",
+	wheel = "Wheel", --deprecated
+	player = "Wheel",
 	platform = "Platform",
 	killBlock = "KillBlock",
 	wind = "Wind"
