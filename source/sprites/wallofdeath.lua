@@ -10,6 +10,7 @@ function WallOfDeath:init(speed)
 	WallOfDeath.super.init(self, gfx.image.new(600, 240))
 	self.type = spriteTypes.killBlock
 	self.speed = speed
+	self.isMoving = false
 	----------------
 	-- Set up Sprite
 	
@@ -27,5 +28,15 @@ function WallOfDeath:init(speed)
 end
 
 function WallOfDeath:update()
-	self:moveBy(self.speed, 0)
+	if self.isMoving then
+		self:moveBy(self.speed, 0)
+	end
+end
+
+function WallOfDeath:beginMoving()
+	self.isMoving = true
+end
+
+function WallOfDeath:stopMoving()
+	self.isMoving = false
 end

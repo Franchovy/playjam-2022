@@ -3,77 +3,20 @@ import "scenes/lib"
 import "sprites/lib"
 import "notify"
 
-local soundFile = nil
 local sceneManager = nil
-local game = nil
+local gameScene = nil
+local gameOverScene = nils
+local acceptsRestart = false
 
 function initialize()
 	-- Create game state manager
-	game = Game()
+	gameScene = GameScene()
+	gameOverScene = GameOverScene()
 	
-	game:start()
-end
-
-class("Game").extends()
-
-gameState = {
-	lobby = 0,
-	playing = 1,
-	ended = 2,
-}
-
-function Game:init() 
-	-- Update game state
-	
-	self.state = gameState.lobby
-	
-	self.gameScene = GameScene()
-	self.gameOverScene = GameOverScene()
-	
-	---------------
-	-- GRAPHICS
-
 	sceneManager = SceneManager()
+	
 	-- Create Scene
-	sceneManager:setCurrentScene(self.gameScene)
-	
-	-- Create Sound fileplayer for background music
-	soundFile = sound.fileplayer.new("music/music_main")
-
-	-- Load background music
-	
-	soundFile:play(0)
-	soundFile:pause()
-end
-
-function Game:start()
-	-- Clear any previous displays
-	
-	-----------------
-	-- Audio
-	soundFile:play(0)
-	
-	-----------------
-	-- Graphics
-	
-	-- If switching from GameOver
-	if sceneManager.currentScene.type == sceneTypes.gameOver then
-		-- Perform transition
-		sceneManager:switchScene(self.gameScene, function () end)
-	end
-	
-	self.state = gameState.playing
-end
-
-
-function Game:ended()
-	
-	soundFile:play(0)
-	
-	-- Perform transition to game over scene
-	sceneManager:switchScene(self.gameOverScene, function () end)
-	
-	self.state = gameState.ended
+	sceneManager:setCurrentScene(gameScene)
 end
 
 function playdate.update()
@@ -86,19 +29,19 @@ function playdate.update()
 	playdate.timer.updateTimers()
 	Sprite.update()
 
-	-- State Management
-	if notify.playerHasDied then
-		game:ended()
-		notify.playerHasDied = false
+	-- State management
+	
+	if sceneManager.currentScene == gameScene 
+			and gameScene.gameState == gameStates.ended then
+		sceneManager:switchScene(gameOverScene, function () acceptsRestart = true end)
 	end
 	
-	if game.state == gameState.ended then
-		-------------------
-		-- On game finished
-		
-		if notify.gameRestart then
-			game:start()
-			notify.gameRestart = false
+	if sceneManager.currentScene == gameOverScene and acceptsRestart then
+		-- Restart game upon pressing A
+		if buttons.isAButtonJustPressed() then
+			-- Perform transition
+			acceptsRestart = false
+			sceneManager:switchScene(gameScene, function () end)
 		end
 	end
 end

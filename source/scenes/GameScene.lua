@@ -5,6 +5,14 @@ class('GameScene').extends(Scene)
 
 GameScene.type = sceneTypes.gameScene
 
+gameStates = {
+	created = "Created",
+	loading = "Loading",
+	readyToStart = "ReadyToStart",
+	playing = "Playing",
+	ended = "Ended"
+}
+
 function GameScene:init()
 	Scene.init(self)
 	
@@ -21,10 +29,20 @@ function GameScene:init()
 	self.numKillBlocks = 80
 	self.numPlatforms = 20
 	self.numWinds = 15
+	
+	self.gameState = gameStates.created
 end
 
 function GameScene:load()
 	Scene.load(self)
+	
+	self.gameState = gameStates.loading
+		
+	-- Load Music
+	
+	self.soundFile = sound.fileplayer.new("music/music_main")
+	self.soundFile:play(0)
+	self.soundFile:pause()
 	
 	-- Draw Background
 	
@@ -55,16 +73,16 @@ function GameScene:load()
 	
 	generator:registerSprite(Wind, self.numWinds, gfx.image.new("images/wind"):scaledImage(6, 4), -4)
 	generator:registerSprite(KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
-	--generator:registerSprite(Platform, numPlatforms, gfx.image.new(400, 20),false)
 	generator:registerSprite(Platform, self.numPlatforms, gfx.image.new(100, 20),true)
-
 	generator:registerSprite(Coin, self.numCoins, gfx.image.new("images/coin"))
 end
 
 function GameScene:present()
-
-	
 	Scene.present(self)
+	
+	-- Play music
+	
+	self.soundFile:play(0)
 	
 	-- Reset sprites
 	
@@ -73,17 +91,17 @@ function GameScene:present()
 	
 	-- Position Sprites
 	
-	self.wheel:moveTo(80, 100)
+	self.wheel:moveTo(80, 188)
 	self.floorPlatform:moveTo(0, 220)
 	self.wallOfDeath:moveTo(-600, 0)
 	
 	-- Set randomly generated sprite positions
 	
-	generator:setSpritePositionsRandomGeneration(Wind, 300, 400, 1300, 50, 200)
+	generator:setSpritePositionsRandomGeneration(Wind, 300, 40, 900, 50, 200)
 	generator:setSpritePositionsRandomGeneration(Coin, 200, 30, 100, 50, 200)
-	generator:setSpritePositionsRandomGeneration(Wind, 300, 400, 1200, 50, 200)
-	generator:setSpritePositionsRandomGeneration(Platform, 200, 400, 1300, 140, 180)
-	generator:setSpritePositionsRandomGeneration(KillBlock, 500, 20, 120, 20, 140)
+	generator:setSpritePositionsRandomGeneration(Wind, 300, 40, 200, 50, 200)
+	generator:setSpritePositionsRandomGeneration(Platform, 200, 100, 400, 140, 180)
+	generator:setSpritePositionsRandomGeneration(KillBlock, 500, 20, 220, 20, 140)
 	
 	generator:loadLevelBegin()
 	
@@ -91,14 +109,30 @@ function GameScene:present()
 	self.floorPlatform:add()
 	self.wallOfDeath:add()
 	self.textImageScore:add()
+	
+	-- Set game as ready to start
+	self.gameState = gameStates.readyToStart
 end
 
 function GameScene:update()
 	Scene.update(self)
 	
-	generator:updateSpritesInView()
+	generator:update()
 	
-	-- Update screen position
+	if self.gameState == gameStates.readyToStart then
+		-- Awaiting player input (jump / crank)
+		if buttons.isUpButtonJustPressed() or (playdate.getCrankChange() > 5) then
+			self.wheel:startGame()
+			self.wallOfDeath:beginMoving()
+			self.gameState = gameStates.playing
+		end
+	end
+	
+	if self.gameState ~= gameStates.playing then
+		return
+	end
+	
+	-- Update screen position based on wheel
 	
 	local drawOffset = gfx.getDrawOffset()
 	local relativeX = self.wheel.x + drawOffset
@@ -111,7 +145,8 @@ function GameScene:update()
 	-- Game State checking
 	
 	if self.wheel.hasJustDied then
-		notify.playerHasDied = true
+		self.gameState = gameStates.ended
+		self.wallOfDeath:stopMoving()
 	end
 	
 	-- Update image score

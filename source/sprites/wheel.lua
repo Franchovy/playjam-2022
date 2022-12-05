@@ -61,34 +61,32 @@ function Wheel:resetValues()
 	self.isAwaitingInput = false
 	self.score = 0
 	self.currentWindPower = 0
+	self.ignoresPlayerInput = true
 end
 
 function Wheel:setIsDead() 
+	self.ignoresPlayerInput = true
 	self.hasJustDied = true
 	sampleplayer:playSample("drop")	
 end
 
 function Wheel:startGame()
-		
+	self.ignoresPlayerInput = false
 end
 
 -- Movement
 
 function Wheel:update()
-	
-	if self.isAwaitingInput then
-		-- Activate only if the jump button is pressed
-		if buttons.isUpButtonPressed() then
-			self.isAwaitingInput = false
-		else 
-			return
-		end
-	end
-	
 	-- Update if player has died
 	
 	if self.y > 260 then
 		self:setIsDead()
+		return
+	end
+	
+	-- Ignore input 
+	
+	if self.ignoresPlayerInput then
 		return
 	end
 	
@@ -137,6 +135,7 @@ function Wheel:update()
 			if collision.normal.x ~= 0 then 
 				--horizontal collision
 				self.velocityX = 0
+				self.currentVelocityDrag = 0
 			end
 			if collision.normal.y == -1 then 
 				--top collision
@@ -151,8 +150,10 @@ function Wheel:update()
 		elseif target.type == spriteTypes.killBlock then
 			if self:alphaCollision(target) then
 				-- Die
-				self:setIsDead()
+				self:setIsDead() 
 			end
+		elseif target.type == spriteTypes.wallOfDeath then
+			self:setIsDead()
 		elseif target.type == spriteTypes.wind then
 			self.currentWindPower += target.windPower
 		end

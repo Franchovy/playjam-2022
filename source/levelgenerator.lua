@@ -39,6 +39,10 @@ function generator:loadLevelBegin()
 	self:updateSpritesInView()
 end
 
+function generator:update()
+	self:updateSpritesInView()
+end
+
 function generator:updateSpritesInView()
 	local currentScreenOffsetX = gfx.getDrawOffset()
 	local minGeneratedX = -currentScreenOffsetX - 400
