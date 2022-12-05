@@ -156,6 +156,8 @@ end
 
 function GameScene:dismiss()
 	Scene.dismiss(self)
+	
+	self.soundFile:stop()
 end
 
 function GameScene:destroy()

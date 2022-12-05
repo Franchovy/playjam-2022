@@ -15,8 +15,8 @@ end
 
 function sampleplayer:playSample(name, callback)
 	if callback then
-		self[name]:play(callback)
-	else 
-		self[name]:play()
+		self[name]:setFinishCallback(callback)
 	end
+	
+	self[name]:play()
 end

@@ -43,8 +43,13 @@ function Wheel:init(image)
 	
 	-- Load sound assets
 	
-	sampleplayer:addSample("jump", "sfx/jump")
-	sampleplayer:addSample("drop", "sfx/drop")
+	sampleplayer:addSample("hurt", "sfx/player_hurt_v1")
+	sampleplayer:addSample("touch_ground", "sfx/player_touches_ground_v1")
+	sampleplayer:addSample("backward_start", "sfx/wheel_backward_v1")
+	sampleplayer:addSample("backward_loop", "sfx/wheel_backward_loop_v1")
+	sampleplayer:addSample("forward_start", "sfx/wheel_forward_v1")
+	sampleplayer:addSample("forward_loop", "sfx/wheel_forward_loop_v1")
+	sampleplayer:addSample("wind", "sfx/wind_v1")
 	
 	-- Create Properties
 	
@@ -67,7 +72,7 @@ end
 function Wheel:setIsDead() 
 	self.ignoresPlayerInput = true
 	self.hasJustDied = true
-	sampleplayer:playSample("drop")	
+	sampleplayer:playSample("hurt")
 end
 
 function Wheel:startGame()
@@ -77,6 +82,7 @@ end
 -- Movement
 
 function Wheel:update()
+	
 	-- Update if player has died
 	
 	if self.y > 260 then
@@ -104,7 +110,6 @@ function Wheel:update()
 		else
 			self.velocityY = -hopSpeed
 		end
-		sampleplayer:playSample("jump")
 	end
 	
 	-- Update velocity according to acceleration
@@ -150,7 +155,7 @@ function Wheel:update()
 		elseif target.type == spriteTypes.killBlock then
 			if self:alphaCollision(target) then
 				-- Die
-				self:setIsDead() 
+				self:setIsDead()
 			end
 		elseif target.type == spriteTypes.wallOfDeath then
 			self:setIsDead()
@@ -158,6 +163,11 @@ function Wheel:update()
 			self.currentWindPower += target.windPower
 		end
 	end
+	
+	-- Play sounds based on movement
+	self:playLandingBasedSound()
+	self:playMovementBasedSounds()
+	self:playWindBasedSounds()
 	
 	-- Update graphics
 	
@@ -167,6 +177,39 @@ function Wheel:update()
 	local imageName = string.format("images/wheel%01d", math.floor(self.angle))
 	
 	self:getImage():load(imageName)
+end
+
+local previousTouchingGround = false
+function Wheel:playLandingBasedSound()
+	if (not previousTouchingGround) and self.touchingGround then
+		sampleplayer:playSample("touch_ground")
+	end
+	
+	previousTouchingGround = self.touchingGround
+end
+
+local movementSampleHasFinishedPlaying = false
+function finishedSamplePlaying() movementSampleHasFinishedPlaying = true end
+
+function Wheel:playMovementBasedSounds()
+	if movementSampleHasFinishedPlaying then return end
+	
+	if self.velocityX > 0 and self.velocityX < 5 then
+		sampleplayer:playSample("forward_start", finishedSamplePlaying)
+	elseif self.velocityX > 5 then
+		sampleplayer:playSample("forward_loop", finishedSamplePlaying)
+	elseif self.velocityX < 0 and self.velocityX > -5 then
+		sampleplayer:playSample("backward_start", finishedSamplePlaying)
+	elseif self.velocityX < -5 then
+		sampleplayer:playSample("backward_loop", finishedSamplePlaying)
+	end
+end
+
+local windSampleHasFinishedPlaying = false
+function Wheel:playWindBasedSounds()
+	if self.currentWindPower > 0 and windSampleHasFinishedPlaying then
+		sampleplayer:playSample("wind", function () windSampleHasFinishedPlaying = true end)
+	end
 end
 
 function Wheel:resetValuesBeforeCollisionUpdate()
