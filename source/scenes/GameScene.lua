@@ -24,6 +24,10 @@ local numWinds = 15
 
 function GameScene:init()
 	Scene.init(self)
+	
+	self:setImage(gfx.image.new("images/background_clouds"):scaledImage(2))
+	self:setZIndex(-2)
+	self:setIgnoresDrawOffset(true)
 end
 
 function GameScene:load()
