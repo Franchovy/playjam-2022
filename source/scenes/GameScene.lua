@@ -109,7 +109,6 @@ function GameScene:update()
 	
 	local drawOffset = gfx.getDrawOffset()
 	local relativeX = wheel.x + drawOffset
-	--print(relativeX) -new
 	if relativeX > 150 then
 		gfx.setDrawOffset(-wheel.x + 150, 0)
 	elseif relativeX < 80 then

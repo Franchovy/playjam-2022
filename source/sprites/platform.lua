@@ -16,7 +16,7 @@ function Platform:init(image,canMove)
 	self.goLeft=true
 	self.currentMove=0
 	self.initPosX, self.initPosY=self:getPosition()
-	--print("INITPOS:" .. self.initPosX)
+	
 	----------------
 	-- Draw Graphics
 	
@@ -55,13 +55,11 @@ end
 function Platform:update()
 	if(self.canMove) then
 		
-		print("ICANMOVE:")
 		local x,y=self:getPosition()
 		if(x~=0 and self.initPosX==0) then
 			self.initPosX, self.initPosY=self:getPosition()
 		end
-		print("POSX:" .. tostring(x))
-		print("currentMove:" .. tostring(self.currentMove))
+		
 		local minMoveX=-50
 		local maxMoveX=50
 		self.velocity=0.8
@@ -82,9 +80,7 @@ function Platform:update()
 
 		self.currentMove+=self.currentOffset
 
-		self:moveTo(self.initPosX+self.currentMove,y)
-
-	
+		self:moveTo(self.initPosX+self.currentMove,y)	
 
 	end
 	
