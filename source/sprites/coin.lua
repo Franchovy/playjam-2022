@@ -21,11 +21,11 @@ function Coin:update()
 	for _, other in pairs(overlappingSprites) do
 		if other.type == spriteTypes.player then
 			-- Die
-			self:destroy()
+			self:isGrabbed()
 		end
 	end
 end
 
-function Coin:destroy()
-	self:remove()
+function Coin:isGrabbed()
+	self:isVisible(false)
 end

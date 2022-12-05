@@ -48,16 +48,7 @@ function GameScene:load()
 	
 	-- Draw Score Text
 	
-	local scoreText = wheel:getScoreText()
-	local scoreTextWidth, scoreTextHeight = gfx.getTextSize(scoreText)
-	local imageScore = gfx.image.new(scoreTextWidth, scoreTextHeight)
-	textImageScore = gfx.sprite.new(imageScore)
-	
-	gfx.pushContext(imageScore)
-	gfx.drawTextAligned(scoreText, 0, 0, textAlignment.left)
-	gfx.popContext()
-	
-	textImageScore:setIgnoresDrawOffset(true)
+	textImageScore = Score.new("Score: 0")
 	
 	-- Create Floor sprite
 	
@@ -90,7 +81,6 @@ function GameScene:present()
 	-- Position Sprites
 	
 	wheel:moveTo(80, 100)
-	textImageScore:moveTo(42, 28)
 	floorPlatform:moveTo(0, 220)
 	wallOfDeath:moveTo(-600, 0)
 	
@@ -107,6 +97,7 @@ function GameScene:present()
 	wheel:add()
 	floorPlatform:add()
 	wallOfDeath:add()
+	textImageScore:add()
 end
 
 function GameScene:update()
@@ -133,15 +124,7 @@ function GameScene:update()
 	
 	-- Update image score
 	
-	local scoreText = wheel:getScoreText()
-	local scoreTextWidth, scoreTextHeight = gfx.getTextSize(scoreText)
-	local imageScore = gfx.image.new(scoreTextWidth, scoreTextHeight)
-	
-	gfx.pushContext(imageScore)
-	gfx.drawTextAligned(wheel:getScoreText(), 0, 0, textAlignment.left)
-	gfx.popContext()
-	
-	textImageScore:setImage(imageScore)
+	textImageScore:setScoreText(wheel:getScoreText())
 end
 
 function GameScene:dismiss()
