@@ -29,7 +29,8 @@ spriteTypes = {
 	player = "Wheel",
 	platform = "Platform",
 	killBlock = "KillBlock",
-	wind = "Wind"
+	wind = "Wind",
+	wallOfDeath = "WallOfDeath"
 }
 
 sceneTypes = {

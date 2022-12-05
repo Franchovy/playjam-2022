@@ -7,15 +7,15 @@ GameScene.type = sceneTypes.gameScene
 
 local wheel = nil
 local floorPlatform = nil
-local killBlocks = {}
-local platforms = {}
-local coins = {}
+local wallOfDeath = nil
 
 local textImageScore=nil
 
 local winds = {}
 local fullWind=8
 local nbrRaw=2
+
+local wallOfDeathSpeed = 4
 
 local numCoins = 60
 local numKillBlocks = 80
@@ -63,6 +63,10 @@ function GameScene:load()
 	
 	floorPlatform = Platform.new(gfx.image.new(9000, 20))
 	
+	-- Create great wall of death
+	
+	wallOfDeath = WallOfDeath.new(wallOfDeathSpeed)
+	
 	-- Generate Level
 	
 	generator:registerSprite(Wind, numWinds, gfx.image.new("images/wind"):scaledImage(6, 4), -4)
@@ -84,6 +88,7 @@ function GameScene:present()
 	wheel:moveTo(80, 100)
 	textImageScore:moveTo(42, 28)
 	floorPlatform:moveTo(0, 220)
+	wallOfDeath:moveTo(-600, 0)
 	
 	-- Set randomly generated sprite positions
 	
@@ -97,6 +102,7 @@ function GameScene:present()
 	
 	wheel:add()
 	floorPlatform:add()
+	wallOfDeath:add()
 end
 
 function GameScene:update()
