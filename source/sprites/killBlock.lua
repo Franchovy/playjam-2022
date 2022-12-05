@@ -11,27 +11,12 @@ function KillBlock:init(image)
 	self.type = spriteTypes.killBlock
 	
 	----------------
-	-- Draw Graphics
-	
-	self:drawSelf()
-	
-	----------------
 	-- Set up Sprite
 	
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)
 end
 
-function KillBlock:drawSelf() 
-	-- Set Graphics context (local (x, y) relative to image)
-	gfx.pushContext(self:getImage())
-	
-	-- Perform draw operations
-	gfx.fillRect(0, 0, self:getSize())
-	
-	-- Close Graphics Context
-	gfx.popContext()
-end
 
 function KillBlock:setSize(width, height)
 	KillBlock.super.setSize(self, width, height)
