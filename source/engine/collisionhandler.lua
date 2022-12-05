@@ -156,6 +156,12 @@ function CollisionHandler:getCollisionsForSprite(object)
 		for _, configuration in pairs(configurations) do
 			if collision.other.type == configuration.targetType then
 				returnCollisions[collision.other] = collision
+				if collision.other.canMove==nil then
+
+				else
+					--print(collision.other.canMove)
+
+				end
 			end
 		end
 	end

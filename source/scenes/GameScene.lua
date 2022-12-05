@@ -61,7 +61,7 @@ function GameScene:load()
 	
 	-- Create Floor sprite
 	
-	floorPlatform = Platform.new(gfx.image.new(9000, 20))
+	floorPlatform = Platform.new(gfx.image.new(9000, 20),false)
 	
 	-- Create great wall of death
 	
@@ -71,11 +71,15 @@ function GameScene:load()
 	
 	generator:registerSprite(Wind, numWinds, gfx.image.new("images/wind"):scaledImage(6, 4), -4)
 	generator:registerSprite(KillBlock, numKillBlocks, gfx.image.new("images/kill_block"))
-	generator:registerSprite(Platform, numPlatforms, gfx.image.new(400, 20))
+	--generator:registerSprite(Platform, numPlatforms, gfx.image.new(400, 20),false)
+	generator:registerSprite(Platform, numPlatforms, gfx.image.new(100, 20),true)
+
 	generator:registerSprite(Coin, numCoins, gfx.image.new("images/coin"))
 end
 
 function GameScene:present()
+
+	
 	Scene.present(self)
 	
 	-- Reset sprites
