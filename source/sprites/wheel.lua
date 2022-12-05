@@ -118,8 +118,10 @@ function Wheel:update()
 				
 			end
 		elseif target.type == spriteTypes.coin then
-			-- Win some points
-			self:increaseScore()
+			if target:isVisible() then
+				-- Win some points
+				self:increaseScore()
+			end
 		elseif target.type == spriteTypes.killBlock then
 			if self:alphaCollision(target) then
 				-- Die

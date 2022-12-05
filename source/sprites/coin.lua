@@ -27,5 +27,5 @@ function Coin:update()
 end
 
 function Coin:isGrabbed()
-	self:isVisible(false)
+	self:setVisible(false)
 end
