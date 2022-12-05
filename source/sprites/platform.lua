@@ -83,6 +83,4 @@ function Platform:update()
 		self:moveTo(self.initPosX+self.currentMove,y)	
 
 	end
-	
-
 end

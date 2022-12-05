@@ -71,7 +71,7 @@ function GameScene:load()
 	
 	-- Generate Level
 	
-	generator:registerSprite(Wind, self.numWinds, gfx.image.new("images/wind"):scaledImage(6, 4), -4)
+	generator:registerSprite(Wind, self.numWinds, gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
 	generator:registerSprite(KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
 	generator:registerSprite(Platform, self.numPlatforms, gfx.image.new(100, 20),true)
 	generator:registerSprite(Coin, self.numCoins, gfx.image.new("images/coin"))
