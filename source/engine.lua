@@ -9,7 +9,6 @@ import "CoreLibs/easing"
 
 import "engine/lib"
 import "extensions"
-import "params"
 
 -- Libraries
 

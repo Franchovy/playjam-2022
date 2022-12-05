@@ -1,5 +1,19 @@
 import "engine"
 
+-- Params
+local jumpSpeed = 18
+local hopSpeed = 12
+local gravity = 2.1
+local scorePerCoin = 10
+local maxFallSpeed = 16
+local speedBoost = 3
+local velocityDragStep = 0.1
+local velocityBrakeStep = 0.4
+local maxVelocityX = 3
+
+-- Params, not to modify
+local crankTicksPerCircle = 36
+
 class("Wheel").extends(Sprite)
 
 function Wheel.new(image) 
@@ -9,11 +23,6 @@ end
 function Wheel:init(image)
 	Wheel.super.init(self, image)
 	self.type = spriteTypes.player
-
-	self.score=0
-
-	self.isInWind=false
-	self.currentWindPower=0
 	
 	local marginSize = 3
 	self:setCollideRect(
@@ -42,20 +51,21 @@ function Wheel:init(image)
 	self:resetValues()
 end
 
-local maxFallSpeed = 12
-local crankTicksPerCircle = 36
-local angle = 1
-local velocityDrag = 0
+function Wheel:resetValues() 
+	self.velocityX = 0
+	self.velocityY = 0
+	self.currentVelocityDrag = 0
+	self.angle = 0
+	self.horizontalAcceleration = 0
+	self.hasJustDied = false
+	self.isAwaitingInput = false
+	self.score = 0
+	self.currentWindPower = 0
+end
 
 function Wheel:setIsDead() 
-	if self.isDead then
-		self.hasJustDied = false
-	else 
-		self.hasJustDied = true
-		self.isDead = true	
-		
-		sampleplayer:playSample("drop")
-	end
+	self.hasJustDied = true
+	sampleplayer:playSample("drop")	
 end
 
 function Wheel:startGame()
@@ -77,28 +87,36 @@ function Wheel:update()
 	
 	-- Update if player has died
 	
-	if self.y > 260 or self.isDead then
+	if self.y > 260 then
 		self:setIsDead()
 		return
 	end
 	
 	-- Player Input
 	
-	local crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
 	local hasJumped = buttons.isUpButtonJustPressed()
+	local crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
+	local isBraking = (crankTicks > 0) ~= (self.velocityX > 0)
 		
 	-- Update push vector based on crank ticks
 		
 	if hasJumped then
-		self.velocityY = -10
+		if self.touchingGround then
+			self.velocityY = -jumpSpeed
+		else
+			self.velocityY = -hopSpeed
+		end
 		sampleplayer:playSample("jump")
 	end
 	
 	-- Update velocity according to acceleration
 	
-	velocityDrag = self.velocityX * 0.2
-	self.velocityX = crankTicks * 2.5 + velocityDrag +self.currentWindPower
+	self.velocityX = self:calculateSpeed(crankTicks, isBraking)
 	self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
+	
+	-- Apply wind power
+	
+	self.velocityX += self.currentWindPower
 	
 	-- Update position according to velocity
 	local actualX, actualY, collisions, length = self:moveWithCollisions(
@@ -106,7 +124,9 @@ function Wheel:update()
 		self.y + self.velocityY
 	)
 
-	self.currentWindPower=0
+	-- Reset values
+	
+	self:resetValuesBeforeCollisionUpdate()
 	
 	-- Collisions-based updates
 	
@@ -114,13 +134,19 @@ function Wheel:update()
 	
 	for target, collision in pairs(collisions) do
 		if target.type == spriteTypes.platform then
-			if self:alphaCollision(target) then
-				
+			if collision.normal.x ~= 0 then 
+				--horizontal collision
+				self.velocityX = 0
+			end
+			if collision.normal.y == -1 then 
+				--top collision
+				self.touchingGround = true
 			end
 		elseif target.type == spriteTypes.coin then
-			if target:isVisible() then
+			if target:isVisible() and self:alphaCollision(target) then
 				-- Win some points
 				self:increaseScore()
+				target:isGrabbed()
 			end
 		elseif target.type == spriteTypes.killBlock then
 			if self:alphaCollision(target) then
@@ -134,25 +160,41 @@ function Wheel:update()
 	
 	-- Update graphics
 	
-	angle = angle + self.velocityX / 10
-	if angle < 1 then angle = 6 end
-	if angle > 6 then angle = 1 end
-	local imageName = string.format("images/wheel%01d", math.floor(angle))
+	self.angle = self.angle + self.velocityX / 10
+	if self.angle < 1 then self.angle = 6 end
+	if self.angle > 6 then self.angle = 1 end
+	local imageName = string.format("images/wheel%01d", math.floor(self.angle))
 	
 	self:getImage():load(imageName)
 end
 
-function Wheel:setAwaitingInput() 
-	self.isAwaitingInput = true
+function Wheel:resetValuesBeforeCollisionUpdate()
+	self.currentWindPower = 0
+	self.touchingGround = false
 end
 
-function Wheel:resetValues() 
-	self.velocityX = 0
-	self.velocityY = 0
-	self.horizontalAcceleration = 0
-	self.isDead = false
-	self.hasJustDied = false
-	self.isAwaitingInput = false
+function Wheel:calculateSpeed(crankTicks, isBraking)
+	if isBraking then
+		-- Apply brakes (slow down faster)
+		self.currentVelocityDrag = math.approach(self.currentVelocityDrag, 0, velocityBrakeStep)
+	else
+		-- Apply wheel momentum to velocity drag
+		self.currentVelocityDrag = math.approach(self.currentVelocityDrag, self.velocityX, velocityDragStep)
+	end
+	
+	-- Handle moving forward
+	local rawVelocityX = crankTicks * speedBoost + self.currentVelocityDrag
+
+	-- Add a drag to velocity if above the max speed	
+	if rawVelocityX > maxVelocityX then
+		return math.approach(rawVelocityX, maxVelocityX, 0.2) 
+	else
+		return rawVelocityX	 
+	end
+end
+
+function Wheel:setAwaitingInput() 
+	self.isAwaitingInput = true
 end
 
 function Wheel:getScoreText()
@@ -160,5 +202,6 @@ function Wheel:getScoreText()
 end
 
 function Wheel:increaseScore()
-	self.score=self.score+1
+	print("increase score")
+	self.score += scorePerCoin
 end

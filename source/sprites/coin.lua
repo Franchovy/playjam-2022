@@ -13,19 +13,6 @@ function Coin:init(image)
 	self:setCollideRect(0, 0, self:getSize())
 end
 
-function Coin:update()
-	-- Collision check for players
-	
-	local overlappingSprites = self:overlappingSprites()
-	
-	for _, other in pairs(overlappingSprites) do
-		if other.type == spriteTypes.player then
-			-- Die
-			self:isGrabbed()
-		end
-	end
-end
-
 function Coin:isGrabbed()
 	self:setVisible(false)
 end
