@@ -25,18 +25,15 @@ function SceneManager:init()
 	self.currentScene = nil
 end
 
-function SceneManager:setCurrentScene(scene, ...)
+function SceneManager:setCurrentScene(scene)
 	self.newScene = scene
-	local args = {...}
-	self.sceneArgs = args
-	
-	self.currentScene = self.newScene(table.unpack(self.sceneArgs))
+	self.currentScene = scene
 
 	self.currentScene:load()
 	self.currentScene:present()
 end
 
-function SceneManager:switchScene(scene, ...)
+function SceneManager:switchScene(scene, onComplete)
 	if self.transitioning then
 		return
 	end
@@ -46,50 +43,58 @@ function SceneManager:switchScene(scene, ...)
 		-- Remove previous scene as sprite
 		self.currentScene:dismiss()
 	end
-	self.currentScene = scene
-
-	-- Set transition properties
-	self.transitioning = true
-	self.currentScene.isFinishedTransitioning = false
-
-	self.newScene = scene
-	local args = {...}
-	self.sceneArgs = args
 	
-	-- Start animated transition
-	self:startTransition()
-end
-
-function SceneManager:loadNewScene()
-	self.currentScene = self.newScene(table.unpack(self.sceneArgs))
+	self.newScene = scene
+	self.currentScene = scene
+	
+	-- Begin scene load
 	self.currentScene:load()
+
+	-- Start animated transition
+	self:startTransition(
+		function () 
+			self:cleanup()
+			self.currentScene:present()
+		end,
+		function ()
+			onComplete()
+		end
+	)
 end
 
-function SceneManager:cleanupScene()
+function SceneManager:cleanup()
 	gfx.sprite.removeAll()
 	self:removeAllTimers()
 	gfx.setDrawOffset(0, 0)
 end
 
-function SceneManager:startTransition()
-	self:loadNewScene()
+function SceneManager:startTransition(onHalfWay, onFinished)
+	self.transitioning = true
+	self.currentScene.isFinishedTransitioning = false
+	
 	-- local transitionTimer = self:fadeTransition(0, 1)
 	local transitionTimer = self:wipeTransition(0, 400)
 
 	transitionTimer.timerEndedCallback = function()
 		-- transitionTimer = self:fadeTransition(1, 0)
-		self:cleanupScene()
-		self.currentScene:present()
+		
+		-- Call on half way completion
+		onHalfWay()
+		
 		transitionTimer = self:wipeTransition(400, 0)
 		transitionTimer.timerEndedCallback = function()
 			self.transitioning = false
 			self.transitionSprite:remove()
 			self.currentScene.isFinishedTransitioning = true
+			
 			-- Temp fix to resolve bug with sprite artifacts/smearing after transition
 			local allSprites = gfx.sprite.getAllSprites()
 			for i=1,#allSprites do
 				allSprites[i]:markDirty()
 			end
+			
+			-- Call finished completion
+			onFinished()
 		end
 	end
 end
@@ -119,7 +124,6 @@ end
 function SceneManager:getFadedImage(alpha)
 	return fadedRects[math.floor(alpha * 100)]
 end
-
 
 function SceneManager:createTransitionSprite()
 	local filledRect = gfx.image.new(400, 240, gfx.kColorBlack)

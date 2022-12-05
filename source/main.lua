@@ -27,13 +27,15 @@ function Game:init()
 	
 	self.state = gameState.lobby
 	
+	self.gameScene = GameScene()
+	self.gameOverScene = GameOverScene()
+	
 	---------------
 	-- GRAPHICS
 
 	sceneManager = SceneManager()
-	
 	-- Create Scene
-	sceneManager:setCurrentScene(GameScene)
+	sceneManager:setCurrentScene(self.gameScene)
 	
 	-- Create Sound fileplayer for background music
 	soundFile = sound.fileplayer.new("music/music_main")
@@ -57,7 +59,7 @@ function Game:start()
 	-- If switching from GameOver
 	if sceneManager.currentScene.type == sceneTypes.gameOver then
 		-- Perform transition
-		sceneManager:switchScene(GameScene)
+		sceneManager:switchScene(self.gameScene, function () end)
 	end
 	
 	self.state = gameState.playing
@@ -66,16 +68,10 @@ end
 
 function Game:ended()
 	
-	--------------
-	-- Audio
-	
 	soundFile:play(0)
 	
-	--------------
-	-- Graphics
-	
 	-- Perform transition to game over scene
-	sceneManager:switchScene(GameOverScene)
+	sceneManager:switchScene(self.gameOverScene, function () end)
 	
 	self.state = gameState.ended
 end
@@ -105,8 +101,6 @@ function playdate.update()
 			notify.gameRestart = false
 		end
 	end
-
-
 end
 
 -- Start Game
