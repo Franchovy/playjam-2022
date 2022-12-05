@@ -75,6 +75,11 @@ function GameScene:load()
 	generator:registerSprite(KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
 	generator:registerSprite(Platform, self.numPlatforms, gfx.image.new(100, 20),true)
 	generator:registerSprite(Coin, self.numCoins, gfx.image.new("images/coin"))
+	
+	generator:setSpawnPattern(Wind, 50, 200, { 3, 5, 8, 3, 6, 12 })
+	generator:setSpawnPattern(Coin, 50, 200, {8, 10, 12, 8, 12, 22})
+	generator:setSpawnPattern(Platform, 140, 180, {6, 8, 10, 20, 10, 5})
+	generator:setSpawnPattern(KillBlock, 20, 140, {6, 8, 10, 10, 15, 28})
 end
 
 function GameScene:present()
@@ -96,12 +101,6 @@ function GameScene:present()
 	self.wallOfDeath:moveTo(-600, 0)
 	
 	-- Set randomly generated sprite positions
-	
-	generator:setSpritePositionsRandomGeneration(Wind, 300, 40, 900, 50, 200)
-	generator:setSpritePositionsRandomGeneration(Coin, 200, 30, 100, 50, 200)
-	generator:setSpritePositionsRandomGeneration(Wind, 300, 40, 200, 50, 200)
-	generator:setSpritePositionsRandomGeneration(Platform, 200, 100, 400, 140, 180)
-	generator:setSpritePositionsRandomGeneration(KillBlock, 500, 20, 220, 20, 140)
 	
 	generator:loadLevelBegin()
 	

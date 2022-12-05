@@ -3,41 +3,118 @@ import "engine"
 generator = {}
 
 local loadedSprites = {}
+local spritePositions = {}
+local levelsGenerated = {}
+local spritesAssigned = {}
+
+local LEVEL_WIDTH = 3000
+local maxLevels = 9
+
+function spritePositions:generateSpritePositions(minY, maxY, numEntities)
+	local positions = {}
+	for i=1,numEntities do
+		positions[i] = {
+			math.random(minY, maxY),
+			math.random(0, LEVEL_WIDTH)
+		}
+	end
+
+	return positions
+end
 
 function generator.registerSprite(self, spriteClass, maxInstances, ...)
 	loadedSprites[spriteClass] = {}
 	
 	for i=1,maxInstances do
-		loadedSprites[spriteClass][i] = { sprite = spriteClass.new(...) }
+		local sprite = spriteClass.new(...)
+		loadedSprites[spriteClass][i] = { sprite = sprite }
+		spritesAssigned[sprite] = false
 	end
 end
 
-function generator:setSpritePositions(spriteClass, positions)
-	for i,position in ipairs(positions) do
-		loadedSprites[spriteClass][i].position = position
-	end
-end
-
-function generator:setSpritePositionsRandomGeneration(spriteClass, initialX, minSpacingX, maxSpacingX, minY, maxY)
-	local previousX = initialX
-	for i,spriteConfig in ipairs(loadedSprites[spriteClass]) do
-		local x = previousX + math.random(minSpacingX, maxSpacingX)
-		local y = math.random(minY, maxY)
-		previousX += x
+function generator:setSpawnPattern(spriteClass, minY, maxY, numEntitiesPerDifficulty)
+	loadedSprites[spriteClass].verticalSpawnRange = { minY, maxY }
+	loadedSprites[spriteClass].spawnPattern = numEntitiesPerDifficulty
+	
+	maxLevels = math.max(maxLevels, #numEntitiesPerDifficulty)
+	for i, numEntities in ipairs(numEntitiesPerDifficulty) do
+		if spritePositions[i] == nil then
+			spritePositions[i] = {}
+		end
 		
-		spriteConfig.position = {x = x, y = y}
+		spritePositions[i][spriteClass] = spritePositions:generateSpritePositions(minY, maxY, numEntities)
 	end
 end
 
-function generator:loadLevelBegin()
-	for _, spriteConfigList in pairs(loadedSprites) do
-		for _, spriteConfig in pairs(spriteConfigList) do
-			spriteConfig.sprite:moveTo(spriteConfig.position.x, spriteConfig.position.y)
+function generator:generateLevel(level)
+	currentLevel = level
+	levelsGenerated[level] = true
+	
+	-- Assign sprites to positions
+	for spriteClass, positions in pairs(spritePositions[level]) do
+		local sprites = loadedSprites[spriteClass]
+		for _, s in ipairs(sprites) do
+			local sprite = s.sprite
+			if spritesAssigned[sprite] == false then
+				-- Assign position
+				sprite.moveTo(positions)
+				spritesAssigned[sprite] = level
+			end
 		end
 	end
+end
+
+function generator:degenerateLevel(level)
+	levelsGenerated[level] = false
 	
+	-- Assign sprites to positions
+	for spriteClass, positions in pairs(spritePositions[level]) do
+		local sprites = loadedSprites[spriteClass]
+		for _, s in ipairs(sprites) do
+			local sprite = s.sprite
+			if spritesAssigned[sprite] == level then
+				-- Assign position
+				spritesAssigned[sprite] = false
+			end
+		end
+	end
+end
+
+
+function generator:loadLevelBegin()
+	
+	-- Register unloaded levels
+	for i=1,maxLevels do levelsGenerated[i] = false end
+	
+	-- Assign sprites to positions in levels 1
+	self:generateLevel(1)
+	
+	-- Update sprites in view (sprite:add/remove)
 	self:updateSpritesInView()
 end
+
+function generator:updateLevelIfNeeded()
+	local currentScreenOffsetX = gfx.getDrawOffset()
+	
+	local levelNeedsGenerating = nil
+	
+	if LEVEL_WIDTH % currentScreenOffsetX > LEVEL_WIDTH / 2 then
+		-- Set needs load next level
+		levelNeedsGenerating = currentLevel + 1
+	else
+		-- Set needs load previous level
+		levelNeedsGenerating = currentLevel - 1
+	end
+	
+	-- Ignore for first level
+	if levelNeedsGenerating < 1 then
+		return
+	end
+	
+	
+end
+
+
 
 function generator:update()
 	self:updateSpritesInView()
