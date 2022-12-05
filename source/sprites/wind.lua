@@ -13,4 +13,6 @@ function Wind:init(image,windPower)
 	self.windPower=windPower
 	
 	self:setCollideRect(0, 0, self:getSize())
+	
+	self:setZIndex(-1)
 end

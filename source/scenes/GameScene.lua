@@ -1,10 +1,12 @@
 import "engine"
+import "levelgenerator"
 
 class('GameScene').extends(Scene)
 
 GameScene.type = sceneTypes.gameScene
 
 local wheel = nil
+local floorPlatform = nil
 local killBlocks = {}
 local platforms = {}
 local coins = {}
@@ -14,6 +16,11 @@ local textImageScore=nil
 local winds = {}
 local fullWind=8
 local nbrRaw=2
+
+local numCoins = 60
+local numKillBlocks = 80
+local numPlatforms = 20
+local numWinds = 15
 
 function GameScene:init()
 	Scene.init(self)
@@ -48,30 +55,16 @@ function GameScene:load()
 	
 	textImageScore:setIgnoresDrawOffset(true)
 	
-	local numCoins = 10
-	local numKillBlocks = 28
-	local numPlatforms = 3
-	local numWinds = 5
+	-- Create Floor sprite
 	
-	-- Create Coin sprites
-	for i=1,numCoins do
-		table.insert(coins, Coin.new(gfx.image.new("images/coin")))
-	end
+	floorPlatform = Platform.new(gfx.image.new(9000, 20))
 	
-	-- Create Obstacle sprites
-	for i=0,numKillBlocks do
-		table.insert(killBlocks, KillBlock.new(gfx.image.new(40, 40)))
-	end
+	-- Generate Level
 	
-	-- Create Platform sprites
-	for i=1,numPlatforms do
-		table.insert(platforms, Platform.new(gfx.image.new(4000, 20)))
-	end
-	
-	-- Create wind sprites
-	for i=1,numWinds do
-		table.insert(winds, Wind.new(gfx.image.new("images/wind"):scaledImage(6, 4),-1))
-	end
+	generator:registerSprite(Wind, numWinds, gfx.image.new("images/wind"):scaledImage(6, 4), -4)
+	generator:registerSprite(KillBlock, numKillBlocks, gfx.image.new(40, 40))
+	generator:registerSprite(Platform, numPlatforms, gfx.image.new(400, 20))
+	generator:registerSprite(Coin, numCoins, gfx.image.new("images/coin"))
 end
 
 function GameScene:present()
@@ -86,66 +79,26 @@ function GameScene:present()
 	
 	wheel:moveTo(80, 100)
 	textImageScore:moveTo(42, 28)
+	floorPlatform:moveTo(0, 220)
 	
-	-- Obstacles, spread through level
-	local previousObstacleX = 500
-	for i=1,#killBlocks do
-		local randY = math.random(20, 140)
-		local randX = math.random(20, 420)
-		local newX = previousObstacleX + randX
-		previousObstacleX = newX
-		killBlocks[i]:moveTo(newX, 240 - randY)
-	end
-		
-	-- Wind, spread through level
-	local windSizeX=winds[1]:getSize()
-	local windSizeY=winds[1]:getSize()
-	local distanceBeetwenWinds=200
-	local firstWindPosX=300
-	for i=1,#winds/fullWind do 
-		for k=1,nbrRaw do
-			for j=1,fullWind/nbrRaw do
-				local x = firstWindPosX+(distanceBeetwenWinds+(fullWind/nbrRaw*windSizeX))*(i-1) +windSizeX*j
-				local y = 50+windSizeY*(k-1)
-				local index = (i-1)*fullWind+(fullWind/nbrRaw)*(k-1)+j
-				
-				winds[index]:moveTo(x,y)
-			end
-		end
-	end
+	-- Set randomly generated sprite positions
 	
-	-- Floor Platform, only two for now
-	platforms[1]:moveTo(0, 230)
-	platforms[2]:moveTo(0, -10)
-	platforms[3]:moveTo(300, 210)
+	generator:setSpritePositionsRandomGeneration(Wind, 300, 400, 1300, 50, 200)
+	generator:setSpritePositionsRandomGeneration(Coin, 200, 30, 100, 50, 200)
+	generator:setSpritePositionsRandomGeneration(Wind, 300, 400, 1200, 50, 200)
+	generator:setSpritePositionsRandomGeneration(Platform, 200, 400, 1300, 140, 180)
+	generator:setSpritePositionsRandomGeneration(KillBlock, 500, 20, 120, 20, 140)
 	
-	-- Coins, spread through level
-	for i=1,#coins do
-		coins[i]:moveTo(150*i,200)
-	end
+	generator:loadLevelBegin()
 	
-	-- Add sprites back into scene
-	
-	for i=1,#winds do
-		winds[i]:add()
-	end
-	for i=1,#coins do
-		coins[i]:add()
-	end
-	for i=1,#killBlocks do
-		killBlocks[i]:add()
-	end
-	for i=1,#platforms do
-		platforms[i]:add()
-	end	
-	textImageScore:add()
 	wheel:add()
-
+	floorPlatform:add()
 end
 
 function GameScene:update()
 	Scene.update(self)
 	
+	generator:updateSpritesInView()
 	
 	-- Update screen position
 	
