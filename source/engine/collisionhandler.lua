@@ -159,6 +159,6 @@ function CollisionHandler:getCollisionsForSprite(object)
 			end
 		end
 	end
-	
+		
 	return returnCollisions
 end
