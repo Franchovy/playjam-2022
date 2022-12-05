@@ -27,7 +27,7 @@ function Wheel:init(image)
 	
 	self:setCollidesWith(spriteTypes.platform, collisionTypes.slide)
 	self:setCollidesWith(spriteTypes.coin, collisionTypes.overlap)
-	self:setCollidesWith(spriteTypes.killBlock, collisionTypes.freeze)
+	self:setCollidesWith(spriteTypes.killBlock, collisionTypes.overlap)
 	self:setCollidesWith(spriteTypes.wind, collisionTypes.overlap)
 	
 	self:activateCollisionResponse()
@@ -133,7 +133,7 @@ function Wheel:update()
 				self:setIsDead()
 			end
 		elseif target.type == spriteTypes.wind then
-			self.currentWindPower = 5
+			self.currentWindPower += target.windPower
 		end
 	end
 	

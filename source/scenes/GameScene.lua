@@ -48,25 +48,29 @@ function GameScene:load()
 	
 	textImageScore:setIgnoresDrawOffset(true)
 	
+	local numCoins = 10
+	local numKillBlocks = 28
+	local numPlatforms = 3
+	local numWinds = 5
+	
 	-- Create Coin sprites
-	for i=1,10 do
+	for i=1,numCoins do
 		table.insert(coins, Coin.new(gfx.image.new("images/coin")))
 	end
 	
 	-- Create Obstacle sprites
-	for i=0,28 do
+	for i=0,numKillBlocks do
 		table.insert(killBlocks, KillBlock.new(gfx.image.new(40, 40)))
 	end
 	
 	-- Create Platform sprites
-	for i=1,2 do
+	for i=1,numPlatforms do
 		table.insert(platforms, Platform.new(gfx.image.new(4000, 20)))
 	end
 	
 	-- Create wind sprites
-	for i=1,fullWind*5 do
-		
-		table.insert(winds, Wind.new(gfx.image.new("images/wind"):scaledImage(2),-4))
+	for i=1,numWinds do
+		table.insert(winds, Wind.new(gfx.image.new("images/wind"):scaledImage(6, 4),-1))
 	end
 end
 
@@ -113,6 +117,7 @@ function GameScene:present()
 	-- Floor Platform, only two for now
 	platforms[1]:moveTo(0, 230)
 	platforms[2]:moveTo(0, -10)
+	platforms[3]:moveTo(300, 210)
 	
 	-- Coins, spread through level
 	for i=1,#coins do
