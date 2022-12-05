@@ -39,7 +39,7 @@ function GameOverScene:present()
 	self.tryAgainTextSprite:add()
 	self.pressAIndicatorTextSprite:add()
 	self.gameOverTextSprite:add()
-		
+	
 end
 
 function GameOverScene:update() 
@@ -50,6 +50,12 @@ function GameOverScene:update()
 	self.pressAIndicatorBlinker:update()
 	self.pressAIndicatorTextSprite:setVisible(self.pressAIndicatorBlinker.on)
 	
+	-- Detect player "press A"
+	if self.isFinishedTransitioning then
+		if buttons.isAButtonJustPressed() then
+			notify.gameRestart = true
+		end
+	end
 end
 
 function GameOverScene:dismiss()

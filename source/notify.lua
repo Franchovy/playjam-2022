@@ -1,5 +1,6 @@
 
 
 notify = {
-	playerHasDied = false
+	playerHasDied = false,
+	gameRestart = false
 }

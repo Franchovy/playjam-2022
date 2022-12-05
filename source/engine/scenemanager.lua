@@ -31,7 +31,7 @@ function SceneManager:setCurrentScene(scene, ...)
 	self.sceneArgs = args
 	
 	self.currentScene = self.newScene(table.unpack(self.sceneArgs))
-		
+
 	self.currentScene:load()
 	self.currentScene:present()
 end
@@ -50,6 +50,7 @@ function SceneManager:switchScene(scene, ...)
 
 	-- Set transition properties
 	self.transitioning = true
+	self.currentScene.isFinishedTransitioning = false
 
 	self.newScene = scene
 	local args = {...}
@@ -83,6 +84,7 @@ function SceneManager:startTransition()
 		transitionTimer.timerEndedCallback = function()
 			self.transitioning = false
 			self.transitionSprite:remove()
+			self.currentScene.isFinishedTransitioning = true
 			-- Temp fix to resolve bug with sprite artifacts/smearing after transition
 			local allSprites = gfx.sprite.getAllSprites()
 			for i=1,#allSprites do

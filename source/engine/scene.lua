@@ -22,6 +22,7 @@ function Scene:init()
 	table.insert(allScenes, self)
 	
 	self.state = sceneState.initialized
+	self.isFinishedTransitioning = true
 end
 
 function Scene:load()

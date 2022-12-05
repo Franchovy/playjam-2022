@@ -100,8 +100,9 @@ function playdate.update()
 		-------------------
 		-- On game finished
 		
-		if buttons.isAButtonPressed() then
+		if notify.gameRestart then
 			game:start()
+			notify.gameRestart = false
 		end
 	end
 
