@@ -41,6 +41,10 @@ function playdate.update()
 		if buttons.isAButtonJustPressed() then
 			-- Perform transition
 			acceptsRestart = false
+			
+			-- Sound effect
+			sampleplayer:playSample("game_start")
+			
 			sceneManager:switchScene(gameScene, function () end)
 		end
 	end

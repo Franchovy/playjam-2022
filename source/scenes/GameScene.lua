@@ -44,6 +44,8 @@ function GameScene:load()
 	self.soundFile:play(0)
 	self.soundFile:pause()
 	
+	sampleplayer:addSample("game_start", "sfx/woosh_v1")
+	
 	-- Draw Background
 	
 	local backgroundImage = gfx.image.new("images/background")
@@ -158,6 +160,9 @@ function GameScene:dismiss()
 	Scene.dismiss(self)
 	
 	self.soundFile:stop()
+	
+	-- Woosh sound effect
+	sampleplayer:playSample("game_start")
 end
 
 function GameScene:destroy()
