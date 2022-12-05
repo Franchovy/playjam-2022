@@ -55,7 +55,7 @@ function GameScene:load()
 		
 	-- Create Player sprite
 	
-	self.wheel = Wheel.new(gfx.image.new("images/wheel1"))
+	self.wheel = Wheel.new(gfx.image.new("images/wheel_v3/new_wheel1"))
 	
 	-- Draw Score Text
 	

@@ -173,9 +173,9 @@ function Wheel:update()
 	-- Update graphics
 	
 	self.angle = self.angle + self.velocityX / 10
-	if self.angle < 1 then self.angle = 6 end
-	if self.angle > 6 then self.angle = 1 end
-	local imageName = string.format("images/wheel%01d", math.floor(self.angle))
+	if self.angle > 12 then self.angle = self.angle % 12 end
+	if self.angle < 1 then self.angle += 12 end
+	local imageName = string.format("images/wheel_v3/new_wheel%01d", math.floor(self.angle))
 	
 	self:getImage():load(imageName)
 end
