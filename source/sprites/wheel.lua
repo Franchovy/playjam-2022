@@ -44,6 +44,7 @@ function Wheel:init(image)
 	-- Load sound assets
 	
 	sampleplayer:addSample("hurt", "sfx/player_hurt_v1")
+	sampleplayer:addSample("coin", "sfx/coin_pickup_v1")
 	sampleplayer:addSample("touch_ground", "sfx/player_touches_ground_v1")
 	sampleplayer:addSample("backward_start", "sfx/wheel_backward_v1")
 	sampleplayer:addSample("backward_loop", "sfx/wheel_backward_loop_v1")
@@ -82,6 +83,7 @@ end
 -- Movement
 
 function Wheel:update()
+	print(self.x)
 	
 	-- Update if player has died
 	
@@ -149,8 +151,7 @@ function Wheel:update()
 		elseif target.type == spriteTypes.coin then
 			if target:isVisible() and self:alphaCollision(target) then
 				-- Win some points
-				self:increaseScore()
-				target:isGrabbed()
+				self:onGrabbedCoin(target)
 			end
 		elseif target.type == spriteTypes.killBlock then
 			if self:alphaCollision(target) then
@@ -245,7 +246,9 @@ function Wheel:getScoreText()
 	return "Score: ".. self.score
 end
 
-function Wheel:increaseScore()
-	print("increase score")
+function Wheel:onGrabbedCoin(coin)
 	self.score += scorePerCoin
+	sampleplayer:playSample("coin")
+	
+	coin:isGrabbed()
 end
