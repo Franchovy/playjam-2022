@@ -43,6 +43,12 @@ sceneTypes = {
 
 easingFunctions = playdate.easingFunctions
 
+colors = {
+	white = gfx.kColorWhite,
+	black = gfx.kColorBlack,
+	xor = gfx.kColorXOR,
+	clear = gfx.kColorClear
+}
 
 collisionTypes = {
 	slide = gfx.sprite.kCollisionTypeSlide,
