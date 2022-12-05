@@ -55,13 +55,13 @@ end
 function Platform:update()
 	if(self.canMove) then
 		
-		print("ICANMOVE:")
+		--print("ICANMOVE:")
 		local x,y=self:getPosition()
 		if(x~=0 and self.initPosX==0) then
 			self.initPosX, self.initPosY=self:getPosition()
 		end
-		print("POSX:" .. tostring(x))
-		print("currentMove:" .. tostring(self.currentMove))
+		--print("POSX:" .. tostring(x))
+		--print("currentMove:" .. tostring(self.currentMove))
 		local minMoveX=-50
 		local maxMoveX=50
 		self.velocity=0.8
