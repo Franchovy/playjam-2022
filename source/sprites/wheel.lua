@@ -10,7 +10,7 @@ function Wheel:init(image)
 	Wheel.super.init(self, image)
 	self.type = spriteTypes.player
 
-	self.score=0--new
+	self.score=0
 
 	self.isInWind=false
 	self.currentWindPower=0
