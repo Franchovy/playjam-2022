@@ -57,8 +57,6 @@ collisionTypes = {
 	bounce = gfx.sprite.kCollisionTypeBounce,
 }
 
-printTable(collisionTypes)
-
 buttons = {
 	isLeftButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonLeft) end,
 	isRightButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonRight) end,

@@ -27,14 +27,12 @@ end
 
 function Scene:load()
 	self.state = sceneState.isLoaded
-	print("Scene Load")
 end
 
 function Scene:present()
 	Scene.currentActiveScene = self
 	self.state = sceneState.isPresented
 	self:add()
-	print("Scene Present")
 end
 
 function Scene:update()
@@ -44,7 +42,6 @@ end
 function Scene:dismiss()
 	self.state = sceneState.isDismissed
 	self:remove()
-	print("Scene Dismiss")
 end
 
 function Scene:destroy()
