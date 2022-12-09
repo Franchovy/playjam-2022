@@ -19,12 +19,13 @@ local spritesAssigned = {}
 local LEVEL_WIDTH = 3000
 local maxLevels = 9
 
-function spritePositions:generateSpritePositions(minY, maxY, numEntities)
+function spritePositions:generateSpritePositions(minY, maxY, offsetX, numEntities)
+	--print("Generating sprite positions")
 	local positions = {}
 	for i=1,numEntities do
 		positions[i] = {
-			math.random(minY, maxY),
-			math.random(0, LEVEL_WIDTH)
+			x = math.random(offsetX, offsetX + LEVEL_WIDTH),
+			y = math.random(minY, maxY)
 		}
 	end
 
@@ -55,7 +56,8 @@ function generator:setSpawnPattern(spriteClass, minY, maxY, numEntitiesPerDiffic
 			spritePositions[i] = {}
 		end
 		
-		spritePositions[i][spriteClass] = spritePositions:generateSpritePositions(minY, maxY, numEntities)
+		local offsetX = (i - 1) * LEVEL_WIDTH
+		spritePositions[i][spriteClass] = spritePositions:generateSpritePositions(minY, maxY, offsetX, numEntities)
 	end
 end
 
@@ -67,17 +69,18 @@ function generator:generateLevel(level)
 	
 	levelsGenerated[level] = true
 	
-	-- Assign sprites to positions
+	-- Get pre-loaded sprite positions for this level
 	for spriteClass, positions in pairs(spritePositions[level]) do
 		local sprites = loadedSprites[spriteClass]
 		local positionIndex = 1
 		for i, position in ipairs(positions) do
+			--print(spriteClass.className .. " position: " .. position.x .. ", " .. position.y)
 			-- Find the next sprite that is currently unassigned
 			local spriteTable = table.getFirst(sprites, function (s) return spritesAssigned[s.sprite] == false end)
 			if spriteTable ~= nil then
 				local sprite = spriteTable.sprite
 				-- Assign position to this sprite
-				sprite:moveTo(position[1], position[2])
+				sprite:moveTo(position.x, position.y)
 				spritesAssigned[sprite] = level
 			end
 		end
@@ -118,6 +121,14 @@ function generator:loadLevelBegin()
 	self:updateSpritesInView()
 end
 
+function generator:degenerateAllLevels()
+	for i=1,maxLevels do
+		if levelsGenerated[i] then
+			self:degenerateLevel(i)
+		end
+	end
+end
+
 function generator:updateLevelIfNeeded()
 	local currentScreenOffsetX = self:getPositiveScreenOffset()
 	
@@ -139,7 +150,7 @@ function generator:updateLevelIfNeeded()
 	if levelsGenerated[levelNeedsGenerating] == true then
 		return
 	else
-		print("Generating level: " .. levelNeedsGenerating)
+		--print("Generating level: " .. levelNeedsGenerating)
 		self:generateLevel(levelNeedsGenerating)
 		
 		if (levelNeedsGenerating == currentLevel + 1) then
@@ -152,7 +163,7 @@ end
 
 function generator:update()
 	currentLevel = math.floor(self:getPositiveScreenOffset() / LEVEL_WIDTH) + 1
-	print("Current Level: " .. currentLevel)
+	--print("Current Level: " .. currentLevel)
 	
 	self:updateSpritesInView()
 	self:updateLevelIfNeeded()

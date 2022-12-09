@@ -25,19 +25,21 @@ function GameScene:init()
 	self.wallOfDeath = nil
 	self.textImageScore = nil
 	self.wallOfDeathSpeed = 4
-	self.numCoins = 60
-	self.numKillBlocks = 80
-	self.numPlatforms = 20
-	self.numWinds = 15
+	self.numWinds = 18
+	self.numCoins = 44
+	self.numPlatforms = 30
+	self.numKillBlocks = 43
 	
 	self.gameState = gameStates.created
+	
+	self.spritesLoaded = false
 end
 
 function GameScene:load()
 	Scene.load(self)
 	
 	self.gameState = gameStates.loading
-		
+	
 	-- Load Music
 	
 	self.soundFile = sound.fileplayer.new("music/music_main")
@@ -52,29 +54,36 @@ function GameScene:load()
 			backgroundImage:draw(0, 0)
 		end
 	)
+	
+	if not self.spritesLoaded then
 		
-	-- Create Player sprite
+		-- Create Player sprite
+		
+		self.wheel = Wheel.new(gfx.image.new("images/wheel_v3/new_wheel1"))
+		
+		-- Draw Score Text
+		
+		self.textImageScore = Score.new("Score: 0")
+		
+		-- Create Floor sprite
+		
+		self.floorPlatform = Platform.new(gfx.image.new(9000, 20),false)
+		
+		-- Create great wall of death
+		
+		self.wallOfDeath = WallOfDeath.new(self.wallOfDeathSpeed)
+		
+		-- Generate Level
+		
+		generator:registerSprite(Wind, self.numWinds, gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
+		generator:registerSprite(KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
+		generator:registerSprite(Platform, self.numPlatforms, gfx.image.new(100, 20),true)
+		generator:registerSprite(Coin, self.numCoins, gfx.image.new("images/coin"))
+		
+		self.spritesLoaded = true
+	end
 	
-	self.wheel = Wheel.new(gfx.image.new("images/wheel_v3/new_wheel1"))
-	
-	-- Draw Score Text
-	
-	self.textImageScore = Score.new("Score: 0")
-	
-	-- Create Floor sprite
-	
-	self.floorPlatform = Platform.new(gfx.image.new(9000, 20),false)
-	
-	-- Create great wall of death
-	
-	self.wallOfDeath = WallOfDeath.new(self.wallOfDeathSpeed)
-	
-	-- Generate Level
-	
-	generator:registerSprite(Wind, self.numWinds, gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
-	generator:registerSprite(KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
-	generator:registerSprite(Platform, self.numPlatforms, gfx.image.new(100, 20),true)
-	generator:registerSprite(Coin, self.numCoins, gfx.image.new("images/coin"))
+	-- Randomize sprite spawn locations
 	
 	generator:setSpawnPattern(Wind, 50, 200, { 3, 5, 8, 3, 6, 12 })
 	generator:setSpawnPattern(Coin, 50, 200, {8, 10, 12, 8, 12, 22})
@@ -84,6 +93,8 @@ end
 
 function GameScene:present()
 	Scene.present(self)
+	
+	print("Game Scene Present")
 	
 	-- Play music
 	
@@ -157,6 +168,8 @@ function GameScene:dismiss()
 	Scene.dismiss(self)
 	
 	self.soundFile:stop()
+	
+	generator:degenerateAllLevels()
 end
 
 function GameScene:destroy()
