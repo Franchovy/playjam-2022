@@ -14,6 +14,7 @@ function Sprite:init(image)
 	Sprite.super.init(self, image)
 	
 	self.type = "unset"
+	self.isAdded = false
 end
 
 -- Global sprite update function
@@ -76,4 +77,18 @@ function Sprite:checkCollisions(goalX, goalY)
 	collisionHandler:updateCollisionForSprite(self, collisions)
 	
 	return actualX, actualY, collisions, length
+end
+
+
+----------------------
+-- Add/Remove override
+
+function Sprite:add() 
+	Sprite.super.add(self)
+	self.isAdded = true
+end
+
+function Sprite:remove()
+	Sprite.super.remove(self)
+	self.isAdded = false
 end

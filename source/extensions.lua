@@ -1,6 +1,14 @@
 
 -- Extensions on "table"
 
+function table.getFirst(t, fn)
+	for _, e in pairs(t) do
+		if fn(e) then
+			return e
+		end
+	end
+end
+
 function table.each( t, fn )
 	if type(fn)~="function" then return end
 	for _, e in pairs(t) do
