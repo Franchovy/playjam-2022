@@ -21,7 +21,6 @@ function GameScene:init()
 	self:setIgnoresDrawOffset(true)
 	
 	self.wheel = nil
-	self.floorPlatform = nil
 	self.wallOfDeath = nil
 	self.textImageScore = nil
 	self.wallOfDeathSpeed = 4
@@ -65,30 +64,28 @@ function GameScene:load()
 		
 		self.textImageScore = Score.new("Score: 0")
 		
-		-- Create Floor sprite
-		
-		self.floorPlatform = Platform.new(gfx.image.new(9000, 20),false)
-		
 		-- Create great wall of death
 		
 		self.wallOfDeath = WallOfDeath.new(self.wallOfDeathSpeed)
 		
 		-- Generate Level
 		
-		generator:registerSprite(Wind, self.numWinds, gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
-		generator:registerSprite(KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
-		generator:registerSprite(Platform, self.numPlatforms, gfx.image.new(100, 20),true)
-		generator:registerSprite(Coin, self.numCoins, gfx.image.new("images/coin"))
+		generator:registerSprite("Wind", Wind, self.numWinds, gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
+		generator:registerSprite("Coin", Coin, self.numCoins, gfx.image.new("images/coin"))
+		generator:registerSprite("Platform.moving", Platform, self.numPlatforms, gfx.image.new(100, 20),true)
+		generator:registerSprite("KillBlock", KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
+		generator:registerSprite("Platform.ground", Platform, 3, gfx.image.new(3000, 20), false)
 		
 		self.spritesLoaded = true
 	end
 	
 	-- Randomize sprite spawn locations
 	
-	generator:setSpawnPattern(Wind, 50, 200, { 3, 5, 8, 3, 6, 12 })
-	generator:setSpawnPattern(Coin, 50, 200, {8, 10, 12, 8, 12, 22})
-	generator:setSpawnPattern(Platform, 140, 180, {6, 8, 10, 20, 10, 5})
-	generator:setSpawnPattern(KillBlock, 20, 140, {6, 8, 10, 10, 15, 28})
+	generator:setSpawnPattern("Wind", 50, 200, { 3, 5, 8, 3, 6, 12 })
+	generator:setSpawnPattern("Coin", 50, 200, {8, 10, 12, 8, 12, 22})
+	generator:setSpawnPattern("Platform.moving", 140, 180, {6, 8, 10, 20, 10, 5})
+	generator:setSpawnPattern("KillBlock", 20, 140, {6, 8, 10, 10, 15, 28})
+	generator:setSpawnPositions("Platform.ground", 0, 220, {1, 1, 1, 1, 1, 1})
 end
 
 function GameScene:present()
@@ -108,7 +105,6 @@ function GameScene:present()
 	-- Position Sprites
 	
 	self.wheel:moveTo(80, 188)
-	self.floorPlatform:moveTo(0, 220)
 	self.wallOfDeath:moveTo(-600, 0)
 	
 	-- Set randomly generated sprite positions
@@ -116,7 +112,6 @@ function GameScene:present()
 	generator:loadLevelBegin()
 	
 	self.wheel:add()
-	self.floorPlatform:add()
 	self.wallOfDeath:add()
 	self.textImageScore:add()
 	

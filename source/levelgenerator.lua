@@ -12,19 +12,28 @@ local loadedSprites = {}
 -- Sprite positions: 
 -- SpriteClass : positions array [ {x, y} ]
 local spritePositions = {}
-
+-- -----------------
+-- Levels generated:
+-- Array (true | false) (sprites loaded or not)
 local levelsGenerated = {}
+-- -----------------
+-- Sprites Assigned:
+-- [sprites : false | number]
+-- Sprite to assigned level / not assigned
+-- For all sprites
 local spritesAssigned = {}
+
+local floorPlatforms = {}
 
 local LEVEL_WIDTH = 3000
 local maxLevels = 9
 
-function spritePositions:generateSpritePositions(minY, maxY, offsetX, numEntities)
+function spritePositions:generateSpritePositions(minX, maxX, minY, maxY, numEntities)
 	--print("Generating sprite positions")
 	local positions = {}
 	for i=1,numEntities do
 		positions[i] = {
-			x = math.random(offsetX, offsetX + LEVEL_WIDTH),
+			x = math.random(minX, maxX),
 			y = math.random(minY, maxY)
 		}
 	end
@@ -32,12 +41,15 @@ function spritePositions:generateSpritePositions(minY, maxY, offsetX, numEntitie
 	return positions
 end
 
-function generator.registerSprite(self, spriteClass, maxInstances, ...)
-	loadedSprites[spriteClass] = {}
+-- --------------
+-- Generator
+
+function generator.registerSprite(self, name, spriteClass, maxInstances, ...)
+	loadedSprites[name] = {}
 	
 	for i=1,maxInstances do
 		local sprite = spriteClass.new(...)
-		loadedSprites[spriteClass][i] = { sprite = sprite }
+		loadedSprites[name][i] = { sprite = sprite }
 		spritesAssigned[sprite] = false
 	end
 end
@@ -46,10 +58,7 @@ function generator:getPositiveScreenOffset()
 	return -gfx.getDrawOffset()
 end
 
-function generator:setSpawnPattern(spriteClass, minY, maxY, numEntitiesPerDifficulty)
-	--loadedSprites[spriteClass].verticalSpawnRange = { minY, maxY }
-	--loadedSprites[spriteClass].spawnPattern = numEntitiesPerDifficulty
-	
+function generator:setSpawnPattern(name, minY, maxY, numEntitiesPerDifficulty)
 	maxLevels = math.max(maxLevels, #numEntitiesPerDifficulty)
 	for i, numEntities in ipairs(numEntitiesPerDifficulty) do
 		if spritePositions[i] == nil then
@@ -57,7 +66,26 @@ function generator:setSpawnPattern(spriteClass, minY, maxY, numEntitiesPerDiffic
 		end
 		
 		local offsetX = (i - 1) * LEVEL_WIDTH
-		spritePositions[i][spriteClass] = spritePositions:generateSpritePositions(minY, maxY, offsetX, numEntities)
+		spritePositions[i][name] = spritePositions:generateSpritePositions(
+			offsetX, 
+			offsetX + LEVEL_WIDTH, 
+			minY, 
+			maxY, 
+			numEntities
+		)
+	end
+end
+
+function generator:setSpawnPositions(name, x, y, numEntitiesPerDifficulty)
+	maxLevels = math.max(maxLevels, #numEntitiesPerDifficulty)
+	for i, numEntities in ipairs(numEntitiesPerDifficulty) do
+		if spritePositions[i] == nil then
+			spritePositions[i] = {}
+		end
+		
+		local offsetX = (i - 1) * LEVEL_WIDTH
+		spritePositions[i][name] = spritePositions:generateSpritePositions(offsetX + x, offsetX + x, y, y, numEntities)
+		printTable(spritePositions[i][name])
 	end
 end
 
@@ -70,11 +98,10 @@ function generator:generateLevel(level)
 	levelsGenerated[level] = true
 	
 	-- Get pre-loaded sprite positions for this level
-	for spriteClass, positions in pairs(spritePositions[level]) do
-		local sprites = loadedSprites[spriteClass]
+	for name, positions in pairs(spritePositions[level]) do
+		local sprites = loadedSprites[name]
 		local positionIndex = 1
 		for i, position in ipairs(positions) do
-			--print(spriteClass.className .. " position: " .. position.x .. ", " .. position.y)
 			-- Find the next sprite that is currently unassigned
 			local spriteTable = table.getFirst(sprites, function (s) return spritesAssigned[s.sprite] == false end)
 			if spriteTable ~= nil then
@@ -96,8 +123,8 @@ function generator:degenerateLevel(level)
 	levelsGenerated[level] = false
 	
 	-- Assign sprites to positions
-	for spriteClass, positions in pairs(spritePositions[level]) do
-		local sprites = loadedSprites[spriteClass]
+	for name, positions in pairs(spritePositions[level]) do
+		local sprites = loadedSprites[name]
 		for _, s in ipairs(sprites) do
 			local sprite = s.sprite
 			if spritesAssigned[sprite] == level then
@@ -176,10 +203,15 @@ function generator:updateSpritesInView()
 	
 	for _, spriteConfigList in pairs(loadedSprites) do
 		for _, spriteConfig in pairs(spriteConfigList) do
-			if spriteConfig.sprite.x > minGeneratedX and spriteConfig.sprite.x < maxGeneratedX then
-				spriteConfig.sprite:add()
+			local sprite = spriteConfig.sprite
+			if sprite.x < minGeneratedX and sprite.x + sprite.width < minGeneratedX then
+				-- Sprite is out of screen (left)
+				sprite:remove()
+			elseif sprite.x > maxGeneratedX and sprite.x + sprite.width > maxGeneratedX then
+				-- Sprite is out of screen (right)
+				sprite:remove()
 			else
-				spriteConfig.sprite:remove()
+				spriteConfig.sprite:add()
 			end
 		end
 	end
