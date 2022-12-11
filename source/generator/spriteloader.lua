@@ -3,6 +3,9 @@ import "levelgenerator"
 
 SpriteLoader = {}
 
+
+--
+
 function SpriteLoader.getSprites() 
 	local sprites = {}
 	for _, spritesOfType in pairs(generator:getLoadedSprites()) do
