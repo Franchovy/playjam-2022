@@ -26,7 +26,7 @@ local spritesAssigned = {}
 local floorPlatforms = {}
 
 local LEVEL_WIDTH = 3000
-local maxLevels = 9
+local maxLevels = 7
 
 function spritePositions:generateSpritePositions(minX, maxX, minY, maxY, numEntities)
 	--print("Generating sprite positions")
@@ -49,7 +49,7 @@ function generator.registerSprite(self, name, spriteClass, maxInstances, ...)
 	
 	for i=1,maxInstances do
 		local sprite = spriteClass.new(...)
-		loadedSprites[name][i] = { sprite = sprite }
+		loadedSprites[name][i] = sprite
 		spritesAssigned[sprite] = false
 	end
 end
@@ -85,7 +85,6 @@ function generator:setSpawnPositions(name, x, y, numEntitiesPerDifficulty)
 		
 		local offsetX = (i - 1) * LEVEL_WIDTH
 		spritePositions[i][name] = spritePositions:generateSpritePositions(offsetX + x, offsetX + x, y, y, numEntities)
-		printTable(spritePositions[i][name])
 	end
 end
 
@@ -103,9 +102,8 @@ function generator:generateLevel(level)
 		local positionIndex = 1
 		for i, position in ipairs(positions) do
 			-- Find the next sprite that is currently unassigned
-			local spriteTable = table.getFirst(sprites, function (s) return spritesAssigned[s.sprite] == false end)
-			if spriteTable ~= nil then
-				local sprite = spriteTable.sprite
+			local sprite = table.getFirst(sprites, function (s) return spritesAssigned[s] == false end)
+			if sprite ~= nil then
 				-- Assign position to this sprite
 				sprite:moveTo(position.x, position.y)
 				spritesAssigned[sprite] = level
@@ -125,8 +123,7 @@ function generator:degenerateLevel(level)
 	-- Assign sprites to positions
 	for name, positions in pairs(spritePositions[level]) do
 		local sprites = loadedSprites[name]
-		for _, s in ipairs(sprites) do
-			local sprite = s.sprite
+		for _, sprite in ipairs(sprites) do
 			if spritesAssigned[sprite] == level then
 				-- Assign position
 				spritesAssigned[sprite] = false
@@ -201,26 +198,33 @@ function generator:updateSpritesInView()
 	local minGeneratedX = currentScreenOffsetX - 400
 	local maxGeneratedX = currentScreenOffsetX + 400 + 400
 	
-	for _, spriteConfigList in pairs(loadedSprites) do
-		for _, spriteConfig in pairs(spriteConfigList) do
-			local sprite = spriteConfig.sprite
+	for _, sprites in pairs(loadedSprites) do
+		for _, sprite in pairs(sprites) do
+			-- TODO: ISSUE - Why are sprites remaining all unassigned?
+			-- Ignore sprites that are not assigned
+			print(spritesAssigned[sprite])
+			if spritesAssigned[sprite] == false then return end
+			
 			if sprite.x < minGeneratedX and sprite.x + sprite.width < minGeneratedX then
 				-- Sprite is out of screen (left)
+				print("Removing " .. sprite.type)
 				sprite:remove()
 			elseif sprite.x > maxGeneratedX and sprite.x + sprite.width > maxGeneratedX then
 				-- Sprite is out of screen (right)
+				print("Removing " .. sprite.type)
 				sprite:remove()
 			else
-				spriteConfig.sprite:add()
+				print("Adding " .. sprite.type)
+				sprite:add()
 			end
 		end
 	end
 end
 
 function generator:removeAllSprites()
-	for _, spriteConfigList in pairs(loadedSprites) do
-		for _, spriteConfig in pairs(spriteConfigList) do
-			spriteConfig.sprite:remove()
+	for _, sprites in pairs(loadedSprites) do
+		for _, sprite in pairs(sprites) do
+			sprite:remove()
 		end
 	end
 end
