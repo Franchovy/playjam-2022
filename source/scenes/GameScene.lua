@@ -1,5 +1,6 @@
 import "engine"
 import "levelgenerator"
+import "generator/spritespawner"
 
 class('GameScene').extends(Scene)
 
@@ -122,7 +123,12 @@ end
 function GameScene:update()
 	Scene.update(self)
 	
+	-- Update sprites
+	
 	generator:update()
+	SpriteSpawner.update()
+	
+	-- On game start
 	
 	if self.gameState == gameStates.readyToStart then
 		-- Awaiting player input (jump / crank)

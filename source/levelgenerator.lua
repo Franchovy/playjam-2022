@@ -54,6 +54,10 @@ function generator.registerSprite(self, name, spriteClass, maxInstances, ...)
 	end
 end
 
+function generator:getLoadedSprites()
+	return loadedSprites
+end
+
 function generator:getPositiveScreenOffset()
 	return -gfx.getDrawOffset()
 end
@@ -202,20 +206,20 @@ function generator:updateSpritesInView()
 		for _, sprite in pairs(sprites) do
 			-- TODO: ISSUE - Why are sprites remaining all unassigned?
 			-- Ignore sprites that are not assigned
-			print(spritesAssigned[sprite])
+			--print(spritesAssigned[sprite])
 			if spritesAssigned[sprite] == false then return end
 			
 			if sprite.x < minGeneratedX and sprite.x + sprite.width < minGeneratedX then
 				-- Sprite is out of screen (left)
-				print("Removing " .. sprite.type)
-				sprite:remove()
+				--print("Removing " .. sprite.type)
+				--sprite:remove()
 			elseif sprite.x > maxGeneratedX and sprite.x + sprite.width > maxGeneratedX then
 				-- Sprite is out of screen (right)
-				print("Removing " .. sprite.type)
-				sprite:remove()
+				--print("Removing " .. sprite.type)
+				--sprite:remove()
 			else
-				print("Adding " .. sprite.type)
-				sprite:add()
+				--print("Adding " .. sprite.type)
+				--sprite:add()
 			end
 		end
 	end
