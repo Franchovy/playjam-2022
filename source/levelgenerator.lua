@@ -41,27 +41,6 @@ end
 -- --------------
 -- Generator
 
--- ---------------
--- Loaded Sprites:
--- [list of sprite instances]
--- spawnPattern --deprecated
--- verticalSpawnRange --deprecated
-local loadedSprites = {}
-
-function generator.registerSprite(self, name, spriteClass, maxInstances, ...)
-	loadedSprites[name] = {}
-	
-	for i=1,maxInstances do
-		local sprite = spriteClass.new(...)
-		loadedSprites[name][i] = sprite
-		spritesAssigned[sprite] = false
-	end
-end
-
-function generator:getLoadedSprites()
-	return loadedSprites
-end
-
 function generator:getPositiveScreenOffset()
 	return -gfx.getDrawOffset()
 end
