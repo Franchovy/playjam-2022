@@ -1,6 +1,5 @@
 import "engine"
 import "levelgenerator"
-import "generator/spritespawner"
 
 class('GameScene').extends(Scene)
 
@@ -25,10 +24,6 @@ function GameScene:init()
 	self.wallOfDeath = nil
 	self.textImageScore = nil
 	self.wallOfDeathSpeed = 4
-	self.numWinds = 18
-	self.numCoins = 44
-	self.numPlatforms = 30
-	self.numKillBlocks = 43
 	
 	self.gameState = gameStates.created
 	
@@ -71,22 +66,17 @@ function GameScene:load()
 		
 		-- Generate Level
 		
-		generator:registerSprite("Wind", Wind, self.numWinds, gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
-		generator:registerSprite("Coin", Coin, self.numCoins, gfx.image.new("images/coin"))
-		generator:registerSprite("Platform.moving", Platform, self.numPlatforms, gfx.image.new(100, 20),true)
-		generator:registerSprite("KillBlock", KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
-		generator:registerSprite("Platform.ground", Platform, 3, gfx.image.new(3000, 20), false)
+		-- TODO: Move arguments into 
+		--SpriteLoader:registerSprite("Wind", Wind, self.numWinds, gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
+		--SpriteLoader:registerSprite("Coin", Coin, self.numCoins, gfx.image.new("images/coin"))
+		--SpriteLoader:registerSprite("Platform.moving", Platform, self.numPlatforms, gfx.image.new(100, 20), true)
+		--SpriteLoader:registerSprite("KillBlock", KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
+		--SpriteLoader:registerSprite("Platform.ground", Platform, 3, gfx.image.new(3000, 20), false)
 		
 		self.spritesLoaded = true
 	end
 	
-	-- Randomize sprite spawn locations
-	
-	generator:setSpawnPattern("Wind", 50, 200, { 3, 5, 8, 3, 6, 12 })
-	generator:setSpawnPattern("Coin", 50, 200, {8, 10, 12, 8, 12, 22})
-	generator:setSpawnPattern("Platform.moving", 140, 180, {6, 8, 10, 20, 10, 5})
-	generator:setSpawnPattern("KillBlock", 20, 140, {6, 8, 10, 10, 15, 28})
-	generator:setSpawnPositions("Platform.ground", 0, 220, {1, 1, 1, 1, 1, 1})
+	-- TODO: Generate random positioning for sprites, store somewhere accessible from in-range check [update function]
 end
 
 function GameScene:present()
@@ -110,23 +100,52 @@ function GameScene:present()
 	
 	-- Set randomly generated sprite positions
 	
-	generator:loadLevelBegin()
+	--generator:loadLevelBegin()
 	
 	self.wheel:add()
 	self.wallOfDeath:add()
 	self.textImageScore:add()
 	
 	-- Set game as ready to start
+	
 	self.gameState = gameStates.readyToStart
 end
 
 function GameScene:update()
 	Scene.update(self)
 	
+	--
+	
+	-- Remove / Add Sprites based on range
+	
+	local sprites = SpriteLoader:getAllSprites()
+	
+	local minGeneratedX = -gfx.getDrawOffset() - 400
+	local maxGeneratedX = -gfx.getDrawOffset() + 400 + 400
+	
+	for _, sprite in pairs(sprites) do
+		if (sprite.x + sprite.width < minGeneratedX) or (sprite.x > maxGeneratedX) then
+			-- Sprite is out of loaded area
+			sprite:remove()
+			
+			-- TODO: Unload sprite
+		else
+			-- Sprite has entered loading area
+			
+			-- TODO: Get any sprite positions in range that are yet unassigned
+			
+			-- TODO: Load sprite
+			-- TODO: If sprite doesn't exist, create sprite (with params)
+			
+			-- TODO: Set Difficulty params
+			
+			sprite:add()
+		end
+	end
+	
 	-- Update sprites
 	
 	generator:update()
-	SpriteSpawner.update()
 	
 	-- On game start
 	
