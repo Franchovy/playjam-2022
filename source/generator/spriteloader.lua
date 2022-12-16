@@ -26,22 +26,22 @@ SpriteLoader = SpriteLoader()
 
 -- Public Functions
 
-function SpriteLoader:createSprite(name, spriteClass, maxInstances, ...)
+function SpriteLoader:createSprite(name, spriteClass, ...)
 	-- Create sprite list if not existing
 	if self.sprites[name] == nil then
 		self.sprites = {}
 	end
 	
-	for i=1,maxInstances do
-		-- Create new sprite from arguments
-		local sprite = spriteClass(...)
-		
-		-- Set assigned status to false
-		self.assignedSprites[newSprite] = false
-		
-		-- Add sprite to sprite lists
-		self:insertSprite(name, sprite)
-	end
+	-- Create new sprite from arguments
+	local sprite = spriteClass(...)
+	
+	-- Set assigned status to false
+	self.assignedSprites[sprite] = false
+	
+	-- Add sprite to sprite lists
+	self:insertSprite(name, sprite)
+	
+	return sprite
 end
 
 function SpriteLoader:getAllSprites() 
@@ -55,9 +55,17 @@ function SpriteLoader:getAllSprites()
 	return sprites
 end
 
+function SpriteLoader:registerSprite(name)
+	self.sprites[name] = {}
+end
+
 function SpriteLoader:loadSprite(name)
 	-- Get sprite if existing
 	local reusedSprite = table.getFirst(self.sprites[name], function (s) self:isSpriteAssigned(s) end)
+	
+	if reusedSprite == nil then
+		return nil
+	end
 	
 	-- Set assigned status to true
 	self.assignedSprites[reusedSprite] = true

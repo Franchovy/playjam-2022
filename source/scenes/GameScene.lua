@@ -1,6 +1,7 @@
 import "engine"
 import "levelgenerator"
 import "generator/spritepositionmanager"
+import "generator/spriteloader"
 
 class('GameScene').extends(Scene)
 
@@ -68,6 +69,7 @@ function GameScene:load()
 		-- Generate Level
 		
 		-- TODO: Move arguments into 
+		SpriteLoader:registerSprite("Wind")
 		--SpriteLoader:registerSprite("Wind", Wind, self.numWinds, gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
 		--SpriteLoader:registerSprite("Coin", Coin, self.numCoins, gfx.image.new("images/coin"))
 		--SpriteLoader:registerSprite("Platform.moving", Platform, self.numPlatforms, gfx.image.new(100, 20), true)
@@ -76,6 +78,8 @@ function GameScene:load()
 		
 		self.spritesLoaded = true
 	end
+	
+	self.loadedChunks = {}
 	
 	-- TODO: Generate random positioning for sprites, store somewhere accessible from in-range check [update function]
 	SpritePositionManager:populate("Wind", {top = 50, bottom = 150}, { left = 300, right = 800})
@@ -124,6 +128,28 @@ function GameScene:update()
 	
 	-- Remove / Add Sprites based on range
 	
+	local chunk = math.floor((-gfx.getDrawOffset()) / 1000)
+	-- TODO: - Add previous and next chunks, not only current
+	
+	local chunkToLoad = chunk + 1
+	if self.loadedChunks[chunkToLoad] ~= true then
+		print("Loading chunk: ".. chunkToLoad)
+		local spritePositions = SpritePositionManager:getPositionsInChunk("Wind", chunkToLoad)
+		
+		for _, position in pairs(spritePositions) do
+			-- Reuse or create new sprite
+			local sprite = SpriteLoader:loadSprite("Wind")
+			if sprite == nil then
+				sprite = SpriteLoader:createSprite("Wind", Wind, gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
+			end
+			
+			-- Move sprite to assigned position
+			sprite:moveTo(position.x, position.y)
+			
+			-- TODO: Set Difficulty params (based on chunk)
+		end
+	end
+	
 	local sprites = SpriteLoader:getAllSprites()
 	
 	local minGeneratedX = -gfx.getDrawOffset() - 400
@@ -133,18 +159,8 @@ function GameScene:update()
 		if (sprite.x + sprite.width < minGeneratedX) or (sprite.x > maxGeneratedX) then
 			-- Sprite is out of loaded area
 			sprite:remove()
-			
-			-- TODO: Unload sprite
 		else
 			-- Sprite has entered loading area
-			
-			-- TODO: Get any sprite positions in range that are yet unassigned
-			
-			-- TODO: Load sprite
-			-- TODO: If sprite doesn't exist, create sprite (with params)
-			
-			-- TODO: Set Difficulty params
-			
 			sprite:add()
 		end
 	end

@@ -2,16 +2,17 @@ import "engine"
 
 class("SpritePositionManager").extends()
 
-SpritePositionManager = SpritePositionManager()
-
 function SpritePositionManager:init()
 	self.positions = {}
 end
+
+SpritePositionManager = SpritePositionManager()
 
 function SpritePositionManager:populate(name, yRange, xIntervalRange)
 	-- Automatically populate 10 chunks
 	local spritePositions = {}
 	for i=1,10 do
+		spritePositions[i] = {}
 		local chunkXOffset = (i - 1) * 1000
 		local nextX = 0
 		local previousX = 0
