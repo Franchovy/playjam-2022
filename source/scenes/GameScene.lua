@@ -1,5 +1,6 @@
 import "engine"
 import "levelgenerator"
+import "generator/spritepositionmanager"
 
 class('GameScene').extends(Scene)
 
@@ -77,6 +78,11 @@ function GameScene:load()
 	end
 	
 	-- TODO: Generate random positioning for sprites, store somewhere accessible from in-range check [update function]
+	SpritePositionManager:populate("Wind", {top = 50, bottom = 150}, { left = 300, right = 800})
+	--SpritePositionManager:populate("Wind", {top = 50, bottom = 150}, { left = 300, right = 800}) -- TODO
+	--SpritePositionManager:populate("Wind", {top = 50, bottom = 150}, { left = 300, right = 800}) -- TODO
+	--SpritePositionManager:populate("Wind", {top = 50, bottom = 150}, { left = 300, right = 800}) -- TODO
+	--SpritePositionManager:populate("Wind", {top = 50, bottom = 150}, { left = 300, right = 800}) -- TODO
 end
 
 function GameScene:present()
