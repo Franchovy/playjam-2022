@@ -8,25 +8,35 @@ end
 
 SpritePositionManager = SpritePositionManager()
 
-function SpritePositionManager:populate(name, yRange, xIntervalRange)
+function SpritePositionManager:generateRandomOffsetsForChunk(count)
+	local offsets = {}
+	for i=1,count do
+		local newOffset = math.random(0, 1000) -- Chunk size by default
+		table.insert(offsets, newOffset)
+	end
+	return offsets
+end
+
+function SpritePositionManager:populate(name, yRange)
 	-- Automatically populate 10 chunks
 	local spritePositions = {}
 	for i=1,10 do
 		spritePositions[i] = {}
 		local chunkXOffset = (i - 1) * 1000
-		local nextX = 0
-		local previousX = 0
-		while (nextX < 1000) do
-		 	table.insert(spritePositions[i], 
-				 { 
-					 y = math.random(yRange.top, yRange.bottom),
-					 x = nextX 
-				 }
-			 )
-		 	previousX = nextX
-		 	nextX = math.random(previousX + xIntervalRange.left, previousX + xIntervalRange.right)
-	 	end
+		local positionsX = self:generateRandomOffsetsForChunk(2)
+		
+		for _, x in pairs(positionsX) do
+			table.insert(spritePositions[i], 
+			 	{ 
+				 	y = math.random(yRange.top, yRange.bottom),
+				 	x = chunkXOffset + x
+			 	}
+			)
+		end
 	end
+	
+	print("Created table of sprite positions: ")
+	printTable(spritePositions)
 	--print("Setting sprite positions for: ".. name)
 	self.positions[name] = spritePositions
 end

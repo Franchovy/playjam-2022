@@ -52,6 +52,27 @@ function GameScene:load()
 		end
 	)
 	
+	-- Set up sprites
+	
+	-- "Coin", Coin, self.numCoins, gfx.image.new("images/coin"))
+	-- "Platform.moving", Platform, self.numPlatforms, gfx.image.new(100, 20), true)
+	-- "KillBlock", KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
+	-- "Platform.ground", Platform, 3, gfx.image.new(3000, 20), false)
+	self.spriteData = {
+		{
+			name = "Wind",
+			className = Wind,
+			yRange = {
+				top = 40,
+				bottom = 100
+			},
+			initParams = {
+				gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4
+			},
+			
+		}
+	}
+	
 	if not self.spritesLoaded then
 		
 		-- Create Player sprite
@@ -68,25 +89,19 @@ function GameScene:load()
 		
 		-- Generate Level
 		
-		-- TODO: Move arguments into 
-		SpriteLoader:registerSprite("Wind")
-		--SpriteLoader:registerSprite("Wind", Wind, self.numWinds, gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
-		--SpriteLoader:registerSprite("Coin", Coin, self.numCoins, gfx.image.new("images/coin"))
-		--SpriteLoader:registerSprite("Platform.moving", Platform, self.numPlatforms, gfx.image.new(100, 20), true)
-		--SpriteLoader:registerSprite("KillBlock", KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
-		--SpriteLoader:registerSprite("Platform.ground", Platform, 3, gfx.image.new(3000, 20), false)
+		for _, spriteData in pairs(self.spriteData) do
+			SpriteLoader:registerSprite(spriteData.name)
+		end
 		
 		self.spritesLoaded = true
 	end
 	
 	self.loadedChunks = {}
 	
-	-- TODO: Generate random positioning for sprites, store somewhere accessible from in-range check [update function]
-	SpritePositionManager:populate("Wind", {top = 50, bottom = 150}, { left = 300, right = 800})
-	--SpritePositionManager:populate("Wind", {top = 50, bottom = 150}, { left = 300, right = 800}) -- TODO
-	--SpritePositionManager:populate("Wind", {top = 50, bottom = 150}, { left = 300, right = 800}) -- TODO
-	--SpritePositionManager:populate("Wind", {top = 50, bottom = 150}, { left = 300, right = 800}) -- TODO
-	--SpritePositionManager:populate("Wind", {top = 50, bottom = 150}, { left = 300, right = 800}) -- TODO
+	-- Create sprite positions
+	for _, spriteData in pairs(self.spriteData) do
+		SpritePositionManager:populate(spriteData.name, spriteData.yRange)
+	end
 end
 
 function GameScene:present()
@@ -110,8 +125,6 @@ function GameScene:present()
 	
 	-- Set randomly generated sprite positions
 	
-	--generator:loadLevelBegin()
-	
 	self.wheel:add()
 	self.wallOfDeath:add()
 	self.textImageScore:add()
@@ -133,28 +146,31 @@ function GameScene:update()
 	-- Remove / Add Sprites based on range
 	
 	local chunk = math.floor((-gfx.getDrawOffset()) / 1000)
-	-- TODO: - Add previous and next chunks, not only current
-	--print("Getting sprites for chunk: ".. chunk)
-	
+
+	-- TODO: - Improve chunks being loaded
 	local chunkToLoad = chunk + 1
 	
 	if self.loadedChunks[chunkToLoad] ~= true then
 		
-		--print("Loading chunk: ".. chunkToLoad)
 		local spritePositions = SpritePositionManager:getPositionsInChunk("Wind", chunkToLoad)
 		
 		for _, position in pairs(spritePositions) do
-			
-			-- Reuse or create new sprite
-			local sprite = SpriteLoader:loadSprite("Wind")
-			if sprite == nil then
-				sprite = SpriteLoader:createSprite("Wind", Wind, gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
+			for _, spriteData in pairs(self.spriteData) do
+				local name = spriteData.name
+				local className = spriteData.className
+				local args = spriteData.initParams
+				
+				-- Reuse or create new sprite
+				local sprite = SpriteLoader:loadSprite(name)
+				if sprite == nil then
+					sprite = SpriteLoader:createSprite(name, className, args)
+				end
+				
+				-- Move sprite to assigned position
+				sprite:moveTo(position.x, position.y)
+				
+				-- TODO: Set Difficulty params (based on chunk)
 			end
-			
-			-- Move sprite to assigned position
-			sprite:moveTo(position.x, position.y)
-			
-			-- TODO: Set Difficulty params (based on chunk)
 		end
 		
 		self.loadedChunks[chunkToLoad] = true

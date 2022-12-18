@@ -26,14 +26,14 @@ SpriteLoader = SpriteLoader()
 
 -- Public Functions
 
-function SpriteLoader:createSprite(name, spriteClass, ...)
+function SpriteLoader:createSprite(name, spriteClass, args)
 	-- Create sprite list if not existing
 	if self.sprites[name] == nil then
 		self.sprites = {}
 	end
 	
 	-- Create new sprite from arguments
-	local sprite = spriteClass(...)
+	local sprite = spriteClass(table.unpack(args))
 	
 	-- Set assigned status to false
 	self.assignedSprites[sprite] = false
