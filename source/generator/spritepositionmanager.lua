@@ -27,10 +27,18 @@ function SpritePositionManager:populate(name, yRange, xIntervalRange)
 		 	nextX = math.random(previousX + xIntervalRange.left, previousX + xIntervalRange.right)
 	 	end
 	end
-	
+	--print("Setting sprite positions for: ".. name)
 	self.positions[name] = spritePositions
 end
 
 function SpritePositionManager:getPositionsInChunk(name, chunk) 
+	--print("Getting sprite positions for: ".. name .. ", chunk: " ..chunk)
+	--print("Response: ".. #self.positions[name][chunk])
+	if self.positions[name] == nil or
+		self.positions[name][chunk] == nil then
+			print("Chunk does not exist: ".. name.. "[".. chunk.. "]")
+		return {}
+	end
+	
 	return self.positions[name][chunk]
 end

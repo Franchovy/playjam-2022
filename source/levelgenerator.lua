@@ -176,8 +176,8 @@ function generator:update()
 	currentLevel = math.floor(self:getPositiveScreenOffset() / CHUNK_WIDTH) + 1
 	--print("Current Level: " .. currentLevel)
 	
-	self:updateSpritesInView()
-	self:updateLevelIfNeeded()
+	--self:updateSpritesInView()
+	--self:updateLevelIfNeeded()
 end
 
 function generator:updateSpritesInView()

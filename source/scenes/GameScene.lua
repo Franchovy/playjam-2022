@@ -119,6 +119,10 @@ function GameScene:present()
 	-- Set game as ready to start
 	
 	self.gameState = gameStates.readyToStart
+	
+	
+	-- TODO: Move
+	self.assignedPositions = {}
 end
 
 function GameScene:update()
@@ -130,13 +134,17 @@ function GameScene:update()
 	
 	local chunk = math.floor((-gfx.getDrawOffset()) / 1000)
 	-- TODO: - Add previous and next chunks, not only current
+	--print("Getting sprites for chunk: ".. chunk)
 	
 	local chunkToLoad = chunk + 1
+	
 	if self.loadedChunks[chunkToLoad] ~= true then
-		print("Loading chunk: ".. chunkToLoad)
+		
+		--print("Loading chunk: ".. chunkToLoad)
 		local spritePositions = SpritePositionManager:getPositionsInChunk("Wind", chunkToLoad)
 		
 		for _, position in pairs(spritePositions) do
+			
 			-- Reuse or create new sprite
 			local sprite = SpriteLoader:loadSprite("Wind")
 			if sprite == nil then
@@ -148,6 +156,8 @@ function GameScene:update()
 			
 			-- TODO: Set Difficulty params (based on chunk)
 		end
+		
+		self.loadedChunks[chunkToLoad] = true
 	end
 	
 	local sprites = SpriteLoader:getAllSprites()
