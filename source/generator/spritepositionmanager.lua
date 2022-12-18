@@ -17,13 +17,13 @@ function SpritePositionManager:generateRandomOffsetsForChunk(count)
 	return offsets
 end
 
-function SpritePositionManager:populate(name, yRange)
+function SpritePositionManager:populate(name, yRange, spriteCount)
 	-- Automatically populate 10 chunks
 	local spritePositions = {}
 	for i=1,10 do
 		spritePositions[i] = {}
 		local chunkXOffset = (i - 1) * 1000
-		local positionsX = self:generateRandomOffsetsForChunk(2)
+		local positionsX = self:generateRandomOffsetsForChunk(spriteCount)
 		
 		for _, x in pairs(positionsX) do
 			table.insert(spritePositions[i], 

@@ -62,6 +62,7 @@ function GameScene:load()
 		{
 			name = "Wind",
 			className = Wind,
+			numSpritesPerChunk = 2,
 			yRange = {
 				top = 40,
 				bottom = 100
@@ -69,7 +70,6 @@ function GameScene:load()
 			initParams = {
 				gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4
 			},
-			
 		}
 	}
 	
@@ -100,7 +100,7 @@ function GameScene:load()
 	
 	-- Create sprite positions
 	for _, spriteData in pairs(self.spriteData) do
-		SpritePositionManager:populate(spriteData.name, spriteData.yRange)
+		SpritePositionManager:populate(spriteData.name, spriteData.yRange, spriteData.numSpritesPerChunk)
 	end
 end
 
@@ -152,10 +152,10 @@ function GameScene:update()
 	
 	if self.loadedChunks[chunkToLoad] ~= true then
 		
-		local spritePositions = SpritePositionManager:getPositionsInChunk("Wind", chunkToLoad)
-		
-		for _, position in pairs(spritePositions) do
-			for _, spriteData in pairs(self.spriteData) do
+		for _, spriteData in pairs(self.spriteData) do
+			local spritePositions = SpritePositionManager:getPositionsInChunk(spriteData.name, chunkToLoad)
+			
+			for _, position in pairs(spritePositions) do
 				local name = spriteData.name
 				local className = spriteData.className
 				local args = spriteData.initParams
