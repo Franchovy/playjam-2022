@@ -2,6 +2,7 @@ import "engine"
 import "levelgenerator"
 import "generator/spritepositionmanager"
 import "generator/spriteloader"
+import "generator/spritedata"
 
 class('GameScene').extends(Scene)
 
@@ -58,20 +59,17 @@ function GameScene:load()
 	-- "Platform.moving", Platform, self.numPlatforms, gfx.image.new(100, 20), true)
 	-- "KillBlock", KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
 	-- "Platform.ground", Platform, 3, gfx.image.new(3000, 20), false)
-	self.spriteData = {
-		{
-			name = "Wind",
-			className = Wind,
-			numSpritesPerChunk = 2,
-			yRange = {
-				top = 40,
-				bottom = 100
-			},
-			initParams = {
-				gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4
-			},
-		}
-	}
+	SpriteData:registerSprite("Wind", Wind, 
+	{
+		gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4
+	},
+	{
+		numSpritesPerChunk = 2,
+		yRange = {
+			top = 40,
+			bottom = 100
+		},
+	})
 	
 	if not self.spritesLoaded then
 		
@@ -89,19 +87,13 @@ function GameScene:load()
 		
 		-- Generate Level
 		
-		for _, spriteData in pairs(self.spriteData) do
-			SpriteLoader:registerSprite(spriteData.name)
-		end
-		
 		self.spritesLoaded = true
 	end
 	
 	self.loadedChunks = {}
 	
 	-- Create sprite positions
-	for _, spriteData in pairs(self.spriteData) do
-		SpritePositionManager:populate(spriteData.name, spriteData.yRange, spriteData.numSpritesPerChunk)
-	end
+	SpriteData:generatePositions()
 end
 
 function GameScene:present()
@@ -133,8 +125,7 @@ function GameScene:present()
 	
 	self.gameState = gameStates.readyToStart
 	
-	
-	-- TODO: Move
+	-- TODO: Move to sprite position assignment manager
 	self.assignedPositions = {}
 end
 
@@ -151,27 +142,7 @@ function GameScene:update()
 	local chunkToLoad = chunk + 1
 	
 	if self.loadedChunks[chunkToLoad] ~= true then
-		
-		for _, spriteData in pairs(self.spriteData) do
-			local spritePositions = SpritePositionManager:getPositionsInChunk(spriteData.name, chunkToLoad)
-			
-			for _, position in pairs(spritePositions) do
-				local name = spriteData.name
-				local className = spriteData.className
-				local args = spriteData.initParams
-				
-				-- Reuse or create new sprite
-				local sprite = SpriteLoader:loadSprite(name)
-				if sprite == nil then
-					sprite = SpriteLoader:createSprite(name, className, args)
-				end
-				
-				-- Move sprite to assigned position
-				sprite:moveTo(position.x, position.y)
-				
-				-- TODO: Set Difficulty params (based on chunk)
-			end
-		end
+		SpriteData:reloadSpritesInChunk(chunkToLoad)
 		
 		self.loadedChunks[chunkToLoad] = true
 	end
