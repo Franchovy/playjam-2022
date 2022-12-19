@@ -36,6 +36,8 @@ end
 function GameScene:load()
 	Scene.load(self)
 	
+	print("Load!")
+	
 	self.gameState = gameStates.loading
 	
 	-- Load Music
@@ -55,21 +57,25 @@ function GameScene:load()
 	
 	-- Set up sprites
 	
-	-- "Coin", Coin, self.numCoins, gfx.image.new("images/coin"))
-	-- "Platform.moving", Platform, self.numPlatforms, gfx.image.new(100, 20), true)
-	-- "KillBlock", KillBlock, self.numKillBlocks, gfx.image.new("images/kill_block"))
-	-- "Platform.ground", Platform, 3, gfx.image.new(3000, 20), false)
-	SpriteData:registerSprite("Wind", Wind, 
-	{
-		gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4
-	},
-	{
-		numSpritesPerChunk = 2,
-		yRange = {
-			top = 40,
-			bottom = 100
-		},
-	})
+	SpriteData:registerSprite("Wind", Wind)
+	SpriteData:setInitializerParams("Wind", gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
+	SpriteData:setPositioning("Wind", 2, { yRange = { 40, 100 } } )
+	
+	SpriteData:registerSprite("Coin", Coin)
+	SpriteData:setInitializerParams("Coin", gfx.image.new("images/coin"))
+	SpriteData:setPositioning("Coin", 6, { yRange = { 30, 200 } } )
+	
+	SpriteData:registerSprite("Platform/moving", Platform)
+	SpriteData:setInitializerParams("Platform/moving", gfx.image.new(100, 20), true)
+	SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
+	
+	SpriteData:registerSprite("Kill Block", KillBlock)
+	SpriteData:setInitializerParams("Kill Block", gfx.image.new("images/kill_block"))
+	SpriteData:setPositioning("Kill Block", 4, { yRange = { 20, 180 } } )
+	
+	SpriteData:registerSprite("Platform/floor", Platform)
+	SpriteData:setInitializerParams("Platform/floor", gfx.image.new(1000, 20), false)
+	SpriteData:setPositioning("Platform/floor", 1, { yRange = { 220, 220 } } )
 	
 	if not self.spritesLoaded then
 		
@@ -91,9 +97,6 @@ function GameScene:load()
 	end
 	
 	self.loadedChunks = {}
-	
-	-- Create sprite positions
-	SpriteData:generatePositions()
 end
 
 function GameScene:present()
@@ -133,6 +136,8 @@ function GameScene:update()
 	Scene.update(self)
 	
 	--
+	
+	--printTable(SpriteData.spriteData[3])
 	
 	-- Remove / Add Sprites based on range
 	

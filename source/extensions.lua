@@ -1,6 +1,14 @@
 
 -- Extensions on "table"
 
+function table.firstIndex(t, fn)
+	for i, e in ipairs(t) do
+		if fn(e) then
+			return i
+		end
+	end
+end
+
 function table.getFirst(t, fn)
 	for _, e in pairs(t) do
 		if fn(e) then

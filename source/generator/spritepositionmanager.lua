@@ -26,9 +26,11 @@ function SpritePositionManager:populate(name, yRange, spriteCount)
 		local positionsX = self:generateRandomOffsetsForChunk(spriteCount)
 		
 		for _, x in pairs(positionsX) do
+			local yRangeMin, yRangeMax = table.unpack(yRange)
+			
 			table.insert(spritePositions[i], 
 			 	{ 
-				 	y = math.random(yRange.top, yRange.bottom),
+				 	y = math.random(yRangeMin, yRangeMax),
 				 	x = chunkXOffset + x
 			 	}
 			)
@@ -42,7 +44,7 @@ function SpritePositionManager:populate(name, yRange, spriteCount)
 end
 
 function SpritePositionManager:getPositionsInChunk(name, chunk) 
-	--print("Getting sprite positions for: ".. name .. ", chunk: " ..chunk)
+	print("Getting sprite positions for: ".. name .. ", chunk: " ..chunk)
 	--print("Response: ".. #self.positions[name][chunk])
 	if self.positions[name] == nil or
 		self.positions[name][chunk] == nil then
