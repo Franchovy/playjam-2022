@@ -1,5 +1,4 @@
 import "engine"
-import "levelgenerator"
 import "generator/spritepositionmanager"
 import "generator/spriteloader"
 import "generator/spritedata"
@@ -167,10 +166,6 @@ function GameScene:update()
 		end
 	end
 	
-	-- Update sprites
-	
-	generator:update()
-	
 	-- On game start
 	
 	if self.gameState == gameStates.readyToStart then
@@ -212,8 +207,6 @@ function GameScene:dismiss()
 	Scene.dismiss(self)
 	
 	self.soundFile:stop()
-	
-	generator:degenerateAllLevels()
 end
 
 function GameScene:destroy()

@@ -1,5 +1,4 @@
 import "engine"
-import "levelgenerator"
 
 class("SpriteLoader").extends()
 
