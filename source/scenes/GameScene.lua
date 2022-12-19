@@ -81,7 +81,7 @@ function GameScene:load()
 	
 	SpriteData:registerSprite("Platform/floor", Platform)
 	SpriteData:setInitializerParams("Platform/floor", gfx.image.new(CHUNK_LENGTH, 20), false)
-	SpriteData:setPositioning("Platform/floor", 1, { yRange = { 220, 220 } } )
+	SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 } )
 	
 	if not self.spritesLoaded then
 		

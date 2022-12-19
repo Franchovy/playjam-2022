@@ -33,7 +33,11 @@ function SpriteData:setInitializerParams(name, ...)
 end
 
 function SpriteData:setPositioning(name, numSpritesPerChunk, positioningData)
-	SpritePositionManager:populate(name, positioningData.yRange, numSpritesPerChunk)
+	if positioningData.x ~= nil then
+		SpritePositionManager:setSinglePositionForSprite(name, positioningData, numSpritesPerChunk)
+	else
+		SpritePositionManager:populate(name, positioningData.yRange, numSpritesPerChunk)
+	end
 end
 
 function SpriteData:loadSpritesInChunk(chunk)
