@@ -80,6 +80,10 @@ function SpriteData:recycleSpritesInChunk(chunk)
 	for _, spriteData in pairs(self.spriteData) do
 		local sprites = self.chunkAssignedSprites[spriteData.name][chunk]
 		
+		if sprites == nil then
+			return
+		end
+		
 		for _, sprite in pairs(sprites) do
 			SpriteLoader:unassignSprite(sprite)
 		end
