@@ -83,7 +83,6 @@ end
 -- Movement
 
 function Wheel:update()
-	print(self.x)
 	
 	-- Update if player has died
 	

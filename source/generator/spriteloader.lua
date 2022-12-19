@@ -73,7 +73,7 @@ function SpriteLoader:loadSprite(name)
 	return reusedSprite
 end
 
-function SpriteLoader.unloadSprite(sprite)
+function SpriteLoader:unassignSprite(sprite)
 	self.assignedSprites[sprite] = false
 end
 

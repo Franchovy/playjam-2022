@@ -58,7 +58,7 @@ function GameScene:load()
 	
 	SpriteData:registerSprite("Wind", Wind)
 	SpriteData:setInitializerParams("Wind", gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
-	SpriteData:setPositioning("Wind", 2, { yRange = { 40, 100 } } )
+	SpriteData:setPositioning("Wind", 0, { yRange = { 40, 100 } } )
 	
 	SpriteData:registerSprite("Coin", Coin)
 	SpriteData:setInitializerParams("Coin", gfx.image.new("images/coin"))
@@ -70,7 +70,7 @@ function GameScene:load()
 	
 	SpriteData:registerSprite("Kill Block", KillBlock)
 	SpriteData:setInitializerParams("Kill Block", gfx.image.new("images/kill_block"))
-	SpriteData:setPositioning("Kill Block", 4, { yRange = { 20, 180 } } )
+	SpriteData:setPositioning("Kill Block", 0, { yRange = { 20, 180 } } )
 	
 	SpriteData:registerSprite("Platform/floor", Platform)
 	SpriteData:setInitializerParams("Platform/floor", gfx.image.new(1000, 20), false)
@@ -94,8 +94,6 @@ function GameScene:load()
 		
 		self.spritesLoaded = true
 	end
-	
-	self.loadedChunks = {}
 end
 
 function GameScene:present()
@@ -127,8 +125,12 @@ function GameScene:present()
 	
 	self.gameState = gameStates.readyToStart
 	
-	-- TODO: Move to sprite position assignment manager
-	self.assignedPositions = {}
+	self.chunksGenerated = {0, 1, 2, 3}
+	
+	SpriteData:loadSpritesInChunk(0)
+	SpriteData:loadSpritesInChunk(1)
+	SpriteData:loadSpritesInChunk(2)
+	SpriteData:loadSpritesInChunk(3)
 end
 
 function GameScene:update()
@@ -136,16 +138,39 @@ function GameScene:update()
 	
 	-- Remove / Add Sprites based on range
 	
-	local chunk = math.floor((-gfx.getDrawOffset()) / 1000)
-
-	-- TODO: - Improve chunks being loaded
-	local chunkToLoad = chunk + 1
+	local currentChunk = math.floor((-gfx.getDrawOffset()) / 1000)
 	
-	if self.loadedChunks[chunkToLoad] ~= true then
-		SpriteData:reloadSpritesInChunk(chunkToLoad)
+	--
+	
+	local nextChunk = currentChunk + 2
+	local previousChunk = currentChunk - 1
+	
+	if nextChunk > self.chunksGenerated[4] and nextChunk <= 10 then
 		
-		self.loadedChunks[chunkToLoad] = true
+		self.chunksGenerated = {
+			currentChunk - 1,
+			currentChunk,
+			currentChunk + 1,
+			currentChunk + 2
+		}
+		
+		SpriteData:recycleSpritesInChunk(self.chunksGenerated[1])
+		SpriteData:loadSpritesInChunk(nextChunk)
+		
+	elseif previousChunk >= 0 and previousChunk < self.chunksGenerated[1] then
+		
+		self.chunksGenerated = {
+			currentChunk - 1,
+			currentChunk,
+			currentChunk + 1,
+			currentChunk + 2
+		}
+		
+		SpriteData:recycleSpritesInChunk(self.chunksGenerated[4])
+		SpriteData:loadSpritesInChunk(previousChunk)
 	end
+	
+	--
 	
 	local sprites = SpriteLoader:getAllSprites()
 	

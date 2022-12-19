@@ -5,6 +5,7 @@ class("SpriteData").extends()
 
 function SpriteData:init()
 	self.spriteData = {}
+	self.chunkAssignedSprites = {}
 end
 
 SpriteData = SpriteData()
@@ -35,9 +36,12 @@ function SpriteData:setPositioning(name, numSpritesPerChunk, positioningData)
 	SpritePositionManager:populate(name, positioningData.yRange, numSpritesPerChunk)
 end
 
-function SpriteData:reloadSpritesInChunk(chunk)
+function SpriteData:loadSpritesInChunk(chunk)
+	print("Loading sprites in chunk: ".. chunk)
+	
 	for _, spriteData in pairs(self.spriteData) do
 		local spritePositions = SpritePositionManager:getPositionsInChunk(spriteData.name, chunk)
+		local spritesAdded = {}
 		
 		for _, position in pairs(spritePositions) do
 			local name = spriteData.name
@@ -54,6 +58,28 @@ function SpriteData:reloadSpritesInChunk(chunk)
 			sprite:moveTo(position.x, position.y)
 			
 			-- TODO: Set Difficulty params (based on chunk)
+			
+			table.insert(spritesAdded, sprite)
 		end
+		
+		if self.chunkAssignedSprites[spriteData.name] == nil then
+			self.chunkAssignedSprites[spriteData.name] = {}
+		end
+		
+		self.chunkAssignedSprites[spriteData.name][chunk] = spritesAdded
+	end
+end
+
+function SpriteData:recycleSpritesInChunk(chunk)
+	print("Recycling sprites in chunk: ".. chunk)
+	
+	for _, spriteData in pairs(self.spriteData) do
+		local sprites = self.chunkAssignedSprites[spriteData.name][chunk]
+		
+		for _, sprite in pairs(sprites) do
+			SpriteLoader:unassignSprite(sprite)
+		end
+		
+		self.chunkAssignedSprites[spriteData.name][chunk] = nil
 	end
 end
