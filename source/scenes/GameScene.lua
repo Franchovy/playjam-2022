@@ -134,10 +134,6 @@ end
 function GameScene:update()
 	Scene.update(self)
 	
-	--
-	
-	--printTable(SpriteData.spriteData[3])
-	
 	-- Remove / Add Sprites based on range
 	
 	local chunk = math.floor((-gfx.getDrawOffset()) / 1000)
