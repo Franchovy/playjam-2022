@@ -2,6 +2,7 @@ import "engine"
 import "generator/spritepositionmanager"
 import "generator/spriteloader"
 import "generator/spritedata"
+import "generator/chunkgenerator"
 
 class('GameScene').extends(Scene)
 
@@ -14,6 +15,9 @@ gameStates = {
 	playing = "Playing",
 	ended = "Ended"
 }
+
+local MAX_CHUNKS = 10
+local CHUNK_LENGTH = 10000
 
 function GameScene:init()
 	Scene.init(self)
@@ -30,6 +34,9 @@ function GameScene:init()
 	self.gameState = gameStates.created
 	
 	self.spritesLoaded = false
+	
+	ChunkGenerator:configure(MAX_CHUNKS, CHUNK_LENGTH)
+	SpritePositionManager:configure(MAX_CHUNKS, CHUNK_LENGTH)
 end
 
 function GameScene:load()
@@ -58,22 +65,22 @@ function GameScene:load()
 	
 	SpriteData:registerSprite("Wind", Wind)
 	SpriteData:setInitializerParams("Wind", gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
-	SpriteData:setPositioning("Wind", 0, { yRange = { 40, 100 } } )
+	SpriteData:setPositioning("Wind", 10, { yRange = { 40, 100 } } )
 	
 	SpriteData:registerSprite("Coin", Coin)
 	SpriteData:setInitializerParams("Coin", gfx.image.new("images/coin"))
-	SpriteData:setPositioning("Coin", 6, { yRange = { 30, 200 } } )
+	SpriteData:setPositioning("Coin", 20, { yRange = { 30, 200 } } )
 	
 	SpriteData:registerSprite("Platform/moving", Platform)
 	SpriteData:setInitializerParams("Platform/moving", gfx.image.new(100, 20), true)
-	SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
+	SpriteData:setPositioning("Platform/moving", 16, { yRange = { 130, 170 } } )
 	
 	SpriteData:registerSprite("Kill Block", KillBlock)
 	SpriteData:setInitializerParams("Kill Block", gfx.image.new("images/kill_block"))
 	SpriteData:setPositioning("Kill Block", 0, { yRange = { 20, 180 } } )
 	
 	SpriteData:registerSprite("Platform/floor", Platform)
-	SpriteData:setInitializerParams("Platform/floor", gfx.image.new(1000, 20), false)
+	SpriteData:setInitializerParams("Platform/floor", gfx.image.new(CHUNK_LENGTH, 20), false)
 	SpriteData:setPositioning("Platform/floor", 1, { yRange = { 220, 220 } } )
 	
 	if not self.spritesLoaded then
@@ -125,50 +132,13 @@ function GameScene:present()
 	
 	self.gameState = gameStates.readyToStart
 	
-	self.chunksGenerated = {0, 1, 2, 3}
-	
-	SpriteData:loadSpritesInChunk(0)
-	SpriteData:loadSpritesInChunk(1)
-	SpriteData:loadSpritesInChunk(2)
-	SpriteData:loadSpritesInChunk(3)
+	ChunkGenerator:initialLoadChunks(4)
 end
 
 function GameScene:update()
 	Scene.update(self)
 	
-	-- Remove / Add Sprites based on range
-	
-	local currentChunk = math.floor((-gfx.getDrawOffset()) / 1000)
-	
-	--
-	
-	local nextChunk = currentChunk + 2
-	local previousChunk = currentChunk - 1
-	
-	if nextChunk > self.chunksGenerated[4] and nextChunk <= 10 then
-		
-		self.chunksGenerated = {
-			currentChunk - 1,
-			currentChunk,
-			currentChunk + 1,
-			currentChunk + 2
-		}
-		
-		SpriteData:recycleSpritesInChunk(self.chunksGenerated[1])
-		SpriteData:loadSpritesInChunk(nextChunk)
-		
-	elseif previousChunk >= 0 and previousChunk < self.chunksGenerated[1] then
-		
-		self.chunksGenerated = {
-			currentChunk - 1,
-			currentChunk,
-			currentChunk + 1,
-			currentChunk + 2
-		}
-		
-		SpriteData:recycleSpritesInChunk(self.chunksGenerated[4])
-		SpriteData:loadSpritesInChunk(previousChunk)
-	end
+	ChunkGenerator:updateChunks()
 	
 	--
 	
