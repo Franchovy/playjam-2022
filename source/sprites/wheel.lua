@@ -1,8 +1,8 @@
 import "engine"
 
 -- Params
-local jumpSpeed = 18
-local hopSpeed = 12
+local jumpSpeed = 22
+local hopSpeed = 16
 local gravity = 2.1
 local scorePerCoin = 10
 local maxFallSpeed = 16
