@@ -58,6 +58,9 @@ function GameScene:load()
 	self.background:moveTo(200, 120)
 	
 	self.background:setParalaxDrawingRatios()
+	local callback = self.background:getBackgroundDrawingCallback()
+	
+	gfx.sprite.setBackgroundDrawingCallback(callback)
 	
 	-- Set up sprites
 	
@@ -135,6 +138,12 @@ end
 
 function GameScene:update()
 	Scene.update(self)
+	
+	-- Update background paralax based on current offset
+	local drawOffsetX, _ = gfx.getDrawOffset()
+	self.background:setParalaxDrawOffset(drawOffsetX)
+	
+	--
 	
 	ChunkGenerator:updateChunks()
 	
