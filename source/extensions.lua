@@ -24,6 +24,14 @@ function table.each( t, fn )
 	end
 end
 
+function table.map( t, fn)
+	local results = {}
+	for i, e in ipairs(t) do
+		results[i] = fn(e)
+	end
+	return results
+end
+
 function table.filter(t)
 if t == nil then return {} end
 	local array = {}

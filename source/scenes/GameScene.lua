@@ -22,9 +22,7 @@ local CHUNK_LENGTH = 1000
 function GameScene:init()
 	Scene.init(self)
 	
-	self:setImage(gfx.image.new("images/background_clouds"):scaledImage(2))
-	self:setZIndex(-2)
-	self:setIgnoresDrawOffset(true)
+	--
 	
 	self.wheel = nil
 	self.wallOfDeath = nil
@@ -54,12 +52,12 @@ function GameScene:load()
 	
 	-- Draw Background
 	
-	local backgroundImage = gfx.image.new("images/background")
-	gfx.sprite.setBackgroundDrawingCallback(
-		function()
-			backgroundImage:draw(0, 0)
-		end
-	)
+	self.background = ParalaxBackground.new("images/paralax_background", 4)
+	
+	self.background:add()
+	self.background:moveTo(200, 120)
+	
+	self.background:setParalaxDrawingRatios()
 	
 	-- Set up sprites
 	
