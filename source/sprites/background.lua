@@ -37,15 +37,15 @@ end
 function ParalaxBackground:getBackgroundDrawingCallback()
 	
 	return function (x, y, w, h)
-		self.backgroundImage:draw(0, 0)
+		self.backgroundImage:drawFaded(0, 0, 0.3, playdate.graphics.image.kDitherTypeFloydSteinberg)
 		
 		for i, image in pairs(self.images) do		
 			
 			local imageOffset = self.imageOffsets[i]
-			image:draw(imageOffset, 0)
+			image:drawFaded(imageOffset, 0, 0.7, playdate.graphics.image.kDitherTypeFloydSteinberg)
 			
 			local imageWidth = image:getSize()
-			image:draw(imageOffset + imageWidth, 0)
+			image:drawFaded(imageOffset + imageWidth, 0, 0.7, playdate.graphics.image.kDitherTypeFloydSteinberg)
 		end
 	end
 end
@@ -56,13 +56,14 @@ function ParalaxBackground:setParalaxDrawingRatios()
 	
 	-- Assign paralax ratios growing relative to number
 	for i, image in pairs(self.images) do
-		self.paralaxRatios[i] = i / 10
+		self.paralaxRatios[i] = i / 50
 	end
 end
 
 function ParalaxBackground:setParalaxDrawOffset(drawOffset)
 	print(drawOffset)
 	for i, image in pairs(self.images) do
-		self.imageOffsets[i] = drawOffset * self.paralaxRatios[i]
+		local originalOffset = drawOffset * self.paralaxRatios[i]
+		self.imageOffsets[i] = originalOffset % 400 - 400
 	end
 end

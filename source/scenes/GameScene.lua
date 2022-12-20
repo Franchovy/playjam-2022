@@ -54,13 +54,7 @@ function GameScene:load()
 	
 	self.background = ParalaxBackground.new("images/paralax_background", 4)
 	
-	self.background:add()
-	self.background:moveTo(200, 120)
-	
 	self.background:setParalaxDrawingRatios()
-	local callback = self.background:getBackgroundDrawingCallback()
-	
-	gfx.sprite.setBackgroundDrawingCallback(callback)
 	
 	-- Set up sprites
 	
@@ -128,6 +122,14 @@ function GameScene:present()
 	self.wheel:add()
 	self.wallOfDeath:add()
 	self.textImageScore:add()
+	
+	-- Set background drawing callback
+	
+	local callback = self.background:getBackgroundDrawingCallback()
+	
+	gfx.sprite.setBackgroundDrawingCallback(callback)
+	
+	self.background:add()
 	
 	-- Set game as ready to start
 	
