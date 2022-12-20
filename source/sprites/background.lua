@@ -7,6 +7,17 @@ function autoScaledImage(image)
 	return image:scaledImage(400 / imageWidth, 240 / imageHeight)
 end
 
+function fadedImage(image, opacity)
+	return image:fadedImage(opacity, playdate.graphics.image.kDitherTypeFloydSteinberg)
+end
+
+function formattedImage(image, opacity)
+	return fadedImage(
+		autoScaledImage(image),
+		0.7
+	)	
+end
+
 function ParalaxBackground.new(pathname, count)
 	return ParalaxBackground(pathname, count)
 end
@@ -17,7 +28,7 @@ function ParalaxBackground:init(pathname, count)
 	self:setSize(400, 240)
 	
 	-- Assign background Image (to draw on)
-	self.backgroundImage = autoScaledImage(gfx.image.new(pathname.. "/".. 0))
+	self.backgroundImage = formattedImage(gfx.image.new(pathname.. "/".. 0), 0,7)
 	
 	-- Initialize Properties
 	
@@ -37,15 +48,15 @@ end
 function ParalaxBackground:getBackgroundDrawingCallback()
 	
 	return function (x, y, w, h)
-		self.backgroundImage:drawFaded(0, 0, 0.3, playdate.graphics.image.kDitherTypeFloydSteinberg)
+		self.backgroundImage:draw(0, 0)
 		
 		for i, image in pairs(self.images) do		
 			
 			local imageOffset = self.imageOffsets[i]
-			image:drawFaded(imageOffset, 0, 0.7, playdate.graphics.image.kDitherTypeFloydSteinberg)
+			image:draw(imageOffset, 0)
 			
 			local imageWidth = image:getSize()
-			image:drawFaded(imageOffset + imageWidth, 0, 0.7, playdate.graphics.image.kDitherTypeFloydSteinberg)
+			image:draw(imageOffset + imageWidth, 0)
 		end
 	end
 end
