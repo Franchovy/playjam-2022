@@ -71,7 +71,7 @@ function GameScene:load()
 	SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
 	
 	SpriteData:registerSprite("Kill Block", KillBlock)
-	SpriteData:setInitializerParams("Kill Block", gfx.image.new("images/kill_block"))
+	SpriteData:setInitializerParams("Kill Block")
 	SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
 	
 	SpriteData:registerSprite("Platform/floor", Platform)

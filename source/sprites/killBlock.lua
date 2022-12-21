@@ -2,11 +2,12 @@ import "engine"
 
 class('KillBlock').extends(Sprite)
 
-function KillBlock.new(image) 
-	return KillBlock(image)
+function KillBlock.new() 
+	return KillBlock()
 end
 
-function KillBlock:init(image)
+function KillBlock:init()
+	local image = gfx.image.new("images/kill_block_v2")
 	KillBlock.super.init(self, image)
 	self.type = spriteTypes.killBlock
 	
@@ -16,3 +17,4 @@ function KillBlock:init(image)
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)
 end
+

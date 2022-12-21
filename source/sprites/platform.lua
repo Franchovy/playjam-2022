@@ -34,7 +34,20 @@ function Platform:drawSelf()
 	gfx.pushContext(self:getImage())
 	
 	-- Perform draw operations
-	gfx.fillRect(0, 0, self:getSize())
+	local sizeX, sizeY = self:getSize()
+	
+	-- Background fill
+	gfx.setBackgroundColor(gfx.kColorBlack)
+	gfx.fillRect(0, 0, sizeX, sizeY)
+	
+	-- Pattern fill
+	gfx.setPattern(gfx.image.new("images/patterntable"), 20, 68)
+	gfx.fillRect(0, 0, sizeX, sizeY)
+	
+	-- White Outline
+	gfx.setColor(gfx.kColorWhite)
+	gfx.setLineWidth(4)
+	gfx.drawRect(0, 0, sizeX, sizeY)
 	
 	-- Close Graphics Context
 	gfx.popContext()

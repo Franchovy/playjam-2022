@@ -72,7 +72,6 @@ function ParalaxBackground:setParalaxDrawingRatios()
 end
 
 function ParalaxBackground:setParalaxDrawOffset(drawOffset)
-	print(drawOffset)
 	for i, image in pairs(self.images) do
 		local originalOffset = drawOffset * self.paralaxRatios[i]
 		self.imageOffsets[i] = originalOffset % 400 - 400

@@ -62,9 +62,6 @@ function SpritePositionManager:populate(name, yRange, spriteCount)
 		end
 	end
 	
-	print(name)
-	printTable(spritePositions)
-	
 	self.positions[name] = spritePositions
 end
 
