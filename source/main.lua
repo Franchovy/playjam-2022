@@ -11,8 +11,6 @@ local acceptsRestart = false
 
 function initialize()
 	-- Create game state manager
-	gameScene = GameScene()
-	gameOverScene = GameOverScene()
 	menuScene = MenuScene()
 	
 	sceneManager = SceneManager()
@@ -38,6 +36,10 @@ end
 
 function onMenuScene()
 	if buttons.isAButtonJustPressed() then
+		
+		gameScene = GameScene()
+		gameOverScene = GameOverScene()
+		
 		sceneManager:switchScene(gameScene, function () end)
 	end
 end
