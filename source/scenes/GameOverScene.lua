@@ -7,7 +7,6 @@ class('GameOverScene').extends(Scene)
 
 function GameOverScene:init()
 	Scene.init(self)
-	self.type = sceneTypes.gameOver
 end
 
 function GameOverScene:load()

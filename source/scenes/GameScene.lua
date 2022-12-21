@@ -6,8 +6,6 @@ import "generator/chunkgenerator"
 
 class('GameScene').extends(Scene)
 
-GameScene.type = sceneTypes.gameScene
-
 gameStates = {
 	created = "Created",
 	loading = "Loading",

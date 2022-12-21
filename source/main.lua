@@ -5,6 +5,7 @@ import "notify"
 
 local sceneManager = nil
 local gameScene = nil
+local menuScene = nil
 local gameOverScene = nils
 local acceptsRestart = false
 
@@ -12,11 +13,12 @@ function initialize()
 	-- Create game state manager
 	gameScene = GameScene()
 	gameOverScene = GameOverScene()
+	menuScene = MenuScene()
 	
 	sceneManager = SceneManager()
 	
 	-- Create Scene
-	sceneManager:setCurrentScene(gameScene)
+	sceneManager:setCurrentScene(menuScene)
 end
 
 function playdate.update()
@@ -31,18 +33,46 @@ function playdate.update()
 
 	-- State management
 	
-	if sceneManager.currentScene == gameScene 
-			and gameScene.gameState == gameStates.ended then
-		sceneManager:switchScene(gameOverScene, function () acceptsRestart = true end)
+	updateScenes()
+end
+
+function onMenuScene()
+	if buttons.isAButtonJustPressed() then
+		sceneManager:switchScene(gameScene, function () end)
+	end
+end
+
+function isGameSceneOver()
+	return gameScene.gameState == gameStates.ended
+end
+
+function transitionToGameOverScene()
+	if buttons.isAButtonJustPressed() then
+		sceneManager:switchScene(gameOverScene, function () end)
+	end
+end
+
+function onGameOverScene()
+	if buttons.isAButtonPressed() then
+		-- Perform transition
+		sceneManager:switchScene(gameScene, function () end)
+	end
+end
+
+function updateScenes()
+	
+	if sceneManager.currentScene == menuScene then
+		onMenuScene()
 	end
 	
-	if sceneManager.currentScene == gameOverScene and acceptsRestart then
-		-- Restart game upon pressing A
-		if buttons.isAButtonJustPressed() then
-			-- Perform transition
-			acceptsRestart = false
-			sceneManager:switchScene(gameScene, function () end)
+	if sceneManager.currentScene == gameScene then
+		if isGameSceneOver() then
+			transitionToGameOverScene()
 		end
+	end
+	
+	if sceneManager.currentScene == gameOverScene then
+		onGameOverScene()
 	end
 end
 

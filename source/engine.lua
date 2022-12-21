@@ -32,11 +32,6 @@ spriteTypes = {
 	wallOfDeath = "WallOfDeath"
 }
 
-sceneTypes = {
-	gameOver = "GameOverScene",
-	gameScene = "GameScene"
-}
-
 -- ===============
 -- Shortcuts
 
