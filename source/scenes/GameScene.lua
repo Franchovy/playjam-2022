@@ -46,9 +46,7 @@ function GameScene:load()
 	
 	-- Load Music
 	
-	self.soundFile = sound.fileplayer.new("music/music_main")
-	self.soundFile:play(0)
-	self.soundFile:pause()
+	self.filePlayer = FilePlayer("music/main")
 	
 	-- Draw Background
 	
@@ -105,7 +103,7 @@ function GameScene:present()
 	
 	-- Play music
 	
-	self.soundFile:play(0)
+	self.filePlayer:play()
 	
 	-- Reset sprites
 	
@@ -206,7 +204,7 @@ end
 function GameScene:dismiss()
 	Scene.dismiss(self)
 	
-	self.soundFile:stop()
+	self.filePlayer:stop()
 end
 
 function GameScene:destroy()
