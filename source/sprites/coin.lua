@@ -18,11 +18,4 @@ end
 
 function Coin:isGrabbed()
 	self:setVisible(false)
-	
-	playdate.display.setInverted(true)
-	local invertedEndTimer = timer.new(1)
-	invertedEndTimer.timerEndedCallback = 
-		function()
-			playdate.display.setInverted(false)
-		end
 end
