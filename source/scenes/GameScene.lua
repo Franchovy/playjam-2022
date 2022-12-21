@@ -59,7 +59,7 @@ function GameScene:load()
 	SpriteData:setPositioning("Wind", 1, { yRange = { 40, 100 } } )
 	
 	SpriteData:registerSprite("Coin", Coin)
-	SpriteData:setInitializerParams("Coin", gfx.image.new("images/coin"))
+	SpriteData:setInitializerParams("Coin")
 	SpriteData:setPositioning("Coin", 2, { yRange = { 30, 200 } } )
 	
 	SpriteData:registerSprite("Platform/moving", Platform)

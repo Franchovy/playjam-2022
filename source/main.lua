@@ -49,9 +49,7 @@ function isGameSceneOver()
 end
 
 function transitionToGameOverScene()
-	if buttons.isAButtonJustPressed() then
-		sceneManager:switchScene(gameOverScene, function () end)
-	end
+	sceneManager:switchScene(gameOverScene, function () end)
 end
 
 function onGameOverScene()
