@@ -8,8 +8,8 @@ local MENUTEXT_SPACING <const> = 40
 
 local options = {
 	main = {
-		"A PLAY", 
-		"B SELECT LEVEL"
+		"PLAY", 
+		"SELECT LEVEL"
 	},
 	levelselect = {
 		"1 MOUNTAIN",
@@ -46,10 +46,7 @@ function MenuScene:present()
 	
 	-- Print Menu Options
 	
-	self.menu = Menu(options.main, 1.8)
-	
-	self.menu:add()
-	self.menu:moveTo(160, 0)
+	MenuScene:displayMainMenu()
 	
 	-- Wheel image
 	
@@ -62,6 +59,16 @@ end
 
 function MenuScene:update() 
 	Scene.update(self)
+	
+	if buttons.isUpButtonJustPressed() then
+		self.menuIndex = math.max(self.menuIndex - 1, 1)
+		self.menu:setSelectedIndex(self.menuIndex)
+	end
+	
+	if buttons.isDownButtonJustPressed() then
+		self.menuIndex = math.max(self.menuIndex + 1, 1)
+		self.menu:setSelectedIndex(self.menuIndex)
+	end
 	
 	if buttons.isBButtonJustReleased() or self.displayingLevelSelect then
 		self:displayLevelSelect()
@@ -76,6 +83,28 @@ end
 function MenuScene:destroy()
 	Scene.destroy(self)
 	
+end
+
+function MenuScene:displayMainMenu()
+	if self.menu ~= nil then
+		self.menu:remove()
+	end
+	
+	self.menu = Menu(options.main, 1.8)
+	self.menu:add()
+	self.menu:moveTo(160, 0)
+	self.menuIndex = 1
+end
+
+function MenuScene:displayLevelSelectMenu()
+	if self.menu ~= nil then
+		self.menu:remove()
+	end
+	
+	self.menu = Menu(options.levelselect, 1.6)
+	self.menu:add()
+	self.menu:moveTo(160, 0)
+	self.menuIndex = 1
 end
 
 function positionTitleSprites(titleSprites)
@@ -108,10 +137,8 @@ function MenuScene:displayLevelSelect()
 	
 	self.displayingLevelSelect = true
 	
-	--clearMenuOptions(self.textSprites)
-	--self.textSprites = drawMenuOptions(options.levelselect)
-	
 	table.each(self.titleSprites, function(sprite) sprite:setVisible(false) end)
+	self:displayLevelSelectMenu()
 	
 	-- Await button release to show
 	
@@ -125,6 +152,5 @@ function MenuScene:hideLevelSelect()
 	
 	table.each(self.titleSprites, function(sprite) sprite:setVisible(true) end)
 	
-	--clearMenuOptions(self.textSprites)
-	--self.textSprites = drawMenuOptions(options.main)
+	self:displayMainMenu()
 end

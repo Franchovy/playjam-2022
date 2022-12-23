@@ -6,13 +6,40 @@ local MARGIN = 25
 
 function Menu:init(textEntries, size)
 	self.selectedIndex = 1
+	self.entries = textEntries
 	self.size = size
 	
-	local image = menuImage(textEntries, size)
-	self:setImage(image)
+	self:drawMenu()
 	
 	self:setCenter(0, 0)
 end 
+
+function Menu:setSelectedIndex(i)
+	if i < 1 then
+		self.selectedIndex = 1
+	elseif i > #self.entries then
+		self.selectedIndex = #self.entries
+	else
+		self.selectedIndex = i
+	end
+	
+	self:drawMenu()
+end
+
+function Menu:drawMenu()
+	local entries = table.imap(self.entries, 
+		function (i) 
+			if i == self.selectedIndex then
+				return "O ".. self.entries[i]
+			else 
+				return " ".. self.entries[i]
+			end
+		end
+	)
+			
+	local image = menuImage(entries, self.size)
+	self:setImage(image)
+end
 
 function getMaxTextWidth(entries)
 	local max = 0
