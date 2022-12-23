@@ -42,10 +42,6 @@ function GameScene:load()
 	
 	self.gameState = gameStates.loading
 	
-	-- Load Music
-	
-	self.filePlayer = FilePlayer("music/main")
-	
 	-- Draw Background
 	
 	self.background = ParalaxBackground.new("images/paralax_background", 4)
@@ -99,10 +95,6 @@ function GameScene:present()
 	
 	print("Game Scene Present")
 	
-	-- Play music
-	
-	self.filePlayer:play()
-	
 	-- Reset sprites
 	
 	self.wheel:resetValues()
@@ -132,6 +124,15 @@ function GameScene:present()
 	self.gameState = gameStates.readyToStart
 	
 	ChunkGenerator:initialLoadChunks(4)
+	
+	-- Play music
+	
+	-- Load Music
+	
+	self.filePlayer = FilePlayer("music/main")
+	
+	self.filePlayer:play()
+	
 end
 
 function GameScene:update()
