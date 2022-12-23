@@ -5,6 +5,7 @@ import "notify"
 
 local acceptsRestart = false
 
+
 function initialize()
 	-- Create game state manager
 	loadInitialScene()

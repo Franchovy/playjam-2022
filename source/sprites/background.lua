@@ -2,21 +2,6 @@ import "engine"
 
 class("ParalaxBackground").extends(gfx.sprite)
 
-function autoScaledImage(image)
-	local imageWidth, imageHeight = image:getSize()
-	return image:scaledImage(400 / imageWidth, 240 / imageHeight)
-end
-
-function fadedImage(image, opacity)
-	return image:fadedImage(opacity, playdate.graphics.image.kDitherTypeFloydSteinberg)
-end
-
-function formattedImage(image, opacity)
-	return fadedImage(
-		autoScaledImage(image),
-		0.7
-	)	
-end
 
 function ParalaxBackground.new(pathname, count)
 	return ParalaxBackground(pathname, count)
@@ -26,18 +11,22 @@ function ParalaxBackground:init(pathname, count)
 	ParalaxBackground.super.init(self)
 	
 	self:setSize(400, 240)
+end
+
+function ParalaxBackground:loadForTheme(theme)
+	local theme = theme:getParalaxImages()
 	
 	-- Assign background Image (to draw on)
-	self.backgroundImage = formattedImage(gfx.image.new(pathname.. "/".. 0), 0,7)
+	self.backgroundImage = theme.background
 	
 	-- Initialize Properties
 	
-	self.images = {}
+	self.images = theme.images
+	
 	self.paralaxRatios = {}
 	self.imageOffsets = {}
 	
-	for i=1,count do
-		self.images[i] = autoScaledImage(gfx.image.new(pathname.. "/".. i))
+	for i=1,#self.images do
 		self.paralaxRatios[i] = 0
 		self.imageOffsets[i] = 0
 	end

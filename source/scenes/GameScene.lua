@@ -4,6 +4,7 @@ import "generator/spriteloader"
 import "generator/spritedata"
 import "generator/chunkgenerator"
 import "services/blinker"
+import "level/levels"
 
 class('GameScene').extends(Scene)
 
@@ -45,7 +46,8 @@ function GameScene:load()
 	
 	-- Draw Background
 	
-	self.background = ParalaxBackground.new("images/paralax_background", 4)
+	self.background = ParalaxBackground.new()
+	self.background:loadForTheme(levels[2])
 	
 	self.background:setParalaxDrawingRatios()
 	
