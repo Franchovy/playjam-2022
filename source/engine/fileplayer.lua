@@ -39,7 +39,9 @@ function FilePlayer:stop()
 end
 
 function FilePlayer:onIntroFinished() 
-	self.isPlayingIntro = false
-	
-	self.loop:play(0)
+	if self.intro:getOffset() >= self.intro:getLength() then
+		self.isPlayingIntro = false
+		
+		self.loop:play(0)
+	end
 end
