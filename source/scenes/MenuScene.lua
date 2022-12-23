@@ -1,5 +1,6 @@
 import "engine"
 import "services/sprite/text"
+import "sprites/components/menu"
 
 class('MenuScene').extends(Scene)
 
@@ -45,7 +46,10 @@ function MenuScene:present()
 	
 	-- Print Menu Options
 	
-	self.textSprites = drawMenuOptions(options.main)
+	self.menu = Menu(options.main, 1.8)
+	
+	self.menu:add()
+	self.menu:moveTo(160, 0)
 	
 	-- Wheel image
 	
@@ -92,27 +96,6 @@ function clearMenuOptions(options)
 	table.each(options, function (sprite) sprite:remove() end )
 end
 
-function drawMenuOptions(options)
-	local font = gfx.font.new("fonts/Sans Regular/AfterBurner")
-	gfx.setFont(font)
-	
-	local sprites = table.imap(options, 
-		function (i)
-			return sizedTextSprite(options[i], 1.8)
-		end
-	)
-	
-	positionTextSprites(sprites)
-	
-	return sprites
-end
-
-function positionTextSprites(sprites)
-	for i, sprite in ipairs(sprites) do
-		sprite:add()
-		sprite:moveTo(160, 40 + MENUTEXT_SPACING * (i - 1))
-	end
-end
 
 function MenuScene:displayLevelSelect()
 	if self.displayingLevelSelect then 
@@ -125,8 +108,8 @@ function MenuScene:displayLevelSelect()
 	
 	self.displayingLevelSelect = true
 	
-	clearMenuOptions(self.textSprites)
-	self.textSprites = drawMenuOptions(options.levelselect)
+	--clearMenuOptions(self.textSprites)
+	--self.textSprites = drawMenuOptions(options.levelselect)
 	
 	table.each(self.titleSprites, function(sprite) sprite:setVisible(false) end)
 	
@@ -142,6 +125,6 @@ function MenuScene:hideLevelSelect()
 	
 	table.each(self.titleSprites, function(sprite) sprite:setVisible(true) end)
 	
-	clearMenuOptions(self.textSprites)
-	self.textSprites = drawMenuOptions(options.main)
+	--clearMenuOptions(self.textSprites)
+	--self.textSprites = drawMenuOptions(options.main)
 end
