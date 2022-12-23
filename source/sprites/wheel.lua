@@ -68,6 +68,7 @@ function Wheel:resetValues()
 	self.score = 0
 	self.currentWindPower = 0
 	self.ignoresPlayerInput = true
+	self.hasDoubleJumped = false
 end
 
 function Wheel:setIsDead() 
@@ -105,11 +106,12 @@ function Wheel:update()
 		
 	-- Update push vector based on crank ticks
 		
-	if hasJumped then
+	if hasJumped and (not self.hasDoubleJumped) then
 		if self.touchingGround then
 			self.velocityY = -jumpSpeed
 		else
 			self.velocityY = -hopSpeed
+			self.hasDoubleJumped = true
 		end
 	end
 	
@@ -146,6 +148,7 @@ function Wheel:update()
 			if collision.normal.y == -1 then 
 				--top collision
 				self.touchingGround = true
+				self.hasDoubleJumped = false
 			end
 		elseif target.type == spriteTypes.coin then
 			if target:isVisible() and self:alphaCollision(target) then
