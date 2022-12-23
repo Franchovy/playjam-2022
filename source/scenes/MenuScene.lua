@@ -1,6 +1,20 @@
 import "engine"
+import "services/sprite/text"
 
 class('MenuScene').extends(Scene)
+
+
+local options = {
+	main = {
+		"A PLAY", 
+		"B SELECT LEVEL"
+	},
+	levelselect = {
+		"1",
+		"2",
+		"3"
+	}
+}
 
 --------------------
 -- Lifecycle Methods
@@ -22,7 +36,7 @@ function MenuScene:present()
 	-- Print Title Texts
 	
 	local texts = {"WHEEL", "RUNNER"}
-	local textSprites = createTextSprites(texts, 5)
+	local textSprites = table.imap(texts, function (i) return sizedTextSprite(texts[i], 5) end)
 	
 	local startPoint = { x = 170, y = 126 }
 	local endPoint = { x = 93, y = 179 }
@@ -41,7 +55,11 @@ function MenuScene:present()
 	local font = gfx.font.new("fonts/Sans Regular/AfterBurner")
 	gfx.setFont(font)
 	
-	local textSprites = createTextSprites({"A PLAY", "B SELECT LEVEL"}, 1.8)
+	local textSprites = table.imap(options.main, 
+		function (i)
+			return sizedTextSprite(options.main[i], 1.8)
+		end
+	)
 	
 	local MENUTEXT_SPACING <const> = 40
 	
@@ -62,6 +80,9 @@ end
 function MenuScene:update() 
 	Scene.update(self)
 	
+	if buttons.isBButtonJustPressed() or displayingLevelSelect then
+		displayLevelSelect()
+	end
 end
 
 function MenuScene:dismiss()
@@ -74,15 +95,14 @@ function MenuScene:destroy()
 	
 end
 
-function createTextSprites(texts, scaling)
-	local textSprites = table.map(texts, 
-		function (text)
-			local image = createTextImage(text):scaledImage(scaling)
-			local sprite = gfx.sprite.new(image)
-			sprite:setCenter(0, 0)
-			return sprite
-		end
-	)
+function displayLevelSelect()
+	displayingLevelSelect = true
 	
-	return textSprites
+	if buttons.isBButtonPressed() then
+		hideLevelSelect()
+	end
+end
+
+function hideLevelSelect()
+	displayingLevelSelect = false
 end

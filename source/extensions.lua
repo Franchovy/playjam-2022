@@ -24,6 +24,14 @@ function table.each( t, fn )
 	end
 end
 
+function table.imap( t, fn)
+		local results = {}
+		for i, e in ipairs(t) do
+			results[i] = fn(i)
+		end
+		return results
+	end
+
 function table.map( t, fn)
 	local results = {}
 	for i, e in ipairs(t) do
