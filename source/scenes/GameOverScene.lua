@@ -1,5 +1,5 @@
 import "engine"
-
+import "services/sprite/textsprite"
 class('GameOverScene').extends(Scene)
 
 --------------------
@@ -14,8 +14,9 @@ function GameOverScene:load()
 	
 	-- Titles
 	
-	self.gameOverTextSprite = self:createTextSprite("*Game Over*", 200, 120)
-	self.tryAgainTextSprite = self:createTextSprite("Try again?", 200, 160)
+	self.gameOverTextSprite = sizedTextSprite("*Game Over*", 2)
+	self.gameOverTextSprite:moveTo(120, 80)
+	self.tryAgainTextSprite = self:createTextSprite("*Try again?*", 200, 160)
 	self.pressAIndicatorTextSprite = self:createTextSprite("*Press A*", 200, 190)
 	
 	-- Blinker
