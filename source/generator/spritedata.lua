@@ -32,11 +32,11 @@ function SpriteData:setInitializerParams(name, ...)
 	self.spriteData[i].initParams = {...}
 end
 
-function SpriteData:setPositioning(name, numSpritesPerChunk, positioningData)
+function SpriteData:setPositioning(name, numSpritesPerChunk, positioningData, numChunks)
 	if positioningData.x ~= nil then
-		SpritePositionManager:setSinglePositionForSprite(name, positioningData, numSpritesPerChunk)
+		SpritePositionManager:setSinglePositionForSprite(name, positioningData, numChunks)
 	else
-		SpritePositionManager:populate(name, positioningData.yRange, numSpritesPerChunk)
+		SpritePositionManager:populate(name, positioningData.yRange, numSpritesPerChunk, numChunks)
 	end
 end
 

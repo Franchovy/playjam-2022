@@ -14,7 +14,7 @@ gameStates = {
 	ended = "Ended"
 }
 
-local MAX_CHUNKS = 20
+local MAX_CHUNKS = 10
 local CHUNK_LENGTH = 1000
 
 function GameScene:init()
@@ -31,7 +31,7 @@ function GameScene:init()
 	
 	self.spritesLoaded = false
 	
-	ChunkGenerator:configure(MAX_CHUNKS, CHUNK_LENGTH)
+	ChunkGenerator:configure(MAX_CHUNKS + 2, CHUNK_LENGTH)
 	SpritePositionManager:configure(MAX_CHUNKS, CHUNK_LENGTH)
 end
 
@@ -68,7 +68,7 @@ function GameScene:load()
 	
 	SpriteData:registerSprite("Platform/floor", Platform)
 	SpriteData:setInitializerParams("Platform/floor", gfx.image.new(CHUNK_LENGTH, 20), false)
-	SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 } )
+	SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 }, MAX_CHUNKS + 2 )
 	
 	if not self.spritesLoaded then
 		
@@ -144,6 +144,12 @@ function GameScene:update()
 	
 	--
 	
+	if self.wheel.x > (MAX_CHUNKS + 1) * CHUNK_LENGTH then
+		onLevelComplete()
+	end
+	
+	--
+	
 	ChunkGenerator:updateChunks()
 	
 	--
@@ -208,4 +214,11 @@ end
 
 function GameScene:destroy()
 	Scene.destroy(self)
+end
+
+function onLevelComplete()
+	print("On Level Complete")
+	-- Show "Level Complete" text
+	-- Transition to Menu after 5s
+	-- Unlock Level
 end
