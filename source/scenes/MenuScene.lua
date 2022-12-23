@@ -1,6 +1,7 @@
 import "engine"
 import "services/sprite/text"
 import "sprites/components/menu"
+import "scenes"
 
 class('MenuScene').extends(Scene)
 
@@ -70,6 +71,18 @@ function MenuScene:update()
 		self.menu:setSelectedIndex(self.menuIndex)
 	end
 	
+	if buttons.isAButtonJustPressed() then
+		if self.displayingLevelSelect then 
+			startGame(self.menuIndex)
+		else
+			if self.menuIndex == 1 then
+				startGame(1)
+			else 
+				self:displayLevelSelect()
+			end
+		end
+	end
+	
 	if buttons.isBButtonJustReleased() or self.displayingLevelSelect then
 		self:displayLevelSelect()
 	end
@@ -105,6 +118,14 @@ function MenuScene:displayLevelSelectMenu()
 	self.menu:add()
 	self.menu:moveTo(160, 0)
 	self.menuIndex = 1
+end
+
+function startGame(level)
+	loadAllScenes()
+	
+	print("Starting game with level: ".. level)
+	
+	sceneManager:switchScene(scenes.game, function () end)
 end
 
 function positionTitleSprites(titleSprites)

@@ -25,6 +25,8 @@ function SceneManager:init()
 	self.currentScene = nil
 end
 
+sceneManager = SceneManager()
+
 function SceneManager:setCurrentScene(scene)
 	self.newScene = scene
 	self.currentScene = scene

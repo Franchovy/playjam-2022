@@ -1,22 +1,16 @@
 import "engine.lua"
-import "scenes/lib"
+import "scenes/scenes"
 import "sprites/lib"
 import "notify"
 
-local sceneManager = nil
-local gameScene = nil
-local menuScene = nil
-local gameOverScene = nils
 local acceptsRestart = false
 
 function initialize()
 	-- Create game state manager
-	menuScene = MenuScene()
-	
-	sceneManager = SceneManager()
+	loadInitialScene()
 	
 	-- Create Scene
-	sceneManager:setCurrentScene(menuScene)
+	sceneManager:setCurrentScene(scenes.menu)
 end
 
 function playdate.update()
@@ -37,41 +31,37 @@ end
 function onMenuScene()
 	if buttons.isAButtonJustPressed() then
 		
-		gameScene = GameScene()
-		gameOverScene = GameOverScene()
-		
-		sceneManager:switchScene(gameScene, function () end)
 	end
 end
 
 function isGameSceneOver()
-	return gameScene.gameState == gameStates.ended
+	return scenes.game.gameState == gameStates.ended
 end
 
 function transitionToGameOverScene()
-	sceneManager:switchScene(gameOverScene, function () end)
+	sceneManager:switchScene(scenes.gameover, function () end)
 end
 
 function onGameOverScene()
 	if buttons.isAButtonPressed() then
 		-- Perform transition
-		sceneManager:switchScene(gameScene, function () end)
+		sceneManager:switchScene(scenes.game, function () end)
 	end
 end
 
 function updateScenes()
 	
-	if sceneManager.currentScene == menuScene then
+	if sceneManager.currentScene == scenes.menu then
 		onMenuScene()
 	end
 	
-	if sceneManager.currentScene == gameScene then
+	if sceneManager.currentScene == scenes.game then
 		if isGameSceneOver() then
 			transitionToGameOverScene()
 		end
 	end
 	
-	if sceneManager.currentScene == gameOverScene then
+	if sceneManager.currentScene == scenes.gameover then
 		onGameOverScene()
 	end
 end
