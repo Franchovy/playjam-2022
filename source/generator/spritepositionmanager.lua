@@ -43,7 +43,9 @@ end
 function SpritePositionManager:populate(name, yRange, spriteCount)
 	local spritePositions = {}
 	
-	for i=1,self.maxChunks do
+	spritePositions[1] = {}
+	
+	for i=2,self.maxChunks + 1 do
 		
 		spritePositions[i] = {}
 		
@@ -61,6 +63,8 @@ function SpritePositionManager:populate(name, yRange, spriteCount)
 			)
 		end
 	end
+	
+	spritePositions[#spritePositions + 1] = {}
 	
 	self.positions[name] = spritePositions
 end
