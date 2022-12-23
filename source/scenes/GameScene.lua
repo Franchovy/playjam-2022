@@ -3,6 +3,7 @@ import "generator/spritepositionmanager"
 import "generator/spriteloader"
 import "generator/spritedata"
 import "generator/chunkgenerator"
+import "services/blinker"
 
 class('GameScene').extends(Scene)
 
@@ -14,7 +15,7 @@ gameStates = {
 	ended = "Ended"
 }
 
-local MAX_CHUNKS = 10
+local MAX_CHUNKS = 1
 local CHUNK_LENGTH = 1000
 
 function GameScene:init()
@@ -60,11 +61,11 @@ function GameScene:load()
 	
 	SpriteData:registerSprite("Platform/moving", Platform)
 	SpriteData:setInitializerParams("Platform/moving", gfx.image.new(100, 20), true)
-	SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
+	--SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
 	
 	SpriteData:registerSprite("Kill Block", KillBlock)
 	SpriteData:setInitializerParams("Kill Block")
-	SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
+	--SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
 	
 	SpriteData:registerSprite("Platform/floor", Platform)
 	SpriteData:setInitializerParams("Platform/floor", gfx.image.new(CHUNK_LENGTH, 20), false)
@@ -127,12 +128,9 @@ function GameScene:present()
 	
 	-- Play music
 	
-	-- Load Music
-	
 	self.filePlayer = FilePlayer("music/main")
 	
 	self.filePlayer:play()
-	
 end
 
 function GameScene:update()
@@ -141,6 +139,15 @@ function GameScene:update()
 	-- Update background paralax based on current offset
 	local drawOffsetX, _ = gfx.getDrawOffset()
 	self.background:setParalaxDrawOffset(drawOffsetX)
+	
+	-- Update Blinker
+	
+	if blinker ~= nil then
+		blinker:update()
+		if levelCompleteSprite ~= nil then	
+			levelCompleteSprite:setVisible(blinker.on)
+		end
+	end
 	
 	--
 	
@@ -217,8 +224,30 @@ function GameScene:destroy()
 end
 
 function onLevelComplete()
-	print("On Level Complete")
-	-- Show "Level Complete" text
-	-- Transition to Menu after 5s
-	-- Unlock Level
+	if levelCompleteSprite ~= nil then
+		return
+	end
+			
+	addLevelCompleteSprite()
+		
+	timer.performAfterDelay(3000,
+		function ()
+			print("Transition!")
+			
+			print("Unlock new level")
+		end
+	)
+end
+
+function addLevelCompleteSprite()
+	levelCompleteSprite = sizedTextSprite("LEVEL COMPLETE", 3)
+	
+	levelCompleteSprite:setImage(levelCompleteSprite:getImage():invertedImage())
+	levelCompleteSprite:setIgnoresDrawOffset(true)
+	
+	levelCompleteSprite:add()
+	levelCompleteSprite:moveTo(10, 110)
+
+	blinker = defaultBlinker(300, 100)
+	blinker:startLoop()
 end
