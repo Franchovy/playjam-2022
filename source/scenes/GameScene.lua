@@ -66,11 +66,11 @@ function GameScene:load(level)
 	
 	SpriteData:registerSprite("Platform/moving", Platform)
 	SpriteData:setInitializerParams("Platform/moving", gfx.image.new(100, 20), true)
-	--SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
+	SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
 	
 	SpriteData:registerSprite("Kill Block", KillBlock)
 	SpriteData:setInitializerParams("Kill Block")
-	--SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
+	SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
 	
 	SpriteData:registerSprite("Platform/floor", Platform)
 	SpriteData:setInitializerParams("Platform/floor", gfx.image.new(CHUNK_LENGTH, 20), false)
