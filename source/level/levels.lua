@@ -4,14 +4,15 @@ import "services/image"
 class("Level").extends()
 
 function Level.new(name, musicFilePath, backgroundFilePath, numImagesInBackground) 
-	local level = Level()
+	local level = Level(name, musicFilePath)
 	level:loadBackground(backgroundFilePath, numImagesInBackground)
 	
 	return level
 end
 
-function Level:init()
-
+function Level:init(name, musicFilePath)
+	self.name = name
+	self.musicFilePath = musicFilePath
 end
 
 function Level:loadBackground(backgroundFilePath, numImagesInBackground)
@@ -34,6 +35,9 @@ function Level:getParalaxImages()
 	}
 end
 
+function Level:getMusicFilepath()
+	return self.musicFilePath
+end
 
 levels = {
 	Level.new(

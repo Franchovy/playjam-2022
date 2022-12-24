@@ -46,8 +46,10 @@ function GameScene:load()
 	
 	-- Draw Background
 	
+	self.levelTheme = levels[3]
+	
 	self.background = ParalaxBackground.new()
-	self.background:loadForTheme(levels[3])
+	self.background:loadForTheme(self.levelTheme)
 	
 	self.background:setParalaxDrawingRatios()
 	
@@ -130,7 +132,7 @@ function GameScene:present()
 	
 	-- Play music
 	
-	self.filePlayer = FilePlayer("music/main")
+	self.filePlayer = FilePlayer(self.levelTheme:getMusicFilepath())
 	
 	self.filePlayer:play()
 end

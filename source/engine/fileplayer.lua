@@ -5,7 +5,6 @@ local sound <const> = playdate.sound
 class("FilePlayer").extends()
 
 function FilePlayer:init(pathName)
-	
 	self.intro = sound.fileplayer.new(pathName.."/intro")
 	self.intro:setFinishCallback(function() self:onIntroFinished() end)
 	
