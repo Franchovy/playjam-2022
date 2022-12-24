@@ -2,6 +2,7 @@ import "engine"
 import "services/sprite/text"
 import "sprites/components/menu"
 import "level/levels"
+import "level/theme"
 import "scenes"
 
 class('MenuScene').extends(Scene)
@@ -127,8 +128,10 @@ function startGame(level)
 	loadAllScenes()
 	
 	print("Starting game with level: ".. level)
+	
+	currentTheme = level
 
-	sceneManager:switchScene(scenes.game, function () end, level)
+	sceneManager:switchScene(scenes.game, function () end)
 end
 
 function positionTitleSprites(titleSprites)

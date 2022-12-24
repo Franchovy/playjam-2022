@@ -1,0 +1,2 @@
+
+currentTheme = nil
