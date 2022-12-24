@@ -46,7 +46,7 @@ end
 function onGameOverScene()
 	if buttons.isAButtonPressed() then
 		-- Perform transition
-		sceneManager:switchScene(scenes.game, function () end)
+		
 	end
 end
 

@@ -1,5 +1,6 @@
 import "engine"
 import "services/sprite/text"
+import "scenes"
 
 class('GameOverScene').extends(Scene)
 
@@ -54,7 +55,9 @@ function GameOverScene:update()
 	-- Detect player "press A"
 	if self.isFinishedTransitioning then
 		if buttons.isAButtonJustPressed() then
-			notify.gameRestart = true
+			sceneManager:switchScene(scenes.game, function () end)
+		elseif buttons.isBButtonJustPressed() then
+			sceneManager:switchScene(scenes.menu, function () end)
 		end
 	end
 end
