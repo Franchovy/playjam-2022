@@ -47,7 +47,7 @@ function GameScene:load()
 	-- Draw Background
 	
 	self.background = ParalaxBackground.new()
-	self.background:loadForTheme(levels[2])
+	self.background:loadForTheme(levels[1])
 	
 	self.background:setParalaxDrawingRatios()
 	
