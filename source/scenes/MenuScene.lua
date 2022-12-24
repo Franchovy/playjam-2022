@@ -1,6 +1,7 @@
 import "engine"
 import "services/sprite/text"
 import "sprites/components/menu"
+import "level/levels"
 import "scenes"
 
 class('MenuScene').extends(Scene)
@@ -114,7 +115,9 @@ function MenuScene:displayLevelSelectMenu()
 		self.menu:remove()
 	end
 	
-	self.menu = Menu(options.levelselect, 1.6)
+	local options = table.imap(levels, function(i) return i.. " ".. levels[i].name end)
+	
+	self.menu = Menu(options, 1.6)
 	self.menu:add()
 	self.menu:moveTo(160, 0)
 	self.menuIndex = 1
@@ -124,8 +127,8 @@ function startGame(level)
 	loadAllScenes()
 	
 	print("Starting game with level: ".. level)
-	
-	sceneManager:switchScene(scenes.game, function () end)
+
+	sceneManager:switchScene(scenes.game, function () end, level)
 end
 
 function positionTitleSprites(titleSprites)

@@ -37,7 +37,7 @@ function GameScene:init()
 	SpritePositionManager:configure(MAX_CHUNKS, CHUNK_LENGTH)
 end
 
-function GameScene:load()
+function GameScene:load(level)
 	Scene.load(self)
 	
 	print("Load!")
@@ -46,7 +46,7 @@ function GameScene:load()
 	
 	-- Draw Background
 	
-	self.levelTheme = levels[3]
+	self.levelTheme = levels[level]
 	
 	self.background = ParalaxBackground.new()
 	self.background:loadForTheme(self.levelTheme)

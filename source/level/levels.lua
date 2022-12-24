@@ -41,17 +41,17 @@ end
 
 levels = {
 	Level.new(
-		"Mountain",
+		"MOUNTAIN",
 		"music/mountain",
 		"images/backgrounds/mountain", 5
 	),
 	Level.new(
-		"Space",
+		"SPACE",
 		"music/space",
 		"images/backgrounds/space", 5
 	),
 	Level.new(
-		"City",
+		"CITY",
 		"music/city",
 		"images/backgrounds/city", 4
 	)

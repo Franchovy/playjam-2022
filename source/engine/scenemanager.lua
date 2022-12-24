@@ -35,7 +35,7 @@ function SceneManager:setCurrentScene(scene)
 	self.currentScene:present()
 end
 
-function SceneManager:switchScene(scene, onComplete)
+function SceneManager:switchScene(scene, onComplete, ...)
 	if self.transitioning then
 		return
 	end
@@ -50,7 +50,7 @@ function SceneManager:switchScene(scene, onComplete)
 	self.currentScene = scene
 	
 	-- Begin scene load
-	self.currentScene:load()
+	self.currentScene:load(...)
 
 	-- Start animated transition
 	self:startTransition(
