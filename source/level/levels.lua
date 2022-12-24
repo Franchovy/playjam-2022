@@ -45,10 +45,10 @@ levels = {
 		"Space",
 		"music/space",
 		"images/backgrounds/space", 5
+	),
+	Level.new(
+		"City",
+		"music/city",
+		"images/backgrounds/city", 4
 	)
-	--Level.new(
-	--	"City",
-	--	"music/city",
-	--	"images/backgrounds/city", 5
-	--)
 }
