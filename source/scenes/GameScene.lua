@@ -17,7 +17,7 @@ gameStates = {
 	ended = "Ended"
 }
 
-local MAX_CHUNKS = 10
+local MAX_CHUNKS = 1
 local CHUNK_LENGTH = 1000
 
 function GameScene:init()
@@ -237,9 +237,7 @@ function onLevelComplete()
 		
 	timer.performAfterDelay(3000,
 		function ()
-			print("Transition!")
-			
-			print("Unlock new level")
+			sceneManager:switchScene(scenes.menu, function() end)
 		end
 	)
 end
