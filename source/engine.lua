@@ -1,11 +1,12 @@
-import "CoreLibs/object"
-import "CoreLibs/graphics"
-import "CoreLibs/sprites"
-import "CoreLibs/timer"
-import "CoreLibs/crank"
 import "CoreLibs/animation"
 import "CoreLibs/animator"
+import "CoreLibs/crank"
 import "CoreLibs/easing"
+import "CoreLibs/frameTimer"
+import "CoreLibs/graphics"
+import "CoreLibs/object"
+import "CoreLibs/sprites"
+import "CoreLibs/timer"
 
 import "engine/lib"
 import "extensions"
@@ -15,6 +16,7 @@ import "extensions"
 geometry = playdate.geometry
 gfx = playdate.graphics
 timer = playdate.timer
+frameTimer = playdate.frameTimer
 sprite = playdate.sprite
 sound = playdate.sound
 
