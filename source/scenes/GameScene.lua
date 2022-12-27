@@ -6,6 +6,7 @@ import "generator/chunkgenerator"
 import "services/blinker"
 import "level/levels"
 import "level/theme"
+import "sprites/boule"
 
 class('GameScene').extends(Scene)
 
@@ -141,6 +142,12 @@ end
 function GameScene:update()
 	Scene.update(self)
 	
+	-- Shoot fireball
+	
+	if buttons.isBButtonJustPressed() then
+		shootFireball(self.wheel.x, self.wheel.y)
+	end
+	
 	-- Update background paralax based on current offset
 	local drawOffsetX, _ = gfx.getDrawOffset()
 	self.background:setParalaxDrawOffset(drawOffsetX)
@@ -226,6 +233,12 @@ end
 
 function GameScene:destroy()
 	Scene.destroy(self)
+end
+
+function shootFireball(x, y)
+	local boule = Boule.new()
+	boule:add()
+	boule:moveTo(x, y)
 end
 
 function onLevelComplete()
