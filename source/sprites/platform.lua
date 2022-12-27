@@ -21,25 +21,21 @@ local TIMER_LENGTH = 75
 -----------------------
 -- Private properties
 
-local direction = directions.left
-local movementTimer = nil
 
-local invertedDirection = function() 
-	if direction[0] ~= 0 then
-		return direction == directions.right and directions.left or directions.right
+function Platform:timerCallback()
+	printTable(self.velocity)
+	if self.velocity.x > 0 then
+		self.velocity.x = -MAX_SPEED
+	elseif self.velocity.x < 0 then
+		self.velocity.x = MAX_SPEED
 	end
-	if direction[1] ~= 0 then
-		return direction == directions.up and directions.down or directions.up
-	end
+	printTable(self.velocity.x)
+	--direction = invertedDirection(direction)
 end
 
-local timerCallback = function(timer)
-	direction = invertedDirection(direction)
-end
-
-local createTimer = function()
-	movementTimer = frameTimer.new(TIMER_LENGTH, timerCallback)
-	movementTimer.repeats = true
+function Platform:createTimer()
+	self.movementTimer = frameTimer.new(TIMER_LENGTH, Platform.timerCallback, self)
+	self.movementTimer.repeats = true
 end
 
 ----------------
@@ -53,11 +49,11 @@ function Platform:init(image,canMove)
 	Platform.super.init(self, image)
 	self.type = spriteTypes.platform
 	self.canMove=canMove
-	self.velocity=0
 	self.currentOffset=0
 	self.goLeft=true
 	self.currentMove=0
 	self.initPosX, self.initPosY=self:getPosition()
+	self.movementTimer = nil
 	
 	----------------
 	-- Draw Graphics
@@ -72,15 +68,16 @@ function Platform:init(image,canMove)
 	
 	if canMove then
 		self.velocity = {
-			vertical = 0,
-			horizontal = MAX_SPEED
+			y = 0,
+			x = MAX_SPEED
 		}
 	else
 		self.velocity = {
-			vertical = 0,
-			horizontal = 0
+			y = 0,
+			x = 0
 		}
 	end
+	printTable(self.velocity)
 end
 
 --------------------
@@ -128,14 +125,14 @@ end
 function Platform:move()
 	local x, y = self:getPosition()
 	self:moveTo(
-		x + self.velocity.horizontal * direction[1],
-		y + self.velocity.vertical * direction[2]
+		x + self.velocity.x,
+		y + self.velocity.y
 	)
-end			
+end
 
 function Platform:update()
-	if movementTimer == nil then
-		createTimer()
+	if self.movementTimer == nil then
+		self:createTimer()
 	end
 	
 	self:move()

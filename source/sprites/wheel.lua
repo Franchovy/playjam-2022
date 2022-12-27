@@ -141,6 +141,11 @@ function Wheel:update()
 	for target, collision in pairs(collisions) do
 		if target.type == spriteTypes.platform then
 			if collision.normal.x ~= 0 then 
+				if collision.normal.x > 0 then
+					print("Move left")
+				elseif collision.normal.x < 0 then
+					print("Move right: ".. target.velocity.x)
+				end
 				--horizontal collision
 				self.velocityX = 0
 				self.currentVelocityDrag = 0
