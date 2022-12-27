@@ -17,7 +17,7 @@ gameStates = {
 	ended = "Ended"
 }
 
-local MAX_CHUNKS = 1
+local MAX_CHUNKS = 16
 local CHUNK_LENGTH = 1000
 
 function GameScene:init()
@@ -58,29 +58,29 @@ function GameScene:load(level)
 	
 	SpriteData:registerSprite("Wind", Wind)
 	SpriteData:setInitializerParams("Wind", gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
-	SpriteData:setPositioning("Wind", 1, { yRange = { 40, 100 } } )
+	SpriteData:setPositioning("Wind", 0, { yRange = { 40, 100 } } )
 	
 	SpriteData:registerSprite("Coin", Coin)
 	SpriteData:setInitializerParams("Coin")
-	SpriteData:setPositioning("Coin", 2, { yRange = { 30, 200 } } )
+	SpriteData:setPositioning("Coin", 100, { yRange = { 30, 200 } } )
 	
 	SpriteData:registerSprite("Platform/moving", Platform)
 	SpriteData:setInitializerParams("Platform/moving", gfx.image.new(100, 20), true)
-	SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
+	SpriteData:setPositioning("Platform/moving", 0, { yRange = { 130, 170 } } )
 	
 	SpriteData:registerSprite("Kill Block", KillBlock)
 	SpriteData:setInitializerParams("Kill Block")
-	SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
+	SpriteData:setPositioning("Kill Block", 0, { yRange = { 20, 180 } } )
 	
 	SpriteData:registerSprite("Platform/floor", Platform)
 	SpriteData:setInitializerParams("Platform/floor", gfx.image.new(CHUNK_LENGTH, 20), false)
-	SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 }, MAX_CHUNKS + 2 )
+	SpriteData:setPositioning("Platform/floor", 0, { x = 0, y = 220 }, MAX_CHUNKS + 2 )
 	
 	if not self.spritesLoaded then
 		
 		-- Create Player sprite
 		
-		self.wheel = Wheel.new(gfx.image.new("images/wheel_v3/new_wheel1"))
+		self.wheel = Wheel.new()
 		
 		-- Draw Score Text
 		

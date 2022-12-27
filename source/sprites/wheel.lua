@@ -16,12 +16,12 @@ local crankTicksPerCircle = 36
 
 class("Wheel").extends(Sprite)
 
-function Wheel.new(image) 
-	return Wheel(image)
+function Wheel.new() 
+	return Wheel()
 end
 
 function Wheel:init(image)
-	Wheel.super.init(self, image)
+	Wheel.super.init(self, gfx.image.new("images/jedi"):scaledImage(4))
 	self.type = spriteTypes.player
 	
 	local marginSize = 3
@@ -179,7 +179,7 @@ function Wheel:update()
 	if self.angle < 1 then self.angle += 12 end
 	local imageName = string.format("images/wheel_v3/new_wheel%01d", math.floor(self.angle))
 	
-	self:getImage():load(imageName)
+	--self:getImage():load(imageName)
 end
 
 local previousTouchingGround = false

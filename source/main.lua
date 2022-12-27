@@ -15,6 +15,7 @@ function initialize()
 end
 
 function playdate.update()
+	print(playdate)
 
 	-- Random Seed (for generating random numbers)
 	math.randomseed(playdate.getSecondsSinceEpoch())
