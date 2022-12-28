@@ -17,7 +17,7 @@ gameStates = {
 	ended = "Ended"
 }
 
-local MAX_CHUNKS = 1
+local MAX_CHUNKS = 16
 local CHUNK_LENGTH = 1000
 
 function GameScene:init()
