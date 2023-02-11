@@ -7,7 +7,7 @@ function Coin.new()
 end
 
 function Coin:init()
-	local image = gfx.image.new("images/coin")
+	local image = gfx.image.new(images.coin)
 	Coin.super.init(self, image:invertedImage())
 	self.type = spriteTypes.coin
 	

@@ -1,4 +1,5 @@
 import "engine"
+import "components/images"
 
 -- Params
 local jumpSpeed = 22
@@ -16,11 +17,12 @@ local crankTicksPerCircle = 36
 
 class("Wheel").extends(Sprite)
 
-function Wheel.new(image) 
-	return Wheel(image)
+function Wheel.new() 
+	return Wheel()
 end
 
-function Wheel:init(image)
+function Wheel:init()
+	local image = gfx.image.new(images.wheel[1])
 	Wheel.super.init(self, image)
 	self.type = spriteTypes.player
 	
@@ -182,9 +184,8 @@ function Wheel:update()
 	self.angle = self.angle + self.velocityX / 10
 	if self.angle > 12 then self.angle = self.angle % 12 end
 	if self.angle < 1 then self.angle += 12 end
-	local imageName = string.format("images/wheel_v3/new_wheel%01d", math.floor(self.angle))
 	
-	self:getImage():load(imageName)
+	self:getImage():load(images.wheel[math.floor(self.angle)])
 end
 
 local previousTouchingGround = false
