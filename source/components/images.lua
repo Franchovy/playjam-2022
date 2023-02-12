@@ -1,7 +1,11 @@
+import "CoreLibs/object"
+import "CoreLibs/graphics"
 
-images = {}
+local graphics <const> = playdate.graphics
 
-images.wheel = {
+kImages = {}
+
+kImages.wheel = {
 	"images/wheel_v3/new_wheel1",
 	"images/wheel_v3/new_wheel2",
 	"images/wheel_v3/new_wheel3",
@@ -16,12 +20,16 @@ images.wheel = {
 	"images/wheel_v3/new_wheel12",
 }
 
-images.wind = {
+kImages.wind = {
 	"images/winds/wind1",
 	"images/winds/wind2",
 	"images/winds/wind3",
 	"images/winds/wind4"
 }
 
-images.coin = "images/coin"
-images.killBlock = "images/kill_block_v2"
+kImages.coin = "images/coin"
+kImages.killBlock = "images/kill_block_v2"
+
+function getImage(path) 
+	return graphics.image.new(path)
+end

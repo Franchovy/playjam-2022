@@ -3,11 +3,11 @@ import "engine"
 class("ParalaxBackground").extends(gfx.sprite)
 
 
-function ParalaxBackground.new(pathname, count)
-	return ParalaxBackground(pathname, count)
+function ParalaxBackground.new()
+	return ParalaxBackground()
 end
 
-function ParalaxBackground:init(pathname, count)
+function ParalaxBackground:init()
 	ParalaxBackground.super.init(self)
 	
 	self:setSize(400, 240)

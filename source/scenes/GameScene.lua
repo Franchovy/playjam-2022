@@ -57,7 +57,7 @@ function GameScene:load(level)
 	-- Set up sprites
 	
 	SpriteData:registerSprite("Wind", Wind)
-	SpriteData:setInitializerParams("Wind", gfx.image.new("images/winds/wind1"):scaledImage(6, 4), -4)
+	SpriteData:setInitializerParams("Wind")
 	SpriteData:setPositioning("Wind", 1, { yRange = { 40, 100 } } )
 	
 	SpriteData:registerSprite("Coin", Coin)
@@ -65,7 +65,7 @@ function GameScene:load(level)
 	SpriteData:setPositioning("Coin", 2, { yRange = { 30, 200 } } )
 	
 	SpriteData:registerSprite("Platform/moving", Platform)
-	SpriteData:setInitializerParams("Platform/moving", gfx.image.new(100, 20), true)
+	SpriteData:setInitializerParams("Platform/moving", 100, 20, true)
 	SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
 	
 	SpriteData:registerSprite("Kill Block", KillBlock)
@@ -73,7 +73,7 @@ function GameScene:load(level)
 	SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
 	
 	SpriteData:registerSprite("Platform/floor", Platform)
-	SpriteData:setInitializerParams("Platform/floor", gfx.image.new(CHUNK_LENGTH, 20), false)
+	SpriteData:setInitializerParams("Platform/floor", CHUNK_LENGTH, 20, false)
 	SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 }, MAX_CHUNKS + 2 )
 	
 	if not self.spritesLoaded then

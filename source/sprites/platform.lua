@@ -41,14 +41,14 @@ end
 ----------------
 -- Initializer
 
-function Platform.new(image,canMove) 
-	return Platform(image,canMove)
+function Platform.new(width, height, isMoving) 
+	return Platform(width, height ,isMoving)
 end
 
-function Platform:init(image,canMove)
-	Platform.super.init(self, image)
+function Platform:init(width, height, isMoving)
+	Platform.super.init(self, gfx.image.new(width, height))
 	self.type = spriteTypes.platform
-	self.canMove=canMove
+	self.canMove=isMoving
 	self.currentOffset=0
 	self.goLeft=true
 	self.currentMove=0

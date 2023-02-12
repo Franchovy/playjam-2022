@@ -1,25 +1,24 @@
 import "engine"
 import "CoreLibs/timer"
+import "components/images"
 
 class('Wind').extends(Sprite)
 
-function Wind.new(image,windPower) 
-	return Wind(image,windPower)
+local windPower = -4
+
+function Wind.new() 
+	return Wind()
 end
 
-function Wind:init(image,windPower)
+function Wind:init()
+	local image = getImage(kImages.wind[1]):scaledImage(6, 4)
 	Wind.super.init(self, image)
+	
 	self.type = spriteTypes.wind
 	
 	self.windPower=windPower
-	self.currentSprite=0
+	self.imageIndex = 1
 
-	if(self.windPower>0) then
-		self.currentSprite=1
-	elseif(self.windPower<0) then
-		self.currentSprite=4
-	end	
-	
 	self:setCollideRect(0, 0, self:getSize())
 	
 	self:setZIndex(-1)
@@ -31,8 +30,8 @@ function Wind:update()
 	
 	if(self.animBegin==false) then
 		self.animBegin=true
-		local trnasitionTime=250
-		local t = playdate.timer.new(trnasitionTime, 0, 1, easingFunctions.linear)
+		local transitionTime=250
+		local t = playdate.timer.new(transitionTime, 0, 1, easingFunctions.linear)
 
 		t.timerEndedCallback= function(timer)
 			self:manageAnim()
@@ -41,18 +40,9 @@ function Wind:update()
 end
 
 function Wind:manageAnim()
-	if(self.currentSprite>4) then
-		self.currentSprite=1
-	elseif(self.currentSprite<1) then
-		self.currentSprite=4
-	end
-
-	if(self.windPower>0) then
-		self.currentSprite+=1
-	elseif(self.windPower<0) then
-		self.currentSprite-=1
-	end
-	local image=gfx.image.new(images.wind[self.currentSprite]):scaledImage(6, 4)
+	self.imageIndex = (self.imageIndex % 4) + 1
+	local image=getImage(kImages.wind[self.imageIndex]):scaledImage(6, 4)
+	
 	self:setImage(image)
 
 	self.animBegin=false

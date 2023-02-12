@@ -7,7 +7,7 @@ function KillBlock.new()
 end
 
 function KillBlock:init()
-	local image = gfx.image.new(images.killBlock)
+	local image = getImage(kImages.killBlock)
 	KillBlock.super.init(self, image)
 	self.type = spriteTypes.killBlock
 	
