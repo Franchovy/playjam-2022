@@ -30,6 +30,17 @@ kImages.wind = {
 kImages.coin = "images/coin"
 kImages.killBlock = "images/kill_block_v2"
 
-function getImage(path) 
+function getImage(path)
 	return graphics.image.new(path)
+end
+
+kSpriteImageType = {
+	default,
+	animated
+}
+
+function setSpriteImage(sprite, path, type)
+	if type == nil or type == kSpriteImageType.default then
+		sprite:setImage(getImage(path))
+	end
 end

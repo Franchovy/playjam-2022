@@ -7,9 +7,11 @@ function KillBlock.new()
 end
 
 function KillBlock:init()
-	local image = getImage(kImages.killBlock)
-	KillBlock.super.init(self, image)
+	--local image = getImage(kImages.killBlock)
+	KillBlock.super.init(self)
 	self.type = spriteTypes.killBlock
+	
+	setSpriteImage(self, kImages.killBlock)
 	
 	----------------
 	-- Set up Sprite

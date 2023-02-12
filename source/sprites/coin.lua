@@ -7,8 +7,9 @@ function Coin.new()
 end
 
 function Coin:init()
-	local image = getImage(kImages.coin)
-	Coin.super.init(self, image:invertedImage())
+	Coin.super.init(self)
+	
+	setSpriteImage(self, kImages.coin)
 	self.type = spriteTypes.coin
 	
 	self.hasBeenGrabbed = false
