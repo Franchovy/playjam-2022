@@ -99,3 +99,11 @@ function math.approach( value, target, step)
 		return value, true
 	end
 end
+
+-- Useful methods
+
+function setIfNil(value, valueIfNil)
+	if value == nil then
+		value = valueIfNil
+	end
+end

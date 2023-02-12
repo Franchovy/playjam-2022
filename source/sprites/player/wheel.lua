@@ -22,8 +22,10 @@ function Wheel.new()
 end
 
 function Wheel:init()
-	local image = getImage(kImages.wheel[1])
-	Wheel.super.init(self, image)
+	Wheel.super.init(self)
+	
+	self:setImage(kImages.wheel, 1)
+	
 	self.type = spriteTypes.player
 	
 	local marginSize = 3
@@ -184,8 +186,9 @@ function Wheel:update()
 	self.angle = self.angle + self.velocityX / 10
 	if self.angle > 12 then self.angle = self.angle % 12 end
 	if self.angle < 1 then self.angle += 12 end
-	
-	self:getImage():load(kImages.wheel[math.floor(self.angle)])
+	local imageIndex = math.floor(self.angle)
+
+	self:setImage(kImages.wheel, imageIndex)
 end
 
 local previousTouchingGround = false

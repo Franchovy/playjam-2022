@@ -9,7 +9,7 @@ end
 function Coin:init()
 	Coin.super.init(self)
 	
-	setSpriteImage(self, kImages.coin)
+	self:setImage(kImages.coin)
 	self.type = spriteTypes.coin
 	
 	self.hasBeenGrabbed = false
