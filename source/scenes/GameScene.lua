@@ -101,7 +101,9 @@ function GameScene:load(level)
 		
 		-- Create great wall of death
 		
-		self.wallOfDeath = WallOfDeath.new(self.wallOfDeathSpeed)
+		if AppConfig.components.wallOfDeath then
+			self.wallOfDeath = WallOfDeath.new(self.wallOfDeathSpeed)
+		end
 		
 		-- Generate Level
 		
@@ -122,12 +124,15 @@ function GameScene:present()
 	-- Position Sprites
 	
 	self.wheel:moveTo(80, 188)
-	self.wallOfDeath:moveTo(-600, 0)
+	
+	if AppConfig.components.wallOfDeath then
+		self.wallOfDeath:moveTo(-600, 0)
+		self.wallOfDeath:add()
+	end
 	
 	-- Set randomly generated sprite positions
 	
 	self.wheel:add()
-	self.wallOfDeath:add()
 	self.textImageScore:add()
 	
 	-- Set background drawing callback
@@ -205,7 +210,11 @@ function GameScene:update()
 		-- Awaiting player input (jump / crank)
 		if buttons.isUpButtonJustPressed() or (playdate.getCrankChange() > 5) then
 			self.wheel:startGame()
-			self.wallOfDeath:beginMoving()
+			
+			if AppConfig.components.wallOfDeath then
+				self.wallOfDeath:beginMoving()
+			end
+			
 			self.gameState = gameStates.playing
 		end
 	end
@@ -228,7 +237,10 @@ function GameScene:update()
 	
 	if self.wheel.hasJustDied then
 		self.gameState = gameStates.ended
-		self.wallOfDeath:stopMoving()
+		
+		if AppConfig.components.wallOfDeath then
+			self.wallOfDeath:stopMoving()
+		end
 	end
 	
 	-- Update image score
