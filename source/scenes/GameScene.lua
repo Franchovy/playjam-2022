@@ -6,6 +6,7 @@ import "generator/chunkgenerator"
 import "services/blinker"
 import "level/levels"
 import "level/theme"
+import "config"
 
 class('GameScene').extends(Scene)
 
@@ -49,10 +50,12 @@ function GameScene:load(level)
 	
 	self.levelTheme = levels[currentTheme]
 	
-	self.background = ParalaxBackground.new()
-	self.background:loadForTheme(self.levelTheme)
-	
-	self.background:setParalaxDrawingRatios()
+	if not AppConfig.hideBackground then
+		self.background = ParalaxBackground.new()
+		self.background:loadForTheme(self.levelTheme)
+		
+		self.background:setParalaxDrawingRatios()
+	end
 	
 	-- Set up sprites
 	
@@ -119,11 +122,13 @@ function GameScene:present()
 	
 	-- Set background drawing callback
 	
-	local callback = self.background:getBackgroundDrawingCallback()
-	
-	gfx.sprite.setBackgroundDrawingCallback(callback)
-	
-	self.background:add()
+	if not AppConfig.hideBackground then
+		local callback = self.background:getBackgroundDrawingCallback()
+		
+		gfx.sprite.setBackgroundDrawingCallback(callback)
+		
+		self.background:add()
+	end
 	
 	-- Set game as ready to start
 	
@@ -142,8 +147,11 @@ function GameScene:update()
 	Scene.update(self)
 	
 	-- Update background paralax based on current offset
-	local drawOffsetX, _ = gfx.getDrawOffset()
-	self.background:setParalaxDrawOffset(drawOffsetX)
+	
+	if not AppConfig.hideBackground then
+		local drawOffsetX, _ = gfx.getDrawOffset()
+		self.background:setParalaxDrawOffset(drawOffsetX)
+	end
 	
 	-- Update Blinker
 	

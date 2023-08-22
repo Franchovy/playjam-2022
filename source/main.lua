@@ -2,6 +2,7 @@ import "engine.lua"
 import "scenes/scenes"
 import "sprites/lib"
 import "notify"
+import "config"
 
 local acceptsRestart = false
 

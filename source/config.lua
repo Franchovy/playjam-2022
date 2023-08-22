@@ -1,0 +1,3 @@
+AppConfig = {}
+
+AppConfig["hideBackground"] = true
