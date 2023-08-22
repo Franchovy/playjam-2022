@@ -59,25 +59,35 @@ function GameScene:load(level)
 	
 	-- Set up sprites
 	
-	SpriteData:registerSprite("Wind", Wind)
-	SpriteData:setInitializerParams("Wind")
-	SpriteData:setPositioning("Wind", 1, { yRange = { 40, 100 } } )
+	if AppConfig.components.wind then
+		SpriteData:registerSprite("Wind", Wind)
+		SpriteData:setInitializerParams("Wind")
+		SpriteData:setPositioning("Wind", 1, { yRange = { 40, 100 } } )
+	end
+
+	if AppConfig.components.coin then
+		SpriteData:registerSprite("Coin", Coin)
+		SpriteData:setInitializerParams("Coin")
+		SpriteData:setPositioning("Coin", 2, { yRange = { 30, 200 } } )
+	end
 	
-	SpriteData:registerSprite("Coin", Coin)
-	SpriteData:setInitializerParams("Coin")
-	SpriteData:setPositioning("Coin", 2, { yRange = { 30, 200 } } )
+	if AppConfig.components.platformMoving then
+		SpriteData:registerSprite("Platform/moving", Platform)
+		SpriteData:setInitializerParams("Platform/moving", 100, 20, true)
+		SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
+	end
 	
-	SpriteData:registerSprite("Platform/moving", Platform)
-	SpriteData:setInitializerParams("Platform/moving", 100, 20, true)
-	SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
+	if AppConfig.components.killBlock then
+		SpriteData:registerSprite("Kill Block", KillBlock)
+		SpriteData:setInitializerParams("Kill Block")
+		SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
+	end
 	
-	SpriteData:registerSprite("Kill Block", KillBlock)
-	SpriteData:setInitializerParams("Kill Block")
-	SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
-	
-	SpriteData:registerSprite("Platform/floor", Platform)
-	SpriteData:setInitializerParams("Platform/floor", CHUNK_LENGTH, 20, false)
-	SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 }, MAX_CHUNKS + 2 )
+	if AppConfig.components.platformFloor then
+		SpriteData:registerSprite("Platform/floor", Platform)
+		SpriteData:setInitializerParams("Platform/floor", CHUNK_LENGTH, 20, false)
+		SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 }, MAX_CHUNKS + 2 )
+	end
 	
 	if not self.spritesLoaded then
 		
@@ -146,7 +156,7 @@ end
 function GameScene:update()
 	Scene.update(self)
 	
-	-- Update background paralax based on current offset
+	-- Update background parallax based on current offset
 	
 	if not AppConfig.hideBackground then
 		local drawOffsetX, _ = gfx.getDrawOffset()
