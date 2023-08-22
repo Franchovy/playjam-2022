@@ -14,7 +14,7 @@ function Menu:init(textEntries, size)
 	self:setCenter(0, 0)
 end 
 
-function Menu:setSelectedIndex(i)
+function Menu:selectIndex(i)	
 	if i < 1 then
 		self.selectedIndex = 1
 	elseif i > #self.entries then
@@ -24,6 +24,8 @@ function Menu:setSelectedIndex(i)
 	end
 	
 	self:drawMenu()
+	
+	return self.selectedIndex
 end
 
 function Menu:drawMenu()

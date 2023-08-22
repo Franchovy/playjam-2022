@@ -1,6 +1,6 @@
 import "engine"
 import "services/sprite/text"
-import "sprites/components/menu"
+import "Menu/menu"
 import "level/levels"
 import "level/theme"
 import "scenes"
@@ -51,6 +51,11 @@ function MenuScene:present()
 	
 	MenuScene:displayMainMenu()
 	
+	-- Sound Effects
+	
+	sampleplayer:addSample("menu-select", "sfx/menu-select")
+	sampleplayer:addSample("menu-select-fail", "sfx/menu-select-fail")
+	
 	-- Wheel image
 	
 	local image = gfx.image.new("images/menu_wheel"):scaledImage(2)
@@ -64,20 +69,22 @@ function MenuScene:update()
 	Scene.update(self)
 	
 	if buttons.isUpButtonJustPressed() then
-		self.menuIndex = math.max(self.menuIndex - 1, 1)
-		self.menu:setSelectedIndex(self.menuIndex)
+		local indexTarget = self.index - 1
+		
+		self:updateMenuIndex(indexTarget)
 	end
 	
 	if buttons.isDownButtonJustPressed() then
-		self.menuIndex = math.max(self.menuIndex + 1, 1)
-		self.menu:setSelectedIndex(self.menuIndex)
+		local indexTarget = self.index + 1
+		
+		self:updateMenuIndex(indexTarget)
 	end
 	
 	if buttons.isAButtonJustPressed() then
 		if self.displayingLevelSelect then 
-			startGame(self.menuIndex)
+			startGame(self.index)
 		else
-			if self.menuIndex == 1 then
+			if self.index == 1 then
 				startGame(1)
 			else 
 				self:displayLevelSelect()
@@ -108,7 +115,7 @@ function MenuScene:displayMainMenu()
 	self.menu = Menu(options.main, 1.8)
 	self.menu:add()
 	self.menu:moveTo(160, 0)
-	self.menuIndex = 1
+	self.index = 1
 end
 
 function MenuScene:displayLevelSelectMenu()
@@ -121,7 +128,21 @@ function MenuScene:displayLevelSelectMenu()
 	self.menu = Menu(options, 1.6)
 	self.menu:add()
 	self.menu:moveTo(160, 0)
-	self.menuIndex = 1
+	self.index = 1
+end
+
+function MenuScene:updateMenuIndex(indexTarget)
+	print("Target: ".. indexTarget)
+	local indexActual = self.menu:selectIndex(indexTarget)
+	print("Actual: ".. indexActual)
+	
+	self.index = indexActual
+	
+	if indexTarget == indexActual then
+		sampleplayer:playSample("menu-select")
+	else 
+		sampleplayer:playSample("menu-select-fail")
+	end
 end
 
 function startGame(level)
