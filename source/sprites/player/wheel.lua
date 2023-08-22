@@ -7,10 +7,11 @@ local hopSpeed = 16
 local gravity = 2.1
 local scorePerCoin = 10
 local maxFallSpeed = 16
-local speedBoost = 3
+local speedMultiplier = 6
+local acceleration = 0.9
 local velocityDragStep = 0.1
 local velocityBrakeStep = 0.4
-local maxVelocityX = 3
+local maxVelocityX = 23
 
 -- Params, not to modify
 local crankTicksPerCircle = 36
@@ -64,7 +65,6 @@ end
 function Wheel:resetValues() 
 	self.velocityX = 0
 	self.velocityY = 0
-	self.currentVelocityDrag = 0
 	self.angle = 0
 	self.horizontalAcceleration = 0
 	self.hasJustDied = false
@@ -106,8 +106,8 @@ function Wheel:update()
 	
 	local hasJumped = buttons.isUpButtonJustPressed()
 	local crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
-	local isBraking = (crankTicks > 0) ~= (self.velocityX > 0)
-		
+	--print("Crank ticks: ".. crankTicks)
+	
 	-- Update push vector based on crank ticks
 		
 	if hasJumped and (not self.hasDoubleJumped) then
@@ -121,7 +121,7 @@ function Wheel:update()
 	
 	-- Update velocity according to acceleration
 	
-	self.velocityX = self:calculateSpeed(crankTicks, isBraking)
+	self.velocityX = self:calculateSpeed(crankTicks, self.velocityX)
 	self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
 	
 	-- Apply wind power
@@ -146,13 +146,12 @@ function Wheel:update()
 		if target.type == spriteTypes.platform then
 			if collision.normal.x ~= 0 then 
 				if collision.normal.x > 0 then
-					print("Move left")
+					--print("Move left")
 				elseif collision.normal.x < 0 then
-					print("Move right: ".. target.velocity.x)
+					--print("Move right: ".. target.velocity.x)
 				end
 				--horizontal collision
 				self.velocityX = 0
-				self.currentVelocityDrag = 0
 			end
 			if collision.normal.y == -1 then 
 				--top collision
@@ -178,7 +177,10 @@ function Wheel:update()
 	
 	-- Play sounds based on movement
 	self:playLandingBasedSound()
-	self:playMovementBasedSounds()
+	local normalizedVelocityFactor = math.abs(self.velocityX) / maxVelocityX
+	print("Speed: ".. self.velocityX)
+	--print("Normalized velocity factor: ".. normalizedVelocityFactor)
+	self:playMovementBasedSounds(normalizedVelocityFactor)
 	self:playWindBasedSounds()
 	
 	-- Update graphics
@@ -191,30 +193,28 @@ function Wheel:update()
 	self:setImage(kImages.wheel, imageIndex)
 end
 
-local previousTouchingGround = false
 function Wheel:playLandingBasedSound()
-	if (not previousTouchingGround) and self.touchingGround then
-		sampleplayer:playSample("touch_ground")
-	end
 	
-	previousTouchingGround = self.touchingGround
 end
 
-local movementSampleHasFinishedPlaying = false
-function finishedSamplePlaying() movementSampleHasFinishedPlaying = true end
+local synth = nil
+local frequency = 440
+local attack = 0.5
+local decay = 1.2
+local maxVolume = 0.4
+local minVolume = 0.1
 
-function Wheel:playMovementBasedSounds()
-	if movementSampleHasFinishedPlaying then return end
-	
-	if self.velocityX > 0 and self.velocityX < 5 then
-		sampleplayer:playSample("forward_start", finishedSamplePlaying)
-	elseif self.velocityX > 5 then
-		sampleplayer:playSample("forward_loop", finishedSamplePlaying)
-	elseif self.velocityX < 0 and self.velocityX > -5 then
-		sampleplayer:playSample("backward_start", finishedSamplePlaying)
-	elseif self.velocityX < -5 then
-		sampleplayer:playSample("backward_loop", finishedSamplePlaying)
+function Wheel:playMovementBasedSounds(velocityFactor)
+	if synth == nil then
+		synth = playdate.sound.synth.new(playdate.sound.kWaveSquare)
+		synth:setAttack(attack)
+		synth:setDecay(decay)
 	end
+	
+	local volume = math.max(velocityFactor, minVolume)
+	synth:setVolume(volume)
+	
+	synth:playNote(frequency)
 end
 
 local windSampleHasFinishedPlaying = false
@@ -229,24 +229,13 @@ function Wheel:resetValuesBeforeCollisionUpdate()
 	self.touchingGround = false
 end
 
-function Wheel:calculateSpeed(crankTicks, isBraking)
-	if isBraking then
-		-- Apply brakes (slow down faster)
-		self.currentVelocityDrag = math.approach(self.currentVelocityDrag, 0, velocityBrakeStep)
-	else
-		-- Apply wheel momentum to velocity drag
-		self.currentVelocityDrag = math.approach(self.currentVelocityDrag, self.velocityX, velocityDragStep)
-	end
-	
+function Wheel:calculateSpeed(crankTicks, velocityCurrent)
 	-- Handle moving forward
-	local rawVelocityX = crankTicks * speedBoost + self.currentVelocityDrag
-
-	-- Add a drag to velocity if above the max speed	
-	if rawVelocityX > maxVelocityX then
-		return math.approach(rawVelocityX, maxVelocityX, 0.2) 
-	else
-		return rawVelocityX	 
-	end
+	local velocityRaw = crankTicks * speedMultiplier
+	local velocityActual = math.approach(velocityCurrent, velocityRaw, acceleration)
+	
+	-- Return speed limited by max speed
+	return math.min(velocityActual, maxVelocityX)
 end
 
 function Wheel:setAwaitingInput() 
