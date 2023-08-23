@@ -59,31 +59,31 @@ function GameScene:load(level)
 	
 	-- Set up sprites
 	
-	if AppConfig.components.wind then
+	if not AppConfig.disableComponents.wind then
 		SpriteData:registerSprite("Wind", Wind)
 		SpriteData:setInitializerParams("Wind")
 		SpriteData:setPositioning("Wind", 1, { yRange = { 40, 100 } } )
 	end
 
-	if AppConfig.components.coin then
+	if not AppConfig.disableComponents.coin then
 		SpriteData:registerSprite("Coin", Coin)
 		SpriteData:setInitializerParams("Coin")
 		SpriteData:setPositioning("Coin", 2, { yRange = { 30, 200 } } )
 	end
 	
-	if AppConfig.components.platformMoving then
+	if not AppConfig.disableComponents.platformMoving then
 		SpriteData:registerSprite("Platform/moving", Platform)
 		SpriteData:setInitializerParams("Platform/moving", 100, 20, true)
 		SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
 	end
 	
-	if AppConfig.components.killBlock then
+	if not AppConfig.disableComponents.killBlock then
 		SpriteData:registerSprite("Kill Block", KillBlock)
 		SpriteData:setInitializerParams("Kill Block")
 		SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
 	end
 	
-	if AppConfig.components.platformFloor then
+	if not AppConfig.disableComponents.platformFloor then
 		SpriteData:registerSprite("Platform/floor", Platform)
 		SpriteData:setInitializerParams("Platform/floor", CHUNK_LENGTH, 20, false)
 		SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 }, MAX_CHUNKS + 2 )
@@ -101,7 +101,7 @@ function GameScene:load(level)
 		
 		-- Create great wall of death
 		
-		if AppConfig.components.wallOfDeath then
+		if not AppConfig.disableComponents.wallOfDeath then
 			self.wallOfDeath = WallOfDeath.new(self.wallOfDeathSpeed)
 		end
 		
@@ -125,7 +125,7 @@ function GameScene:present()
 	
 	self.wheel:moveTo(80, 188)
 	
-	if AppConfig.components.wallOfDeath then
+	if not AppConfig.disableComponents.wallOfDeath then
 		self.wallOfDeath:moveTo(-600, 0)
 		self.wallOfDeath:add()
 	end
@@ -153,9 +153,11 @@ function GameScene:present()
 	
 	-- Play music
 	
-	self.filePlayer = FilePlayer(self.levelTheme:getMusicFilepath())
-	
-	self.filePlayer:play()
+	if not AppConfig.disableBackgroundMusic then
+		self.filePlayer = FilePlayer(self.levelTheme:getMusicFilepath())
+		
+		self.filePlayer:play()
+	end
 end
 
 function GameScene:update()
@@ -211,7 +213,7 @@ function GameScene:update()
 		if buttons.isUpButtonJustPressed() or (playdate.getCrankChange() > 5) then
 			self.wheel:startGame()
 			
-			if AppConfig.components.wallOfDeath then
+			if not AppConfig.disableComponents.wallOfDeath then
 				self.wallOfDeath:beginMoving()
 			end
 			
@@ -238,7 +240,7 @@ function GameScene:update()
 	if self.wheel.hasJustDied then
 		self.gameState = gameStates.ended
 		
-		if AppConfig.components.wallOfDeath then
+		if not AppConfig.disableComponents.wallOfDeath then
 			self.wallOfDeath:stopMoving()
 		end
 	end
@@ -251,7 +253,9 @@ end
 function GameScene:dismiss()
 	Scene.dismiss(self)
 	
-	self.filePlayer:stop()
+	if not AppConfig.disableBackgroundMusic then
+		self.filePlayer:stop()
+		end
 end
 
 function GameScene:destroy()

@@ -3,11 +3,13 @@ AppConfig = {}
 AppConfig["hideBackground"] = true
 
 local levelComponents = {}
-levelComponents["platformMoving"] = true
-levelComponents["platformFloor"] = true
-levelComponents["killBlock"] = false
-levelComponents["wind"] = false
-levelComponents["coin"] = false
-levelComponents["wallOfDeath"] = false
+levelComponents["platformMoving"] = false
+levelComponents["platformFloor"] = false
+levelComponents["killBlock"] = true
+levelComponents["wind"] = true
+levelComponents["coin"] = true
+levelComponents["wallOfDeath"] = true
 
-AppConfig["components"] = levelComponents
+AppConfig["disableComponents"] = levelComponents
+
+AppConfig["disableBackgroundMusic"] = true
