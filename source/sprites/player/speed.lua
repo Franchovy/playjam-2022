@@ -1,19 +1,60 @@
-local speedMultiplier = 6
-local acceleration = 0.9
+local crankTickMultiplier = 3
+local accelerationManual = 3.5
+local maxSpeedManual = 10.0
+
+local speedUpAcceleration = 0.01
+local speedUpDragAcceleration = 0.1
+local speedUpBrakeAcceleration = 2.5
+
 local velocityDragStep = 0.1
 local velocityBrakeStep = 0.4
 local maxVelocityX = 23
 
-function Wheel:calculateSpeed(crankTicks, velocityCurrent)
-	-- Handle moving forward
-	local velocityRaw = crankTicks * speedMultiplier
-	local velocityActual = math.approach(velocityCurrent, velocityRaw, acceleration)
+function Wheel:calculateSpeed(crankTicks, speedPreviousActual)
+	local crankTicks = crankTicks * crankTickMultiplier
+	
+	-- Handle update manual
+	
+	local speedManualBounded = math.clamp(crankTicks, -maxSpeedManual, maxSpeedManual)
+	local speedPreviousBounded = math.clamp(speedPreviousActual, -maxSpeedManual, maxSpeedManual)
+	local speedManualActual = math.approach(
+		speedPreviousBounded, 
+		speedManualBounded, 
+		accelerationManual
+	)
+	
+	-- Handle speed-up
+	
+	local speedUpActual = 0
+	
+	if math.abs(speedPreviousActual) >= maxSpeedManual then
+		-- print("Currently in speedup mode")
+		local speedUpPreviousActual = math.sign(speedPreviousActual) * (math.abs(speedPreviousActual) - maxSpeedManual)
+		
+		if math.sign(speedManualActual) == math.sign(speedPreviousActual) then
+		    --print("Crank speed fast enough: ".. math.abs(crankTicks))
+			-- Apply Speed up
+			
+			print("Speed up previous: ".. speedUpPreviousActual)
+			
+			speedUpActual = speedUpPreviousActual + crankTicks * speedUpAcceleration 
+		end
+		--print(speedPreviousActual)
+		print("SpeedUp: ".. speedUpActual)
+		--print()
+	end
+	
+	
+	-- Assign actual speed
+	
+	local speedActual = speedManualActual + speedUpActual
 	
 	-- Return speed limited by max speed
-	if velocityActual < 0 then
-		return math.max(velocityActual, -maxVelocityX)
+	
+	if speedActual < 0 then
+		return math.max(speedActual, -maxVelocityX)
 	else 
-		return math.min(velocityActual, maxVelocityX)
+		return math.min(speedActual, maxVelocityX)
 	end
 end
 

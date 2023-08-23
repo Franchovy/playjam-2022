@@ -8,8 +8,7 @@ local gravity = 2.1
 local scorePerCoin = 10
 local maxFallSpeed = 16
 
--- Params, not to modify
-local crankTicksPerCircle = 36
+local crankTicksPerCircle = 72
 
 class("Wheel").extends(Sprite)
 

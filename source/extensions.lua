@@ -100,6 +100,20 @@ function math.approach( value, target, step)
 	end
 end
 
+function math.clamp(value, min, max)
+	return math.max(math.min(value, max), min)
+end
+
+function math.sign(value)
+	if value < 0 then
+		return -1
+	elseif value > 0 then
+		return 1
+	elseif value == 0 then
+		return 0
+	end
+end
+
 -- Useful methods
 
 function setIfNil(value, valueIfNil)
