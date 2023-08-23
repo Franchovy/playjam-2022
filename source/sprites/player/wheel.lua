@@ -171,7 +171,7 @@ function Wheel:update()
 	
 	-- Update graphics
 	
-	self.angle = self.angle + self.velocityX / 10
+	self.angle = self.angle + self.velocityX / 5
 	if self.angle > 12 then self.angle = self.angle % 12 end
 	if self.angle < 1 then self.angle += 12 end
 	local imageIndex = math.floor(self.angle)
