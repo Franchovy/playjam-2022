@@ -177,10 +177,10 @@ function Wheel:update()
 	
 	-- Play sounds based on movement
 	self:playLandingBasedSound()
+	
 	local normalizedVelocityFactor = math.abs(self.velocityX) / maxVelocityX
-	print("Speed: ".. self.velocityX)
-	--print("Normalized velocity factor: ".. normalizedVelocityFactor)
 	self:playMovementBasedSounds(normalizedVelocityFactor)
+	
 	self:playWindBasedSounds()
 	
 	-- Update graphics
@@ -201,20 +201,41 @@ local synth = nil
 local frequency = 440
 local attack = 0.5
 local decay = 1.2
-local maxVolume = 0.4
-local minVolume = 0.1
+local maxVolume = 0.7
+local minVolume = 0.0
+
+local volumeChangeSpeed = 0.1
+local frequencyChangeSpeed = 10
+local previousVolume = nil
+local previousFrequency = nil
 
 function Wheel:playMovementBasedSounds(velocityFactor)
 	if synth == nil then
-		synth = playdate.sound.synth.new(playdate.sound.kWaveSquare)
+		local sample = playdate.sound.sample.new("sfx/wheel_movement")
+		synth = playdate.sound.synth.new(sample)
 		synth:setAttack(attack)
 		synth:setDecay(decay)
 	end
 	
-	local volume = math.max(velocityFactor, minVolume)
-	synth:setVolume(volume)
+	local volume = math.max(velocityFactor * maxVolume, minVolume)
+	local frequencyFactor = (velocityFactor + 1) * 0.7
 	
-	synth:playNote(frequency)
+	-- update frequency and volume
+	if previousVolume ~= nil then
+		previousVolume = math.approach(previousVolume, volume, volumeChangeSpeed)
+	else
+		previousVolume = volume
+	end
+	
+	local newFrequency = frequency * frequencyFactor
+	if previousFrequency ~= nil then
+		previousFrequency = math.approach(previousFrequency, newFrequency, frequencyChangeSpeed)
+	else
+		previousFrequency = newFrequency
+	end
+	
+	synth:setVolume(previousVolume)
+	synth:playNote(previousFrequency)
 end
 
 local windSampleHasFinishedPlaying = false
@@ -235,7 +256,11 @@ function Wheel:calculateSpeed(crankTicks, velocityCurrent)
 	local velocityActual = math.approach(velocityCurrent, velocityRaw, acceleration)
 	
 	-- Return speed limited by max speed
-	return math.min(velocityActual, maxVelocityX)
+	if velocityActual < 0 then
+		return math.max(velocityActual, -maxVelocityX)
+	else 
+		return math.min(velocityActual, maxVelocityX)
+	end
 end
 
 function Wheel:setAwaitingInput() 
