@@ -20,11 +20,11 @@ local synth = nil
 local frequency = 440
 local attack = 0.5
 local decay = 1.2
-local maxVolume = 0.7
-local minVolume = 0.0
+local maxVolume = 1.0
+local minVolume = 0.1
 
-local volumeChangeSpeed = 0.1
-local frequencyChangeSpeed = 10
+local volumeChangeSpeed = 0.3
+local frequencyChangeSpeed = 15
 local previousVolume = nil
 local previousFrequency = nil
 
@@ -41,14 +41,14 @@ function Wheel:playMovementBasedSounds(velocityFactor)
 	
 	-- update frequency and volume
 	if previousVolume ~= nil then
-		previousVolume = math.approach(previousVolume, volume, volumeChangeSpeed)
+		previousVolume = math.approach(previousVolume, volume, velocityFactor * volumeChangeSpeed)
 	else
 		previousVolume = volume
 	end
 	
 	local newFrequency = frequency * frequencyFactor
 	if previousFrequency ~= nil then
-		previousFrequency = math.approach(previousFrequency, newFrequency, frequencyChangeSpeed)
+		previousFrequency = math.approach(previousFrequency, newFrequency, velocityFactor * frequencyChangeSpeed)
 	else
 		previousFrequency = newFrequency
 	end
