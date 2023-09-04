@@ -2,11 +2,9 @@ import "engine"
 import "components/images"
 
 -- Params
-local jumpSpeed = 22
-local hopSpeed = 16
+local maxFallSpeed = 16
 local gravity = 2.1
 local scorePerCoin = 10
-local maxFallSpeed = 16
 
 local crankTicksPerCircle = 72
 
@@ -14,6 +12,7 @@ class("Wheel").extends(Sprite)
 
 import "speed"
 import "sounds"
+import "jump"
 
 function Wheel.new() 
 	return Wheel()
@@ -48,6 +47,7 @@ function Wheel:init()
 	-- Create Properties
 	
 	self:resetValues()
+	self:resetJumpState()
 end
 
 function Wheel:resetValues() 
@@ -59,7 +59,6 @@ function Wheel:resetValues()
 	self.score = 0
 	self.currentWindPower = 0
 	self.ignoresPlayerInput = true
-	self.hasDoubleJumped = false
 end
 
 function Wheel:setIsDead() 
@@ -91,17 +90,13 @@ function Wheel:update()
 	
 	-- Player Input
 	
-	local hasJumped = buttons.isUpButtonJustPressed()
-	
-	-- Update push vector based on crank ticks
-		
-	if hasJumped and (not self.hasDoubleJumped) then
-		if self.touchingGround then
-			self.velocityY = -jumpSpeed
-		else
-			self.velocityY = -hopSpeed
-			self.hasDoubleJumped = true
-		end
+	-- Has just pressed jump
+	-- Is holding jump (Jump timer)
+
+	if buttons.isUpButtonPressed() then
+		self:applyJump()
+	elseif buttons.isUpButtonJustReleased() and self:isJumping() then
+		self:endJump()
 	end
 	
 	self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
@@ -144,7 +139,8 @@ function Wheel:update()
 			if collision.normal.y == -1 then 
 				--top collision
 				self.touchingGround = true
-				self.hasDoubleJumped = false
+				
+				self:resetJumpState()
 			end
 		elseif target.type == spriteTypes.coin then
 			if target:isVisible() and self:alphaCollision(target) then
