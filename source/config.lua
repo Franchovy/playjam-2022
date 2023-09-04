@@ -1,15 +1,15 @@
 AppConfig = {}
 
-AppConfig["hideBackground"] = true
+AppConfig["enableParalaxBackground"] = true
 
 local levelComponents = {}
 levelComponents["platformMoving"] = true
-levelComponents["platformFloor"] = false
+levelComponents["platformFloor"] = true
 levelComponents["killBlock"] = true
-levelComponents["wind"] = true
+levelComponents["wind"] = false
 levelComponents["coin"] = true
 levelComponents["wallOfDeath"] = true
 
-AppConfig["disableComponents"] = levelComponents
+AppConfig["enableComponents"] = levelComponents
 
-AppConfig["disableBackgroundMusic"] = true
+AppConfig["enableBackgroundMusic"] = true

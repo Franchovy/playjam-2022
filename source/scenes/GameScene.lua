@@ -50,7 +50,7 @@ function GameScene:load(level)
 	
 	self.levelTheme = levels[currentTheme]
 	
-	if not AppConfig.hideBackground then
+	if AppConfig.enableParalaxBackground then
 		self.background = ParalaxBackground.new()
 		self.background:loadForTheme(self.levelTheme)
 		
@@ -59,31 +59,31 @@ function GameScene:load(level)
 	
 	-- Set up sprites
 	
-	if not AppConfig.disableComponents.wind then
+	if AppConfig.enableComponents.wind then
 		SpriteData:registerSprite("Wind", Wind)
 		SpriteData:setInitializerParams("Wind")
 		SpriteData:setPositioning("Wind", 1, { yRange = { 40, 100 } } )
 	end
 
-	if not AppConfig.disableComponents.coin then
+	if AppConfig.enableComponents.coin then
 		SpriteData:registerSprite("Coin", Coin)
 		SpriteData:setInitializerParams("Coin")
 		SpriteData:setPositioning("Coin", 2, { yRange = { 30, 200 } } )
 	end
 	
-	if not AppConfig.disableComponents.platformMoving then
+	if AppConfig.enableComponents.platformMoving then
 		SpriteData:registerSprite("Platform/moving", Platform)
 		SpriteData:setInitializerParams("Platform/moving", 100, 20, true)
 		SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
 	end
 	
-	if not AppConfig.disableComponents.killBlock then
+	if AppConfig.enableComponents.killBlock then
 		SpriteData:registerSprite("Kill Block", KillBlock)
 		SpriteData:setInitializerParams("Kill Block")
 		SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
 	end
 	
-	if not AppConfig.disableComponents.platformFloor then
+	if AppConfig.enableComponents.platformFloor then
 		SpriteData:registerSprite("Platform/floor", Platform)
 		SpriteData:setInitializerParams("Platform/floor", CHUNK_LENGTH, 20, false)
 		SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 }, MAX_CHUNKS + 2 )
@@ -101,7 +101,7 @@ function GameScene:load(level)
 		
 		-- Create great wall of death
 		
-		if not AppConfig.disableComponents.wallOfDeath then
+		if AppConfig.enableComponents.wallOfDeath then
 			self.wallOfDeath = WallOfDeath.new(self.wallOfDeathSpeed)
 		end
 		
@@ -125,7 +125,7 @@ function GameScene:present()
 	
 	self.wheel:moveTo(80, 188)
 	
-	if not AppConfig.disableComponents.wallOfDeath then
+	if AppConfig.enableComponents.wallOfDeath then
 		self.wallOfDeath:moveTo(-600, 0)
 		self.wallOfDeath:add()
 	end
@@ -137,7 +137,7 @@ function GameScene:present()
 	
 	-- Set background drawing callback
 	
-	if not AppConfig.hideBackground then
+	if AppConfig.enableParalaxBackground then
 		local callback = self.background:getBackgroundDrawingCallback()
 		
 		gfx.sprite.setBackgroundDrawingCallback(callback)
@@ -153,7 +153,7 @@ function GameScene:present()
 	
 	-- Play music
 	
-	if not AppConfig.disableBackgroundMusic then
+	if AppConfig.enableBackgroundMusic then
 		self.filePlayer = FilePlayer(self.levelTheme:getMusicFilepath())
 		
 		self.filePlayer:play()
@@ -165,7 +165,7 @@ function GameScene:update()
 	
 	-- Update background parallax based on current offset
 	
-	if not AppConfig.hideBackground then
+	if AppConfig.enableParalaxBackground then
 		local drawOffsetX, _ = gfx.getDrawOffset()
 		self.background:setParalaxDrawOffset(drawOffsetX)
 	end
@@ -213,7 +213,7 @@ function GameScene:update()
 		if buttons.isUpButtonJustPressed() or (playdate.getCrankChange() > 5) then
 			self.wheel:startGame()
 			
-			if not AppConfig.disableComponents.wallOfDeath then
+			if AppConfig.enableComponents.wallOfDeath then
 				self.wallOfDeath:beginMoving()
 			end
 			
@@ -240,7 +240,7 @@ function GameScene:update()
 	if self.wheel.hasJustDied then
 		self.gameState = gameStates.ended
 		
-		if not AppConfig.disableComponents.wallOfDeath then
+		if AppConfig.enableComponents.wallOfDeath then
 			self.wallOfDeath:stopMoving()
 		end
 	end
@@ -253,7 +253,7 @@ end
 function GameScene:dismiss()
 	Scene.dismiss(self)
 	
-	if not AppConfig.disableBackgroundMusic then
+	if AppConfig.enableBackgroundMusic then
 		self.filePlayer:stop()
 		end
 end
