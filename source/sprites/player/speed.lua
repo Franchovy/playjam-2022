@@ -28,22 +28,14 @@ function Wheel:calculateSpeed(crankTicks, speedPreviousActual)
 	local speedUpActual = 0
 	
 	if math.abs(speedPreviousActual) >= maxSpeedManual then
-		-- print("Currently in speedup mode")
 		local speedUpPreviousActual = math.sign(speedPreviousActual) * (math.abs(speedPreviousActual) - maxSpeedManual)
 		
 		if math.sign(speedManualActual) == math.sign(speedPreviousActual) then
-		    --print("Crank speed fast enough: ".. math.abs(crankTicks))
 			-- Apply Speed up
-			
-			print("Speed up previous: ".. speedUpPreviousActual)
 			
 			speedUpActual = speedUpPreviousActual + crankTicks * speedUpAcceleration 
 		end
-		--print(speedPreviousActual)
-		print("SpeedUp: ".. speedUpActual)
-		--print()
 	end
-	
 	
 	-- Assign actual speed
 	
