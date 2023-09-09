@@ -1,6 +1,7 @@
 import "engine"
 import "services/sprite/text"
-import "Menu/menu"
+import "Menu/SpriteMenu"
+import "Menu/MenuOption"
 import "level/levels"
 import "level/theme"
 import "scenes"
@@ -9,15 +10,34 @@ class('MenuScene').extends(Scene)
 
 local MENUTEXT_SPACING <const> = 40
 
-local options = {
-	main = {
-		"PLAY", 
-		"SELECT LEVEL"
+local selectedIndex = [1]
+local menu = nil
+
+options = {
+	{
+		title = "PLAY",
+		callback = function() startGame(1) end
 	},
-	levelselect = {
-		"1 MOUNTAIN",
-		"2 SEA",
-		"3 CASTLE"
+	{
+		title = "SELECT LEVEL",
+		menu = {
+			{
+				title = "1 COUNTRY",
+				callback = function() startGame(1) end
+			},
+			{
+				title = "2 SPACE",
+				callback = function() startGame(2) end
+			},
+			{
+				title = "3 CITY",
+				callback = function() startGame(3) end
+			},
+		}
+	},
+	{
+		title = "CUSTOM LEVELS",
+		menu = {}
 	}
 }
 
@@ -26,123 +46,56 @@ local options = {
 
 function MenuScene:init()
 	Scene.init(self)
-	
-	self.displayingLevelSelect = false
 end
 
 function MenuScene:load()
 	Scene.load(self)
+	
+	-- Draw Menu Background
+	
+	drawBackground()
+	
+	-- Create Menu Sprite
+	
+	menu = Menu.new(options)
+	
+	-- TODO: Load custom levelsfile names
 end
 
 function MenuScene:present()
 	Scene.present(self)
 	
-	local font = gfx.font.new("fonts/Sans Bold/Cyberball")
-	gfx.setFont(font)
+	-- Print SpriteMenu Options
 	
-	-- Print Title Texts
-	
-	local titleTexts = {"WHEEL", "RUNNER"}
-	self.titleSprites = table.imap(titleTexts, function (i) return sizedTextSprite(titleTexts[i], 5) end)
-	
-	positionTitleSprites(self.titleSprites)
-	
-	-- Print Menu Options
-	
-	MenuScene:displayMainMenu()
-	
-	-- Sound Effects
-	
-	sampleplayer:addSample("menu-select", "sfx/menu-select")
-	sampleplayer:addSample("menu-select-fail", "sfx/menu-select-fail")
-	
-	-- Wheel image
-	
-	local image = gfx.image.new("images/menu_wheel"):scaledImage(2)
-	wheel = gfx.sprite.new(image)
-	
-	wheel:add()
-	wheel:moveTo(75, 90)
+	menu:add()
 end
 
 function MenuScene:update() 
 	Scene.update(self)
 	
 	if buttons.isUpButtonJustPressed() then
-		local indexTarget = self.index - 1
-		
-		self:updateMenuIndex(indexTarget)
+		menu:indexDecrement()
 	end
 	
 	if buttons.isDownButtonJustPressed() then
-		local indexTarget = self.index + 1
-		
-		self:updateMenuIndex(indexTarget)
+		menu:indexIncrement()
 	end
 	
 	if buttons.isAButtonJustPressed() then
-		if self.displayingLevelSelect then 
-			startGame(self.index)
-		else
-			if self.index == 1 then
-				startGame(1)
-			else 
-				self:displayLevelSelect()
-			end
-		end
+		menu:indexSelect()
 	end
 	
-	if buttons.isBButtonJustReleased() or self.displayingLevelSelect then
-		self:displayLevelSelect()
+	if buttons.isBButtonJustReleased() then
+		menu:indexReturn()
 	end
 end
 
 function MenuScene:dismiss()
 	Scene.dismiss(self)
-	
 end
 
 function MenuScene:destroy()
 	Scene.destroy(self)
-	
-end
-
-function MenuScene:displayMainMenu()
-	if self.menu ~= nil then
-		self.menu:remove()
-	end
-	
-	self.menu = Menu(options.main, 1.8)
-	self.menu:add()
-	self.menu:moveTo(160, 0)
-	self.index = 1
-end
-
-function MenuScene:displayLevelSelectMenu()
-	if self.menu ~= nil then
-		self.menu:remove()
-	end
-	
-	local options = table.imap(levels, function(i) return i.. " ".. levels[i].name end)
-	
-	self.menu = Menu(options, 1.6)
-	self.menu:add()
-	self.menu:moveTo(160, 0)
-	self.index = 1
-end
-
-function MenuScene:updateMenuIndex(indexTarget)
-	print("Target: ".. indexTarget)
-	local indexActual = self.menu:selectIndex(indexTarget)
-	print("Actual: ".. indexActual)
-	
-	self.index = indexActual
-	
-	if indexTarget == indexActual then
-		sampleplayer:playSample("menu-select")
-	else 
-		sampleplayer:playSample("menu-select-fail")
-	end
 end
 
 function startGame(level)
@@ -155,50 +108,30 @@ function startGame(level)
 	sceneManager:switchScene(scenes.game, function () end)
 end
 
-function positionTitleSprites(titleSprites)
+function drawBackground()
+	
+	local images = {}
+	
+	-- Print Title Texts
+	
+	gfx.setFont(gfx.font.new("fonts/Sans Bold/Cyberball"))
+	local titleTexts = {"WHEEL", "RUNNER"}
+	self.titleImages = table.imap(titleTexts, function (i) return createTextImage(titleTexts[i]):scaledImage(5) end)
+	
 	local startPoint = { x = 170, y = 126 }
 	local endPoint = { x = 93, y = 179 }
-	for i, sprite in ipairs(titleSprites) do
-		sprite:add()
-		
+	for i, sprite in ipairs(titleImages) do
 		if i == 1 then
-			sprite:moveTo(startPoint.x, startPoint.y)
-		else 
-			sprite:moveTo(endPoint.x, endPoint.y)
+			table.insert(images, { image = imageTitle, x = startPoint.x, y = startPoint.y)
+		else
+			table.insert(images, { image = imageTitle, x = endPoint.x, y = endPoint.y) 
 		end
 	end
-end
-
-function clearMenuOptions(options)
-	table.each(options, function (sprite) sprite:remove() end )
-end
-
-
-function MenuScene:displayLevelSelect()
-	if self.displayingLevelSelect then 
-		if cooldown and buttons.isBButtonJustReleased() then
-			self:hideLevelSelect()
-		end
-		
-		return 
-	end
 	
-	self.displayingLevelSelect = true
+	-- Wheel image
 	
-	table.each(self.titleSprites, function(sprite) sprite:setVisible(false) end)
-	self:displayLevelSelectMenu()
+	local image = gfx.image.new("images/menu_wheel"):scaledImage(2)
+	table.insert(images, { image = imageWheel, x = 75, y = 90 })
 	
-	-- Await button release to show
-	
-	cooldown = false
-	
-	timer.performAfterDelay(10, function() cooldown = true end)
-end
-
-function MenuScene:hideLevelSelect()
-	self.displayingLevelSelect = false
-	
-	table.each(self.titleSprites, function(sprite) sprite:setVisible(true) end)
-	
-	self:displayMainMenu()
+	-- TODO: Draw image in background
 end

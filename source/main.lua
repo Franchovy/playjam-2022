@@ -9,7 +9,7 @@ local acceptsRestart = false
 
 function initialize()
 	-- Create game state manager
-	loadInitialScene()
+	scenes.menu = MenuScene()
 	
 	-- Create Scene
 	sceneManager:setCurrentScene(scenes.menu)

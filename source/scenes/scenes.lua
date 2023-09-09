@@ -9,10 +9,6 @@ scenes = {
 	gameover = nil
 }
 
-function loadInitialScene()
-	scenes.menu = MenuScene()
-end
-
 function loadAllScenes()
 	scenes.game = GameScene()
 	scenes.gameover = GameOverScene()
