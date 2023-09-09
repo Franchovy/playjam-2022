@@ -1,7 +1,7 @@
-name=PlaydateSDKExampleProject
+name=Wheel Runner
 author=Franchovy
-description=Rolly
-bundleID=io.widgetlib.roller
+description=Wheel Runner
+bundleID=io.Franchovy.wheelrunner
 version=1.0
 imagePath=images/
 buildNumber=148
