@@ -8,6 +8,8 @@ local acceptsRestart = false
 
 
 function initialize()
+	gfx.setFont(gfx.font.new("fonts/Sans Bold/Cyberball"))
+	
 	-- Create game state manager
 	scenes.menu = MenuScene()
 	

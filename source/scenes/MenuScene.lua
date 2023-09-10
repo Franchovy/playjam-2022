@@ -48,13 +48,14 @@ function MenuScene:load()
 	
 	-- Draw Menu Background
 	
-	drawBackground()
+	self:setCenter(0, 0)
+	self:setImage(makeBackgroundImage())
 	
 	-- Create Menu Sprite
 	
 	menu = Menu(options)
 	
-	-- TODO: Load custom levelsfile names
+	-- TODO: Load custom levels file names
 end
 
 function MenuScene:present()
@@ -90,28 +91,32 @@ function startGame(level)
 	sceneManager:switchScene(scenes.game, function () end)
 end
 
-function drawBackground()
+function makeBackgroundImage()	
+	local image = gfx.image.new(400, 240)
 	
-	local images = {}
+	gfx.pushContext(image)
 	
 	-- Print Title Texts
 	
-	gfx.setFont(gfx.font.new("fonts/Sans Bold/Cyberball"))
 	local titleTexts = {"WHEEL", "RUNNER"}
 	local titleImages = table.imap(titleTexts, function (i) return createTextImage(titleTexts[i]):scaledImage(5) end)
 	
-	local startPoint = { x = 170, y = 126 }
-	local endPoint = { x = 93, y = 179 }
-	for i, sprite in ipairs(titleImages) do
+	local startPoint = { x = 170, y = 136 }
+	local endPoint = { x = 93, y = 189 }
+	for i, image in ipairs(titleImages) do
 		if i == 1 then
-			table.insert(images, { image = imageTitle, x = startPoint.x, y = startPoint.y })
+			image:draw(startPoint.x, startPoint.y)
 		else
-			table.insert(images, { image = imageTitle, x = endPoint.x, y = endPoint.y }) 
+			image:draw(endPoint.x, endPoint.y)
 		end
 	end
 	
 	-- Wheel image
 	
-	local image = gfx.image.new("images/menu_wheel"):scaledImage(2)
-	--table.insert(images, { image = imageWheel, x = 75, y = 90 })
+	local imageWheel = gfx.image.new("images/menu_wheel"):scaledImage(2)
+	imageWheel:draw(5, 25)
+	
+	gfx.popContext()
+	
+	return image
 end
