@@ -1,7 +1,10 @@
 import "engine"
 
-local <const> MARGIN = 19
-local <const> SIZE = 1.8
+local MARGIN <const> = 19
+local SIZE <const> = 1.8
+
+local sampleSelect = "menu-select"
+local sampleSelectFail = "menu-select-fail"
 
 class("Menu").extends(Sprite)
 
@@ -16,68 +19,123 @@ function Menu:init(options)
 	
 	-- Load Sound Effects
 	
-	sampleplayer:addSample("menu-select", "sfx/menu-select")
-	sampleplayer:addSample("menu-select-fail", "sfx/menu-select-fail")
+	sampleplayer:addSample(sampleSelect, "sfx/menu-select")
+	sampleplayer:addSample(sampleSelectFail, "sfx/menu-select-fail")
 	
 	-- Menu index
 	
-	self.currentMenu = {}
-	self.index = 1
+	self.currentMenuIndex = {}
+	self.selectedIndex = 1
 end
 
-function Menu:activate() 
-	self.entries = {"test1", "test2", "test3"}
-	
-	self:setImage(getMenuImage()) -- TODO: Feed in current menu
+function Menu:activate() 	
+	self:setImage(getMenuImage(self:getCurrentMenu(), self.selectedIndex))
 	
 	self:setCenter(0, 0)
 	self:moveTo(160, 0)
 end
 
 function Menu:update()
-	-- TODO: Menu navigation
+	
+	if buttons.isButtonJustPressedAny(buttons.up, buttons.down, buttons.a, buttons.b) then
+		local success
+		 
+		if buttons.isButtonJustPressed(buttons.up) then
+			success = self:indexDecrement()
+			
+		elseif buttons.isButtonJustPressed(buttons.down) then
+			success = self:indexIncrement()
+			
+		elseif buttons.isButtonJustPressed(buttons.a) then
+			success = self:indexSelect()
+			
+		elseif buttons.isButtonJustPressed(buttons.b) then
+			success = self:indexReturn()
+		end
+		
+		print(self.selectedIndex)
+		
+		if success then
+			sampleplayer:playSample(sampleSelect)
+		else 
+			sampleplayer:playSample(sampleSelectFail)
+		end
+	elseif buttons.isButtonJustPressedAny() then
+		sampleplayer:play(sampleSelectFail)
+	end
 end
 
-function SpriteMenu:selectIndex(i)	 -- TODO: Move into index methods
-	if i < 1 then
-		self.selectedIndex = 1
-	elseif i > #self.entries then
-		self.selectedIndex = #self.entries
-	else
-		self.selectedIndex = i
+-- Menu Navigation Functions
+
+function Menu:getCurrentMenu()
+	local options = self.options;
+	
+	for _, index in pairs(self.currentMenuIndex) do
+		local option = options[index]
+		
+		if option.menu ~= nil then
+			-- Get Submenu
+			options = option.menu
+		end
 	end
 	
-	self:drawMenu()
-	
-	return self.selectedIndex
-end
-
-function Menu:indexDecrement()
-	
+	return table.map(options, function(value) return value.title end)
 end
 
 function Menu:indexIncrement()
+	local menu = self:getCurrentMenu()
 	
+	if self.selectedIndex == #menu then
+		return false
+	end
+	
+	self.selectedIndex += 1
+	
+	return true
+end
+
+function Menu:indexDecrement()
+	local menu = self:getCurrentMenu()
+
+	if self.selectedIndex == 1 then
+		return false
+	end
+	
+	self.selectedIndex -= 1
+	
+	return true
 end
 
 function Menu:indexSelect()
+	local option = self:getCurrentMenu()[self.selectedIndex]
 	
+	if option.menu == nil and option.callback == nil then
+		print("Menu option [".. option.title.."] is missing submenu or callback!")
+		return false
+	end
+	
+	if option.menu ~= nil then
+		table.insert(self.currentMenuIndex, self.selectedIndex)
+	elseif option.callback ~= nil then
+		option.callback()
+	end
+	
+	return true
 end
 
 function Menu:indexReturn()
+	if #self.currentMenuIndex == 1 then
+		return false
+	end
 	
+	self.selectedIndex = table.remove(self.currentMenuIndex)
+	
+	return true
 end
 
-function playSample(isFail) 
-	if not isFail then
-		sampleplayer:playSample("menu-select")
-	else 
-		sampleplayer:playSample("menu-select-fail")
-	end
-end
+-- Drawing Functions
 
 function getMenuImage(entries, index)
-	
 	-- Create Menu Image using entries
 
 	local _, textHeight = gfx.getTextSize(entries[1])
@@ -89,7 +147,7 @@ function getMenuImage(entries, index)
 	
 	local entryImages = {}
 	for _, entry in pairs(entries) do
-		local itemImage = getMenuItemImage(text)
+		local itemImage = getMenuItemImage(entries[1])
 		table.insert(entryImages, itemImage)
 	end
 		
@@ -110,14 +168,18 @@ end
 
 function getMenuItemImage(text, isSelected)
 	local textSizeWidth, textSizeHeight = gfx.getTextSize(text)
-	local textImage = gfx.image.new(textSizeWidth, textSizeHeight)
 	local textSpacingX = isSelected and 30 or 0
 	
+	local textImage = gfx.image.new(textSizeWidth, textSizeHeight)
+	
 	gfx.pushContext(textImage)
+	
 	if isSelected then
 		gfx.drawTriangle(0, 0, 20, textSizeHeight / 2, 0, textSizeHeight)
 	end
+	
 	gfx.drawTextAligned(text, textSpacingX, 0, textAlignment.left)
+	
 	gfx.popContext()
 	
 	return textImage

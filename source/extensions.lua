@@ -1,6 +1,26 @@
 
 -- Extensions on "table"
 
+function table.values(inputTable)
+	local values = {}
+	
+	for _, value in pairs(inputTable) do
+		table.insert(values, value)
+	end
+	
+	return values
+end
+
+function table.keys(inputTable)
+	local keys = {}
+	
+	for key, _ in pairs(inputTable) do
+		table.insert(keys, key)
+	end
+	
+	return keys
+end
+
 function table.firstIndex(t, fn)
 	for i, e in ipairs(t) do
 		if fn(e) then

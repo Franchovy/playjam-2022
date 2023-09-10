@@ -54,32 +54,6 @@ collisionTypes = {
 	bounce = gfx.sprite.kCollisionTypeBounce,
 }
 
-buttons = {
-	isLeftButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonLeft) end,
-	isRightButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonRight) end,
-	isDownButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonDown) end,
-	isUpButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonUp) end,
-	isAButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonA) end,
-	isBButtonPressed = function() return playdate.buttonIsPressed(playdate.kButtonB) end,
-	isLeftButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonLeft) end,
-	isRightButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonRight) end,
-	isDownButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonDown) end,
-	isUpButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonUp) end,
-	isAButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonA) end,
-	isBButtonJustPressed = function() return playdate.buttonJustPressed(playdate.kButtonB) end,
-	isLeftButtonJustReleased = function() return playdate.buttonJustReleased(playdate.kButtonLeft) end,
-	isRightButtonJustReleased = function() return playdate.buttonJustReleased(playdate.kButtonRight) end,
-	isDownButtonJustReleased = function() return playdate.buttonJustReleased(playdate.kButtonDown) end,
-	isUpButtonJustReleased = function() return playdate.buttonJustReleased(playdate.kButtonUp) end,
-	isAButtonJustReleased = function() return playdate.buttonJustReleased(playdate.kButtonA) end,
-	isBButtonJustReleased = function() return playdate.buttonJustReleased(playdate.kButtonB) end,
-	left = playdate.kButtonLeft,
-	right = playdate.kButtonRight,
-	down = playdate.kButtonDown,
-	up = playdate.kButtonUp,
-	a = playdate.kButtonA,
-	b = playdate.kButtonB
-}
 
 textAlignment = {
 	center = playdate.kTextAlignmentCenter,
