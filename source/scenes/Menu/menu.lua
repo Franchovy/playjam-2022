@@ -2,9 +2,13 @@ import "engine"
 
 local MARGIN <const> = 19
 local SIZE <const> = 1.8
+local selectedEntryMargin <const> = 15
 
-local sampleSelect = "menu-select"
-local sampleSelectFail = "menu-select-fail"
+local sampleSelect <const> = "menu-select"
+local sampleSelectFail <const> = "menu-select-fail"
+
+local textHeight = nil;
+local menuWidth = nil;
 
 class("Menu").extends(Sprite)
 
@@ -28,7 +32,15 @@ function Menu:init(options)
 	self.selectedIndex = 1
 end
 
+local test = {gfx.getTextSize("A")}
+printTable(test)
+
 function Menu:activate() 	
+	local entries = table.map(self.options, function (value) return value.title end)
+	local w, h = gfx.getTextSize("AAAAAAAAAAAAA")
+	menuWidth = w * SIZE + selectedEntryMargin
+	textHeight = h * SIZE
+	
 	self:setImage(getMenuImage(self:getCurrentMenu(), self.selectedIndex))
 	
 	self:setCenter(0, 0)
@@ -56,6 +68,7 @@ function Menu:update()
 		print(self.selectedIndex)
 		
 		if success then
+			self:setImage(getMenuImage(self:getCurrentMenu(), self.selectedIndex))
 			sampleplayer:playSample(sampleSelect)
 		else 
 			sampleplayer:playSample(sampleSelectFail)
@@ -135,19 +148,17 @@ end
 
 -- Drawing Functions
 
-function getMenuImage(entries, index)
+function getMenuImage(entries, selectedIndex)
 	-- Create Menu Image using entries
-
-	local _, textHeight = gfx.getTextSize(entries[1])
-	local width = getMaxTextWidth(entries) * SIZE
-	local height = textHeight * SIZE * (#entries + MARGIN) - MARGIN
-	local menuImage = gfx.image.new(width, height)
+	
+	local height = textHeight * (#entries + MARGIN) - MARGIN
+	local menuImage = gfx.image.new(menuWidth, height)
 	
 	-- Create images for entries
 	
 	local entryImages = {}
-	for _, entry in pairs(entries) do
-		local itemImage = getMenuItemImage(entries[1])
+	for i, entry in ipairs(entries) do
+		local itemImage = getMenuItemImage(entry, selectedIndex == i)
 		table.insert(entryImages, itemImage)
 	end
 		
@@ -157,7 +168,7 @@ function getMenuImage(entries, index)
 	
 	for i, imageEntry in pairs(entryImages) do
 		-- Draw individual text (scaled)
-		local y = (textHeight * SIZE + MARGIN) * i
+		local y = (textHeight + MARGIN) * i
 		imageEntry:scaledImage(SIZE):draw(0, y)
 	end
 	
@@ -167,15 +178,13 @@ function getMenuImage(entries, index)
 end
 
 function getMenuItemImage(text, isSelected)
-	local textSizeWidth, textSizeHeight = gfx.getTextSize(text)
-	local textSpacingX = isSelected and 30 or 0
-	
-	local textImage = gfx.image.new(textSizeWidth, textSizeHeight)
+	local textSpacingX = isSelected and selectedEntryMargin or 0
+	local textImage = gfx.image.new(menuWidth, textHeight)
 	
 	gfx.pushContext(textImage)
 	
 	if isSelected then
-		gfx.drawTriangle(0, 0, 20, textSizeHeight / 2, 0, textSizeHeight)
+		gfx.fillTriangle(0, 10, 10, textHeight / 2, 0, textHeight - 10)
 	end
 	
 	gfx.drawTextAligned(text, textSpacingX, 0, textAlignment.left)
@@ -183,16 +192,4 @@ function getMenuItemImage(text, isSelected)
 	gfx.popContext()
 	
 	return textImage
-end
-
--- TODO: replace with function max(table, callback)
-function getMaxTextWidth(entries)
-	local max = 0
-	for _, entry in ipairs(entries) do
-		local width = gfx.getTextSize(entry)
-		if max < width then
-			max = width
-		end
-	end
-	return max
 end
