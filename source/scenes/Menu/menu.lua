@@ -32,16 +32,13 @@ function Menu:init(options)
 	self.selectedIndex = 1
 end
 
-local test = {gfx.getTextSize("A")}
-printTable(test)
-
 function Menu:activate() 	
 	local entries = table.map(self.options, function (value) return value.title end)
 	local w, h = gfx.getTextSize("AAAAAAAAAAAAA")
 	menuWidth = w * SIZE + selectedEntryMargin
 	textHeight = h * SIZE
 	
-	self:setImage(getMenuImage(self:getCurrentMenu(), self.selectedIndex))
+	self:setImage(getMenuImage(self:getCurrentMenuTitles(), self.selectedIndex))
 	
 	self:setCenter(0, 0)
 	self:moveTo(160, 0)
@@ -68,7 +65,7 @@ function Menu:update()
 		print(self.selectedIndex)
 		
 		if success then
-			self:setImage(getMenuImage(self:getCurrentMenu(), self.selectedIndex))
+			self:setImage(getMenuImage(self:getCurrentMenuTitles(), self.selectedIndex))
 			sampleplayer:playSample(sampleSelect)
 		else 
 			sampleplayer:playSample(sampleSelectFail)
@@ -79,6 +76,10 @@ function Menu:update()
 end
 
 -- Menu Navigation Functions
+
+function Menu:getCurrentMenuTitles()
+	return table.map(self:getCurrentMenu(), function(value) return value.title end)
+end
 
 function Menu:getCurrentMenu()
 	local options = self.options;
@@ -92,7 +93,7 @@ function Menu:getCurrentMenu()
 		end
 	end
 	
-	return table.map(options, function(value) return value.title end)
+	return options
 end
 
 function Menu:indexIncrement()
@@ -129,6 +130,7 @@ function Menu:indexSelect()
 	
 	if option.menu ~= nil then
 		table.insert(self.currentMenuIndex, self.selectedIndex)
+		self.selectedIndex = 1
 	elseif option.callback ~= nil then
 		option.callback()
 	end
@@ -137,7 +139,7 @@ function Menu:indexSelect()
 end
 
 function Menu:indexReturn()
-	if #self.currentMenuIndex == 1 then
+	if #self.currentMenuIndex == 0 then
 		return false
 	end
 	
@@ -184,7 +186,8 @@ function getMenuItemImage(text, isSelected)
 	gfx.pushContext(textImage)
 	
 	if isSelected then
-		gfx.fillTriangle(0, 10, 10, textHeight / 2, 0, textHeight - 10)
+		local triangleHeight = 7
+		gfx.fillTriangle(0, 0, 10, (textHeight - triangleHeight) / 2 , 0, textHeight - triangleHeight)
 	end
 	
 	gfx.drawTextAligned(text, textSpacingX, 0, textAlignment.left)
