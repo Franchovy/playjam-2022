@@ -1,6 +1,7 @@
 import "engine.lua"
 import "scenes/scenes"
 import "sprites/lib"
+import "utils/level"
 import "notify"
 import "config"
 
@@ -9,6 +10,7 @@ local acceptsRestart = false
 
 function initialize()
 	gfx.setFont(gfx.font.new("fonts/Sans Bold/Cyberball"))
+	createLevelPathIfNeeded()
 	
 	-- Create game state manager
 	scenes.menu = MenuScene()

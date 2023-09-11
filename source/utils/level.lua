@@ -25,10 +25,6 @@ function importLevel(fileName)
 	local path = PATHS.levels.."/"..fileName
 	local levelData = json.decodeFile(path)
 	
-	print("Imported file: ".. path)
-	print("Level data: ")
-	printTable(levelData)
-	
 	return levelData
 end
 

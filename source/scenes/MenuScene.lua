@@ -1,5 +1,6 @@
 import "engine"
 import "services/sprite/text"
+import "utils/level"
 import "level/levels"
 import "level/theme"
 import "menu/menu"
@@ -55,7 +56,7 @@ function MenuScene:load()
 	
 	menu = Menu(options)
 	
-	-- TODO: Load custom levels file names
+	options[3].menu = loadCustomLevels()
 end
 
 function MenuScene:present()
@@ -81,6 +82,8 @@ function MenuScene:destroy()
 	Scene.destroy(self)
 end
 
+-- Local Functions
+
 function startGame(level)
 	loadAllScenes()
 	
@@ -88,6 +91,20 @@ function startGame(level)
 	
 	currentTheme = level
 
+	sceneManager:switchScene(scenes.game, function () end)
+end
+
+function startCustomGame(fileName)
+	loadAllScenes()
+	
+	local levelData = importLevel(fileName)
+	
+	print("Starting game with custom level: ".. fileName)
+	print("Level data:")
+	printTable(levelData)
+	
+	currentTheme = 0
+	
 	sceneManager:switchScene(scenes.game, function () end)
 end
 
@@ -119,4 +136,23 @@ function makeBackgroundImage()
 	gfx.popContext()
 	
 	return image
+end
+
+function loadCustomLevels() 
+	local levels = getLevelFiles()
+	if #levels == 0 then
+		return nil
+	end
+	
+	local submenu = {}
+	for _, level in pairs(levels) do
+		local levelName = level:match("(.+).json$"):upper()
+		local option = {
+			title = levelName,
+			callback = function() startCustomGame(level) end
+		}
+		
+		table.insert(submenu, option)
+	end
+	return submenu
 end
