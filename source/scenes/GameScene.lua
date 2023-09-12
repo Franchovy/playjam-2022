@@ -53,7 +53,15 @@ end
 function GameScene:load(config)
 	Scene.load(self)
 	
-	local theme = config.theme
+	if config ~= nil then
+		self.config = config
+	elseif self.config == nil then
+		print("Error: No config found")
+		sceneManager:switchScene(menuScene, nil)
+		return
+	end
+	
+	local theme = self.config.theme
 	
 	print("Load!")
 	
