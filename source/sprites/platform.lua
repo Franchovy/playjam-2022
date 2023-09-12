@@ -65,6 +65,9 @@ function Platform:init(width, height, isMoving)
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)
 	
+	-- DEBUG
+	self.canMove = false
+	
 	if self.canMove then
 		self.velocity = {
 			y = 0,
