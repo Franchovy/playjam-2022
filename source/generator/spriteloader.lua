@@ -98,3 +98,9 @@ function SpriteLoader:getLoadedSprites()
 	-- Return full sprite list
 	return self.sprites
 end
+
+function SpriteLoader:reset()
+	self.sprites = {}
+	self.assignedSprites = {}
+	self.initializedSprites = {}
+end

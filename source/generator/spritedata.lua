@@ -91,3 +91,11 @@ function SpriteData:recycleSpritesInChunk(chunk)
 		self.chunkAssignedSprites[spriteData.name][chunk] = nil
 	end
 end
+
+function SpriteData:reset()
+	self.spriteData = {}
+	self.chunkAssignedSprites = {}
+	
+	SpritePositionManager:reset()
+	SpriteLoader:reset()
+end

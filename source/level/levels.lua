@@ -56,3 +56,19 @@ levels = {
 		"images/backgrounds/city", 4
 	)
 }
+
+levelComponents = {
+	{
+		platformMoving = { frequency = 1 },
+		platformFloor = { frequency = 1 },
+		killBlock = { frequency = 1 },
+		wind = { frequency = 1 },
+		coin = { frequency = 1 },
+	},
+	{
+		
+	},
+	{
+		
+	}
+}

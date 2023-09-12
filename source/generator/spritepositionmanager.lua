@@ -78,3 +78,7 @@ function SpritePositionManager:getPositionsInChunk(name, chunk)
 	
 	return self.positions[name][chunk]
 end
+
+function SpritePositionManager:reset()
+	self.positions = {}
+end

@@ -82,34 +82,12 @@ function GameScene:load(config)
 	
 	-- Set up sprites
 	
-	if AppConfig.enableComponents.wind then
-		SpriteData:registerSprite("Wind", Wind)
-		SpriteData:setInitializerParams("Wind")
-		SpriteData:setPositioning("Wind", 1, { yRange = { 40, 100 } } )
-	end
-
-	if AppConfig.enableComponents.coin then
-		SpriteData:registerSprite("Coin", Coin)
-		SpriteData:setInitializerParams("Coin")
-		SpriteData:setPositioning("Coin", 2, { yRange = { 30, 200 } } )
-	end
-	
-	if AppConfig.enableComponents.platformMoving then
-		SpriteData:registerSprite("Platform/moving", Platform)
-		SpriteData:setInitializerParams("Platform/moving", 100, 20, true)
-		SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
-	end
-	
-	if AppConfig.enableComponents.killBlock then
-		SpriteData:registerSprite("Kill Block", KillBlock)
-		SpriteData:setInitializerParams("Kill Block")
-		SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
-	end
-	
-	if AppConfig.enableComponents.platformFloor then
-		SpriteData:registerSprite("Platform/floor", Platform)
-		SpriteData:setInitializerParams("Platform/floor", CHUNK_LENGTH, 20, false)
-		SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 }, MAX_CHUNKS + 2 )
+	if self.config.components ~= nil then
+		print("Level Mode: Procedural")
+		loadProceduralSprites(self.config.components)
+	elseif self.config.gameObjects ~= nil then
+		print("Level Mode: Scripted")
+		loadSprites(self.config.gameObjects)
 	end
 	
 	if not self.spritesLoaded then
@@ -276,9 +254,11 @@ end
 function GameScene:dismiss()
 	Scene.dismiss(self)
 	
+	SpriteData:reset()
+	
 	if AppConfig.enableBackgroundMusic and self.levelTheme ~= nil then
 		self.filePlayer:stop()
-		end
+	end
 end
 
 function GameScene:destroy()
@@ -297,6 +277,49 @@ function onLevelComplete()
 			sceneManager:switchScene(scenes.menu, function() end)
 		end
 	)
+end
+
+function loadSprites(objects)
+	-- TODO: Add implementation
+	local fail = nil
+	fail()
+end
+
+function loadProceduralSprites(components)
+	if AppConfig.enableComponents.wind and components.wind then
+		print("Wind")
+		SpriteData:registerSprite("Wind", Wind)
+		SpriteData:setInitializerParams("Wind")
+		SpriteData:setPositioning("Wind", 1, { yRange = { 40, 100 } } )
+	end
+	
+	if AppConfig.enableComponents.coin and components.coin then
+		print("Coin")
+		SpriteData:registerSprite("Coin", Coin)
+		SpriteData:setInitializerParams("Coin")
+		SpriteData:setPositioning("Coin", 2, { yRange = { 30, 200 } } )
+	end
+	
+	if AppConfig.enableComponents.platformMoving and components.platformMoving then
+		print("PlatformMoving")
+		SpriteData:registerSprite("Platform/moving", Platform)
+		SpriteData:setInitializerParams("Platform/moving", 100, 20, true)
+		SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
+	end
+	
+	if AppConfig.enableComponents.killBlock and components.killBlock then
+		print("Kill Block")
+		SpriteData:registerSprite("Kill Block", KillBlock)
+		SpriteData:setInitializerParams("Kill Block")
+		SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
+	end
+	
+	if AppConfig.enableComponents.platformFloor and components.platformFloor then
+		print("PlatformFloor")
+		SpriteData:registerSprite("Platform/floor", Platform)
+		SpriteData:setInitializerParams("Platform/floor", CHUNK_LENGTH, 20, false)
+		SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 }, MAX_CHUNKS + 2 )
+	end
 end
 
 function addLevelCompleteSprite()

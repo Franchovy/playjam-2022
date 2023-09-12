@@ -90,7 +90,8 @@ function startGame(level)
 	print("Starting game with theme: ".. level)
 	
 	local gameConfig = {
-		theme = level
+		theme = level,
+		components = levelComponents[level]
 	}
 
 	sceneManager:switchScene(scenes.game, nil, gameConfig)
@@ -106,7 +107,8 @@ function startCustomGame(fileName)
 	printTable(levelData)
 	
 	local gameConfig = {
-		theme = 0
+		theme = 0,
+		gameObjects = {}
 	}
 	
 	sceneManager:switchScene(scenes.game, nil, gameConfig)
