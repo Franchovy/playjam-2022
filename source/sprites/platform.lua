@@ -23,13 +23,12 @@ local TIMER_LENGTH = 75
 
 
 function Platform:timerCallback()
-	printTable(self.velocity)
 	if self.velocity.x > 0 then
 		self.velocity.x = -MAX_SPEED
 	elseif self.velocity.x < 0 then
 		self.velocity.x = MAX_SPEED
 	end
-	printTable(self.velocity.x)
+	
 	--direction = invertedDirection(direction)
 end
 
@@ -66,7 +65,7 @@ function Platform:init(width, height, isMoving)
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)
 	
-	if canMove then
+	if self.canMove then
 		self.velocity = {
 			y = 0,
 			x = MAX_SPEED
@@ -77,7 +76,6 @@ function Platform:init(width, height, isMoving)
 			x = 0
 		}
 	end
-	printTable(self.velocity)
 end
 
 --------------------
