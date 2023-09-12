@@ -87,11 +87,13 @@ end
 function startGame(level)
 	loadAllScenes()
 	
-	print("Starting game with level: ".. level)
+	print("Starting game with theme: ".. level)
 	
-	currentTheme = level
+	local gameConfig = {
+		theme = level
+	}
 
-	sceneManager:switchScene(scenes.game, function () end)
+	sceneManager:switchScene(scenes.game, nil, gameConfig)
 end
 
 function startCustomGame(fileName)
@@ -103,9 +105,11 @@ function startCustomGame(fileName)
 	print("Level data:")
 	printTable(levelData)
 	
-	currentTheme = 0
+	local gameConfig = {
+		theme = 0
+	}
 	
-	sceneManager:switchScene(scenes.game, function () end)
+	sceneManager:switchScene(scenes.game, nil, gameConfig)
 end
 
 function makeBackgroundImage()	

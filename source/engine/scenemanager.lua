@@ -59,7 +59,9 @@ function SceneManager:switchScene(scene, onComplete, ...)
 			self.currentScene:present()
 		end,
 		function ()
-			onComplete()
+			if onComplete ~= nil then
+				onComplete()
+			end
 		end
 	)
 end

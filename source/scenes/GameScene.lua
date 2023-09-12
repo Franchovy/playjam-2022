@@ -39,8 +39,21 @@ function GameScene:init()
 	SpritePositionManager:configure(MAX_CHUNKS, CHUNK_LENGTH)
 end
 
-function GameScene:load(level)
+-- TODO: Components frequency
+
+-- config: { theme: [0,1,2,3], components: {
+-- 	1 - Wind
+--  2 - Coin, freq. 
+-- }, (OR)
+-- gameObjects: { (CHUNK) 1 = {
+--	id = 1, x = 5, y = 10
+-- }, (CHUNK) 2 = { ... }
+-- }
+
+function GameScene:load(config)
 	Scene.load(self)
+	
+	local theme = config.theme
 	
 	print("Load!")
 	
@@ -48,9 +61,11 @@ function GameScene:load(level)
 	
 	-- Draw Background
 	
-	self.levelTheme = levels[currentTheme]
+	if theme ~= 0 then
+		self.levelTheme = levels[theme]
+	end
 	
-	if AppConfig.enableParalaxBackground then
+	if AppConfig.enableParalaxBackground and self.levelTheme ~= nil then
 		self.background = ParalaxBackground.new()
 		self.background:loadForTheme(self.levelTheme)
 		
@@ -137,7 +152,7 @@ function GameScene:present()
 	
 	-- Set background drawing callback
 	
-	if AppConfig.enableParalaxBackground then
+	if AppConfig.enableParalaxBackground and self.levelTheme ~= nil then
 		local callback = self.background:getBackgroundDrawingCallback()
 		
 		gfx.sprite.setBackgroundDrawingCallback(callback)
@@ -153,7 +168,7 @@ function GameScene:present()
 	
 	-- Play music
 	
-	if AppConfig.enableBackgroundMusic then
+	if AppConfig.enableBackgroundMusic and self.levelTheme ~= nil then
 		self.filePlayer = FilePlayer(self.levelTheme:getMusicFilepath())
 		
 		self.filePlayer:play()
@@ -165,7 +180,7 @@ function GameScene:update()
 	
 	-- Update background parallax based on current offset
 	
-	if AppConfig.enableParalaxBackground then
+	if AppConfig.enableParalaxBackground and self.levelTheme ~= nil then
 		local drawOffsetX, _ = gfx.getDrawOffset()
 		self.background:setParalaxDrawOffset(drawOffsetX)
 	end
@@ -253,7 +268,7 @@ end
 function GameScene:dismiss()
 	Scene.dismiss(self)
 	
-	if AppConfig.enableBackgroundMusic then
+	if AppConfig.enableBackgroundMusic and self.levelTheme ~= nil then
 		self.filePlayer:stop()
 		end
 end
