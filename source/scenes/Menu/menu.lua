@@ -38,7 +38,9 @@ function Menu:activate()
 	menuWidth = w * SIZE + selectedEntryMargin
 	textHeight = h * SIZE
 	
-	self:setImage(getMenuImage(self:getCurrentMenuTitles(), self.selectedIndex))
+	local titles = self:getCurrentMenuTitles()
+	local image = getMenuImage(titles, self.selectedIndex)
+	self:setImage(image)
 	
 	self:setCenter(0, 0)
 	self:moveTo(160, 0)

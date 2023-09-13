@@ -20,6 +20,7 @@ gameStates = {
 
 local MAX_CHUNKS = 16
 local CHUNK_LENGTH = 1000
+local GRID_SIZE = 24
 
 local spriteCycler = nil
 local levelCompleteSprite = nil
@@ -158,6 +159,19 @@ function GameScene:present()
 	self.gameState = gameStates.readyToStart
 	
 	--ChunkGenerator:initialLoadChunks(4)
+	spriteCycler:initializeChunks({1, 2}, function(id, position, config)
+		local sprite;
+		
+		if id == 1 then
+			sprite = Platform.new(GRID_SIZE, GRID_SIZE, false)
+		else 
+			print("Unrecognized ID: ".. id)
+		end
+		
+		sprite:moveTo(GRID_SIZE * position.x, GRID_SIZE * position.y)
+		
+		return sprite
+	end)
 	
 	-- Play music
 	
@@ -200,6 +214,15 @@ function GameScene:update()
 	end
 	
 	--
+	
+	local currentChunk = math.ceil((self.wheel.x + 1) / CHUNK_LENGTH) 
+	local chunksToLoad = {currentChunk, currentChunk + 1}
+	
+	spriteCycler:activateChunks(chunksToLoad, function(sprite) 
+		print("Activate sprite: ".. tostring(sprite))
+		sprite:add()
+		printTable(sprite)
+	end)
 	
 	--ChunkGenerator:updateChunks()
 	

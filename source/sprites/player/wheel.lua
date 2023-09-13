@@ -2,7 +2,7 @@ import "engine"
 import "components/images"
 
 -- Params
-local maxFallSpeed = 16
+local maxFallSpeed = 14
 local gravity = 2.1
 local scorePerCoin = 10
 

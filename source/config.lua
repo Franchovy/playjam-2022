@@ -8,7 +8,7 @@ levelComponents["platformFloor"] = true
 levelComponents["killBlock"] = true
 levelComponents["wind"] = true
 levelComponents["coin"] = true
-levelComponents["wallOfDeath"] = true
+levelComponents["wallOfDeath"] = false
 
 AppConfig["enableComponents"] = levelComponents
 

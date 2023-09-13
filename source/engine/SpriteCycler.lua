@@ -18,38 +18,66 @@ function SpriteCycler:load(config)
 	-- Set sprite positions in level
 	
 	for _, object in pairs(config.objects) do
-		local chunk = math.ceil(object.position.x + 1 / self.chunkLength)
+		local chunk = math.ceil((object.position.x + 1) / self.chunkLength)
 		
-		local spriteData = createSpritePositionData(object.id, object.config)
+		local spriteData = createSpritePositionData(object)
 		
-		setSpritePositionData(self.data, chunk, object.position, spriteData)
+		setSpritePositionData(self.data, chunk, spriteData)
 	end
 	
+	print("Loaded config:")
 	printTable(self.data)
+end
+
+function SpriteCycler:initializeChunks(chunks, createSpriteCallback)
+	for _, chunk in pairs(chunks) do
+		for _, object in pairs(self.data[chunk].sprites) do
+			object.sprite = createSpriteCallback(object.id, object.position, object.config)
+		end
+		
+		self.data[chunk].state = "loaded"
+	end
+end
+
+function SpriteCycler:activateChunks(chunks, activateSpriteCallback)
+	for _, chunk in pairs(chunks) do
+		if self.data[chunk] ~= nil and self.data[chunk].state == "loaded" then
+			for _, object in pairs(self.data[chunk].sprites) do
+				if not object.isActive then
+					activateSpriteCallback(object.sprite)
+					object.isActive = true
+				end
+			end
+			
+			self.data[chunk].state = "active"
+		end
+	end
 end
 
 function createChunk()
 	return {
-		positions = {},
+		sprites = {},
 		state = "positioned"
 	}
 end
 
-function createSpritePositionData(id, config)
+function createSpritePositionData(object)
 	return {
-		id = id,
-		config = config,
-		isActive = false
+		id = object.id,
+		position = {
+			x = object.position.x,
+			y = object.position.y,
+		},
+		config = object.config,
+		isActive = false,
+		sprite = nil
 	}
 end
 
-function setSpritePositionData(data, chunk, position, spriteData)
+function setSpritePositionData(data, chunk, spriteData)
 	if data[chunk] == nil then
 		fatalError("Chunk has not been loaded! Please check your level config.")
 	end
 	
-	table.setIfNil(data[chunk], position.x)
-	table.setIfNil(data[chunk][position.x], position.y)
-	
-	data[chunk][position.x][position.y] = spriteData
+	table.insert(data[chunk].sprites, spriteData)
 end
