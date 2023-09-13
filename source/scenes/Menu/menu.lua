@@ -62,8 +62,6 @@ function Menu:update()
 			success = self:indexReturn()
 		end
 		
-		print(self.selectedIndex)
-		
 		if success then
 			self:setImage(getMenuImage(self:getCurrentMenuTitles(), self.selectedIndex))
 			sampleplayer:playSample(sampleSelect)

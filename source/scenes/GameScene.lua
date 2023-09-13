@@ -21,6 +21,7 @@ gameStates = {
 local MAX_CHUNKS = 16
 local CHUNK_LENGTH = 1000
 
+local spriteCycler = nil
 local levelCompleteSprite = nil
 
 function GameScene:init()
@@ -35,10 +36,11 @@ function GameScene:init()
 	
 	self.gameState = gameStates.created
 	
-	self.spritesLoaded = false
+	spriteCycler = SpriteCycler(AppConfig["chunkLength"])
 	
-	ChunkGenerator:configure(MAX_CHUNKS + 2, CHUNK_LENGTH)
-	SpritePositionManager:configure(MAX_CHUNKS, CHUNK_LENGTH)
+	self.spritesLoaded = false
+	--ChunkGenerator:configure(MAX_CHUNKS + 2, CHUNK_LENGTH)
+	--SpritePositionManager:configure(MAX_CHUNKS, CHUNK_LENGTH)
 end
 
 -- TODO: Components frequency
@@ -86,10 +88,13 @@ function GameScene:load(config)
 	
 	if self.config.components ~= nil then
 		print("Level Mode: Procedural")
-		loadProceduralSprites(self.config.components)
-	elseif self.config.gameObjects ~= nil then
+		--loadProceduralSprites(self.config.components)
+	elseif self.config.objects ~= nil then
 		print("Level Mode: Scripted")
-		loadSprites(self.config.gameObjects)
+		
+		printTable(self.config)
+		
+		spriteCycler:load(self.config)
 	end
 	
 	if not self.spritesLoaded then
@@ -152,7 +157,7 @@ function GameScene:present()
 	
 	self.gameState = gameStates.readyToStart
 	
-	ChunkGenerator:initialLoadChunks(4)
+	--ChunkGenerator:initialLoadChunks(4)
 	
 	-- Play music
 	
@@ -196,30 +201,30 @@ function GameScene:update()
 	
 	--
 	
-	ChunkGenerator:updateChunks()
+	--ChunkGenerator:updateChunks()
 	
 	--
 	
-	local sprites = SpriteLoader:getAllSprites()
+	--local sprites = SpriteLoader:getAllSprites()
 	
-	local minGeneratedX = -gfx.getDrawOffset() - 400
-	local maxGeneratedX = -gfx.getDrawOffset() + 400 + 400
+	--local minGeneratedX = -gfx.getDrawOffset() - 400
+	--local maxGeneratedX = -gfx.getDrawOffset() + 400 + 400
 	
-	for _, sprite in pairs(sprites) do
-		if (sprite.x + sprite.width < minGeneratedX) or (sprite.x > maxGeneratedX) then
+	--for _, sprite in pairs(sprites) do
+		--if (sprite.x + sprite.width < minGeneratedX) or (sprite.x > maxGeneratedX) then
 			-- Sprite is out of loaded area
-			sprite:remove()
-		else
+			--sprite:remove()
+		--else
 			-- Sprite has entered loading area
-			sprite:add()
-		end
-	end
+			--sprite:add()
+		--end
+	--end
 	
 	-- On game start
 	
 	if self.gameState == gameStates.readyToStart then
 		-- Awaiting player input (jump / crank)
-		if buttons.isUpButtonJustPressed() or (playdate.getCrankChange() > 5) then
+		if buttons.isUpButtonJustPressed() or (math.abs(playdate.getCrankChange()) > 5) then
 			self.wheel:startGame()
 			
 			if AppConfig.enableComponents.wallOfDeath then
@@ -262,7 +267,7 @@ end
 function GameScene:dismiss()
 	Scene.dismiss(self)
 	
-	SpriteData:reset()
+	--SpriteData:reset()
 	
 	if AppConfig.enableBackgroundMusic and self.levelTheme ~= nil then
 		self.filePlayer:stop()
@@ -293,14 +298,6 @@ function onLevelComplete(nextLevel)
 			
 		end
 	)
-end
-
-function loadSprites(objects)
-	
-	-- Chunk 1
-	for _, object in objects[1] do
-		
-	end
 end
 
 function loadProceduralSprites(components)

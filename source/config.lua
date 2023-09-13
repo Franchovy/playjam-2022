@@ -13,3 +13,5 @@ levelComponents["wallOfDeath"] = true
 AppConfig["enableComponents"] = levelComponents
 
 AppConfig["enableBackgroundMusic"] = true
+
+AppConfig["chunkLength"] = 50

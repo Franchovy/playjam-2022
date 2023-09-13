@@ -93,6 +93,12 @@ function table.find(table, value)
 	end	
 end
 
+function table.setIfNil(table, key)
+	if table[key] == nil then
+		table[key] = {}
+	end
+end
+
 -- Extensions on "math"
 
 function math.approach( value, target, step)
