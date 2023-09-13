@@ -5,7 +5,7 @@ import "generator/spritedata"
 import "generator/chunkgenerator"
 import "services/blinker"
 import "level/levels"
-import "level/theme"
+import "level/gameConfig"
 import "config"
 
 class('GameScene').extends(Scene)
@@ -20,6 +20,8 @@ gameStates = {
 
 local MAX_CHUNKS = 16
 local CHUNK_LENGTH = 1000
+
+local levelCompleteSprite = nil
 
 function GameScene:init()
 	Scene.init(self)
@@ -183,7 +185,13 @@ function GameScene:update()
 	--
 	
 	if self.wheel.x > (MAX_CHUNKS + 1) * CHUNK_LENGTH then
-		onLevelComplete()
+		
+		if self.config.level ~= nil then
+			local nextLevel = self.config.level + 1
+			onLevelComplete(nextLevel)
+		else
+			onLevelComplete() 
+		end
 	end
 	
 	--
@@ -265,7 +273,7 @@ function GameScene:destroy()
 	Scene.destroy(self)
 end
 
-function onLevelComplete()
+function onLevelComplete(nextLevel)
 	if levelCompleteSprite ~= nil then
 		return
 	end
@@ -274,15 +282,25 @@ function onLevelComplete()
 		
 	timer.performAfterDelay(3000,
 		function ()
-			sceneManager:switchScene(scenes.menu, function() end)
+			levelCompleteSprite:remove()
+			levelCompleteSprite = nil
+			
+			if nextLevel ~= nil and nextLevel < 4 then
+			    sceneManager:switchScene(scenes.game, function() end, GameConfig.getLevelConfig(nextLevel))
+			else 
+				sceneManager:switchScene(scenes.menu, function() end)
+			end
+			
 		end
 	)
 end
 
 function loadSprites(objects)
-	-- TODO: Add implementation
-	local fail = nil
-	fail()
+	
+	-- Chunk 1
+	for _, object in objects[1] do
+		
+	end
 end
 
 function loadProceduralSprites(components)

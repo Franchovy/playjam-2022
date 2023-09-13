@@ -59,16 +59,19 @@ levels = {
 
 levelComponents = {
 	{
-		platformMoving = { frequency = 1 },
-		platformFloor = { frequency = 1 },
-		killBlock = { frequency = 1 },
-		wind = { frequency = 1 },
-		coin = { frequency = 1 },
+		platformMoving = { },
+		platformFloor = { },
+		coin = { },
 	},
 	{
-		
+		platformMoving = { },
+		wind = { },
+		coin = { },
 	},
 	{
-		
+		platformMoving = { },
+		platformFloor = { },
+		killBlock = { },
+		coin = { },
 	}
 }

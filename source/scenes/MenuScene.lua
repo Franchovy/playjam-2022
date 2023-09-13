@@ -2,7 +2,7 @@ import "engine"
 import "services/sprite/text"
 import "utils/level"
 import "level/levels"
-import "level/theme"
+import "level/gameConfig"
 import "menu/menu"
 import "scenes"
 
@@ -89,12 +89,7 @@ function startGame(level)
 	
 	print("Starting game with theme: ".. level)
 	
-	local gameConfig = {
-		theme = level,
-		components = levelComponents[level]
-	}
-
-	sceneManager:switchScene(scenes.game, nil, gameConfig)
+	sceneManager:switchScene(scenes.game, nil, GameConfig.getLevelConfig(level))
 end
 
 function startCustomGame(fileName)
