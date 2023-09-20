@@ -162,8 +162,12 @@ function GameScene:present()
 	spriteCycler:initializeChunks({1, 2}, function(id, position, config)
 		local sprite;
 		
-		if id == 1 then
+		if id == "platform" then
 			sprite = Platform.new(GRID_SIZE, GRID_SIZE, false)
+		elseif id == "killBlock" then
+			sprite = KillBlock.new()
+		elseif id == "coin" then
+			sprite = Coin.new()
 		else 
 			print("Unrecognized ID: ".. id)
 		end
