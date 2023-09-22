@@ -20,9 +20,12 @@ function SpriteCycler:load(config)
 	for _, object in pairs(config.objects) do
 		local chunk = math.ceil((object.position.x + 1) / self.chunkLength)
 		
-		local spriteData = createSpritePositionData(object)
-		
-		setSpritePositionData(self.data, chunk, spriteData)
+		-- For now, only accept positive integer chunks.
+		if chunk > 0 then
+			local spriteData = createSpritePositionData(object)
+			
+			setSpritePositionData(self.data, chunk, spriteData)
+		end
 	end
 	
 	print("Loaded config:")
