@@ -7,6 +7,8 @@ class('Wind').extends(Sprite)
 local windPower = -4
 local animationSpeed = 250
 
+local images = {}
+
 function Wind.new() 
 	return Wind()
 end
@@ -14,7 +16,9 @@ end
 function Wind:init()
 	Wind.super.init(self)
 	
-	local image = gfx.image.new(kImages.wind):scaledImage(6, 4)
+	images = getSpriteImagesScaled()
+	
+	local image = gfx.image.new(images[1])
 	self:setImage(image)
 	
 	self.type = spriteTypes.wind
@@ -31,5 +35,14 @@ end
 function Wind:manageAnim()
 	self.imageIndex = (self.imageIndex % 4) + 1
 	
-	self:setImage(kImages.wind, self.imageIndex)
+	self:setImage(images[self.imageIndex])
+end
+
+function getSpriteImagesScaled()
+	local scaledImages = {}
+	local images = getImageTable(kImages.wind, 4)
+	for _, v in pairs(images) do
+		table.insert(scaledImages, v:scaledImage(6, 4))
+	end
+	return scaledImages
 end

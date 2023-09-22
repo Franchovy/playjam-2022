@@ -1,18 +1,18 @@
 import "engine"
 import "components/images"
 
--- Params
-local maxFallSpeed = 14
-local gravity = 2.1
-local scorePerCoin = 10
-
-local crankTicksPerCircle = 72
 
 class("Wheel").extends(Sprite)
 
 import "speed"
 import "sounds"
 import "jump"
+
+local maxFallSpeed = 14
+local gravity = 2.1
+local scorePerCoin = 10
+local crankTicksPerCircle = 72
+local images = {}
 
 function Wheel.new() 
 	return Wheel()
@@ -21,8 +21,9 @@ end
 function Wheel:init()
 	Wheel.super.init(self)
 	
-	local image = gfx.image.new(kImages.wheel)
-	self:setImage(image)
+	images = getImageTable(kImages.wheel, 12)
+	printTable(images)
+	self:setImage(images[1])
 	
 	self.type = spriteTypes.player
 	
@@ -168,12 +169,18 @@ function Wheel:update()
 	
 	-- Update graphics
 	
-	self.angle = self.angle + self.velocityX / 5
-	if self.angle > 12 then self.angle = self.angle % 12 end
-	if self.angle < 1 then self.angle += 12 end
+	self.angle = self.angle - self.velocityX / 5
+	
+	if self.angle > 12 then 
+		self.angle = self.angle % 12 
+	end
+	if self.angle < 1 then 
+		self.angle += 12 
+	end
+	
 	local imageIndex = math.floor(self.angle)
 
-	--self:setImage(kImages.wheel, imageIndex)
+	self:setImage(images[imageIndex])
 end
 
 function Wheel:resetValuesBeforeCollisionUpdate()
