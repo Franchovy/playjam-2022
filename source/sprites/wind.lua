@@ -14,8 +14,9 @@ end
 function Wind:init()
 	Wind.super.init(self)
 	
-	self.imageTransforms = {scale = {x = 6, y = 4}}
-	self:setImage(kImages.wind, 1)
+	local image = gfx.image.new(kImages.wind):scaledImage(6, 4)
+	self:setImage(image)
+	
 	self.type = spriteTypes.wind
 	self.windPower = windPower
 	self:setZIndex(-1)

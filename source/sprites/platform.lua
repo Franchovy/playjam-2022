@@ -57,7 +57,9 @@ function Platform:init(width, height, isMoving)
 	----------------
 	-- Draw Graphics
 	
-	self:drawSelf()
+	local image = gfx.image.new("images/sprites/platform")
+	self:setImage(image)
+	self:setCollideRect(0, 0, self:getSize())
 	
 	----------------
 	-- Set up Sprite
@@ -79,45 +81,6 @@ function Platform:init(width, height, isMoving)
 			x = 0
 		}
 	end
-end
-
---------------------
--- Draw methods
-
-function Platform:drawSelf() 
-	-- Set Graphics context (local (x, y) relative to image)
-	gfx.pushContext(self:getImage())
-	
-	-- Perform draw operations
-	local sizeX, sizeY = self:getSize()
-	
-	-- Background fill
-	gfx.setBackgroundColor(gfx.kColorBlack)
-	gfx.fillRect(0, 0, sizeX, sizeY)
-	
-	-- Pattern fill
-	gfx.setPattern(gfx.image.new("images/patterntable"), 20, 68)
-	gfx.fillRect(0, 0, sizeX, sizeY)
-	
-	-- White Outline
-	gfx.setColor(gfx.kColorWhite)
-	gfx.setLineWidth(4)
-	gfx.drawRect(0, 0, sizeX, sizeY)
-	
-	-- Close Graphics Context
-	gfx.popContext()
-end
-
-function Platform:setSize(width, height)
-	Platform.super.setSize(self, width, height)
-	self:setImage(gfx.image.new(width, height))
-	
-	self:onSizeChanged()
-end
-
-function Platform:onSizeChanged()
-	self:setCollideRect(0, 0, self:getSize())
-	self:drawSelf()
 end
 
 --------------------

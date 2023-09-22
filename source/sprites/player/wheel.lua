@@ -21,7 +21,8 @@ end
 function Wheel:init()
 	Wheel.super.init(self)
 	
-	self:setImage(kImages.wheel, 1)
+	local image = gfx.image.new(kImages.wheel)
+	self:setImage(image)
 	
 	self.type = spriteTypes.player
 	
@@ -172,7 +173,7 @@ function Wheel:update()
 	if self.angle < 1 then self.angle += 12 end
 	local imageIndex = math.floor(self.angle)
 
-	self:setImage(kImages.wheel, imageIndex)
+	--self:setImage(kImages.wheel, imageIndex)
 end
 
 function Wheel:resetValuesBeforeCollisionUpdate()

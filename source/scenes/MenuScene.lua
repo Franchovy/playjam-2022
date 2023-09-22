@@ -126,7 +126,7 @@ function makeBackgroundImage()
 	
 	-- Wheel image
 	
-	local imageWheel = gfx.image.new("images/menu_wheel"):scaledImage(2)
+	local imageWheel = gfx.image.new("images/menu/wheel"):scaledImage(2)
 	imageWheel:draw(5, 25)
 	
 	gfx.popContext()

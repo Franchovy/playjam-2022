@@ -11,7 +11,8 @@ function KillBlock:init()
 	KillBlock.super.init(self)
 	self.type = spriteTypes.killBlock
 	
-	self:setImage(kImages.killBlock)
+	local image = gfx.image.new(kImages.killBlock)
+	self:setImage(image)
 	
 	----------------
 	-- Set up Sprite

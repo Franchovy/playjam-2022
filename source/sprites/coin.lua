@@ -9,7 +9,8 @@ end
 function Coin:init()
 	Coin.super.init(self)
 	
-	self:setImage(kImages.coin)
+	local image = gfx.image.new(kImages.coin)
+	self:setImage(image)
 	self.type = spriteTypes.coin
 	
 	self.hasBeenGrabbed = false

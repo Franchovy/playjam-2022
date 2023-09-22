@@ -10,7 +10,6 @@ import "CoreLibs/timer"
 
 import "engine/lib"
 import "extensions"
-import "swizzles/sprite"
 
 -- Libraries
 

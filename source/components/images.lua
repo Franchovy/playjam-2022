@@ -6,10 +6,10 @@ local graphics <const> = playdate.graphics
 
 kImages = {}
 
-kImages.wheel = "images/wheel_v3/new_wheel"
-kImages.wind = "images/winds/wind"
-kImages.coin = "images/coin"
-kImages.killBlock = "images/kill_block_v2"
+kImages.wheel = "images/sprites/wheel/wheel_0"
+kImages.wind = "images/sprites/wind/wind_0"
+kImages.coin = "images/sprites/coin"
+kImages.killBlock = "images/sprites/killBlock"
 
 function getImage(path, count)
 	count = count or ""
