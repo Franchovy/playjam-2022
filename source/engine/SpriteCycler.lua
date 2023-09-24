@@ -1,36 +1,70 @@
 
 class("SpriteCycler").extends()
 
+local generationRangeX = 2
+local generationRangeY = 1
+
 function SpriteCycler:init(chunkLength)
 	self.chunkLength = chunkLength
 	self.data = {}
 end
 
 function SpriteCycler:load(config)
-	self.numChunks = math.ceil(config.levelSize / self.chunkLength)
+	local chunksData = getChunksDataForLevel(config.objects, self.chunkLength)
 	
-	-- Create chunks
+	self.data = chunksData
+end
+
+function getChunksDataForLevel(objects, chunkLength)
+	local chunksData = {}
 	
-	for i=1,self.numChunks do
-		table.insert(self.data, createChunk())
+	for _, object in pairs(objects) do
+		-- Create Chunk in level chunks
+		chunkIndexX = math.ceil((object.position.x) / chunkLength)
+		chunkIndexY = math.ceil((object.position.y + 1) / chunkLength)
+		
+		-- Create chunk if needed
+		table.setIfNil(chunksData, chunkIndexX)
+		table.setIfNil(chunksData[chunkIndexX], chunkIndexY)
+		
+		-- Insert object data
+		local spriteData = spritePositionData(object)
+		table.insert(chunksData[chunkIndexX][chunkIndexY], spriteData)
 	end
 	
-	-- Set sprite positions in level
+	-- Create Empty chunks if needed
 	
-	for _, object in pairs(config.objects) do
-		local chunk = math.ceil((object.position.x + 1) / self.chunkLength)
+	fillEmptyChunks(chunksData)
+	
+	return chunksData
+end
+
+function fillEmptyChunks(chunksData)
+	local chunkIndexesX = {}
+	local chunkIndexesY = {}
+	
+	for chunkIndexX, v in pairs(chunksData) do
+		table.insert(chunkIndexesX, chunkIndexX)
 		
-		-- For now, only accept positive integer chunks.
-		if chunk > 0 then
-			local spriteData = createSpritePositionData(object)
-			
-			setSpritePositionData(self.data, chunk, spriteData)
+		for chunkIndexY, _ in pairs(chunksData[chunkIndexX]) do
+			table.insert(chunkIndexesY, chunkIndexY)
+		end
+	end	
+	
+	local chunkIndexMinX = math.min(table.unpack(chunkIndexesX))
+	local chunkIndexMaxX = math.max(table.unpack(chunkIndexesX))
+	local chunkIndexMinY = math.min(table.unpack(chunkIndexesY))
+	local chunkIndexMaxY = math.max(table.unpack(chunkIndexesY))
+	
+	for i=chunkIndexMinX, chunkIndexMaxX do
+		table.setIfNil(chunksData, chunkIndexX)
+		
+		for j=chunkIndexMinX, chunkIndexMaxX do
+			table.setIfNil(chunksData[chunkIndexX], chunkIndexY)
 		end
 	end
-	
-	print("Loaded config:")
-	printTable(self.data)
 end
+
 
 function SpriteCycler:initializeChunks(chunks, createSpriteCallback)
 	for _, chunk in pairs(chunks) do
@@ -57,14 +91,7 @@ function SpriteCycler:activateChunks(chunks, activateSpriteCallback)
 	end
 end
 
-function createChunk()
-	return {
-		sprites = {},
-		state = "positioned"
-	}
-end
-
-function createSpritePositionData(object)
+function spritePositionData(object)
 	return {
 		id = object.id,
 		position = {
@@ -75,12 +102,4 @@ function createSpritePositionData(object)
 		isActive = false,
 		sprite = nil
 	}
-end
-
-function setSpritePositionData(data, chunk, spriteData)
-	if data[chunk] == nil then
-		fatalError("Chunk has not been loaded! Please check your level config.")
-	end
-	
-	table.insert(data[chunk].sprites, spriteData)
 end
