@@ -1,78 +1,50 @@
 import "sprites"
+import "chunks"
 
 class("SpriteCycler").extends()
 
 local generationRangeX = 2
 local generationRangeY = 1
 
-function SpriteCycler:init(chunkLength)
-	self.chunkLength = chunkLength
+function SpriteCycler:init()
 	self.data = {}
 	self.chunksLoaded = {}
+	self.spritesToRecycle = {}
 end
 
-function SpriteCycler:load(config)
-	local chunksData = getChunksDataForLevel(config.objects, self.chunkLength)
+function SpriteCycler:load(levelConfig, chunkLength, recycledSpriteIds)
+	self.chunkLength = chunkLength
 	
-	self.data = chunksData
-end
-
-function getChunksDataForLevel(objects, chunkLength)
-	local chunksData = {}
+	-- Load chunks from level config
 	
-	for _, object in pairs(objects) do
-		-- Create Chunk in level chunks
-		chunkIndexX = math.ceil((object.position.x) / chunkLength)
-		chunkIndexY = math.ceil((object.position.y + 1) / chunkLength)
-		
-		-- Create chunk if needed
-		table.setIfNil(chunksData, chunkIndexX)
-		table.setIfNil(chunksData[chunkIndexX], chunkIndexY)
-		
-		-- Insert object data
-		local spriteData = spritePositionData(object)
-		table.insert(chunksData[chunkIndexX][chunkIndexY], spriteData)
-	end
+	local chunksData = getChunksDataForLevel(levelConfig.objects, chunkLength)
 	
 	-- Create Empty chunks if needed
 	
 	fillEmptyChunks(chunksData)
 	
-	return chunksData
+	-- Load item IDs for recycling sprites
+	for _, v in pairs(recycledSpriteIds) do
+		self.spritesToRecycle[v] = {}
+	end
+	
+	self.data = chunksData
 end
 
-function fillEmptyChunks(chunksData)
-	local chunkIndexesX = {}
-	local chunkIndexesY = {}
+function SpriteCycler:initialize(x, y)
+	local currentChunk = math.ceil(x / self.chunkLength)
+	local chunksToLoad = {currentChunk}
 	
-	for chunkIndexX, v in pairs(chunksData) do
-		table.insert(chunkIndexesX, chunkIndexX)
-		
-		for chunkIndexY, _ in pairs(chunksData[chunkIndexX]) do
-			table.insert(chunkIndexesY, chunkIndexY)
-		end
-	end	
+	-- load Sprites In Chunk If Needed
 	
-	local chunkIndexMinX = math.min(table.unpack(chunkIndexesX))
-	local chunkIndexMaxX = math.max(table.unpack(chunkIndexesX))
-	local chunkIndexMinY = math.min(table.unpack(chunkIndexesY))
-	local chunkIndexMaxY = math.max(table.unpack(chunkIndexesY))
-	
-	for i=chunkIndexMinX, chunkIndexMaxX do
-		table.setIfNil(chunksData, chunkIndexX)
-		
-		for j=chunkIndexMinX, chunkIndexMaxX do
-			table.setIfNil(chunksData[chunkIndexX], chunkIndexY)
-		end
-	end
+	local count = loadSpritesInChunksIfNeeded(self, chunksToLoad)
+	print("Initialized level with ".. count.. " sprites")
+	self.chunksLoaded = chunksToLoad
 end
 
 function SpriteCycler:update(drawOffsetX, drawOffsetY)
-	--print("Draw offset: ".. drawOffsetX)
 	local currentChunk = math.ceil(drawOffsetX / self.chunkLength) 
 	local chunksShouldLoad = {currentChunk - 1, currentChunk, currentChunk + 1}
-	
-	--printTable(chunksShouldLoad)
 	
 	-- Get chunks to unload
 	
@@ -90,60 +62,21 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY)
 		end
 	end
 	
-	if (#chunksToLoad == 0) and (#chunksToUnload == 0) then
-		return
+	if (#chunksToLoad > 0) or (#chunksToUnload > 0) then
+		-- Load and Unload
+		
+		local loadCount = loadSpritesInChunksIfNeeded(self, chunksToLoad)
+		print("Sprites loaded: ".. loadCount)
+		
+		local unloadCount = unloadSpritesInChunksIfNeeded(self, chunksToUnload)
+		print("Sprites unloaded: ".. unloadCount)
+		
+		printTable(self.chunksLoaded)
 	end
-	
-	print("Chunks Should load:")
-	printTable(chunksShouldLoad)
-	
-	if (#chunksToLoad > 0) then
-		print("Loading chunks: ")
-		printTable(chunksToLoad)
-	end
-	
-	if (#chunksToUnload > 0) then
-		print("Unloading chunks: ")
-		printTable(chunksToUnload)
-	end
-	
-	-- Load and Unload
-	
-	local loadCount = loadChunksIfNeeded(self, chunksToLoad)
-	print("Sprites loaded: ".. loadCount)
-	
-	local unloadCount = unloadChunksIfNeeded(self, chunksToUnload)
-	print("Sprites unloaded: ".. unloadCount)
-	
-	printTable(self.chunksLoaded)
-end
-
-function SpriteCycler:initialize(x, y)
-	local currentChunk = math.ceil(x / self.chunkLength)
-	local chunksToLoad = {currentChunk}
-	
-	-- load Sprites In Chunk If Needed
-	
-	local count = loadChunksIfNeeded(self, chunksToLoad)
-	print("Initialized level with ".. count.. " sprites")
-	self.chunksLoaded = chunksToLoad
 end
 
 function SpriteCycler:unloadAll()
-	local count = unloadChunksIfNeeded(self, self.chunksLoaded)
+	local count = unloadSpritesInChunksIfNeeded(self, self.chunksLoaded)
 	print("Unloaded ".. count.. " sprites from level.")
 	self.chunksLoaded = {}
-end
-
-function spritePositionData(object)
-	return {
-		id = object.id,
-		position = {
-			x = object.position.x,
-			y = object.position.y,
-		},
-		config = object.config,
-		isActive = false,
-		sprite = nil
-	}
 end

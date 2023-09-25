@@ -1,10 +1,20 @@
 import "extensions"
+import "chunks"
 
-function chunkExists(self, x, y)
-	return (self.data[x] ~= nil) and (self.data[x][y] ~= nil)
+function spritePositionData(object)
+	return {
+		id = object.id,
+		position = {
+			x = object.position.x,
+			y = object.position.y,
+		},
+		config = object.config,
+		isActive = false,
+		sprite = nil
+	}
 end
 
-function loadChunksIfNeeded(self, chunksToLoad)
+function loadSpritesInChunksIfNeeded(self, chunksToLoad)
 	local count = 0
 	
 	for _, chunk in pairs(chunksToLoad) do
@@ -25,8 +35,7 @@ function loadChunksIfNeeded(self, chunksToLoad)
 	return count
 end
 
-
-function unloadChunksIfNeeded(self, chunksToUnload)
+function unloadSpritesInChunksIfNeeded(self, chunksToUnload)
 	local count = 0
 	
 	for _, chunk in pairs(chunksToUnload) do
