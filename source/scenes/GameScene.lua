@@ -39,6 +39,27 @@ function GameScene:init()
 	
 	spriteCycler = SpriteCycler()
 	
+	spriteCycler.createSpriteCallback = function(id, position, config, spriteToRecycle)
+		local sprite = spriteToRecycle;
+			
+		if sprite == nil then
+			if id == "platform" then
+				sprite = Platform.new(GRID_SIZE, GRID_SIZE, false)
+			elseif id == "killBlock" then
+				sprite = KillBlock.new()
+			elseif id == "coin" then
+				sprite = Coin.new()
+			else 
+				print("Unrecognized ID: ".. id)
+			end
+		end
+		
+		sprite:moveTo(GRID_SIZE * position.x, GRID_SIZE * position.y)
+		sprite:add()
+		
+		return sprite
+	end
+	
 	self.spritesLoaded = false
 end
 
@@ -137,25 +158,6 @@ function GameScene:present()
 	-- Set game as ready to start
 	
 	self.gameState = gameStates.readyToStart
-	
-	spriteCycler.createSpriteCallback = function(id, position, config, spriteToRecycle)
-		local sprite;
-		
-		if id == "platform" then
-			sprite = Platform.new(GRID_SIZE, GRID_SIZE, false)
-		elseif id == "killBlock" then
-			sprite = KillBlock.new()
-		elseif id == "coin" then
-			sprite = Coin.new()
-		else 
-			print("Unrecognized ID: ".. id)
-		end
-		
-		sprite:moveTo(GRID_SIZE * position.x, GRID_SIZE * position.y)
-		sprite:add()
-		
-		return sprite
-	end
 	
 	-- Initialize Sprite cycling using initial position
 	

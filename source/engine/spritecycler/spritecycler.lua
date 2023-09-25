@@ -37,7 +37,7 @@ function SpriteCycler:initialize(x, y)
 	
 	-- load Sprites In Chunk If Needed
 	
-	local count = loadSpritesInChunksIfNeeded(self, chunksToLoad)
+	local count, _ = loadSpritesInChunksIfNeeded(self, chunksToLoad)
 	print("Initialized level with ".. count.. " sprites")
 	self.chunksLoaded = chunksToLoad
 end
@@ -65,8 +65,8 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY)
 	if (#chunksToLoad > 0) or (#chunksToUnload > 0) then
 		-- Load and Unload
 		
-		local loadCount = loadSpritesInChunksIfNeeded(self, chunksToLoad)
-		print("Sprites loaded: ".. loadCount)
+		local loadCount, recycledCount = loadSpritesInChunksIfNeeded(self, chunksToLoad)
+		print("Sprites loaded: ".. loadCount.. " of which ".. recycledCount.. " recycled.")
 		
 		local unloadCount = unloadSpritesInChunksIfNeeded(self, chunksToUnload)
 		print("Sprites unloaded: ".. unloadCount)

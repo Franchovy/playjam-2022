@@ -20,6 +20,7 @@ function initialize()
 end
 
 function playdate.update()
+	playdate.drawFPS(60, 10)
 
 	-- Random Seed (for generating random numbers)
 	math.randomseed(playdate.getSecondsSinceEpoch())
