@@ -68,31 +68,34 @@ function fillEmptyChunks(chunksData)
 end
 
 function SpriteCycler:update(drawOffsetX, drawOffsetY)
-	print("Draw offset: ".. drawOffsetX)
+	--print("Draw offset: ".. drawOffsetX)
 	local currentChunk = math.ceil(drawOffsetX / self.chunkLength) 
-	local chunksShouldLoad = {currentChunk, currentChunk + 1}
+	local chunksShouldLoad = {currentChunk - 1, currentChunk, currentChunk + 1}
 	
-	printTable(chunksShouldLoad)
+	--printTable(chunksShouldLoad)
 	
 	-- Get chunks to unload
 	
 	local chunksToLoad = {}
-	for _, v in pairs(chunksShouldLoad) do
-		if not table.contains(self.chunksLoaded, v) then
-			table.insert(chunksToLoad, v)
+	for _, chunk in pairs(chunksShouldLoad) do
+		if chunkExists(self, chunk, 1) and not table.contains(self.chunksLoaded, chunk) then
+			table.insert(chunksToLoad, chunk)
 		end
 	end
 	
 	local chunksToUnload = {}
-	for _, v in pairs(self.chunksLoaded) do
-		if not table.contains(chunksShouldLoad, v) then
-			table.insert(chunksToUnload, v)
+	for _, chunk in pairs(self.chunksLoaded) do
+		if chunkExists(self, chunk, 1) and not table.contains(chunksShouldLoad, chunk) then
+			table.insert(chunksToUnload, chunk)
 		end
 	end
 	
 	if (#chunksToLoad == 0) and (#chunksToUnload == 0) then
 		return
 	end
+	
+	print("Chunks Should load:")
+	printTable(chunksShouldLoad)
 	
 	if (#chunksToLoad > 0) then
 		print("Loading chunks: ")
@@ -109,7 +112,6 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY)
 	local loadCount = loadChunksIfNeeded(self, chunksToLoad)
 	print("Sprites loaded: ".. loadCount)
 	
-	
 	local unloadCount = unloadChunksIfNeeded(self, chunksToUnload)
 	print("Sprites unloaded: ".. unloadCount)
 	
@@ -124,12 +126,13 @@ function SpriteCycler:initialize(x, y)
 	
 	local count = loadChunksIfNeeded(self, chunksToLoad)
 	print("Initialized level with ".. count.. " sprites")
+	self.chunksLoaded = chunksToLoad
 end
 
 function SpriteCycler:unloadAll()
 	local count = unloadChunksIfNeeded(self, self.chunksLoaded)
-	
 	print("Unloaded ".. count.. " sprites from level.")
+	self.chunksLoaded = {}
 end
 
 function spritePositionData(object)

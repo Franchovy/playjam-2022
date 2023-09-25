@@ -45,5 +45,5 @@ function Scene:dismiss()
 end
 
 function Scene:destroy()
-	table.removevalue(self)
+	table.removevalue(allScenes, self)
 end

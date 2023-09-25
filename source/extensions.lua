@@ -80,10 +80,16 @@ function table.contains(t, value)
 	return false
 end
 
-function table.remove(t, value)
+function table.removekey(t, key)
+   local element = t[key]
+   t[key] = nil
+   return element
+end
+
+function table.removevalue(t, value)
    for k, v in pairs(t) do
 	   if v == value then
-		   table[k] = nil
+		   t[k] = nil
 	   end
    end
 end

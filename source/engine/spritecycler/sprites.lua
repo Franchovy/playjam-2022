@@ -1,8 +1,14 @@
+import "extensions"
+
+function chunkExists(self, x, y)
+	return (self.data[x] ~= nil) and (self.data[x][y] ~= nil)
+end
+
 function loadChunksIfNeeded(self, chunksToLoad)
 	local count = 0
 	
 	for _, chunk in pairs(chunksToLoad) do
-		if not table.contains(self.chunksLoaded, chunk) then
+		if chunkExists(self, chunk, 1) and not table.contains(self.chunksLoaded, chunk) then
 			-- Load chunk
 			local chunkData = self.data[chunk][1]
 			
@@ -24,7 +30,7 @@ function unloadChunksIfNeeded(self, chunksToUnload)
 	local count = 0
 	
 	for _, chunk in pairs(chunksToUnload) do
-		if table.contains(self.chunksLoaded, chunk) then		
+		if chunkExists(self, chunk, 1) and table.contains(self.chunksLoaded, chunk) then
 			local chunkData = self.data[chunk][1]
 			
 			for _, object in pairs(chunkData) do
@@ -36,7 +42,7 @@ function unloadChunksIfNeeded(self, chunksToUnload)
 				end
 			end
 			
-			table.remove(self.chunksLoaded, chunk)
+			table.removevalue(self.chunksLoaded, chunk)
 		end
 	end
 	
