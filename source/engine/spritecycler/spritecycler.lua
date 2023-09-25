@@ -3,8 +3,7 @@ import "chunks"
 
 class("SpriteCycler").extends()
 
-local generationRangeX = 2
-local generationRangeY = 1
+local generationConfig = { left = 1, right = 2}
 
 function SpriteCycler:init()
 	self.data = {}
@@ -33,18 +32,18 @@ end
 
 function SpriteCycler:initialize(x, y)
 	local currentChunk = math.ceil(x / self.chunkLength)
-	local chunksToLoad = {currentChunk}
+	local chunksToLoad = chunksToGenerate(currentChunk, generationConfig)
 	
 	-- load Sprites In Chunk If Needed
 	
-	local count, _ = loadSpritesInChunksIfNeeded(self, chunksToLoad)
-	print("Initialized level with ".. count.. " sprites")
+	local count, recycledCount = loadSpritesInChunksIfNeeded(self, chunksToLoad)
+	print("Initialized level with ".. count.. " sprites, ".. recycledCount.. " of which were recycled.")
 	self.chunksLoaded = chunksToLoad
 end
 
 function SpriteCycler:update(drawOffsetX, drawOffsetY)
 	local currentChunk = math.ceil(drawOffsetX / self.chunkLength) 
-	local chunksShouldLoad = {currentChunk - 1, currentChunk, currentChunk + 1}
+	local chunksShouldLoad = chunksToGenerate(currentChunk, generationConfig)
 	
 	-- Get chunks to unload
 	

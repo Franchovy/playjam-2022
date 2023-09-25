@@ -63,7 +63,18 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload)
 		end
 	end
 	
+	debugPrintRecycledSprites(self)
+	
 	return count
+end
+
+function debugPrintRecycledSprites(self)
+	local printContents = {}
+	for k, v in pairs(self.spritesToRecycle) do
+		printContents[k] = #v
+	end
+	print("Sprites Recycled:")
+	printTable(printContents)
 end
 
 function getRecycledSprite(self, id) 
@@ -76,8 +87,5 @@ function getRecycledSprite(self, id)
 end
 
 function recycleSprite(self, sprite, id)
-	-- debug:
-	return
-	
 	table.insert(self.spritesToRecycle[id], sprite)
 end

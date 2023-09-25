@@ -18,6 +18,12 @@ function Coin:init()
 	self:setCollideRect(0, 0, self:getSize())
 end
 
+function Coin:reset()
+	self.hasBeenGrabbed = false
+	
+	self:setVisible(true)
+end
+
 function Coin:isGrabbed()
 	self:setVisible(false)
 end

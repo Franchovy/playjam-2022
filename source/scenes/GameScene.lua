@@ -43,6 +43,8 @@ function GameScene:init()
 		local sprite = spriteToRecycle;
 			
 		if sprite == nil then
+			-- Create sprites
+			
 			if id == "platform" then
 				sprite = Platform.new(GRID_SIZE, GRID_SIZE, false)
 			elseif id == "killBlock" then
@@ -51,6 +53,12 @@ function GameScene:init()
 				sprite = Coin.new()
 			else 
 				print("Unrecognized ID: ".. id)
+			end
+		else 
+			-- Recycle sprites
+			
+			if id == "coin" then
+				sprite:reset()
 			end
 		end
 		
