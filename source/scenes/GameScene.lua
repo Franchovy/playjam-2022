@@ -37,23 +37,11 @@ function GameScene:init()
 	
 	self.gameState = gameStates.created
 	
-	spriteCycler = SpriteCycler(AppConfig["chunkLength"])
+	local chunkLength = AppConfig["chunkLength"]
+	spriteCycler = SpriteCycler(chunkLength)
 	
 	self.spritesLoaded = false
-	--ChunkGenerator:configure(MAX_CHUNKS + 2, CHUNK_LENGTH)
-	--SpritePositionManager:configure(MAX_CHUNKS, CHUNK_LENGTH)
 end
-
--- TODO: Components frequency
-
--- config: { theme: [0,1,2,3], components: {
--- 	1 - Wind
---  2 - Coin, freq. 
--- }, (OR)
--- gameObjects: { (CHUNK) 1 = {
---	id = 1, x = 5, y = 10
--- }, (CHUNK) 2 = { ... }
--- }
 
 function GameScene:load(config)
 	Scene.load(self)
@@ -87,14 +75,7 @@ function GameScene:load(config)
 	
 	-- Set up sprites
 	
-	if self.config.components ~= nil then
-		print("Level Mode: Procedural")
-		--loadProceduralSprites(self.config.components)
-	elseif self.config.objects ~= nil then
-		print("Level Mode: Scripted")
-		
-		printTable(self.config)
-		
+	if self.config.objects ~= nil then
 		spriteCycler:load(self.config)
 	end
 	
@@ -158,8 +139,7 @@ function GameScene:present()
 	
 	self.gameState = gameStates.readyToStart
 	
-	--ChunkGenerator:initialLoadChunks(4)
-	spriteCycler:initializeChunks({1, 2}, function(id, position, config)
+	spriteCycler.createSpriteCallback = function(id, position, config, spriteToRecycle)
 		local sprite;
 		
 		if id == "platform" then
@@ -173,9 +153,14 @@ function GameScene:present()
 		end
 		
 		sprite:moveTo(GRID_SIZE * position.x, GRID_SIZE * position.y)
+		sprite:add()
 		
 		return sprite
-	end)
+	end
+	
+	-- Initialize Sprite cycling using initial position
+	
+	spriteCycler:initialize(1, 1)
 	
 	-- Play music
 	
@@ -189,12 +174,16 @@ end
 function GameScene:update()
 	Scene.update(self)
 	
+	local drawOffsetX, drawOffsetY = gfx.getDrawOffset()
+	
 	-- Update background parallax based on current offset
 	
 	if AppConfig.enableParalaxBackground and self.levelTheme ~= nil then
-		local drawOffsetX, _ = gfx.getDrawOffset()
 		self.background:setParalaxDrawOffset(drawOffsetX)
 	end
+	
+	-- Updates sprites cycling
+	spriteCycler:update(-drawOffsetX / GRID_SIZE, drawOffsetY / GRID_SIZE)
 	
 	-- Update Blinker
 	
@@ -216,36 +205,6 @@ function GameScene:update()
 			onLevelComplete() 
 		end
 	end
-	
-	--
-	
-	local currentChunk = math.ceil((self.wheel.x + 1) / CHUNK_LENGTH) 
-	local chunksToLoad = {currentChunk, currentChunk + 1}
-	
-	spriteCycler:activateChunks(chunksToLoad, function(sprite) 
-		print("Activate sprite: ".. tostring(sprite))
-		sprite:add()
-		printTable(sprite)
-	end)
-	
-	--ChunkGenerator:updateChunks()
-	
-	--
-	
-	--local sprites = SpriteLoader:getAllSprites()
-	
-	--local minGeneratedX = -gfx.getDrawOffset() - 400
-	--local maxGeneratedX = -gfx.getDrawOffset() + 400 + 400
-	
-	--for _, sprite in pairs(sprites) do
-		--if (sprite.x + sprite.width < minGeneratedX) or (sprite.x > maxGeneratedX) then
-			-- Sprite is out of loaded area
-			--sprite:remove()
-		--else
-			-- Sprite has entered loading area
-			--sprite:add()
-		--end
-	--end
 	
 	-- On game start
 	
@@ -294,7 +253,7 @@ end
 function GameScene:dismiss()
 	Scene.dismiss(self)
 	
-	--SpriteData:reset()
+	spriteCycler:unloadAll()
 	
 	if AppConfig.enableBackgroundMusic and self.levelTheme ~= nil then
 		self.filePlayer:stop()

@@ -14,4 +14,4 @@ AppConfig["enableComponents"] = levelComponents
 
 AppConfig["enableBackgroundMusic"] = true
 
-AppConfig["chunkLength"] = 50
+AppConfig["chunkLength"] = 25

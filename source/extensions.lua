@@ -71,6 +71,15 @@ if t == nil then return {} end
 	return array
 end
 
+function table.contains(t, value)
+	for _, v in pairs(t) do
+		if v == value then 
+			return true
+		end
+	end
+	return false
+end
+
 function table.removekey(table, key)
    local element = table[key]
    table[key] = nil

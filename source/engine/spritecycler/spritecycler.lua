@@ -1,3 +1,4 @@
+import "sprites"
 
 class("SpriteCycler").extends()
 
@@ -7,6 +8,7 @@ local generationRangeY = 1
 function SpriteCycler:init(chunkLength)
 	self.chunkLength = chunkLength
 	self.data = {}
+	self.chunksLoaded = {}
 end
 
 function SpriteCycler:load(config)
@@ -65,30 +67,67 @@ function fillEmptyChunks(chunksData)
 	end
 end
 
-
-function SpriteCycler:initializeChunks(chunks, createSpriteCallback)
-	for _, chunk in pairs(chunks) do
-		for _, object in pairs(self.data[chunk].sprites) do
-			object.sprite = createSpriteCallback(object.id, object.position, object.config)
+function SpriteCycler:update(drawOffsetX, drawOffsetY)
+	print("Draw offset: ".. drawOffsetX)
+	local currentChunk = math.ceil(drawOffsetX / self.chunkLength) 
+	local chunksShouldLoad = {currentChunk, currentChunk + 1}
+	
+	printTable(chunksShouldLoad)
+	
+	-- Get chunks to unload
+	
+	local chunksToLoad = {}
+	for _, v in pairs(chunksToLoad) do
+		if not table.contains(self.chunksLoaded, v) then
+			table.insert(chunksToLoad, v)
 		end
-		
-		self.data[chunk].state = "loaded"
 	end
+	
+	local chunksToUnload = {}
+	for _, v in pairs(self.chunksLoaded) do
+		if not table.contains(chunksShouldLoad, v) then
+			table.insert(chunksToUnload, v)
+		end
+	end
+	
+	if not (#chunksToLoad > 0) and not (#chunksToUnload > 0) then
+		return
+	end
+	
+	if (#chunksToLoad > 0) then
+		print("Loading chunks: ")
+		printTable(chunksToLoad)
+	end
+	
+	if (#chunksToUnload > 0) then
+		print("Unloading chunks: ")
+		printTable(chunksToUnload)
+	end
+	
+	-- Load and Unload
+	
+	local loadCount = loadChunksIfNeeded(self, chunksToLoad)
+	print("Sprites loaded: ".. loadCount)
+	
+	
+	local unloadCount = unloadChunksIfNeeded(self, chunksToLoad)
+	print("Sprites unloaded: ".. unloadCount)
 end
 
-function SpriteCycler:activateChunks(chunks, activateSpriteCallback)
-	for _, chunk in pairs(chunks) do
-		if self.data[chunk] ~= nil and self.data[chunk].state == "loaded" then
-			for _, object in pairs(self.data[chunk].sprites) do
-				if not object.isActive then
-					activateSpriteCallback(object.sprite)
-					object.isActive = true
-				end
-			end
-			
-			self.data[chunk].state = "active"
-		end
-	end
+function SpriteCycler:initialize(x, y)
+	local currentChunk = math.ceil(x / self.chunkLength)
+	local chunksToLoad = {currentChunk}
+	
+	-- load Sprites In Chunk If Needed
+	
+	local count = loadChunksIfNeeded(self, chunksToLoad)
+	print("Initialized level with ".. count.. " sprites")
+end
+
+function SpriteCycler:unloadAll()
+	local count = unloadChunksIfNeeded(self, self.chunksLoaded)
+	
+	print("Unloaded ".. count.. " sprites from level.")
 end
 
 function spritePositionData(object)
