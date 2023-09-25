@@ -28,10 +28,12 @@ function unloadChunksIfNeeded(self, chunksToUnload)
 			local chunkData = self.data[chunk][1]
 			
 			for _, object in pairs(chunkData) do
-				object.sprite:remove()
-				object.sprite = nil
-				
-				count += 1
+				if object.sprite ~= nil then
+					object.sprite:remove()
+					object.sprite = nil
+					
+					count += 1
+				end
 			end
 			
 			table.remove(self.chunksLoaded, chunk)

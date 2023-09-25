@@ -77,7 +77,7 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY)
 	-- Get chunks to unload
 	
 	local chunksToLoad = {}
-	for _, v in pairs(chunksToLoad) do
+	for _, v in pairs(chunksShouldLoad) do
 		if not table.contains(self.chunksLoaded, v) then
 			table.insert(chunksToLoad, v)
 		end
@@ -90,7 +90,7 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY)
 		end
 	end
 	
-	if not (#chunksToLoad > 0) and not (#chunksToUnload > 0) then
+	if (#chunksToLoad == 0) and (#chunksToUnload == 0) then
 		return
 	end
 	
@@ -110,8 +110,10 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY)
 	print("Sprites loaded: ".. loadCount)
 	
 	
-	local unloadCount = unloadChunksIfNeeded(self, chunksToLoad)
+	local unloadCount = unloadChunksIfNeeded(self, chunksToUnload)
 	print("Sprites unloaded: ".. unloadCount)
+	
+	printTable(self.chunksLoaded)
 end
 
 function SpriteCycler:initialize(x, y)
