@@ -54,5 +54,6 @@ function Wheel:endJump()
 		self.velocityY = -smallJumpSpeed
 	end
 	
+	isJumping = false
 	hasJumpedFinished = true
 end

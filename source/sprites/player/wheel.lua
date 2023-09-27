@@ -95,10 +95,12 @@ function Wheel:update()
 	-- Has just pressed jump
 	-- Is holding jump (Jump timer)
 
+	if buttons.isUpButtonJustReleased() and self:isJumping() then
+		self:endJump()
+	end
+	
 	if buttons.isUpButtonPressed() then
 		self:applyJump()
-	elseif buttons.isUpButtonJustReleased() and self:isJumping() then
-		self:endJump()
 	end
 	
 	self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
