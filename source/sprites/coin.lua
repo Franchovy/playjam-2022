@@ -11,6 +11,7 @@ function Coin:init()
 	
 	local image = gfx.image.new(kImages.coin)
 	self:setImage(image)
+	self:setCenter(0, 0)
 	self.type = spriteTypes.coin
 	
 	self.hasBeenGrabbed = false
@@ -21,9 +22,10 @@ end
 function Coin:loadConfig(config)
 	Coin.super.loadConfig(self, config)
 	
-	-- TODO: REMOVE ME: Default values for config
 	if config.isPicked == nil then
 		config.isPicked = false
+		
+		print("WARNING: [Coin:loadConfig] - no config value for 'isPicked'! Setting default value...")
 	end
 	
 	self.hasBeenGrabbed = config.isPicked
