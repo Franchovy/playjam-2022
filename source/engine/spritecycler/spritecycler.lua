@@ -11,23 +11,33 @@ function SpriteCycler:init()
 	self.spritesToRecycle = {}
 end
 
-function SpriteCycler:load(levelConfig, chunkLength, recycledSpriteIds)
+function SpriteCycler:setData(levelConfig, chunkLength, recycledSpriteIds)
 	self.chunkLength = chunkLength
+	self.levelConfig = levelConfig
+	self.recycledSpriteIds = recycledSpriteIds
+end
+
+function SpriteCycler:load()
 	
-	-- Load chunks from level config
-	
-	local chunksData = getChunksDataForLevel(levelConfig.objects, chunkLength)
-	
-	-- Create Empty chunks if needed
-	
-	fillEmptyChunks(chunksData)
-	
-	-- Load item IDs for recycling sprites
-	for _, v in pairs(recycledSpriteIds) do
-		self.spritesToRecycle[v] = {}
+	if self.initialData == nil then
+		-- Load chunks from level config
+		
+		local chunksData = getChunksDataForLevel(self.levelConfig.objects, self.chunkLength)
+		
+		-- Create Empty chunks if needed
+		
+		fillEmptyChunks(chunksData)
+		
+		-- Load item IDs for recycling sprites
+		for _, v in pairs(self.recycledSpriteIds) do
+			self.spritesToRecycle[v] = {}
+		end
+		
+		self.initialData = chunksData
 	end
 	
-	self.data = chunksData
+	-- Load level from initial data
+	self.data = table.deepcopy(self.initialData)
 end
 
 function SpriteCycler:initialize(x, y)

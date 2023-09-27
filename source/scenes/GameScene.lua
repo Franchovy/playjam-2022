@@ -100,7 +100,8 @@ function GameScene:load(config)
 	
 	local chunkLength = AppConfig["chunkLength"]
 	local recycledSpriteIds = {"platform", "killBlock", "coin"}
-	spriteCycler:load(self.config, chunkLength, recycledSpriteIds)
+	spriteCycler:setData(self.config, chunkLength, recycledSpriteIds)
+	spriteCycler:load()
 	
 	if not self.spritesLoaded then
 		
