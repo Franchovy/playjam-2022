@@ -64,11 +64,11 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY)
 	if (#chunksToLoad > 0) or (#chunksToUnload > 0) then
 		-- Load and Unload
 		
-		local loadCount, recycledCount = loadSpritesInChunksIfNeeded(self, chunksToLoad)
-		print("Sprites loaded: ".. loadCount.. " of which ".. recycledCount.. " recycled.")
-		
 		local unloadCount = unloadSpritesInChunksIfNeeded(self, chunksToUnload)
 		print("Sprites unloaded: ".. unloadCount)
+		
+		local loadCount, recycledCount = loadSpritesInChunksIfNeeded(self, chunksToLoad)
+		print("Sprites loaded: ".. loadCount.. " of which ".. recycledCount.. " recycled.")
 		
 		printTable(self.chunksLoaded)
 	end

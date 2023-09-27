@@ -54,14 +54,9 @@ function GameScene:init()
 			else 
 				print("Unrecognized ID: ".. id)
 			end
-		else 
-			-- Recycle sprites
-			
-			if id == "coin" then
-				sprite:reset()
-			end
 		end
 		
+		sprite:loadConfig(config)
 		sprite:moveTo(GRID_SIZE * position.x, GRID_SIZE * position.y)
 		sprite:add()
 		

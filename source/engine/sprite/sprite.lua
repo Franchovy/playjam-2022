@@ -92,3 +92,14 @@ function Sprite:remove()
 	Sprite.super.remove(self)
 	self.isAdded = false
 end
+
+-----------------------
+-- Sprite Config
+
+function Sprite:loadConfig(config)
+	
+end
+
+function Sprite:updateConfig(config)
+	
+end

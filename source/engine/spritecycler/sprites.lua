@@ -2,7 +2,7 @@ import "extensions"
 import "chunks"
 
 function spritePositionData(object)
-	return {
+	local spriteData = {
 		id = object.id,
 		position = {
 			x = object.position.x,
@@ -12,6 +12,8 @@ function spritePositionData(object)
 		isActive = false,
 		sprite = nil
 	}
+	
+	return spriteData
 end
 
 function loadSpritesInChunksIfNeeded(self, chunksToLoad)
@@ -52,7 +54,9 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload)
 				if object.sprite ~= nil then
 					local sprite = table.removekey(object, "sprite")
 					
+					sprite:updateConfig(object.config)
 					sprite:remove()
+					
 					recycleSprite(self, sprite, object.id)
 					
 					count += 1
@@ -68,15 +72,6 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload)
 	return count
 end
 
-function debugPrintRecycledSprites(self)
-	local printContents = {}
-	for k, v in pairs(self.spritesToRecycle) do
-		printContents[k] = #v
-	end
-	print("Sprites Recycled:")
-	printTable(printContents)
-end
-
 function getRecycledSprite(self, id) 
 	if #self.spritesToRecycle[id] > 0 then
 		local sprite = table.remove(self.spritesToRecycle[id])
@@ -88,4 +83,13 @@ end
 
 function recycleSprite(self, sprite, id)
 	table.insert(self.spritesToRecycle[id], sprite)
+end
+
+function debugPrintRecycledSprites(self)
+	local printContents = {}
+	for k, v in pairs(self.spritesToRecycle) do
+		printContents[k] = #v
+	end
+	print("Sprites Recycled:")
+	printTable(printContents)
 end
