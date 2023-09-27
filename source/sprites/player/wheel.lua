@@ -64,6 +64,10 @@ function Wheel:resetValues()
 end
 
 function Wheel:setIsDead() 
+	if self.hasJustDied then
+		return
+	end
+	
 	self.ignoresPlayerInput = true
 	self.hasJustDied = true
 	sampleplayer:playSample("hurt")
