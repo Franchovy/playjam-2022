@@ -9,40 +9,43 @@ function SpriteCycler:init()
 	self.data = {}
 	self.chunksLoaded = {}
 	self.spritesToRecycle = {}
+	self.levelDataInitial = nil
+	self.levelData = nil
 end
 
-function SpriteCycler:setData(levelConfig, chunkLength, recycledSpriteIds)
-	self.chunkLength = chunkLength
-	self.levelConfig = levelConfig
-	self.recycledSpriteIds = recycledSpriteIds
+-- Level Data
+
+function SpriteCycler:hasLoadedInitialLevel()
+	return self.levelDataInitial ~= nil
 end
 
-function SpriteCycler:load()
+function SpriteCycler:loadInitialLevel()
+	-- Load chunks from level config
 	
-	if self.initialData == nil then
-		-- Load chunks from level config
-		
-		local chunksData = getChunksDataForLevel(self.levelConfig.objects, self.chunkLength)
-		
-		-- Create Empty chunks if needed
-		
-		fillEmptyChunks(chunksData)
-		
-		-- Load item IDs for recycling sprites
-		for _, v in pairs(self.recycledSpriteIds) do
-			self.spritesToRecycle[v] = {}
-		end
-		
-		self.initialData = chunksData
+	local chunksData = getChunksDataForLevel(self.levelConfig.objects, self.chunkLength)
+	
+	-- Create Empty chunks if needed
+	
+	fillEmptyChunks(chunksData)
+	
+	-- Load item IDs for recycling sprites
+	for _, v in pairs(self.recycledSpriteIds) do
+		self.spritesToRecycle[v] = {}
 	end
 	
+	self.initialData = chunksData
+end
+
+function SpriteCycler:loadLevel()
 	-- Load level from initial data
+	
 	self.data = table.deepcopy(self.initialData)
 end
 
-function SpriteCycler:initialize(x, y)
-	local currentChunk = math.ceil(x / self.chunkLength)
-	local chunksToLoad = chunksToGenerate(currentChunk, generationConfig)
+-- Lifecycle
+
+function SpriteCycler:loadInitialSprites(initialChunkX, initialChunkY)
+	local chunksToLoad = chunksToGenerate(initialChunkX, generationConfig)
 	
 	-- load Sprites In Chunk If Needed
 	

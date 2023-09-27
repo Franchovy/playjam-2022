@@ -22,6 +22,8 @@ local MAX_CHUNKS = 16
 local CHUNK_LENGTH = 1000
 local GRID_SIZE = 24
 
+local LEVEL_COMPLETE_SIZE = 3500
+
 local spriteCycler = nil
 local levelCompleteSprite = nil
 
@@ -96,12 +98,19 @@ function GameScene:load(config)
 		self.background:setParalaxDrawingRatios()
 	end
 	
-	-- Set up sprites
+	-- Set up sprite cycler
 	
-	local chunkLength = AppConfig["chunkLength"]
-	local recycledSpriteIds = {"platform", "killBlock", "coin"}
-	spriteCycler:setData(self.config, chunkLength, recycledSpriteIds)
-	spriteCycler:load()
+	spriteCycler.chunkLength = AppConfig["chunkLength"]
+	spriteCycler.levelConfig = self.config
+	spriteCycler.recycledSpriteIds = {"platform", "killBlock", "coin"}
+	
+	if not spriteCycler:hasLoadedInitialLevel() then
+		spriteCycler:loadInitialLevel()
+	end
+	
+	spriteCycler:loadLevel()
+	
+	-- set up other sprites
 	
 	if not self.spritesLoaded then
 		
@@ -165,7 +174,7 @@ function GameScene:present()
 	
 	-- Initialize Sprite cycling using initial position
 	
-	spriteCycler:initialize(1, 1)
+	spriteCycler:loadInitialSprites(1, 1)
 	
 	-- Play music
 	
@@ -190,27 +199,6 @@ function GameScene:update()
 	-- Updates sprites cycling
 	spriteCycler:update(-drawOffsetX / GRID_SIZE, drawOffsetY / GRID_SIZE)
 	
-	-- Update Blinker
-	
-	if blinker ~= nil then
-		blinker:update()
-		if levelCompleteSprite ~= nil then	
-			levelCompleteSprite:setVisible(blinker.on)
-		end
-	end
-	
-	--
-	
-	if self.wheel.x > (MAX_CHUNKS + 1) * CHUNK_LENGTH then
-		
-		if self.config.level ~= nil then
-			local nextLevel = self.config.level + 1
-			onLevelComplete(nextLevel)
-		else
-			onLevelComplete() 
-		end
-	end
-	
 	-- On game start
 	
 	if self.gameState == gameStates.readyToStart then
@@ -226,33 +214,53 @@ function GameScene:update()
 		end
 	end
 	
-	if self.gameState ~= gameStates.playing then
-		return
-	end
-	
-	-- Update screen position based on wheel
-	
-	local drawOffset = gfx.getDrawOffset()
-	local relativeX = self.wheel.x + drawOffset
-	if relativeX > 150 then
-		gfx.setDrawOffset(-self.wheel.x + 150, 0)
-	elseif relativeX < 80 then
-		gfx.setDrawOffset(-self.wheel.x + 80, 0)
-	end
-	
-	-- Game State checking
-	
-	if self.wheel.hasJustDied then
-		self.gameState = gameStates.ended
+	if self.gameState == gameStates.playing then
 		
-		if AppConfig.enableComponents.wallOfDeath then
-			self.wallOfDeath:stopMoving()
+		-- Update Blinker
+		
+		if blinker ~= nil then
+			blinker:update()
+			if levelCompleteSprite ~= nil then	
+				levelCompleteSprite:setVisible(blinker.on)
+			end
 		end
+		
+		--
+		
+		if self.wheel.x > LEVEL_COMPLETE_SIZE then
+			
+			if self.config.level ~= nil then
+				local nextLevel = self.config.level + 1
+				onLevelComplete(nextLevel)
+			else
+				onLevelComplete() 
+			end
+		end
+		
+		-- Camera movement based on wheel position
+		
+		local drawOffset = gfx.getDrawOffset()
+		local relativeX = self.wheel.x + drawOffset
+		if relativeX > 150 then
+			gfx.setDrawOffset(-self.wheel.x + 150, 0)
+		elseif relativeX < 80 then
+			gfx.setDrawOffset(-self.wheel.x + 80, 0)
+		end
+		
+		-- Game State checking
+		
+		if self.wheel.hasJustDied then
+			self.gameState = gameStates.ended
+			
+			if AppConfig.enableComponents.wallOfDeath then
+				self.wallOfDeath:stopMoving()
+			end
+		end
+		
+		-- Update image score
+		
+		self.textImageScore:setScoreText(self.wheel:getScoreText())
 	end
-	
-	-- Update image score
-	
-	self.textImageScore:setScoreText(self.wheel:getScoreText())
 end
 
 function GameScene:dismiss()
@@ -291,47 +299,10 @@ function onLevelComplete(nextLevel)
 	)
 end
 
-function loadProceduralSprites(components)
-	if AppConfig.enableComponents.wind and components.wind then
-		print("Wind")
-		SpriteData:registerSprite("Wind", Wind)
-		SpriteData:setInitializerParams("Wind")
-		SpriteData:setPositioning("Wind", 1, { yRange = { 40, 100 } } )
-	end
-	
-	if AppConfig.enableComponents.coin and components.coin then
-		print("Coin")
-		SpriteData:registerSprite("Coin", Coin)
-		SpriteData:setInitializerParams("Coin")
-		SpriteData:setPositioning("Coin", 2, { yRange = { 30, 200 } } )
-	end
-	
-	if AppConfig.enableComponents.platformMoving and components.platformMoving then
-		print("PlatformMoving")
-		SpriteData:registerSprite("Platform/moving", Platform)
-		SpriteData:setInitializerParams("Platform/moving", 100, 20, true)
-		SpriteData:setPositioning("Platform/moving", 1, { yRange = { 130, 170 } } )
-	end
-	
-	if AppConfig.enableComponents.killBlock and components.killBlock then
-		print("Kill Block")
-		SpriteData:registerSprite("Kill Block", KillBlock)
-		SpriteData:setInitializerParams("Kill Block")
-		SpriteData:setPositioning("Kill Block", 1, { yRange = { 20, 180 } } )
-	end
-	
-	if AppConfig.enableComponents.platformFloor and components.platformFloor then
-		print("PlatformFloor")
-		SpriteData:registerSprite("Platform/floor", Platform)
-		SpriteData:setInitializerParams("Platform/floor", CHUNK_LENGTH, 20, false)
-		SpriteData:setPositioning("Platform/floor", 1, { x = 0, y = 220 }, MAX_CHUNKS + 2 )
-	end
-end
-
 function addLevelCompleteSprite()
 	levelCompleteSprite = sizedTextSprite("LEVEL COMPLETE", 3)
 	
-	levelCompleteSprite:setImage(levelCompleteSprite:getImage():invertedImage())
+	levelCompleteSprite:setImage(levelCompleteSprite:getImage())
 	levelCompleteSprite:setIgnoresDrawOffset(true)
 	
 	levelCompleteSprite:add()
