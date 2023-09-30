@@ -22,19 +22,12 @@ function Wheel:init()
 	Wheel.super.init(self)
 	
 	images = getImageTable(kImages.wheel, 12)
-	printTable(images)
 	self:setImage(images[1])
 	self:setCenter(0, 0)
 	
 	self.type = spriteTypes.player
 	
-	local marginSize = 3
-	self:setCollideRect(
-		marginSize, 
-		marginSize, 
-		self:getSize() - marginSize * 2, 
-		self:getSize() - marginSize * 2
-	)
+	self:setCollideRect(self:getBounds())
 	
 	-- Collisions Response
 	

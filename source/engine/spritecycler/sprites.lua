@@ -51,7 +51,13 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload)
 			local chunkData = self.data[chunk][1]
 			
 			for _, object in pairs(chunkData) do
-				if object.sprite ~= nil then
+				local shouldRecycle = true
+				if self.spritesToRecycle[object.id] == nil then
+					-- Sprite is not registered as recyclable
+					shouldRecycle = false
+				end
+				
+				if shouldRecycle and object.sprite ~= nil then
 					local sprite = table.removekey(object, "sprite")
 					
 					sprite:updateConfig(object.config)
