@@ -1,10 +1,10 @@
 -- Constants
 
-local jumpSpeed = 24
-local smallJumpSpeed = 8
+local jumpSpeed = 18
+local smallJumpSpeed = 4.5
 
-local smallJumpMaxTicks = 6
-local jumpMaxTicks = 12
+local smallJumpMaxTicks = 10
+local jumpMaxTicks = 14
 
 -- State
 

@@ -1,14 +1,14 @@
 local crankTickMultiplier = 3
-local accelerationManual = 3.5
-local maxSpeedManual = 10.0
+local accelerationManual = 1.0
+local maxSpeedManual = 8.0
 
 local speedUpAcceleration = 0.01
 local speedUpDragAcceleration = 0.1
-local speedUpBrakeAcceleration = 2.5
+local speedUpBrakeAcceleration = 1.5
 
 local velocityDragStep = 0.1
-local velocityBrakeStep = 0.4
-local maxVelocityX = 23
+local velocityBrakeStep = 0.2
+local maxVelocityX = 11
 
 function Wheel:calculateSpeed(crankTicks, speedPreviousActual)
 	local crankTicks = crankTicks * crankTickMultiplier

@@ -9,7 +9,7 @@ import "sounds"
 import "jump"
 
 local maxFallSpeed = 14
-local gravity = 2.1
+local gravity = 1.4
 local scorePerCoin = 10
 local crankTicksPerCircle = 72
 local images = {}
