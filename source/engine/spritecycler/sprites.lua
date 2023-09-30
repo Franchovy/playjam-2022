@@ -88,6 +88,11 @@ function getRecycledSprite(self, id)
 end
 
 function recycleSprite(self, sprite, id)
+	if self.spritesToRecycle[id] == nil then
+		-- Sprite is not registered for recycling
+		return
+	end
+	
 	table.insert(self.spritesToRecycle[id], sprite)
 end
 

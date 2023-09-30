@@ -42,6 +42,7 @@ function Wheel:init()
 	self:setCollidesWith(spriteTypes.coin, collisionTypes.overlap)
 	self:setCollidesWith(spriteTypes.killBlock, collisionTypes.overlap)
 	self:setCollidesWith(spriteTypes.wind, collisionTypes.overlap)
+	self:setCollidesWith(spriteTypes.levelEnd, collisionTypes.overlap)
 	
 	self:activateCollisionResponse()
 	
@@ -62,6 +63,7 @@ function Wheel:resetValues()
 	self.score = 0
 	self.currentWindPower = 0
 	self.ignoresPlayerInput = true
+	self.hasReachedLevelEnd = false
 end
 
 function Wheel:setIsDead() 
@@ -126,9 +128,10 @@ function Wheel:update()
 		self.y + self.velocityY
 	)
 
-	-- Reset values
+	-- Reset values before collision update
 	
-	self:resetValuesBeforeCollisionUpdate()
+	self.currentWindPower = 0
+	self.touchingGround = false
 	
 	-- Collisions-based updates
 	
@@ -165,6 +168,11 @@ function Wheel:update()
 			self:setIsDead()
 		elseif target.type == spriteTypes.wind then
 			self.currentWindPower += target.windPower
+		elseif target.type == spriteTypes.levelEnd then
+			if self:alphaCollision(target) then
+				-- Die
+				self.hasReachedLevelEnd = true
+			end
 		end
 	end
 	
@@ -190,9 +198,8 @@ function Wheel:update()
 	self:setImage(images[imageIndex])
 end
 
-function Wheel:resetValuesBeforeCollisionUpdate()
-	self.currentWindPower = 0
-	self.touchingGround = false
+function Wheel:hasReachedLevelEnd()
+	return self.hasReachedLevelEnd
 end
 
 function Wheel:setAwaitingInput() 
@@ -209,3 +216,5 @@ function Wheel:onGrabbedCoin(coin)
 	
 	coin:isGrabbed()
 end
+
+

@@ -146,9 +146,6 @@ function GameScene:present()
 	
 	print("Game Scene Present")
 	
-	-- Reset sprites
-
-	
 	-- Position Sprites
 	
 	if AppConfig.enableComponents.wallOfDeath then
@@ -175,6 +172,10 @@ function GameScene:present()
 	-- Initialize Sprite cycling using initial position
 	
 	spriteCycler:loadInitialSprites(1, 1)
+	
+	-- Set camera to center on wheel
+	
+	self:updateDrawOffset()
 	
 	-- Play music
 	
@@ -225,9 +226,9 @@ function GameScene:update()
 			end
 		end
 		
-		--
+		-- Level End Trigger
 		
-		if self.wheel.x > LEVEL_COMPLETE_SIZE then
+		if self.wheel.hasReachedLevelEnd and levelCompleteSprite == nil then
 			
 			if self.config.level ~= nil then
 				local nextLevel = self.config.level + 1
@@ -239,13 +240,7 @@ function GameScene:update()
 		
 		-- Camera movement based on wheel position
 		
-		local drawOffset = gfx.getDrawOffset()
-		local relativeX = self.wheel.x + drawOffset
-		if relativeX > 150 then
-			gfx.setDrawOffset(-self.wheel.x + 150, 0)
-		elseif relativeX < 80 then
-			gfx.setDrawOffset(-self.wheel.x + 80, 0)
-		end
+		self:updateDrawOffset()
 		
 		-- Game State checking
 		
@@ -277,11 +272,18 @@ function GameScene:destroy()
 	Scene.destroy(self)
 end
 
-function onLevelComplete(nextLevel)
-	if levelCompleteSprite ~= nil then
-		return
+function GameScene:updateDrawOffset()
+	local drawOffset = gfx.getDrawOffset()
+	local relativeX = self.wheel.x + drawOffset
+	if relativeX > 150 then
+		gfx.setDrawOffset(-self.wheel.x + 150, 0)
+	elseif relativeX < 80 then
+		gfx.setDrawOffset(-self.wheel.x + 80, 0)
 	end
-			
+end
+
+function onLevelComplete(nextLevel)
+
 	addLevelCompleteSprite()
 		
 	timer.performAfterDelay(3000,

@@ -13,4 +13,5 @@ function LevelEnd:init()
 	self:setImage(image)
 	self:setCenter(0, 0)
 	self.type = spriteTypes.levelEnd
+	self:setCollideRect(self:getBounds())
 end
