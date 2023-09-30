@@ -1,6 +1,7 @@
 import "engine"
 import "components/images"
-
+import "components/collisionGroups"
+import "components/spriteTypes"
 
 class("Wheel").extends(Sprite)
 
@@ -24,6 +25,8 @@ function Wheel:init()
 	images = getImageTable(kImages.wheel, 12)
 	self:setImage(images[1])
 	self:setCenter(0, 0)
+	self:setGroups(collisionGroups.moving)
+	self:setCollidesWithGroups(collisionGroups.static)
 	
 	self.type = spriteTypes.player
 	

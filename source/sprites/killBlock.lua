@@ -1,5 +1,7 @@
 import "engine"
-import "spriteTypes"
+import "components/images"
+import "components/spriteTypes"
+import "components/collisionGroups"
 
 class('KillBlock').extends(Sprite)
 
@@ -13,11 +15,8 @@ function KillBlock:init()
 	
 	local image = gfx.image.new(kImages.killBlock)
 	self:setImage(image)
-	
-	----------------
-	-- Set up Sprite
-	
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)
+	self:setGroups(collisionGroups.static)
 end
 

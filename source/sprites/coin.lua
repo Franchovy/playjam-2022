@@ -1,4 +1,7 @@
 import "engine"
+import "components/images"
+import "components/spriteTypes"
+import "components/collisionGroups"
 
 class('Coin').extends(Sprite)
 
@@ -8,15 +11,16 @@ end
 
 function Coin:init()
 	Coin.super.init(self)
+	self.type = spriteTypes.coin
 	
 	local image = gfx.image.new(kImages.coin)
 	self:setImage(image)
 	self:setCenter(0, 0)
-	self.type = spriteTypes.coin
+	self:setCollideRect(self:getBounds())
+	self:setGroups(collisionGroups.static)
 	
 	self.hasBeenGrabbed = false
 	
-	self:setCollideRect(0, 0, self:getSize())
 end
 
 function Coin:loadConfig(config)
