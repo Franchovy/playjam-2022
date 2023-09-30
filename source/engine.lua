@@ -20,20 +20,6 @@ frameTimer = playdate.frameTimer
 sprite = playdate.sprite
 sound = playdate.sound
 
-
--- ===============
--- Custom Types
-
-spriteTypes = {
-	coin = "Coin",
-	wheel = "Wheel", --deprecated
-	player = "Wheel",
-	platform = "Platform",
-	killBlock = "KillBlock",
-	wind = "Wind",
-	wallOfDeath = "WallOfDeath"
-}
-
 -- ===============
 -- Shortcuts
 

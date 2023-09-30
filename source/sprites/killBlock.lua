@@ -1,4 +1,5 @@
 import "engine"
+import "spriteTypes"
 
 class('KillBlock').extends(Sprite)
 

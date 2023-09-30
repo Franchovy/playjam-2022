@@ -73,12 +73,18 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload)
 end
 
 function getRecycledSprite(self, id) 
-	if #self.spritesToRecycle[id] > 0 then
-		local sprite = table.remove(self.spritesToRecycle[id])
-		return sprite
+	if self.spritesToRecycle[id] == nil then
+		-- Sprite is not registered as recyclable
+		return nil
 	end
 	
-	return nil
+	if #self.spritesToRecycle[id] == 0 then
+		-- No sprites to recycle
+		return nil
+	end
+	
+	local sprite = table.remove(self.spritesToRecycle[id])
+	return sprite
 end
 
 function recycleSprite(self, sprite, id)

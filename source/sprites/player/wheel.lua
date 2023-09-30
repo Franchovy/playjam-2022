@@ -24,6 +24,7 @@ function Wheel:init()
 	images = getImageTable(kImages.wheel, 12)
 	printTable(images)
 	self:setImage(images[1])
+	self:setCenter(0, 0)
 	
 	self.type = spriteTypes.player
 	

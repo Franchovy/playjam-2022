@@ -53,6 +53,13 @@ function GameScene:init()
 				sprite = KillBlock.new()
 			elseif id == "coin" then
 				sprite = Coin.new()
+			elseif id == "player" then
+				sprite = Wheel.new()
+				sprite:resetValues()
+				sprite:setAwaitingInput()
+				self.wheel = sprite
+			elseif id == "levelEnd" then
+				sprite = LevelEnd.new()
 			else 
 				print("Unrecognized ID: ".. id)
 			end
@@ -116,7 +123,7 @@ function GameScene:load(config)
 		
 		-- Create Player sprite
 		
-		self.wheel = Wheel.new()
+		--self.wheel = Wheel.new()
 		
 		-- Draw Score Text
 		
@@ -140,22 +147,15 @@ function GameScene:present()
 	print("Game Scene Present")
 	
 	-- Reset sprites
-	
-	self.wheel:resetValues()
-	self.wheel:setAwaitingInput()
+
 	
 	-- Position Sprites
-	
-	self.wheel:moveTo(80, 188)
 	
 	if AppConfig.enableComponents.wallOfDeath then
 		self.wallOfDeath:moveTo(-600, 0)
 		self.wallOfDeath:add()
 	end
 	
-	-- Set randomly generated sprite positions
-	
-	self.wheel:add()
 	self.textImageScore:add()
 	
 	-- Set background drawing callback
@@ -308,6 +308,6 @@ function addLevelCompleteSprite()
 	levelCompleteSprite:add()
 	levelCompleteSprite:moveTo(10, 110)
 
-	blinker = defaultBlinker(300, 100)
+	blinker = gfx.blinker.default(300, 100)
 	blinker:startLoop()
 end
