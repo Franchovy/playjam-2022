@@ -15,6 +15,17 @@ end
 
 -- Level Data
 
+-- Returns the chunk where the first sprite with id is found. Useful for getting the starting chunk of a level.
+function SpriteCycler:getFirstInstanceChunk(id)
+	for k, chunk in pairs(self.data) do
+		for _, object in pairs(chunk[1]) do
+			if object.id == id then
+				return k
+			end
+		end
+	end
+end
+
 function SpriteCycler:hasLoadedInitialLevel()
 	return self.levelDataInitial ~= nil
 end

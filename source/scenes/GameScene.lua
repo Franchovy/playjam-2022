@@ -115,7 +115,7 @@ function GameScene:load(config)
 		spriteCycler:loadInitialLevel()
 	end
 	
-	spriteCycler:loadLevel()
+	spriteCycler:loadLevel(initialChunk)
 	
 	-- set up other sprites
 	
@@ -171,7 +171,8 @@ function GameScene:present()
 	
 	-- Initialize Sprite cycling using initial position
 	
-	spriteCycler:loadInitialSprites(1, 1)
+	local initialChunk = spriteCycler:getFirstInstanceChunk("player")
+	spriteCycler:loadInitialSprites(initialChunk, 1)
 	
 	-- Set camera to center on wheel
 	
