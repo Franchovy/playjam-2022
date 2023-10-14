@@ -65,7 +65,6 @@ levelComponents = {
 	},
 	{
 		platformMoving = { },
-		wind = { },
 		coin = { },
 	},
 	{

@@ -55,7 +55,6 @@ function Wheel:resetValues()
 	self.hasJustDied = false
 	self.isAwaitingInput = false
 	self.score = 0
-	self.currentWindPower = 0
 	self.ignoresPlayerInput = true
 	self.hasReachedLevelEnd = false
 end
@@ -112,13 +111,8 @@ function Wheel:update()
 	
 	self.velocityX = self:calculateSpeed(crankTicks, self.velocityX)
 	
-	-- Apply wind power
-	
-	self.velocityX += self.currentWindPower
-	
 	-- Reset values that get re-calculated
 	
-	self.currentWindPower = 0
 	self.touchingGround = false
 	
 	-- Update position according to velocity
@@ -153,14 +147,10 @@ function Wheel:update()
 				-- Die
 				self:setIsDead()
 			end
-		elseif target.type == spriteTypes.wallOfDeath then
-			self:setIsDead()
 		elseif target.type == spriteTypes.checkpoint then
 			if not target:isSet() then
 				target:set()
 			end
-		elseif target.type == spriteTypes.wind then
-			self.currentWindPower += target.windPower
 		elseif target.type == spriteTypes.levelEnd then
 			if self:alphaCollision(target) then
 				-- Die
@@ -171,8 +161,6 @@ function Wheel:update()
 	
 	-- Play sounds based on movement
 	self:playMovementSound()
-	
-	self:playWindBasedSounds()
 	
 	-- Update graphics
 	

@@ -3,12 +3,9 @@ AppConfig = {}
 AppConfig["enableParalaxBackground"] = true
 
 local levelComponents = {}
-levelComponents["platformMoving"] = true
-levelComponents["platformFloor"] = true
+levelComponents["platform"] = true
 levelComponents["killBlock"] = true
-levelComponents["wind"] = true
 levelComponents["coin"] = true
-levelComponents["wallOfDeath"] = false
 
 AppConfig["enableComponents"] = levelComponents
 

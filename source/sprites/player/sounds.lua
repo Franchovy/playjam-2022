@@ -5,11 +5,6 @@ function Wheel:initializeSamples()
 	sampleplayer:addSample("hurt", "sfx/player_hurt_v1")
 	sampleplayer:addSample("coin", "sfx/coin")
 	sampleplayer:addSample("land", "sfx/land")
-	sampleplayer:addSample("backward_start", "sfx/wheel_backward_v1")
-	sampleplayer:addSample("backward_loop", "sfx/wheel_backward_loop_v1")
-	sampleplayer:addSample("forward_start", "sfx/wheel_forward_v1")
-	sampleplayer:addSample("forward_loop", "sfx/wheel_forward_loop_v1")
-	sampleplayer:addSample("wind", "sfx/wind_v1")
 end
 
 local synth = nil
@@ -51,11 +46,4 @@ function Wheel:playMovementBasedSounds(velocityFactor)
 	
 	synth:setVolume(previousVolume)
 	synth:playNote(previousFrequency)
-end
-
-local windSampleHasFinishedPlaying = false
-function Wheel:playWindBasedSounds()
-	if self.currentWindPower > 0 and windSampleHasFinishedPlaying then
-		sampleplayer:playSample("wind", function () windSampleHasFinishedPlaying = true end)
-	end
 end

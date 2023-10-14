@@ -33,9 +33,7 @@ function GameScene:init()
 	--
 	
 	self.wheel = nil
-	self.wallOfDeath = nil
 	self.textImageScore = nil
-	self.wallOfDeathSpeed = 4
 	
 	self.gameState = gameStates.created
 	
@@ -116,12 +114,6 @@ function GameScene:load(level)
 		
 		self.textImageScore = Score.new("Score: 0")
 		
-		-- Create great wall of death
-		
-		if AppConfig.enableComponents.wallOfDeath then
-			self.wallOfDeath = WallOfDeath.new(self.wallOfDeathSpeed)
-		end
-		
 		-- Generate Level
 		
 		self.spritesLoaded = true
@@ -134,11 +126,6 @@ function GameScene:present()
 	print("Game Scene Present")
 	
 	-- Position Sprites
-	
-	if AppConfig.enableComponents.wallOfDeath then
-		self.wallOfDeath:moveTo(-600, 0)
-		self.wallOfDeath:add()
-	end
 	
 	self.textImageScore:add()
 	
@@ -195,10 +182,6 @@ function GameScene:update()
 		if buttons.isUpButtonJustPressed() or (math.abs(playdate.getCrankChange()) > 5) then
 			self.wheel:startGame()
 			
-			if AppConfig.enableComponents.wallOfDeath then
-				self.wallOfDeath:beginMoving()
-			end
-			
 			self.gameState = gameStates.playing
 		end
 	end
@@ -234,10 +217,6 @@ function GameScene:update()
 		
 		if self.wheel.hasJustDied then
 			self.gameState = gameStates.ended
-			
-			if AppConfig.enableComponents.wallOfDeath then
-				self.wallOfDeath:stopMoving()
-			end
 		end
 		
 		-- Update image score
