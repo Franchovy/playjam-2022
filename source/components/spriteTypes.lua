@@ -6,5 +6,6 @@ spriteTypes = {
 	killBlock = "KillBlock",
 	wind = "Wind",
 	wallOfDeath = "WallOfDeath",
-	levelEnd = "LevelEnd"
+	levelEnd = "LevelEnd",
+	checkpoint = "Checkpoint"
 }

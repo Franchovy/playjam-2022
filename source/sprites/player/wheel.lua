@@ -39,6 +39,7 @@ function Wheel:init()
 	self:setCollidesWith(spriteTypes.killBlock, collisionTypes.overlap)
 	self:setCollidesWith(spriteTypes.wind, collisionTypes.overlap)
 	self:setCollidesWith(spriteTypes.levelEnd, collisionTypes.overlap)
+	self:setCollidesWith(spriteTypes.checkpoint, collisionTypes.overlap)
 	
 	self:activateCollisionResponse()
 	
@@ -162,6 +163,10 @@ function Wheel:update()
 			end
 		elseif target.type == spriteTypes.wallOfDeath then
 			self:setIsDead()
+		elseif target.type == spriteTypes.checkpoint then
+			if not target:isSet() then
+				target:set()
+			end
 		elseif target.type == spriteTypes.wind then
 			self.currentWindPower += target.windPower
 		elseif target.type == spriteTypes.levelEnd then

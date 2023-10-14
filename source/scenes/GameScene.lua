@@ -33,6 +33,7 @@ function GameScene:init()
 	--
 	
 	self.wheel = nil
+	self.wheelPositionInitial = {x = 0, y = 0}
 	self.wallOfDeath = nil
 	self.textImageScore = nil
 	self.wallOfDeathSpeed = 4
@@ -53,11 +54,14 @@ function GameScene:init()
 				sprite = KillBlock.new()
 			elseif id == "coin" then
 				sprite = Coin.new()
+			elseif id == "checkpoint" then
+				sprite = Checkpoint.new()
 			elseif id == "player" then
 				sprite = Wheel.new()
 				sprite:resetValues()
 				sprite:setAwaitingInput()
 				self.wheel = sprite
+				self.wheelPositionInitial = { x = position.x, y = position.y }
 			elseif id == "levelEnd" then
 				sprite = LevelEnd.new()
 			else 
@@ -109,7 +113,7 @@ function GameScene:load(config)
 	
 	spriteCycler.chunkLength = AppConfig["chunkLength"]
 	spriteCycler.levelConfig = self.config
-	spriteCycler.recycledSpriteIds = {"platform", "killBlock", "coin"}
+	spriteCycler.recycledSpriteIds = {"platform", "killBlock", "coin", "checkpoint"}
 	
 	if not spriteCycler:hasLoadedInitialLevel() then
 		spriteCycler:loadInitialLevel()
@@ -169,10 +173,9 @@ function GameScene:present()
 	
 	self.gameState = gameStates.readyToStart
 	
-	-- Initialize Sprite cycling using initial position
+	-- Initialize Sprite cycling using initial wheel position
 	
-	local initialChunk = spriteCycler:getFirstInstanceChunk("player")
-	spriteCycler:loadInitialSprites(initialChunk, 1)
+	spriteCycler:update(self.wheelPositionInitial.x, self.wheelPositionInitial.y)
 	
 	-- Set camera to center on wheel
 	
