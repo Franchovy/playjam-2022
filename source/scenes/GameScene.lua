@@ -33,7 +33,6 @@ function GameScene:init()
 	--
 	
 	self.wheel = nil
-	self.wheelPositionInitial = {x = 0, y = 0}
 	self.wallOfDeath = nil
 	self.textImageScore = nil
 	self.wallOfDeathSpeed = 4
@@ -61,7 +60,6 @@ function GameScene:init()
 				sprite:resetValues()
 				sprite:setAwaitingInput()
 				self.wheel = sprite
-				self.wheelPositionInitial = { x = position.x, y = position.y }
 			elseif id == "levelEnd" then
 				sprite = LevelEnd.new()
 			else 
@@ -175,7 +173,8 @@ function GameScene:present()
 	
 	-- Initialize Sprite cycling using initial wheel position
 	
-	spriteCycler:update(self.wheelPositionInitial.x, self.wheelPositionInitial.y)
+	local initialChunk = spriteCycler:getFirstInstanceChunk("player")
+	spriteCycler:loadInitialSprites(initialChunk, 1)
 	
 	-- Set camera to center on wheel
 	
