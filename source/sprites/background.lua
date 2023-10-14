@@ -10,7 +10,10 @@ end
 function ParalaxBackground:init()
 	ParalaxBackground.super.init(self)
 	
-	self:setSize(400, 240)
+	self:setSize(playdate.display.getSize())
+	self:setUpdatesEnabled(false)
+	
+	self:setIgnoresDrawOffset(true)
 end
 
 function ParalaxBackground:loadForTheme(theme)
@@ -30,8 +33,6 @@ function ParalaxBackground:loadForTheme(theme)
 		self.paralaxRatios[i] = 0
 		self.imageOffsets[i] = 0
 	end
-	
-	self:setIgnoresDrawOffset(true)
 end
 
 function ParalaxBackground:getBackgroundDrawingCallback()
