@@ -73,8 +73,6 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload)
 		end
 	end
 	
-	debugPrintRecycledSprites(self)
-	
 	return count
 end
 

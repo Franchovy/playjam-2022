@@ -46,11 +46,8 @@ function Wheel:isJumping()
 	return isJumping
 end
 
-function Wheel:endJump()
-	print("Ticks: ".. jumpTimeInTicks)
-	
+function Wheel:endJump()	
 	if isJumping and jumpTimeInTicks < smallJumpMaxTicks then
-		print("Small jump!")
 		self.velocityY = -smallJumpSpeed
 	end
 	

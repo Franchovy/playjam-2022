@@ -41,7 +41,6 @@ function SpriteData:setPositioning(name, numSpritesPerChunk, positioningData, nu
 end
 
 function SpriteData:loadSpritesInChunk(chunk)
-	print("Loading sprites in chunk: ".. chunk)
 	
 	for _, spriteData in pairs(self.spriteData) do
 		local spritePositions = SpritePositionManager:getPositionsInChunk(spriteData.name, chunk)
@@ -74,9 +73,7 @@ function SpriteData:loadSpritesInChunk(chunk)
 	end
 end
 
-function SpriteData:recycleSpritesInChunk(chunk)
-	print("Recycling sprites in chunk: ".. chunk)
-	
+function SpriteData:recycleSpritesInChunk(chunk)	
 	for _, spriteData in pairs(self.spriteData) do
 		local sprites = self.chunkAssignedSprites[spriteData.name][chunk]
 		
