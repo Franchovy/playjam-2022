@@ -180,7 +180,6 @@ function Wheel:update()
 	-- Play sounds based on movement
 	self:playMovementSound()
 	
-	self:playLandingBasedSound()
 	self:playWindBasedSounds()
 	
 	-- Update graphics
