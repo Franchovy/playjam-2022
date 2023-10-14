@@ -39,9 +39,9 @@ function GameScene:init()
 	
 	self.gameState = gameStates.created
 	
-	spriteCycler = SpriteCycler()
-	
-	spriteCycler.createSpriteCallback = function(id, position, config, spriteToRecycle)
+	local chunkLength = AppConfig["chunkLength"]
+	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint"}
+	spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, config, spriteToRecycle)
 		local sprite = spriteToRecycle;
 			
 		if sprite == nil then
@@ -72,29 +72,30 @@ function GameScene:init()
 		sprite:add()
 		
 		return sprite
-	end
+	end)
 	
 	self.spritesLoaded = false
 end
 
-function GameScene:load(config)
+function GameScene:load(level)
 	Scene.load(self)
 	
-	if config ~= nil then
-		self.config = config
-	elseif self.config == nil then
-		print("Error: No config found")
-		sceneManager:switchScene(menuScene, nil)
-		return
+	if level ~= nil then
+		self.level = level
 	end
 	
-	local theme = self.config.theme
+	print("Game Scene Load")
 	
-	print("Load!")
+	local levelConfig = importLevel(self.level)
+	assert(levelConfig)
+	spriteCycler:load(levelConfig)
+	self.config = levelConfig
 	
 	self.gameState = gameStates.loading
 	
 	-- Draw Background
+	
+	local theme = self.config.theme
 	
 	if theme ~= 0 then
 		self.levelTheme = levels[theme]
@@ -107,25 +108,9 @@ function GameScene:load(config)
 		self.background:setParalaxDrawingRatios()
 	end
 	
-	-- Set up sprite cycler
-	
-	spriteCycler.chunkLength = AppConfig["chunkLength"]
-	spriteCycler.levelConfig = self.config
-	spriteCycler.recycledSpriteIds = {"platform", "killBlock", "coin", "checkpoint"}
-	
-	if not spriteCycler:hasLoadedInitialLevel() then
-		spriteCycler:loadInitialLevel()
-	end
-	
-	spriteCycler:loadLevel(initialChunk)
-	
 	-- set up other sprites
 	
 	if not self.spritesLoaded then
-		
-		-- Create Player sprite
-		
-		--self.wheel = Wheel.new()
 		
 		-- Draw Score Text
 		

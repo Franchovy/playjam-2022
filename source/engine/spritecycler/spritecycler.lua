@@ -5,12 +5,13 @@ class("SpriteCycler").extends()
 
 local generationConfig = { left = 1, right = 2}
 
-function SpriteCycler:init()
+function SpriteCycler:init(chunkLength, recycledSpriteIds, createSpriteCallback)
 	self.data = {}
 	self.chunksLoaded = {}
 	self.spritesToRecycle = {}
-	self.levelDataInitial = nil
-	self.levelData = nil
+	self.chunkLength = chunkLength
+	self.recycledSpriteIds = recycledSpriteIds
+	self.createSpriteCallback = createSpriteCallback
 end
 
 -- Level Data
@@ -27,13 +28,14 @@ function SpriteCycler:getFirstInstanceChunk(id)
 end
 
 function SpriteCycler:hasLoadedInitialLevel()
-	return self.levelDataInitial ~= nil
+	return self.data ~= nil
 end
 
-function SpriteCycler:loadInitialLevel()
+function SpriteCycler:load(levelConfig)
+	
 	-- Load chunks from level config
 	
-	local chunksData = getChunksDataForLevel(self.levelConfig.objects, self.chunkLength)
+	local chunksData = getChunksDataForLevel(levelConfig.objects, self.chunkLength)
 	
 	-- Create Empty chunks if needed
 	
@@ -44,13 +46,7 @@ function SpriteCycler:loadInitialLevel()
 		self.spritesToRecycle[v] = {}
 	end
 	
-	self.initialData = chunksData
-end
-
-function SpriteCycler:loadLevel()
-	-- Load level from initial data
-	
-	self.data = table.deepcopy(self.initialData)
+	self.data = chunksData
 end
 
 -- Lifecycle

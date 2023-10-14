@@ -85,23 +85,17 @@ end
 -- Local Functions
 
 function startGame(level)
-	loadAllScenes()
+	--loadAllScenes()
 	
 	print("Starting game with theme: ".. level)
 	
-	sceneManager:switchScene(scenes.game, nil, GameConfig.getLevelConfig(level))
+	--sceneManager:switchScene(scenes.game, nil, GameConfig.getLevelConfig(level))
 end
 
 function startCustomGame(fileName)
 	loadAllScenes()
 	
-	local levelData = importLevel(fileName)
-	
-	print("Starting game with custom level: ".. fileName)
-	print("Level data:")
-	printTable(levelData)
-	
-	sceneManager:switchScene(scenes.game, nil, levelData)
+	sceneManager:switchScene(scenes.game, nil, fileName)
 end
 
 function makeBackgroundImage()	
