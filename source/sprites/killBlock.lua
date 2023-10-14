@@ -17,6 +17,5 @@ function KillBlock:init()
 	self:setImage(image)
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)
-	self:setGroups(collisionGroups.static)
 end
 

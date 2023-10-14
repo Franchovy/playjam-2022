@@ -63,7 +63,6 @@ function Platform:init(width, height, isMoving)
 	local image = gfx.image.new("images/sprites/platform")
 	self:setImage(image)
 	self:setCollideRect(0, 0, self:getSize())
-	self:setGroups(collisionGroups.static)
 	
 	----------------
 	-- Set up Sprite

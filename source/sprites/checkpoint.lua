@@ -27,7 +27,6 @@ function Checkpoint:init()
 	
 	self:setImageState()
 	self:setCollideRect(self:getBounds())
-	self:setGroups(collisionGroups.static)
 	
 	-- Sound effects
 	

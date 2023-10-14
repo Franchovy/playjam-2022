@@ -17,10 +17,8 @@ function Coin:init()
 	self:setImage(image)
 	self:setCenter(0, 0)
 	self:setCollideRect(self:getBounds())
-	self:setGroups(collisionGroups.static)
 	
 	self.hasBeenGrabbed = false
-	
 end
 
 function Coin:loadConfig(config)

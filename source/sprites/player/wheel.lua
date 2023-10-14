@@ -2,6 +2,7 @@ import "engine"
 import "constant/images"
 import "constant/collisionGroups"
 import "constant/spriteTypes"
+import "playdate"
 
 class("Wheel").extends(Sprite)
 
@@ -25,23 +26,20 @@ function Wheel:init()
 	images = getImageTable(kImages.wheel, 12)
 	self:setImage(images[1])
 	self:setCenter(0, 0)
-	self:setGroups(collisionGroups.moving)
-	self:setCollidesWithGroups(collisionGroups.static)
 	
 	self.type = spriteTypes.player
 	
 	self:setCollideRect(self:getBounds())
 	
-	-- Collisions Response
+	self.collisionResponse = function(self, other)
+		if other.type == spriteTypes.platform then
+			return kCollisionResponse.slide
+		end
+		
+		return kCollisionResponse.overlap
+	end
 	
-	self:setCollidesWith(spriteTypes.platform, collisionTypes.slide)
-	self:setCollidesWith(spriteTypes.coin, collisionTypes.overlap)
-	self:setCollidesWith(spriteTypes.killBlock, collisionTypes.overlap)
-	self:setCollidesWith(spriteTypes.wind, collisionTypes.overlap)
-	self:setCollidesWith(spriteTypes.levelEnd, collisionTypes.overlap)
-	self:setCollidesWith(spriteTypes.checkpoint, collisionTypes.overlap)
-	
-	self:activateCollisionResponse()
+	-- Samples
 	
 	self:initializeSamples()
 	
@@ -119,22 +117,22 @@ function Wheel:update()
 	
 	self.velocityX += self.currentWindPower
 	
+	-- Reset values that get re-calculated
+	
+	self.currentWindPower = 0
+	self.touchingGround = false
+	
 	-- Update position according to velocity
+	
 	local actualX, actualY, collisions, length = self:moveWithCollisions(
 		self.x + self.velocityX, 
 		self.y + self.velocityY
 	)
 
-	-- Reset values before collision update
-	
-	self.currentWindPower = 0
-	self.touchingGround = false
-	
 	-- Collisions-based updates
 	
-	local collisions = collisionHandler:getCollisionsForSprite(self)
-	
-	for target, collision in pairs(collisions) do
+	for _, collision in pairs(collisions) do
+		local target = collision.other
 		if target.type == spriteTypes.platform then
 			if collision.normal.x ~= 0 then 
 				--horizontal collision
