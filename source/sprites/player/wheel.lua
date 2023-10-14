@@ -1,7 +1,7 @@
 import "engine"
-import "components/images"
-import "components/collisionGroups"
-import "components/spriteTypes"
+import "constant/images"
+import "constant/collisionGroups"
+import "constant/spriteTypes"
 
 class("Wheel").extends(Sprite)
 

@@ -1,5 +1,5 @@
 import "engine"
-import "components/images"
+import "constant/images"
 
 class("Checkpoint").extends(Sprite)
 

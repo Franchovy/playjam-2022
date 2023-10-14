@@ -1,6 +1,6 @@
 import "engine"
 import "CoreLibs/timer"
-import "components/images"
+import "constant/images"
 
 class('Wind').extends(Sprite)
 

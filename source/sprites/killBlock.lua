@@ -1,7 +1,7 @@
 import "engine"
-import "components/images"
-import "components/spriteTypes"
-import "components/collisionGroups"
+import "constant/images"
+import "constant/spriteTypes"
+import "constant/collisionGroups"
 
 class('KillBlock').extends(Sprite)
 
