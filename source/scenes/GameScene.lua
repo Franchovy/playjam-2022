@@ -156,7 +156,7 @@ function GameScene:present()
 	
 	self.gameState = gameStates.readyToStart
 	
-	-- Initialize Sprite cycling using initial wheel position
+	-- Initialize sprite cycling using initial wheel position
 	
 	local initialChunk = spriteCycler:getFirstInstanceChunk("player")
 	spriteCycler:loadInitialSprites(initialChunk, 1)

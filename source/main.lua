@@ -28,7 +28,7 @@ function playdate.update()
 	-- Game Update
 
 	timer.updateTimers()
-	Sprite.update()
+	sprite.update()
 	frameTimer.updateTimers()
 
 	-- State management

@@ -1,5 +1,4 @@
 import "sampleplayer"
-import "sprite/sprite"
 import "scene"
 import "scenemanager"
 import "fileplayer"

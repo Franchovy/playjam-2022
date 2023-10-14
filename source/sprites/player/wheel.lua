@@ -1,10 +1,9 @@
 import "engine"
-import "constant/images"
-import "constant/collisionGroups"
-import "constant/spriteTypes"
+import "constant"
+import "utils/images"
 import "playdate"
 
-class("Wheel").extends(Sprite)
+class("Wheel").extends(playdate.sprite)
 
 import "speed"
 import "sounds"

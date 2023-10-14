@@ -1,6 +1,6 @@
 import "engine"
 
-class("Score").extends(Sprite)
+class("Score").extends(playdate.sprite)
 
 function Score.new(scoreText)
 	return Score(scoreText)

@@ -10,7 +10,7 @@ local sampleSelectFail <const> = "menu-select-fail"
 local textHeight = nil;
 local menuWidth = nil;
 
-class("Menu").extends(Sprite)
+class("Menu").extends(playdate.sprite)
 
 function Menu.new(options)
 	return Menu(options)

@@ -1,9 +1,7 @@
 import "engine"
-import "constant/images"
-import "constant/spriteTypes"
-import "constant/collisionGroups"
+import "constant"
 
-class('Platform').extends(Sprite)
+class('Platform').extends(playdate.sprite)
 
 -------------------------
 -- Structs
@@ -65,7 +63,7 @@ function Platform:init(width, height, isMoving)
 	self:setCollideRect(0, 0, self:getSize())
 	
 	----------------
-	-- Set up Sprite
+	-- Set up sprite
 	
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)

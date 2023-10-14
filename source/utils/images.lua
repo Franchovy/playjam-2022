@@ -1,19 +1,12 @@
+
+
 import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "extensions"
 
 local graphics <const> = playdate.graphics
 
-kImages = {}
-
 local imageFolderPath = "images/sprites/"
-
-kImages.wheel = "wheel"
-kImages.wind = "images/sprites/wind/wind"
-kImages.coin = "images/sprites/coin"
-kImages.killBlock = "images/sprites/killBlock"
-kImages.levelEnd = "images/sprites/portal"
-kImages.checkpoint = "images/sprites/checkpoint/checkpoint"
 
 function getImageTable(name, count)
 	local folderPath = imageFolderPath..name
@@ -30,6 +23,7 @@ function getImageTable(name, count)
 	return images
 end
 
+-- Note: this would be a good sprite callback property, from (state) -> image.
 function getImageForState(imagePath, state)
 	local imagePathState = imagePath
 	for k, v in pairs(state) do

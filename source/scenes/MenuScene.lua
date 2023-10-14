@@ -52,7 +52,7 @@ function MenuScene:load()
 	self:setCenter(0, 0)
 	self:setImage(makeBackgroundImage())
 	
-	-- Create Menu Sprite
+	-- Create Menu sprite
 	
 	menu = Menu(options)
 	

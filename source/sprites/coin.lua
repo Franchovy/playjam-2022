@@ -1,9 +1,7 @@
 import "engine"
-import "constant/images"
-import "constant/spriteTypes"
-import "constant/collisionGroups"
+import "constant"
 
-class('Coin').extends(Sprite)
+class('Coin').extends(playdate.sprite)
 
 function Coin.new() 
 	return Coin()

@@ -53,7 +53,7 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload)
 			for _, object in pairs(chunkData) do
 				local shouldRecycle = true
 				if self.spritesToRecycle[object.id] == nil then
-					-- Sprite is not registered as recyclable
+					-- sprite is not registered as recyclable
 					shouldRecycle = false
 				end
 				
@@ -78,7 +78,7 @@ end
 
 function getRecycledSprite(self, id) 
 	if self.spritesToRecycle[id] == nil then
-		-- Sprite is not registered as recyclable
+		-- sprite is not registered as recyclable
 		return nil
 	end
 	
@@ -93,7 +93,7 @@ end
 
 function recycleSprite(self, sprite, id)
 	if self.spritesToRecycle[id] == nil then
-		-- Sprite is not registered for recycling
+		-- sprite is not registered for recycling
 		return
 	end
 	

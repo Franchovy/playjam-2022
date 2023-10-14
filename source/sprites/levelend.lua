@@ -1,9 +1,7 @@
 import "engine"
-import "constant/images"
-import "constant/spriteTypes"
-import "constant/collisionGroups"
+import "constant"
 
-class("LevelEnd").extends("Sprite")
+class("LevelEnd").extends(playdate.sprite)
 
 function LevelEnd.new()
 	return LevelEnd()

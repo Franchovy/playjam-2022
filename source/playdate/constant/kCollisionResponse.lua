@@ -1,10 +1,6 @@
-import "CoreLibs/sprites"
-
-local sprite <const> = playdate.graphics.sprite
-
 kCollisionResponse = {
-	overlap = sprite.kCollisionTypeOverlap,
-	slide = sprite.kCollisionTypeSlide,
-	bounce = sprite.kCollisionTypeBounce,
-	freeze = sprite.kCollisionTypeFreeze
+	overlap = playdate.sprite.kCollisionTypeOverlap,
+	slide = playdate.sprite.kCollisionTypeSlide,
+	bounce = playdate.sprite.kCollisionTypeBounce,
+	freeze = playdate.sprite.kCollisionTypeFreeze
 }

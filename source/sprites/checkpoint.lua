@@ -1,7 +1,9 @@
 import "engine"
-import "constant/images"
+import "constant"
+import "utils/images"
+import "playdate"
 
-class("Checkpoint").extends(Sprite)
+class("Checkpoint").extends(playdate.sprite)
 
 local kStateKeys = { isSet = "isSet" }
 
@@ -44,7 +46,7 @@ function Checkpoint:set()
 	self:setImageState()
 end
 
--- These Methods can be moved into "Sprite" once state management is well thought-out.
+-- These Methods can be moved into "sprite" once state management is well thought-out.
 
 function Checkpoint:setInitialState(state)
 	self._stateInitial = state

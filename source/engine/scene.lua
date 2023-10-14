@@ -1,10 +1,11 @@
 import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/sprites"
+import "playdate"
 
 local gfx <const> = playdate.graphics
 
-class("Scene").extends(gfx.sprite)
+class("Scene").extends(playdate.sprite)
 
 local allScenes = {}
 Scene.currentActiveScene = nil

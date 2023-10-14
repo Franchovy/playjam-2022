@@ -1,6 +1,6 @@
 import "engine"
 
-class("ParalaxBackground").extends(gfx.sprite)
+class("ParalaxBackground").extends(playdate.sprite)
 
 
 function ParalaxBackground.new()
