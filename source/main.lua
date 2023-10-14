@@ -20,8 +20,6 @@ function initialize()
 end
 
 function playdate.update()
-	playdate.drawFPS(60, 10)
-	
 	gfx.sprite.redrawBackground()
 
 	-- Random Seed (for generating random numbers)
@@ -36,6 +34,9 @@ function playdate.update()
 	-- State management
 	
 	updateScenes()
+	
+	playdate.drawFPS(10, 10)
+		
 end
 
 function onMenuScene()
@@ -49,7 +50,8 @@ function isGameSceneOver()
 end
 
 function transitionToGameOverScene()
-	sceneManager:switchScene(scenes.gameover, function () end)
+	local gameScene = sceneManager.currentScene
+	sceneManager:switchScene(scenes.gameover, function () gameScene:destroy() end)
 end
 
 function onGameOverScene()

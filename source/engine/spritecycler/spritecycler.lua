@@ -92,4 +92,8 @@ function SpriteCycler:unloadAll()
 	local count = unloadSpritesInChunksIfNeeded(self, self.chunksLoaded)
 	print("Unloaded ".. count.. " sprites from level.")
 	self.chunksLoaded = {}
+	
+	self.data = {}
+	self.chunksLoaded = {}
+	self.spritesToRecycle = {}
 end

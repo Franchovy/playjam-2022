@@ -38,7 +38,7 @@ function Score:drawScore()
 	gfx.setLineWidth(2)
 	gfx.drawRoundRect(0, 0, width, height, 8)
 	-- Draw Score text
-	gfx.drawTextAligned(self.scoreText, horizontalMargin, verticalMargin, textAlignment.left)
+	--gfx.drawTextAligned(self.scoreText, horizontalMargin, verticalMargin, textAlignment.left)
 	gfx.popContext()
 	
 	self:setImage(image)

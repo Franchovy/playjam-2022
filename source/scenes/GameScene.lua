@@ -220,9 +220,9 @@ function GameScene:update()
 			
 			if self.config.level ~= nil then
 				local nextLevel = self.config.level + 1
-				onLevelComplete(nextLevel)
+				self:onLevelComplete(nextLevel)
 			else
-				onLevelComplete() 
+				self:onLevelComplete() 
 			end
 		end
 		
@@ -270,7 +270,7 @@ function GameScene:updateDrawOffset()
 	end
 end
 
-function onLevelComplete(nextLevel)
+function GameScene:onLevelComplete(nextLevel)
 
 	addLevelCompleteSprite()
 		
@@ -280,9 +280,9 @@ function onLevelComplete(nextLevel)
 			levelCompleteSprite = nil
 			
 			if nextLevel ~= nil and nextLevel < 4 then
-			    sceneManager:switchScene(scenes.game, function() end, GameConfig.getLevelConfig(nextLevel))
+			    sceneManager:switchScene(scenes.game, nil, GameConfig.getLevelConfig(nextLevel))
 			else 
-				sceneManager:switchScene(scenes.menu, function() end)
+				sceneManager:switchScene(scenes.menu, function() self:destroy() end)
 			end
 			
 		end
