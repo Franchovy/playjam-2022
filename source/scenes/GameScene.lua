@@ -1,6 +1,7 @@
 import "engine"
 import "config"
 import "utils/themes"
+import "utils/rect"
 
 class('GameScene').extends(Scene)
 
@@ -9,7 +10,8 @@ gameStates = {
 	loading = "Loading",
 	readyToStart = "ReadyToStart",
 	playing = "Playing",
-	ended = "Ended"
+	playerDied = "PlayerDied",
+	levelEnd = "LevelEnd"
 }
 
 local MAX_CHUNKS = 16
@@ -241,7 +243,7 @@ function GameScene:update()
 		-- Game State checking
 		
 		if self.wheel.hasJustDied then
-			self.gameState = gameStates.ended
+			self.gameState = gameStates.playerDied
 		end
 		
 		-- Update image score
@@ -282,10 +284,13 @@ function GameScene:onLevelComplete(nextLevel)
 		
 	timer.performAfterDelay(3000,
 		function ()
+			self.gameState = gameStates.levelEnd
+			
 			levelCompleteSprite:remove()
 			levelCompleteSprite = nil
 			
-			sceneManager:switchScene(scenes.menu, function() self:destroy() end)
+			drawLevelClearSprite()
+			--sceneManager:switchScene(scenes.menu, function() self:destroy() end)
 		end
 	)
 end
@@ -301,4 +306,41 @@ function addLevelCompleteSprite()
 
 	blinker = playdate.graphics.animation.blinker.new(300, 100)
 	blinker:startLoop()
+end
+
+function drawLevelClearSprite()
+	local bounds = playdate.display.getRect()
+	local x1, y1, width1, height1 = rectInsetBy(bounds, 30, 30)
+	local x2, y2, width2, height2 = rectInsetBy(bounds, 34, 36)
+	
+	local image = playdate.graphics.image.new(width1, height1)
+	
+	playdate.graphics.pushContext(image)
+	playdate.graphics.setColor(playdate.graphics.kColorBlack)
+	playdate.graphics.fillRoundRect(0, 0, width1, height1, 16)
+	playdate.graphics.setColor(playdate.graphics.kColorWhite)
+	playdate.graphics.fillRoundRect(x2 - x1, (y2 - y1) / 2, width2, height2, 18)
+	playdate.graphics.popContext()
+	
+	local sprite = playdate.graphics.sprite.new(image)
+	sprite:add()
+	sprite:setCenter(0, 0)
+	--sprite:setZIndex(100)
+	sprite:setIgnoresDrawOffset(true)
+	
+	local animationStartPosition = 240
+	local animationEndPosition = y1
+	
+	sprite:moveTo(x1, animationStartPosition)
+	
+	local animationTimer = playdate.timer.new(400, animationStartPosition, animationEndPosition, playdate.easingFunctions.inQuad)
+	
+	animationTimer.updateCallback = function(timer)
+		sprite:moveTo(x1, timer.value)
+	end
+	
+	animationTimer.timerEndedCallback = function(timer)
+		sprite:moveTo(x1, animationEndPosition)
+		timer:remove()
+	end
 end
