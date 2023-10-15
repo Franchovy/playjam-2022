@@ -174,7 +174,7 @@ function GameScene:update()
 	
 	if self.gameState == gameStates.readyToStart then
 		-- Awaiting player input (jump / crank)
-		if buttons.isUpButtonJustPressed() or (math.abs(playdate.getCrankChange()) > 5) then
+		if playdate.buttonIsPressed(playdate.kButtonA) or (math.abs(playdate.getCrankChange()) > 5) then
 			self.wheel:startGame()
 			
 			self.gameState = gameStates.playing

@@ -54,9 +54,9 @@ function GameOverScene:update()
 	
 	-- Detect player "press A"
 	if self.isFinishedTransitioning then
-		if buttons.isAButtonJustPressed() then
+		if playdate.buttonJustPressed(playdate.kButtonA) then
 			sceneManager:switchScene(scenes.game, function () end)
-		elseif buttons.isBButtonJustPressed() then
+		elseif playdate.buttonJustPressed(playdate.kButtonB) then
 			sceneManager:switchScene(scenes.menu, function () end)
 		end
 	end

@@ -39,12 +39,6 @@ function playdate.update()
 		
 end
 
-function onMenuScene()
-	if buttons.isAButtonJustPressed() then
-		
-	end
-end
-
 function isGameSceneOver()
 	return scenes.game.gameState == gameStates.ended
 end
@@ -54,27 +48,12 @@ function transitionToGameOverScene()
 	sceneManager:switchScene(scenes.gameover, function () gameScene:destroy() end)
 end
 
-function onGameOverScene()
-	if buttons.isAButtonPressed() then
-		-- Perform transition
-		
-	end
-end
 
 function updateScenes()
-	
-	if sceneManager.currentScene == scenes.menu then
-		onMenuScene()
-	end
-	
 	if sceneManager.currentScene == scenes.game then
 		if isGameSceneOver() then
 			transitionToGameOverScene()
 		end
-	end
-	
-	if sceneManager.currentScene == scenes.gameover then
-		onGameOverScene()
 	end
 end
 

@@ -48,19 +48,19 @@ end
 
 function Menu:update()
 	
-	if buttons.isButtonJustPressedAny(buttons.up, buttons.down, buttons.a, buttons.b) then
+	if playdate.buttonJustPressedAny(buttons.up, buttons.down, buttons.a, buttons.b) then
 		local success
 		 
-		if buttons.isButtonJustPressed(buttons.up) then
+		if playdate.buttonJustPressed(playdate.kButtonUp) then
 			success = self:indexDecrement()
 			
-		elseif buttons.isButtonJustPressed(buttons.down) then
+		elseif playdate.buttonJustPressed(playdate.kButtonDown) then
 			success = self:indexIncrement()
 			
-		elseif buttons.isButtonJustPressed(buttons.a) then
+		elseif playdate.buttonJustPressed(playdate.kButtonA) then
 			success = self:indexSelect()
 			
-		elseif buttons.isButtonJustPressed(buttons.b) then
+		elseif playdate.buttonJustPressed(playdate.kButtonB) then
 			success = self:indexReturn()
 		end
 		
@@ -70,8 +70,8 @@ function Menu:update()
 		else 
 			sampleplayer:playSample(sampleSelectFail)
 		end
-	elseif buttons.isButtonJustPressedAny() then
-		sampleplayer:play(sampleSelectFail)
+	elseif playdate.buttonJustPressedAny() then
+		sampleplayer:playSample(sampleSelectFail)
 	end
 end
 

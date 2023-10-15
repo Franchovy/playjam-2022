@@ -95,11 +95,11 @@ function Wheel:update()
 	-- Has just pressed jump
 	-- Is holding jump (Jump timer)
 
-	if buttons.isUpButtonJustReleased() and self:isJumping() then
+	if playdate.buttonJustReleased(playdate.kButtonUp) and self:isJumping() then
 		self:endJump()
 	end
 	
-	if buttons.isUpButtonPressed() then
+	if playdate.buttonIsPressed(playdate.kButtonUp) then
 		self:applyJump()
 	end
 	

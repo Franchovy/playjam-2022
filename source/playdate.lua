@@ -1,4 +1,10 @@
 
+-- OBJECT / GENERIC
+
+import "CoreLibs/object"
+
+import "playdate/extensions/buttons"
+
 -- SPRITES
 
 import "CoreLibs/sprites"
