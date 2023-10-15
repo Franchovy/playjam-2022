@@ -11,6 +11,7 @@ local acceptsRestart = false
 
 function initialize()
 	gfx.setFont(gfx.font.new(kAssetsFonts.twinbee))
+	gfx.setFontTracking(1)
 	createLevelPathIfNeeded()
 	
 	-- Create game state manager

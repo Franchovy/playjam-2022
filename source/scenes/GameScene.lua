@@ -1,6 +1,7 @@
 import "engine"
 import "config"
 import "utils/themes"
+import "utils/text"
 import "utils/rect"
 
 class('GameScene').extends(Scene)
@@ -316,16 +317,42 @@ function drawLevelClearSprite()
 	local image = playdate.graphics.image.new(width1, height1)
 	
 	playdate.graphics.pushContext(image)
+	
+	-- Frame
+	
 	playdate.graphics.setColor(playdate.graphics.kColorBlack)
 	playdate.graphics.fillRoundRect(0, 0, width1, height1, 16)
 	playdate.graphics.setColor(playdate.graphics.kColorWhite)
 	playdate.graphics.fillRoundRect(x2 - x1, (y2 - y1) / 2, width2, height2, 18)
+	
+	gfx.setFontTracking(1)
+	local textImageTitle = createTextImage("LEVEL COMPLETE"):scaledImage(2)
+	
+	gfx.setFontTracking(1)
+	local textImageCoinsLabel = createTextImage("COINS"):scaledImage(1.7)
+	local textImageTimeLabel = createTextImage("TIME"):scaledImage(1.7)
+	gfx.setFontTracking(0)
+	local textImageCoinsValue = createTextImage("".. 40 .. "/".. 40):scaledImage(2)
+	local textImageTimeValue = createTextImage("02:00".. "/".. "02:00"):scaledImage(2)
+	
+	local widthTitle, _ = textImageTitle:getSize()
+	textImageTitle:draw((width1 - widthTitle) / 2, 10)
+	
+	local widthCoinsLabel, heightCoinsLabel = textImageCoinsLabel:getSize()
+	local widthCoinsValue, heightCoinsValue = textImageCoinsValue:getSize()
+	textImageCoinsLabel:draw(20 + (widthCoinsValue - widthCoinsLabel) / 2, height1 - heightCoinsLabel - 10 - heightCoinsValue - 20)
+	textImageCoinsValue:draw(20, height1 - heightCoinsValue - 20)
+	
+	local widthTimeLabel, heightTimeLabel = textImageTimeLabel:getSize()
+	local widthTimeValue, heightTimeValue = textImageTimeValue:getSize()
+	textImageTimeLabel:draw(width1 - widthTimeValue + (widthTimeValue - widthTimeLabel) / 2 - 20, height1 - heightTimeLabel - 10 - heightCoinsValue - 20)
+	textImageTimeValue:draw(width1 - widthTimeValue - 20, height1 - heightTimeValue - (heightCoinsValue - heightTimeValue) / 2 - 20)
+	
 	playdate.graphics.popContext()
 	
 	local sprite = playdate.graphics.sprite.new(image)
 	sprite:add()
 	sprite:setCenter(0, 0)
-	--sprite:setZIndex(100)
 	sprite:setIgnoresDrawOffset(true)
 	
 	local animationStartPosition = 240

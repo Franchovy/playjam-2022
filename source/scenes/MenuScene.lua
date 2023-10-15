@@ -1,5 +1,5 @@
 import "engine"
-import "utils/spriteText"
+import "utils/text"
 import "utils/level"
 import "menu/menu"
 import "scenes"

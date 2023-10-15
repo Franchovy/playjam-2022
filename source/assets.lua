@@ -29,6 +29,6 @@ kAssetsTracks = {
 }
 
 kAssetsFonts = {
-	twinbee = dirFonts.."Twinbee",
-	marbleMadness = dirFonts.."Marble Madness [unused 1]"
+	twinbee = dirFonts.."Twinbee (1)",
+	marbleMadness = dirFonts.."Marble Madness [unused 1] (1)"
 }
