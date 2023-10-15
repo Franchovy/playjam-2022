@@ -1,6 +1,5 @@
 import "engine"
 import "level/levels"
-import "level/gameConfig"
 import "config"
 
 class('GameScene').extends(Scene)
@@ -211,12 +210,7 @@ function GameScene:update()
 		
 		if self.wheel.hasReachedLevelEnd and levelCompleteSprite == nil then
 			
-			if self.config.level ~= nil then
-				local nextLevel = self.config.level + 1
-				self:onLevelComplete(nextLevel)
-			else
-				self:onLevelComplete() 
-			end
+			self:onLevelComplete()
 		end
 		
 		-- Camera movement based on wheel position
@@ -270,12 +264,7 @@ function GameScene:onLevelComplete(nextLevel)
 			levelCompleteSprite:remove()
 			levelCompleteSprite = nil
 			
-			if nextLevel ~= nil and nextLevel < 4 then
-			    sceneManager:switchScene(scenes.game, nil, GameConfig.getLevelConfig(nextLevel))
-			else 
-				sceneManager:switchScene(scenes.menu, function() self:destroy() end)
-			end
-			
+			sceneManager:switchScene(scenes.menu, function() self:destroy() end)
 		end
 	)
 end

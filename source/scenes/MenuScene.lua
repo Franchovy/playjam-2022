@@ -2,7 +2,6 @@ import "engine"
 import "utils/spriteText"
 import "utils/level"
 import "level/levels"
-import "level/gameConfig"
 import "menu/menu"
 import "scenes"
 
@@ -13,22 +12,22 @@ local menu = nil
 options = {
 	{
 		title = "PLAY",
-		callback = function() startGame(1) end
+		callback = function() end
 	},
 	{
 		title = "SELECT LEVEL",
 		menu = {
 			{
 				title = "1 COUNTRY",
-				callback = function() startGame(1) end
+				callback = function() end
 			},
 			{
 				title = "2 SPACE",
-				callback = function() startGame(2) end
+				callback = function() end
 			},
 			{
 				title = "3 CITY",
-				callback = function() startGame(3) end
+				callback = function() end
 			},
 		}
 	},
@@ -83,14 +82,6 @@ function MenuScene:destroy()
 end
 
 -- Local Functions
-
-function startGame(level)
-	--loadAllScenes()
-	
-	print("Starting game with theme: ".. level)
-	
-	--sceneManager:switchScene(scenes.game, nil, GameConfig.getLevelConfig(level))
-end
 
 function startCustomGame(fileName)
 	loadAllScenes()
