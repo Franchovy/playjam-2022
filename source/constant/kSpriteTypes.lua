@@ -1,5 +1,5 @@
 
-spriteTypes = {
+kSpriteTypes = {
 	coin = "Coin",
 	player = "Wheel",
 	platform = "Platform",

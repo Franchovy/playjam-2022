@@ -9,7 +9,7 @@ end
 
 function Platform:init(width, height)
 	Platform.super.init(self, gfx.image.new(width, height))
-	self.type = spriteTypes.platform
+	self.type = kSpriteTypes.platform
 	local image = gfx.image.new("images/sprites/platform")
 	self:setImage(image)
 	self:setCollideRect(0, 0, self:getSize())

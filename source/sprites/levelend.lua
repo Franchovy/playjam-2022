@@ -9,7 +9,7 @@ end
 
 function LevelEnd:init()
 	LevelEnd.super.init(self)
-	self.type = spriteTypes.levelEnd
+	self.type = kSpriteTypes.levelEnd
 	
 	local image = gfx.image.new(kImages.levelEnd)
 	self:setImage(image)

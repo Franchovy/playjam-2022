@@ -16,7 +16,7 @@ function Checkpoint:init()
 	
 	-- Legacy, to abstract away
 	
-	self.type = spriteTypes.checkpoint
+	self.type = kSpriteTypes.checkpoint
 	self:setCenter(0, 0)
 	
 	-- State

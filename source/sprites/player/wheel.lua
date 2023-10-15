@@ -26,12 +26,12 @@ function Wheel:init()
 	self:setImage(images[1])
 	self:setCenter(0, 0)
 	
-	self.type = spriteTypes.player
+	self.type = kSpriteTypes.player
 	
 	self:setCollideRect(self:getBounds())
 	
 	self.collisionResponse = function(self, other)
-		if other.type == spriteTypes.platform then
+		if other.type == kSpriteTypes.platform then
 			return kCollisionResponse.slide
 		end
 		
@@ -126,7 +126,7 @@ function Wheel:update()
 	
 	for _, collision in pairs(collisions) do
 		local target = collision.other
-		if target.type == spriteTypes.platform then
+		if target.type == kSpriteTypes.platform then
 			if collision.normal.x ~= 0 then 
 				--horizontal collision
 				self.velocityX = 0
@@ -137,21 +137,21 @@ function Wheel:update()
 				
 				self:resetJumpState()
 			end
-		elseif target.type == spriteTypes.coin then
+		elseif target.type == kSpriteTypes.coin then
 			if target:isVisible() and self:alphaCollision(target) then
 				-- Win some points
 				self:onGrabbedCoin(target)
 			end
-		elseif target.type == spriteTypes.killBlock then
+		elseif target.type == kSpriteTypes.killBlock then
 			if self:alphaCollision(target) then
 				-- Die
 				self:setIsDead()
 			end
-		elseif target.type == spriteTypes.checkpoint then
+		elseif target.type == kSpriteTypes.checkpoint then
 			if not target:isSet() then
 				target:set()
 			end
-		elseif target.type == spriteTypes.levelEnd then
+		elseif target.type == kSpriteTypes.levelEnd then
 			if self:alphaCollision(target) then
 				-- Die
 				self.hasReachedLevelEnd = true

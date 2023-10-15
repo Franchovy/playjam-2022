@@ -1,4 +1,4 @@
-import "constant/collisionGroups"
+import "constant/kCollisionGroups"
 import "constant/kImages"
-import "constant/spriteTypes"
+import "constant/kSpriteTypes"
 

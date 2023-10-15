@@ -10,7 +10,7 @@ end
 
 function KillBlock:init()
 	KillBlock.super.init(self)
-	self.type = spriteTypes.killBlock
+	self.type = kSpriteTypes.killBlock
 	print(thisIsMyTestVariable)
 	local image = gfx.image.new(kImages.killBlock)
 	self:setImage(image)

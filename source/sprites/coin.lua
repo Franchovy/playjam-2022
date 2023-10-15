@@ -9,7 +9,7 @@ end
 
 function Coin:init()
 	Coin.super.init(self)
-	self.type = spriteTypes.coin
+	self.type = kSpriteTypes.coin
 	
 	local image = gfx.image.new(kImages.coin)
 	self:setImage(image)
