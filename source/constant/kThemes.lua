@@ -1,0 +1,20 @@
+kThemes = {
+	{
+		"MOUNTAIN",
+		"assets/tracks/mountain",
+		"assets/images/backgrounds/mountain", 
+		5
+	},
+	{
+		"SPACE",
+		"assets/tracks/space",
+		"assets/images/backgrounds/space", 
+		5
+	},
+	{
+		"CITY",
+		"assets/tracks/city",
+		"assets/images/backgrounds/city", 
+		4
+	}
+}

@@ -16,15 +16,15 @@ function ParalaxBackground:init()
 	self:setIgnoresDrawOffset(true)
 end
 
-function ParalaxBackground:loadForTheme(theme)
-	local theme = theme:getParalaxImages()
+function ParalaxBackground:loadTheme(theme)
+	local images = getParalaxImagesForTheme(theme)
 	
 	-- Assign background Image (to draw on)
-	self.backgroundImage = theme.background
+	self.backgroundImage = images.background
 	
 	-- Initialize Properties
 	
-	self.images = theme.images
+	self.images = images.images
 	
 	self.paralaxRatios = {}
 	self.imageOffsets = {}

@@ -1,6 +1,6 @@
 import "engine"
-import "level/levels"
 import "config"
+import "utils/themes"
 
 class('GameScene').extends(Scene)
 
@@ -92,15 +92,15 @@ function GameScene:load(level)
 	
 	-- Draw Background
 	
-	local theme = self.config.theme
+	local themeId = self.config.theme
 	
-	if theme ~= 0 then
-		self.levelTheme = levels[theme]
+	if themeId ~= 0 then
+		self.theme = kThemes[themeId]
 	end
 	
-	if AppConfig.enableParalaxBackground and self.levelTheme ~= nil then
+	if AppConfig.enableParalaxBackground and self.theme ~= nil then
 		self.background = ParalaxBackground.new()
-		self.background:loadForTheme(self.levelTheme)
+		self.background:loadTheme(self.theme)
 		
 		self.background:setParalaxDrawingRatios()
 	end
@@ -136,7 +136,7 @@ function GameScene:present()
 	
 	-- Set background drawing callback
 	
-	if AppConfig.enableParalaxBackground and self.levelTheme ~= nil then
+	if AppConfig.enableParalaxBackground and self.theme ~= nil then
 		local callback = self.background:getBackgroundDrawingCallback()
 		
 		gfx.sprite.setBackgroundDrawingCallback(callback)
@@ -159,8 +159,9 @@ function GameScene:present()
 	
 	-- Play music
 	
-	if AppConfig.enableBackgroundMusic and self.levelTheme ~= nil then
-		self.filePlayer = FilePlayer(self.levelTheme:getMusicFilepath())
+	if AppConfig.enableBackgroundMusic and self.theme ~= nil then
+		local musicFilePath = getMusicFilepathForTheme(self.theme)
+		self.filePlayer = FilePlayer(musicFilePath)
 		
 		self.filePlayer:play()
 	end
@@ -177,7 +178,7 @@ function GameScene:update()
 	
 	-- Update background parallax based on current offset
 	
-	if AppConfig.enableParalaxBackground and self.levelTheme ~= nil then
+	if AppConfig.enableParalaxBackground and self.theme ~= nil then
 		self.background:setParalaxDrawOffset(drawOffsetX)
 	end
 	
@@ -234,7 +235,7 @@ function GameScene:dismiss()
 	
 	spriteCycler:unloadAll()
 	
-	if AppConfig.enableBackgroundMusic and self.levelTheme ~= nil then
+	if AppConfig.enableBackgroundMusic and self.theme ~= nil then
 		self.filePlayer:stop()
 	end
 	

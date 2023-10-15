@@ -1,7 +1,6 @@
 import "engine"
 import "utils/spriteText"
 import "utils/level"
-import "level/levels"
 import "menu/menu"
 import "scenes"
 
