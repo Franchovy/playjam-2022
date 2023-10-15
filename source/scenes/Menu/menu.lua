@@ -23,8 +23,8 @@ function Menu:init(options)
 	
 	-- Load Sound Effects
 	
-	sampleplayer:addSample(sampleSelect, "sfx/menu-select")
-	sampleplayer:addSample(sampleSelectFail, "sfx/menu-select-fail")
+	sampleplayer:addSample(sampleSelect, kAssetsSounds.menuSelect)
+	sampleplayer:addSample(sampleSelectFail, kAssetsSounds.menuSelectFail)
 	
 	-- Menu index
 	
@@ -195,36 +195,4 @@ function getMenuItemImage(text, isSelected)
 	gfx.popContext()
 	
 	return textImage
-end
-
-
-function makeBackgroundImage()	
-	local image = gfx.image.new(400, 200)
-	
-	gfx.pushContext(image)
-	
-	-- Print Title Texts
-	
-	gfx.setFont(gfx.font.new("fonts/Sans Bold/Cyberball"))
-	local titleTexts = {"WHEEL", "RUNNER"}
-	local titleImages = table.imap(titleTexts, function (i) return createTextImage(titleTexts[i]):scaledImage(5) end)
-	
-	local startPoint = { x = 170, y = 126 }
-	local endPoint = { x = 93, y = 179 }
-	for i, image in ipairs(titleImages) do
-		if i == 1 then
-			image:draw(startPoint.x, startPoint.y)
-		else
-			image:draw(endPoint.x, endPoint.y)
-		end
-	end
-	
-	-- Wheel image
-	
-	local imageWheel = gfx.image.new("images/menu/wheel"):scaledImage(2)
-	imageWheel:draw(75, 90)
-	
-	gfx.popContext()
-	
-	return image
 end

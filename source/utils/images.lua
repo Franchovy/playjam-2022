@@ -6,16 +6,11 @@ import "extensions"
 
 local graphics <const> = playdate.graphics
 
-local imageFolderPath <const> = "images/sprites/"
-
-function getImageTable(name, count)
-	local folderPath = imageFolderPath..name
-	
-	-- TODO: Verify folder exists, folder contents
+function getImageTable(path, count)
 	
 	local images = {}
 	for i=0,count-1 do
-		local imagePath = folderPath.."/"..name.."_"..i
+		local imagePath = path.."/"..i
 		local image = graphics.image.new(imagePath)
 		table.insert(images, image)
 	end

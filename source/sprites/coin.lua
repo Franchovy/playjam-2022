@@ -11,7 +11,7 @@ function Coin:init()
 	Coin.super.init(self)
 	self.type = kSpriteTypes.coin
 	
-	local image = gfx.image.new(kImages.coin)
+	local image = gfx.image.new(kAssetsImages.coin)
 	self:setImage(image)
 	self:setCenter(0, 0)
 	self:setCollideRect(self:getBounds())

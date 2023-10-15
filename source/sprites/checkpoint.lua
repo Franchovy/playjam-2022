@@ -32,7 +32,7 @@ function Checkpoint:init()
 	
 	-- Sound effects
 	
-	sampleplayer:addSample("set", "sfx/checkpoint_set")
+	sampleplayer:addSample("set", kAssetsSounds.checkpointSet)
 end
 
 function Checkpoint:isSet()
@@ -66,7 +66,7 @@ function Checkpoint:getStateValue(key)
 end
 
 function Checkpoint:setImageState()
-	local imagePath = getImageForState(kImages.checkpoint, self._state)
+	local imagePath = getImageForState(kAssetsImages.checkpoint, self._state)
 	local image = gfx.image.new(imagePath)
 	self:setImage(image)
 end

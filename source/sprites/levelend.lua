@@ -11,7 +11,7 @@ function LevelEnd:init()
 	LevelEnd.super.init(self)
 	self.type = kSpriteTypes.levelEnd
 	
-	local image = gfx.image.new(kImages.levelEnd)
+	local image = gfx.image.new(kAssetsImages.levelEnd)
 	self:setImage(image)
 	self:setCenter(0, 0)
 	self:setCollideRect(self:getBounds())

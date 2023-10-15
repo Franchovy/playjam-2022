@@ -42,18 +42,18 @@ end
 levels = {
 	Level.new(
 		"MOUNTAIN",
-		"music/mountain",
-		"images/backgrounds/mountain", 5
+		"assets/tracks/mountain",
+		"assets/images/backgrounds/mountain", 5
 	),
 	Level.new(
 		"SPACE",
-		"music/space",
-		"images/backgrounds/space", 5
+		"assets/tracks/space",
+		"assets/images/backgrounds/space", 5
 	),
 	Level.new(
 		"CITY",
-		"music/city",
-		"images/backgrounds/city", 4
+		"assets/tracks/city",
+		"assets/images/backgrounds/city", 4
 	)
 }
 

@@ -22,7 +22,7 @@ end
 function Wheel:init()
 	Wheel.super.init(self)
 	
-	images = getImageTable(kImages.wheel, 12)
+	images = getImageTable(kAssetsImages.wheel, 12)
 	self:setImage(images[1])
 	self:setCenter(0, 0)
 	

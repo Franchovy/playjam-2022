@@ -246,13 +246,11 @@ function GameScene:dismiss()
 		self.filePlayer:stop()
 	end
 	
-	self.periodicBlinker:pause()
+	self.periodicBlinker:destroy()
 end
 
 function GameScene:destroy()
 	Scene.destroy(self)
-	
-	self.periodicBlinker:destroy()
 end
 
 function GameScene:updateDrawOffset()

@@ -1,4 +1,5 @@
 import "engine.lua"
+import "assets"
 import "scenes/scenes"
 import "sprites/lib"
 import "utils/level"
@@ -9,7 +10,7 @@ local acceptsRestart = false
 
 
 function initialize()
-	gfx.setFont(gfx.font.new("fonts/Sans Bold/Cyberball"))
+	gfx.setFont(gfx.font.new(kAssetsFonts.cyberball))
 	createLevelPathIfNeeded()
 	
 	-- Create game state manager

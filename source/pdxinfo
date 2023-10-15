@@ -3,5 +3,5 @@ author=Franchovy
 description=Wheel Runner
 bundleID=io.Franchovy.wheelrunner
 version=1.0
-imagePath=images/
+imagePath=assets/images
 buildNumber=148

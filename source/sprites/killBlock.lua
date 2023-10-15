@@ -17,7 +17,7 @@ function KillBlock:init(periodicBlinker)
 	KillBlock.super.init(self)
 	self.type = kSpriteTypes.killBlock
 	
-	local image = gfx.image.new(kImages.killBlock)
+	local image = gfx.image.new(kAssetsImages.killBlock)
 	self:setImage(image)
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)
