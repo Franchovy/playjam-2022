@@ -10,7 +10,7 @@ local acceptsRestart = false
 
 
 function initialize()
-	gfx.setFont(gfx.font.new(kAssetsFonts.cyberball))
+	gfx.setFont(gfx.font.new(kAssetsFonts.twinbee))
 	createLevelPathIfNeeded()
 	
 	-- Create game state manager
