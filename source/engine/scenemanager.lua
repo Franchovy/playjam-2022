@@ -57,7 +57,6 @@ end
 
 function SceneManager:cleanup()
 	gfx.sprite.removeAll()
-	self:removeAllTimers()
 	gfx.setDrawOffset(0, 0)
 end
 
@@ -72,7 +71,7 @@ function SceneManager:startTransition(onHalfWay, onFinished)
 		-- Call on half way completion
 		onHalfWay()
 		
-		transitionTimer = self:wipeTransition(400, 0)
+		local transitionTimer = self:wipeTransition(400, 0)
 		transitionTimer.timerEndedCallback = function()
 			self.transitioning = false
 			self.transitionSprite:remove()
@@ -110,11 +109,4 @@ function SceneManager:createTransitionSprite()
 	transitionSprite:add()
 	self.transitionSprite = transitionSprite
 	return transitionSprite
-end
-
-function SceneManager:removeAllTimers()
-	local allTimers = timer.allTimers()
-	for _, timer in ipairs(allTimers) do
-		timer:remove()
-	end
 end

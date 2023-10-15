@@ -46,6 +46,10 @@ function GameScene:load(level)
 	
 	self.gameState = gameStates.loading
 	
+	-- Create periodic blinker
+	
+	self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
+	
 	-- Set up spritecycler
 	
 	local chunkLength = AppConfig["chunkLength"]
@@ -55,7 +59,6 @@ function GameScene:load(level)
 			
 		if sprite == nil then
 			-- Create sprites
-			
 			if id == "platform" then
 				sprite = Platform.new(GRID_SIZE, GRID_SIZE, false)
 			elseif id == "killBlock" then
@@ -76,9 +79,14 @@ function GameScene:load(level)
 			end
 		end
 		
-		sprite:loadConfig(config)
-		sprite:moveTo(GRID_SIZE * position.x, GRID_SIZE * position.y)
-		sprite:add()
+		if config ~= nil then
+			sprite:loadConfig(config)
+		end
+		
+		if position ~= nil then
+			sprite:moveTo(GRID_SIZE * position.x, GRID_SIZE * position.y)
+			sprite:add()
+		end
 		
 		return sprite
 	end)
@@ -88,6 +96,20 @@ function GameScene:load(level)
 	local levelConfig = importLevel(self.level)
 	assert(levelConfig)
 	spriteCycler:load(levelConfig)
+	spriteCycler:preloadSprites({
+		id = "platform",
+		count = 35
+	}, {
+		id = "killBlock",
+		count = 15
+	}, {
+		id = "coin",
+		count = 25
+	}, {
+		id = "checkpoint",
+		count = 1
+	})
+	
 	self.config = levelConfig
 	
 	-- Draw Background
@@ -129,8 +151,6 @@ function GameScene:present()
 	self.textImageScore:add()
 	
 	-- Start periodicBlinker for flashing animations
-	
-	self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
 	
 	self.periodicBlinker:start()
 	

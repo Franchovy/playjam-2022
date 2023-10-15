@@ -49,6 +49,18 @@ function SpriteCycler:load(levelConfig)
 	self.data = chunksData
 end
 
+function SpriteCycler:preloadSprites(...)
+	local spriteIdCountPairs = {...}
+	for _, v in pairs(spriteIdCountPairs) do
+		local id = v.id
+		local count = v.count
+		
+		for i=1,count do
+			createRecycledSprite(self, id)
+		end
+	end
+end
+
 -- Lifecycle
 
 function SpriteCycler:loadInitialSprites(initialChunkX, initialChunkY)

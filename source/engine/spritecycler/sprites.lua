@@ -76,6 +76,12 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload)
 	return count
 end
 
+function createRecycledSprite(self, id)
+	local sprite = self.createSpriteCallback(id)
+	
+	table.insert(self.spritesToRecycle[id], sprite)
+end
+
 function getRecycledSprite(self, id) 
 	if self.spritesToRecycle[id] == nil then
 		-- sprite is not registered as recyclable
