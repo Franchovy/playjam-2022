@@ -27,6 +27,7 @@ function playdate.update()
 
 	-- Game Update
 
+	playdate.graphics.animation.blinker.updateAll()
 	timer.updateTimers()
 	sprite.update()
 	frameTimer.updateTimers()
