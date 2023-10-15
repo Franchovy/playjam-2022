@@ -314,9 +314,9 @@ function drawLevelClearSprite()
 	local x1, y1, width1, height1 = rectInsetBy(bounds, 30, 30)
 	local x2, y2, width2, height2 = rectInsetBy(bounds, 34, 36)
 	
-	local image = playdate.graphics.image.new(width1, height1)
+	local imageCard = playdate.graphics.image.new(width1, height1)
 	
-	playdate.graphics.pushContext(image)
+	playdate.graphics.pushContext(imageCard)
 	
 	-- Frame
 	
@@ -329,8 +329,8 @@ function drawLevelClearSprite()
 	local textImageTitle = createTextImage("LEVEL COMPLETE"):scaledImage(2)
 	
 	gfx.setFontTracking(1)
-	local textImageCoinsLabel = createTextImage("COINS"):scaledImage(1.7)
-	local textImageTimeLabel = createTextImage("TIME"):scaledImage(1.7)
+	local textImageCoinsLabel = createTextImage("COINS"):scaledImage(1)
+	local textImageTimeLabel = createTextImage("TIME"):scaledImage(1)
 	gfx.setFontTracking(0)
 	local textImageCoinsValue = createTextImage("".. 40 .. "/".. 40):scaledImage(2)
 	local textImageTimeValue = createTextImage("02:00".. "/".. "02:00"):scaledImage(2)
@@ -340,20 +340,46 @@ function drawLevelClearSprite()
 	
 	local widthCoinsLabel, heightCoinsLabel = textImageCoinsLabel:getSize()
 	local widthCoinsValue, heightCoinsValue = textImageCoinsValue:getSize()
-	textImageCoinsLabel:draw(20 + (widthCoinsValue - widthCoinsLabel) / 2, height1 - heightCoinsLabel - 10 - heightCoinsValue - 20)
+	textImageCoinsLabel:draw(20 + (widthCoinsValue - widthCoinsLabel) / 2, height1 - heightCoinsLabel - 15 - heightCoinsValue - 20)
 	textImageCoinsValue:draw(20, height1 - heightCoinsValue - 20)
 	
 	local widthTimeLabel, heightTimeLabel = textImageTimeLabel:getSize()
 	local widthTimeValue, heightTimeValue = textImageTimeValue:getSize()
-	textImageTimeLabel:draw(width1 - widthTimeValue + (widthTimeValue - widthTimeLabel) / 2 - 20, height1 - heightTimeLabel - 10 - heightCoinsValue - 20)
+	textImageTimeLabel:draw(width1 - widthTimeValue + (widthTimeValue - widthTimeLabel) / 2 - 20, height1 - heightTimeLabel - 15 - heightCoinsValue - 20)
 	textImageTimeValue:draw(width1 - widthTimeValue - 20, height1 - heightTimeValue - (heightCoinsValue - heightTimeValue) / 2 - 20)
 	
 	playdate.graphics.popContext()
 	
-	local sprite = playdate.graphics.sprite.new(image)
+	local sprite = playdate.graphics.sprite.new(imageCard)
 	sprite:add()
 	sprite:setCenter(0, 0)
 	sprite:setIgnoresDrawOffset(true)
+	
+	-- Button Labels
+	
+	local buttonALabelText = createTextImage("A - RETRY")
+	local buttonALabel = createRoundedRectFrame(buttonALabelText, 4, 8, 3)
+	
+	local buttonBLabelText = createTextImage("B - LEVELS")
+	local buttonBLabel = createRoundedRectFrame(buttonBLabelText, 4, 8, 3)
+	
+	local buttonBLabelWidth, buttonBLabelHeight = buttonBLabel:getSize()
+	local buttonsImage = playdate.graphics.image.new(360, buttonBLabelHeight)
+	
+	playdate.graphics.pushContext(buttonsImage)
+	local margin = 44
+	buttonALabel:draw(0, 0)
+	buttonBLabel:draw(bounds.width - (margin * 2) - buttonBLabelWidth, 0)
+	
+	playdate.graphics.popContext(buttonsImage)
+	
+	local spriteButtons = playdate.graphics.sprite.new(buttonsImage)
+	spriteButtons:add()
+	spriteButtons:setCenter(0, 0)
+	spriteButtons:setIgnoresDrawOffset(true)
+	spriteButtons:moveTo(margin, bounds.height - 10 - buttonBLabelHeight)
+	
+	-- Animations
 	
 	local animationStartPosition = 240
 	local animationEndPosition = y1

@@ -43,7 +43,7 @@ function playdate.update()
 end
 
 function isGameSceneOver()
-	return scenes.game.gameState == gameStates.ended
+	return scenes.game.gameState == gameStates.playerDied
 end
 
 function transitionToGameOverScene()
