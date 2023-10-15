@@ -314,19 +314,30 @@ function drawLevelClearSprite()
 	local x1, y1, width1, height1 = rectInsetBy(bounds, 30, 30)
 	local x2, y2, width2, height2 = rectInsetBy(bounds, 34, 36)
 	
+	local imageCardBackground = playdate.graphics.image.new(width2, height2)
+	
+	playdate.graphics.pushContext(imageCardBackground)
+	
+	playdate.graphics.setColor(playdate.graphics.kColorWhite)
+	playdate.graphics.fillRoundRect(0, 0, width2, height2, 18)
+	
+	playdate.graphics.popContext()
+	
 	local imageCard = playdate.graphics.image.new(width1, height1)
 	
 	playdate.graphics.pushContext(imageCard)
 	
 	-- Frame
-	
+		
 	playdate.graphics.setColor(playdate.graphics.kColorBlack)
 	playdate.graphics.fillRoundRect(0, 0, width1, height1, 16)
-	playdate.graphics.setColor(playdate.graphics.kColorWhite)
+	playdate.graphics.setColor(playdate.graphics.kColorClear)
 	playdate.graphics.fillRoundRect(x2 - x1, (y2 - y1) / 2, width2, height2, 18)
 	
+	imageCardBackground:fadedImage(0.8, playdate.graphics.image.kDitherTypeDiagonalLine):draw(x2 - x1, (y2 - y1) / 2)
+	
 	gfx.setFontTracking(1)
-	local textImageTitle = createTextImage("LEVEL COMPLETE"):scaledImage(2)
+	local textImageTitle = createTextImage("LEVEL COMPLETE!"):scaledImage(2)
 	
 	gfx.setFontTracking(1)
 	local textImageCoinsLabel = createTextImage("COINS"):scaledImage(1)
@@ -358,10 +369,10 @@ function drawLevelClearSprite()
 	-- Button Labels
 	
 	local buttonALabelText = createTextImage("A - RETRY")
-	local buttonALabel = createRoundedRectFrame(buttonALabelText, 4, 8, 3)
+	local buttonALabel = createRoundedRectFrame(buttonALabelText, 4, 8, 5)
 	
 	local buttonBLabelText = createTextImage("B - LEVELS")
-	local buttonBLabel = createRoundedRectFrame(buttonBLabelText, 4, 8, 3)
+	local buttonBLabel = createRoundedRectFrame(buttonBLabelText, 4, 8, 5)
 	
 	local buttonBLabelWidth, buttonBLabelHeight = buttonBLabel:getSize()
 	local buttonsImage = playdate.graphics.image.new(360, buttonBLabelHeight)
@@ -377,7 +388,39 @@ function drawLevelClearSprite()
 	spriteButtons:add()
 	spriteButtons:setCenter(0, 0)
 	spriteButtons:setIgnoresDrawOffset(true)
-	spriteButtons:moveTo(margin, bounds.height - 10 - buttonBLabelHeight)
+	spriteButtons:moveTo(margin, bounds.height - 6 - buttonBLabelHeight)
+	
+	-- Stars
+	
+	local imageTable = playdate.graphics.imagetable.new(kAssetsImages.star)
+	local star1 = playdate.graphics.animation.loop.new(200, imageTable)
+	local star2 = playdate.graphics.animation.loop.new(200, imageTable)
+	local star3 = playdate.graphics.animation.loop.new(200, imageTable)
+	star1.paused = true
+	star2.paused = true
+	star3.paused = true
+	
+	local marginStar = 20
+	local starWidth, starHeight = imageTable:getImage(1):getSize()
+	
+	local starSprite = playdate.graphics.sprite.new()
+	starSprite:setSize(starWidth * 3 + marginStar * 2, starHeight)
+	starSprite:setCenter(0, 0)
+	starSprite:setIgnoresDrawOffset(true)
+	starSprite:setAlwaysRedraw(true)
+	
+	star1.paused = false
+	star2.paused = false
+	star3.paused = false
+	
+	starSprite.draw = function (self, x, y)
+		star1:draw(0, 0)
+		star2:draw(starWidth + marginStar, 0)
+		star3:draw((starWidth + marginStar) * 2, 0)
+	end
+	
+	starSprite:add()
+	starSprite:moveTo(70, 65)
 	
 	-- Animations
 	
@@ -385,6 +428,7 @@ function drawLevelClearSprite()
 	local animationEndPosition = y1
 	
 	sprite:moveTo(x1, animationStartPosition)
+	
 	
 	local animationTimer = playdate.timer.new(400, animationStartPosition, animationEndPosition, playdate.easingFunctions.inQuad)
 	

@@ -25,10 +25,7 @@ import "playdate/constant/kCollisionResponse"
 
 import "CoreLibs/animation"
 
--- Add update blinkers injection
-
 -- Timers
 
 import "CoreLibs/timer"
 
--- Add update timers injection
