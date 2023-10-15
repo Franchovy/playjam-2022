@@ -47,10 +47,6 @@ function GameScene:load(level)
 	
 	self.gameState = gameStates.loading
 	
-	-- BlinkerTimer to manage sprite flashing animation
-	
-	self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
-	
 	-- Set up spritecycler
 	
 	local chunkLength = AppConfig["chunkLength"]
@@ -134,6 +130,8 @@ function GameScene:present()
 	self.textImageScore:add()
 	
 	-- Start periodicBlinker for flashing animations
+	
+	self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
 	
 	self.periodicBlinker:start()
 	

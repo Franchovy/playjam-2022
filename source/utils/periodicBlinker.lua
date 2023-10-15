@@ -18,17 +18,18 @@ function periodicBlinker(blinkerConfig, delay)
 	
 	local timer = playdate.timer.new(timerDelay)
 	timer.repeats = true
-	timer.timerEndedArgs = {blinker}
+	timer.discardOnCompletion = false
 	
-	timer.timerEndedCallback = function(blinker) 
+	timer.timerEndedArgs = {blinker, timer}
+	timer.timerEndedCallback = function(blinker, timer) 
 		blinker:start()
-		
-		print("Callback!")
+		timer:reset()
+		timer:start()
 	end
 	
 	-- Timers start when initialized, so we pause and reset.
+
 	timer:pause()
-	timer:reset()
 	blinker:stop()
 	
 	-- Build periodicBlinker
@@ -43,8 +44,6 @@ function periodicBlinker(blinkerConfig, delay)
 	function periodicBlinker.start(self)
 		self.blinker:start()
 		self.timer:start()
-		
-		print("Start")	
 	end
 	
 	function periodicBlinker.update(self)
@@ -55,16 +54,12 @@ function periodicBlinker(blinkerConfig, delay)
 		end
 		
 		self.previousValue = self.blinker.on
-		
-		print("update: ".. (self.hasChanged and "true" or "false"))
 	end
 	
-	function periodicBlinker.pause(self)
-		self.timer:pause()
+	function periodicBlinker.stop(self)
 		self.timer:reset()
+		self.timer:pause()
 		self.blinker:stop()
-		
-		print("Pause")
 	end
 	
 	function periodicBlinker.destroy(self)
@@ -72,8 +67,6 @@ function periodicBlinker(blinkerConfig, delay)
 		self.timer = nil
 		self.blinker:remove()
 		self.blinker = nil
-		
-		print("Destroy")
 	end
 	
 	return periodicBlinker
