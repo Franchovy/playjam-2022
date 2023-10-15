@@ -208,6 +208,10 @@ function GameScene:update()
 	-- Updates sprites cycling
 	spriteCycler:update(-drawOffsetX / GRID_SIZE, drawOffsetY / GRID_SIZE)
 	
+	if not self.isFinishedTransitioning then
+		return
+	end
+	
 	-- On game start
 	
 	if self.gameState == gameStates.readyToStart then
@@ -251,6 +255,14 @@ function GameScene:update()
 		
 		self.textImageScore:setScoreText(self.wheel:getScoreText())
 	end
+	
+	if self.gameState == gameStates.levelEnd then
+		if playdate.buttonJustPressed(playdate.kButtonA) then
+			sceneManager:switchScene(scenes.menu, function() self:destroy() end)
+		elseif playdate.buttonJustPressed(playdate.kButtonB) then
+			sceneManager:switchScene(scenes.game, function () end)
+		end
+	end
 end
 
 function GameScene:dismiss()
@@ -291,7 +303,6 @@ function GameScene:onLevelComplete(nextLevel)
 			levelCompleteSprite = nil
 			
 			drawLevelClearSprite()
-			--sceneManager:switchScene(scenes.menu, function() self:destroy() end)
 		end
 	)
 end
@@ -368,10 +379,10 @@ function drawLevelClearSprite()
 	
 	-- Button Labels
 	
-	local buttonALabelText = createTextImage("A - RETRY")
+	local buttonALabelText = createTextImage("B - RETRY")
 	local buttonALabel = createRoundedRectFrame(buttonALabelText, 4, 8, 5)
 	
-	local buttonBLabelText = createTextImage("B - LEVELS")
+	local buttonBLabelText = createTextImage("A - LEVELS")
 	local buttonBLabel = createRoundedRectFrame(buttonBLabelText, 4, 8, 5)
 	
 	local buttonBLabelWidth, buttonBLabelHeight = buttonBLabel:getSize()
