@@ -48,7 +48,7 @@ end
 
 function Menu:update()
 	
-	if playdate.buttonJustPressedAny(buttons.up, buttons.down, buttons.a, buttons.b) then
+	if playdate.buttonJustPressedAny(playdate.kButtonUp, playdate.kButtonDown, playdate.kButtonA, playdate.kButtonB) then
 		local success
 		 
 		if playdate.buttonJustPressed(playdate.kButtonUp) then

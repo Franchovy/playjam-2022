@@ -272,6 +272,6 @@ function addLevelCompleteSprite()
 	levelCompleteSprite:add()
 	levelCompleteSprite:moveTo(10, 110)
 
-	blinker = gfx.blinker.default(300, 100)
+	blinker = playdate.graphics.animation.blinker.new(300, 100)
 	blinker:startLoop()
 end

@@ -1,11 +1,11 @@
 
--- OBJECT / GENERIC
+-- Object / Generic
 
 import "CoreLibs/object"
 
 import "playdate/extensions/buttons"
 
--- SPRITES
+-- Sprits
 
 import "CoreLibs/sprites"
 
@@ -21,3 +21,6 @@ end
 
 import "playdate/constant/kCollisionResponse"
 
+-- Animations
+
+import "CoreLibs/animation"

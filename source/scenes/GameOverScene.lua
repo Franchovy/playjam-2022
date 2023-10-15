@@ -23,10 +23,7 @@ function GameOverScene:load()
 	
 	-- Blinker
 	
-	self.pressAIndicatorBlinker = gfx.animation.blinker.new()
-	self.pressAIndicatorBlinker.default = false
-	self.pressAIndicatorBlinker.onDuration = 750
-	self.pressAIndicatorBlinker.offDuration = 600
+	self.pressAIndicatorBlinker = playdate.graphics.animation.blinker.new(750, 600, true, nil, false)
 end
 
 function GameOverScene:present()
