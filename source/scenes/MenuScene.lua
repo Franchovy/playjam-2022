@@ -1,5 +1,5 @@
 import "engine"
-import "services/sprite/text"
+import "utils/spriteText"
 import "utils/level"
 import "level/levels"
 import "level/gameConfig"

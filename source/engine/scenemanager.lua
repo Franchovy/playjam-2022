@@ -6,17 +6,6 @@ import "CoreLibs/easing"
 
 local gfx <const> = playdate.graphics
 
-local fadedRects = {}
-for i=0,1,0.01 do
-	local fadedImage = gfx.image.new(400, 240)
-	gfx.pushContext(fadedImage)
-		local filledRect = gfx.image.new(400, 240, gfx.kColorBlack)
-		filledRect:drawFaded(0, 0, i, gfx.image.kDitherTypeBayer8x8)
-	gfx.popContext()
-	fadedRects[math.floor(i * 100)] = fadedImage
-end
-fadedRects[100] = gfx.image.new(400, 240, gfx.kColorBlack)
-
 class('SceneManager').extends()
 
 function SceneManager:init()
@@ -76,11 +65,9 @@ function SceneManager:startTransition(onHalfWay, onFinished)
 	self.transitioning = true
 	self.currentScene.isFinishedTransitioning = false
 	
-	-- local transitionTimer = self:fadeTransition(0, 1)
 	local transitionTimer = self:wipeTransition(0, 400)
 
 	transitionTimer.timerEndedCallback = function()
-		-- transitionTimer = self:fadeTransition(1, 0)
 		
 		-- Call on half way completion
 		onHalfWay()
@@ -112,21 +99,6 @@ function SceneManager:wipeTransition(startValue, endValue)
 		transitionSprite:setClipRect(0, 0, timer.value, 240)
 	end
 	return transitionTimer
-end
-
-function SceneManager:fadeTransition(startValue, endValue)
-	local transitionSprite = self:createTransitionSprite()
-	transitionSprite:setImage(self:getFadedImage(startValue))
-
-	local transitionTimer = timer.new(self.transitionTime, startValue, endValue, easingFunctions.inOutCubic)
-	transitionTimer.updateCallback = function(timer)
-		transitionSprite:setImage(self:getFadedImage(timer.value))
-	end
-	return transitionTimer
-end
-
-function SceneManager:getFadedImage(alpha)
-	return fadedRects[math.floor(alpha * 100)]
 end
 
 function SceneManager:createTransitionSprite()

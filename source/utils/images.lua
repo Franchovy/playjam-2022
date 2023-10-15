@@ -1,12 +1,12 @@
-
-
 import "CoreLibs/object"
 import "CoreLibs/graphics"
+import "engine"
 import "extensions"
+
 
 local graphics <const> = playdate.graphics
 
-local imageFolderPath = "images/sprites/"
+local imageFolderPath <const> = "images/sprites/"
 
 function getImageTable(name, count)
 	local folderPath = imageFolderPath..name

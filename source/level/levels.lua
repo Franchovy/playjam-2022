@@ -1,5 +1,5 @@
 import "engine"
-import "services/image"
+import "utils/images"
 
 class("Level").extends()
 

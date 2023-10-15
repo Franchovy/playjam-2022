@@ -1,5 +1,5 @@
 import "engine"
-import "services/sprite/text"
+import "utils/spriteText"
 import "scenes"
 
 class('GameOverScene').extends(Scene)
