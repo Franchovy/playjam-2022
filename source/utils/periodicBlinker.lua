@@ -12,27 +12,69 @@ function periodicBlinker(blinkerConfig, delay)
 		blinkerConfig.default
 	)
 	
-	local blinkerDuration = (blinker.onDuration + blinker.offDuration) * blinker.cycles / 2
+	local blinkerDuration = (
+		blinker.onDuration + blinker.offDuration) * blinker.cycles / 2
 	local timerDelay = blinkerDuration + delay
 	
 	local timer = playdate.timer.new(timerDelay)
 	timer.repeats = true
-	timer.timerEndedArgs = {blinker, timer}
-	timer.timerEndedCallback = function(blinker, timer) 
-		timer:reset()
-		timer:start()
+	timer.timerEndedArgs = {blinker}
+	
+	timer.timerEndedCallback = function(blinker) 
 		blinker:start()
+		
+		print("Callback!")
 	end
 	
-	blinker:start()
-	timer:start()
+	-- Timers start when initialized, so we pause and reset.
+	timer:pause()
+	timer:reset()
+	blinker:stop()
 	
-	local destroyMethod = function()
-		timer:remove()
-		timer = nil
-		blinker:remove()
-		blinker = nil
+	-- Build periodicBlinker
+	
+	local periodicBlinker = {
+		timer = timer,
+		blinker = blinker,
+		hasChanged = false,
+		previousValue = blinker.on
+	}
+	
+	function periodicBlinker.start(self)
+		self.blinker:start()
+		self.timer:start()
+		
+		print("Start")	
 	end
 	
-	return timer, blinker, destroyMethod
+	function periodicBlinker.update(self)
+		if self.previousValue ~= self.blinker.on then
+			self.hasChanged = true
+		else 
+			self.hasChanged = false
+		end
+		
+		self.previousValue = self.blinker.on
+		
+		print("update: ".. (self.hasChanged and "true" or "false"))
+	end
+	
+	function periodicBlinker.pause(self)
+		self.timer:pause()
+		self.timer:reset()
+		self.blinker:stop()
+		
+		print("Pause")
+	end
+	
+	function periodicBlinker.destroy(self)
+		self.timer:remove()
+		self.timer = nil
+		self.blinker:remove()
+		self.blinker = nil
+		
+		print("Destroy")
+	end
+	
+	return periodicBlinker
 end

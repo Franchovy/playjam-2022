@@ -32,6 +32,27 @@ function GameScene:init()
 	
 	self.gameState = gameStates.created
 	
+	self.spritesLoaded = false
+end
+
+function GameScene:load(level)
+	Scene.load(self)
+	
+	-- Level nil check for restarting after Game Over
+	if level ~= nil then
+		self.level = level
+	end
+	
+	print("Game Scene Load")
+	
+	self.gameState = gameStates.loading
+	
+	-- BlinkerTimer to manage sprite flashing animation
+	
+	self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
+	
+	-- Set up spritecycler
+	
 	local chunkLength = AppConfig["chunkLength"]
 	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint"}
 	spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, config, spriteToRecycle)
@@ -43,7 +64,7 @@ function GameScene:init()
 			if id == "platform" then
 				sprite = Platform.new(GRID_SIZE, GRID_SIZE, false)
 			elseif id == "killBlock" then
-				sprite = KillBlock.new()
+				sprite = KillBlock.new(self.periodicBlinker)
 			elseif id == "coin" then
 				sprite = Coin.new()
 			elseif id == "checkpoint" then
@@ -67,24 +88,12 @@ function GameScene:init()
 		return sprite
 	end)
 	
-	self.spritesLoaded = false
-end
-
-function GameScene:load(level)
-	Scene.load(self)
-	
-	if level ~= nil then
-		self.level = level
-	end
-	
-	print("Game Scene Load")
+	-- Load Level Config
 	
 	local levelConfig = importLevel(self.level)
 	assert(levelConfig)
 	spriteCycler:load(levelConfig)
 	self.config = levelConfig
-	
-	self.gameState = gameStates.loading
 	
 	-- Draw Background
 	
@@ -124,6 +133,10 @@ function GameScene:present()
 	
 	self.textImageScore:add()
 	
+	-- Start periodicBlinker for flashing animations
+	
+	self.periodicBlinker:start()
+	
 	-- Set background drawing callback
 	
 	if AppConfig.enableParalaxBackground and self.levelTheme ~= nil then
@@ -160,6 +173,10 @@ function GameScene:update()
 	Scene.update(self)
 	
 	local drawOffsetX, drawOffsetY = gfx.getDrawOffset()
+	
+	-- Update periodicBlinker
+	
+	self.periodicBlinker:update()
 	
 	-- Update background parallax based on current offset
 	
@@ -228,10 +245,14 @@ function GameScene:dismiss()
 	if AppConfig.enableBackgroundMusic and self.levelTheme ~= nil then
 		self.filePlayer:stop()
 	end
+	
+	self.periodicBlinker:pause()
 end
 
 function GameScene:destroy()
 	Scene.destroy(self)
+	
+	self.periodicBlinker:destroy()
 end
 
 function GameScene:updateDrawOffset()
