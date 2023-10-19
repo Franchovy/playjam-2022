@@ -75,6 +75,10 @@ function GameScene:load(level)
 				sprite:resetValues()
 				sprite:setAwaitingInput()
 				self.wheel = sprite
+				
+				if self.previousLoadPoint ~= nil then
+					position = self.previousLoadPoint
+				end
 			elseif id == "levelEnd" then
 				sprite = LevelEnd.new()
 			else 
@@ -232,6 +236,13 @@ function GameScene:update()
 			if levelCompleteSprite ~= nil then	
 				levelCompleteSprite:setVisible(blinker.on)
 			end
+		end
+		
+		-- Touch Checkpoint: set new load point
+		
+		if self.wheel.hasTouchedNewCheckpoint == true then
+			local position = self.wheel:getRecentCheckpoint()
+			self.previousLoadPoint = { x = position.x / GRID_SIZE, y = position.y / GRID_SIZE }
 		end
 		
 		-- Level End Trigger

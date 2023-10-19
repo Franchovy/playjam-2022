@@ -57,6 +57,8 @@ function Wheel:resetValues()
 	self.score = 0
 	self.ignoresPlayerInput = true
 	self.hasReachedLevelEnd = false
+	self.hasTouchedNewCheckpoint = false
+	self._recentCheckpoint = nil
 end
 
 function Wheel:setIsDead() 
@@ -67,6 +69,11 @@ function Wheel:setIsDead()
 	self.ignoresPlayerInput = true
 	self.hasJustDied = true
 	sampleplayer:playSample("hurt")
+end
+
+function Wheel:getRecentCheckpoint()
+	self.hasTouchedNewCheckpoint = false
+	return self._recentCheckpoint
 end
 
 function Wheel:startGame()
@@ -150,6 +157,8 @@ function Wheel:update()
 		elseif target.type == kSpriteTypes.checkpoint then
 			if not target:isSet() then
 				target:set()
+				self.hasTouchedNewCheckpoint = true
+				self._recentCheckpoint = {x = target.x, y = target.y}
 			end
 		elseif target.type == kSpriteTypes.levelEnd then
 			if self:alphaCollision(target) then
