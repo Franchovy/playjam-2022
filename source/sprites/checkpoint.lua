@@ -21,14 +21,12 @@ function Checkpoint:init()
 	
 	-- State
 	
-	local state = {}
-	state[kStateKeys.isSet] = false
-	self:setInitialState(state)
+	self:reset()
 	
 	-- Set Image
 	
-	self:setImageState()
-	self:setCollideRect(self:getBounds())
+	self:updateImage()
+	self:setCollideRect(0, -240, 24, 480)
 	
 	-- Sound effects
 	
@@ -43,8 +41,34 @@ function Checkpoint:set()
 	sampleplayer:playSample("set")
 	
 	self:setStateValue(kStateKeys.isSet, true)
-	self:setImageState()
+	self:updateImage()
 end
+
+function Checkpoint:loadConfig(config)
+	Checkpoint.super.loadConfig(self, config)
+		
+	if config.isSet == nil then
+		config.isSet = false
+		
+		print("WARNING: [Checkpoint:loadConfig] - no config value for 'isSet'! Setting default value...")
+	end
+	
+	self:setStateValue(kStateKeys.isSet, config.isSet)
+	self:updateImage()
+end
+
+function Checkpoint:updateConfig(config)
+	config.isSet = self:getStateValue(kStateKeys.isSet)
+end
+
+function Checkpoint:reset()
+	local state = {}
+	state[kStateKeys.isSet] = false
+	self:setInitialState(state)
+	
+	self:updateImage()
+end
+
 
 -- These Methods can be moved into "sprite" once state management is well thought-out.
 
@@ -65,7 +89,7 @@ function Checkpoint:getStateValue(key)
 	return self._state[key]
 end
 
-function Checkpoint:setImageState()
+function Checkpoint:updateImage()
 	local imagePath = getImageForState(kAssetsImages.checkpoint, self._state)
 	local image = gfx.image.new(imagePath)
 	self:setImage(image)
