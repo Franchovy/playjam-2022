@@ -26,13 +26,15 @@ function loadSpritesInChunksIfNeeded(self, chunksToLoad)
 			local chunkData = self.data[chunk][1]
 			
 			for _, object in pairs(chunkData) do
-				local spriteToRecycle = getRecycledSprite(self, object.id)
-				object.sprite = self.createSpriteCallback(object.id, object.position, object.config, spriteToRecycle)
-				
-				count += 1
-				
-				if spriteToRecycle ~= nil then
-					recycledSpriteCount += 1
+				if self.spritesToRecycle[object.id] ~= nil or object.sprite == nil then
+					local spriteToRecycle = getRecycledSprite(self, object.id)
+					object.sprite = self.createSpriteCallback(object.id, object.position, object.config, spriteToRecycle)
+					
+					count += 1
+					
+					if spriteToRecycle ~= nil then
+						recycledSpriteCount += 1
+					end
 				end
 			end
 			
