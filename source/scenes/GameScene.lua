@@ -271,6 +271,7 @@ function GameScene:update()
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			sceneManager:switchScene(scenes.menu, function() self:destroy() end)
 		elseif playdate.buttonJustPressed(playdate.kButtonB) then
+			self.previousLoadPoint = nil
 			sceneManager:switchScene(scenes.game, function () end)
 		end
 	end
