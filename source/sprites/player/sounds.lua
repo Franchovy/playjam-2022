@@ -19,6 +19,10 @@ local previousVolume = nil
 local previousFrequency = nil
 
 function Wheel:playMovementBasedSounds(velocityFactor)
+	if AppConfig.sfx.disabled then
+		return
+	end
+	
 	if synth == nil then
 		local sample = playdate.sound.sample.new(kAssetsSounds.wheelMovement)
 		synth = playdate.sound.synth.new(sample)

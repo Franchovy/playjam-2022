@@ -14,6 +14,10 @@ function sampleplayer:addSample(name, filePath)
 end
 
 function sampleplayer:playSample(name, callback)
+	if AppConfig.sfx.disabled then
+		return 
+	end
+	
 	if callback then
 		self[name]:setFinishCallback(callback)
 	end
