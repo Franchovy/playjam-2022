@@ -1,6 +1,7 @@
 import "engine"
 import "utils/text"
-import "utils/level"
+import "constant"
+import "playdate"
 import "menu/menu"
 import "scenes"
 
@@ -47,8 +48,8 @@ function MenuScene:load()
 	
 	-- Draw Menu Background
 	
-	self:setCenter(0, 0)
-	self:setImage(makeBackgroundImage())
+	self._sprite:setCenter(0, 0)
+	self._sprite:setImage(makeBackgroundImage())
 	
 	-- Create Menu sprite
 	
@@ -118,8 +119,11 @@ function makeBackgroundImage()
 	return image
 end
 
-function loadCustomLevels() 
-	local levels = getLevelFiles()
+function loadCustomLevels()
+	playdate.file.mkdirIfNeeded(kFilePath.levels)
+	
+	local levels = playdate.file.listFiles(kFilePath.levels)
+	
 	if #levels == 0 then
 		return nil
 	end

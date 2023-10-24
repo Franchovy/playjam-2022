@@ -100,18 +100,22 @@ function GameScene:load(level)
 	
 	-- Load Level Config
 	
-	local levelConfig = importLevel(self.level)
+	local path = kFilePath.levels.."/"..self.level
+	local levelConfig = json.decodeFile(path)
+	
 	assert(levelConfig)
+	
 	spriteCycler:load(levelConfig)
+	
 	spriteCycler:preloadSprites({
 		id = "platform",
-		count = 35
+		count = 40
 	}, {
 		id = "killBlock",
-		count = 15
+		count = 10
 	}, {
 		id = "coin",
-		count = 25
+		count = 20
 	}, {
 		id = "checkpoint",
 		count = 1

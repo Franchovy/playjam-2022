@@ -5,7 +5,11 @@ import "CoreLibs/object"
 
 import "playdate/extensions/buttons"
 
--- Sprits
+-- File
+
+import "playdate/extensions/file"
+
+-- Sprites
 
 import "CoreLibs/sprites"
 
@@ -28,4 +32,3 @@ import "CoreLibs/animation"
 -- Timers
 
 import "CoreLibs/timer"
-
