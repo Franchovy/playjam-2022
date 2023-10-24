@@ -109,13 +109,13 @@ function GameScene:load(level)
 	
 	spriteCycler:preloadSprites({
 		id = "platform",
-		count = 40
+		count = 80
 	}, {
 		id = "killBlock",
-		count = 10
+		count = 30
 	}, {
 		id = "coin",
-		count = 20
+		count = 30
 	}, {
 		id = "checkpoint",
 		count = 1
