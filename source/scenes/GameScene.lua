@@ -199,8 +199,6 @@ function GameScene:present()
 end
 
 function GameScene:update()
-	Scene.update(self)
-	
 	local drawOffsetX, drawOffsetY = gfx.getDrawOffset()
 	
 	-- Update periodicBlinker

@@ -68,7 +68,7 @@ function MenuScene:present()
 end
 
 function MenuScene:update() 
-	Scene.update(self)
+	
 end
 
 function MenuScene:dismiss()

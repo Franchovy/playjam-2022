@@ -2,7 +2,6 @@ import "engine.lua"
 import "assets"
 import "scenes/scenes"
 import "sprites/lib"
-import "utils/level"
 import "notify"
 import "config"
 
@@ -12,12 +11,12 @@ local acceptsRestart = false
 function initialize()
 	gfx.setFont(gfx.font.new(kAssetsFonts.twinbee))
 	gfx.setFontTracking(1)
-	createLevelPathIfNeeded()
 	
 	-- Create game state manager
 	scenes.menu = MenuScene()
 	
 	-- Create Scene
+	-- * calls load and present
 	sceneManager:setCurrentScene(scenes.menu)
 end
 
@@ -29,6 +28,7 @@ function playdate.update()
 
 	-- Game Update
 
+	Scene.update()
 	playdate.graphics.animation.blinker.updateAll()
 	timer.updateTimers()
 	sprite.update()
@@ -39,7 +39,6 @@ function playdate.update()
 	updateScenes()
 	
 	playdate.drawFPS(10, 10)
-		
 end
 
 function isGameSceneOver()

@@ -42,8 +42,6 @@ function GameOverScene:present()
 end
 
 function GameOverScene:update() 
-	Scene.update(self)
-	
 	-- Update blinker display
 	
 	self.pressAIndicatorBlinker:update()

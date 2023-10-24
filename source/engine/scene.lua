@@ -5,7 +5,7 @@ import "playdate"
 
 local gfx <const> = playdate.graphics
 
-class("Scene").extends(playdate.sprite)
+class("Scene").extends()
 
 local allScenes = {}
 Scene.currentActiveScene = nil
@@ -17,32 +17,44 @@ sceneState = {
 	isDismissed = "Dismissed"
 }
 
+Scene.addedScenes = {}
+
 function Scene:init()
-	gfx.sprite.init(self)
+	self._sprite = gfx.sprite.new()
 	
 	table.insert(allScenes, self)
 	
-	self.state = sceneState.initialized
+	self._state = sceneState.initialized
 	self.isFinishedTransitioning = true
 end
 
 function Scene:load()
-	self.state = sceneState.isLoaded
+	self._state = sceneState.isLoaded
 end
 
 function Scene:present()
 	Scene.currentActiveScene = self
-	self.state = sceneState.isPresented
-	self:add()
+	self._state = sceneState.isPresented
+	self._sprite:add()
+	
+	table.insert(Scene.addedScenes, self)
 end
 
-function Scene:update()
-	gfx.sprite.update(self)
+function Scene.update(self)
+	if self == nil then
+		for _, scene in pairs(Scene.addedScenes) do
+			scene:update()
+		end
+	else 
+		assert(false, "Cannot call Scene:update() on instance! Not implemented yet.")
+	end
 end
 
 function Scene:dismiss()
-	self.state = sceneState.isDismissed
-	self:remove()
+	self._state = sceneState.isDismissed
+	self._sprite:remove()
+	
+	table.removevalue(Scene.addedScenes, self)
 end
 
 function Scene:destroy()
