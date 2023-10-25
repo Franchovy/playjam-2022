@@ -40,6 +40,21 @@ end
 function GameScene:load(level)
 	Scene.load(self)
 	
+	-- Draw loading wheel
+	playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
+	local imageWheelLoading = playdate.graphics.image.new(kAssetsImages.wheelLoading):invertedImage()
+	imageWheelLoading:draw(30, 170)
+	
+	playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeFillWhite)
+	local loadingText = createTextImage("LOADING..."):scaledImage(2)
+	local _, heightLoadingText = loadingText:getSize()
+	loadingText:draw(105, 218 - heightLoadingText - 5)
+	
+	function clearLoading()
+		imageWheelLoading:clear(playdate.graphics.kColorClear)
+		loadingText:clear(playdate.graphics.kColorClear)
+	end
+	
 	-- Level nil check for restarting after Game Over
 	if level ~= nil then
 		self.level = level
@@ -151,7 +166,10 @@ function GameScene:load(level)
 		self.spritesLoaded = true
 	end
 	
-	self:loadComplete()
+	playdate.timer.performAfterDelay(100, function()
+		clearLoading()
+		self:loadComplete()
+	end)
 end
 
 function GameScene:present()

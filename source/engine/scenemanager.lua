@@ -43,13 +43,11 @@ function SceneManager:switchScene(scene, onComplete, ...)
 	
 	-- Start animated transition
 	self:startTransition(
-		function () 
-			-- Cleanup previous scene
-			-- TODO: Make this scene-specific
-			self:cleanup()
-			
+		function (loadCompleteCallback) 
 			self.currentScene.loadCompleteCallback = function() 
 				self.currentScene:present()
+				
+				loadCompleteCallback()
 			end
 			
 			-- Begin scene load
@@ -75,25 +73,33 @@ function SceneManager:startTransition(onHalfWay, onFinished)
 	local transitionTimer = self:wipeTransition(0, 400)
 
 	transitionTimer.timerEndedCallback = function()
+		-- Cleanup previous scene
+		-- TODO: Make this scene-specific
+		self:cleanup()
 		
-		-- Call on half way completion
-		onHalfWay()
-		
-		local transitionTimer = self:wipeTransition(400, 0)
-		transitionTimer.timerEndedCallback = function()
-			self.transitioning = false
-			self.transitionSprite:remove()
-			self.currentScene.isFinishedTransitioning = true
-			
-			-- Temp fix to resolve bug with sprite artifacts/smearing after transition
-			local allSprites = gfx.sprite.getAllSprites()
-			for i=1,#allSprites do
-				allSprites[i]:markDirty()
+		function loadCompleteCallback()
+			local transitionTimer = self:wipeTransition(400, 0)
+			transitionTimer.timerEndedCallback = function()
+				self.transitioning = false
+				self.transitionSprite:remove()
+				self.currentScene.isFinishedTransitioning = true
+				
+				-- Temp fix to resolve bug with sprite artifacts/smearing after transition
+				local allSprites = gfx.sprite.getAllSprites()
+				for i=1,#allSprites do
+					allSprites[i]:markDirty()
+				end
+				
+				-- Call finished completion
+				onFinished()
 			end
-			
-			-- Call finished completion
-			onFinished()
 		end
+		
+		playdate.graphics.setBackgroundColor(playdate.graphics.kColorBlack)
+		-- Call on half way completion
+		onHalfWay(loadCompleteCallback)
+		
+		playdate.graphics.setBackgroundColor(playdate.graphics.kColorClear)
 	end
 end
 
@@ -112,7 +118,7 @@ function SceneManager:createTransitionSprite()
 	local filledRect = gfx.image.new(400, 240, gfx.kColorBlack)
 	local transitionSprite = gfx.sprite.new(filledRect)
 	transitionSprite:moveTo(200, 120)
-	transitionSprite:setZIndex(10000)
+	--transitionSprite:setZIndex(1)
 	transitionSprite:setIgnoresDrawOffset(true)
 	transitionSprite:add()
 	self.transitionSprite = transitionSprite
