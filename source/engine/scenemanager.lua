@@ -17,11 +17,13 @@ end
 sceneManager = SceneManager()
 
 function SceneManager:setCurrentScene(scene)
-	self.newScene = scene
 	self.currentScene = scene
-
+	
+	self.currentScene.loadCompleteCallback = function() 
+		self.currentScene:present()
+	end
+	
 	self.currentScene:load()
-	self.currentScene:present()
 end
 
 function SceneManager:switchScene(scene, onComplete, ...)
@@ -29,23 +31,29 @@ function SceneManager:switchScene(scene, onComplete, ...)
 		return
 	end
 	
+	local args = {...}
+	
 	-- Update current Scene
 	if self.currentScene ~= nil then 
 		-- Remove previous scene as sprite
 		self.currentScene:dismiss()
 	end
 	
-	self.newScene = scene
 	self.currentScene = scene
 	
-	-- Begin scene load
-	self.currentScene:load(...)
-
 	-- Start animated transition
 	self:startTransition(
 		function () 
+			-- Cleanup previous scene
+			-- TODO: Make this scene-specific
 			self:cleanup()
-			self.currentScene:present()
+			
+			self.currentScene.loadCompleteCallback = function() 
+				self.currentScene:present()
+			end
+			
+			-- Begin scene load
+			self.currentScene:load(table.unpack(args))
 		end,
 		function ()
 			if onComplete ~= nil then

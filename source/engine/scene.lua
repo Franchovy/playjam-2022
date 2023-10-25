@@ -26,10 +26,18 @@ function Scene:init()
 	
 	self._state = sceneState.initialized
 	self.isFinishedTransitioning = true
+	
+	self.loadCompleteCallback = nil
 end
 
 function Scene:load()
 	self._state = sceneState.isLoaded
+end
+
+function Scene:loadComplete()
+	if self.loadCompleteCallback ~= nil then
+		self.loadCompleteCallback()
+	end
 end
 
 function Scene:present()

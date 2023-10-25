@@ -24,6 +24,8 @@ function GameOverScene:load()
 	-- Blinker
 	
 	self.pressAIndicatorBlinker = playdate.graphics.animation.blinker.new(750, 600, true, nil, false)
+	
+	self:loadComplete()
 end
 
 function GameOverScene:present()

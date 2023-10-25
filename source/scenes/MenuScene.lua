@@ -56,6 +56,8 @@ function MenuScene:load()
 	menu = Menu(options)
 	
 	options[3].menu = loadCustomLevels()
+	
+	self:loadComplete()
 end
 
 function MenuScene:present()
