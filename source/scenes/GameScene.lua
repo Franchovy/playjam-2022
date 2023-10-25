@@ -35,25 +35,32 @@ function GameScene:init()
 	self.gameState = gameStates.created
 	
 	self.spritesLoaded = false
+	
+	-- Loading screen drawing & clearing
+	
+	self.imageWheelLoading = nil
+	self.loadingText = nil
+	
+	self.loadingDrawCallback = function()
+		-- Draw loading wheel
+		playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
+		self.imageWheelLoading = playdate.graphics.image.new(kAssetsImages.wheelLoading):invertedImage()
+		self.imageWheelLoading:draw(30, 170)
+		
+		playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeFillWhite)
+		self.loadingText = createTextImage("LOADING..."):scaledImage(2)
+		local _, heightLoadingText = self.loadingText:getSize()
+		self.loadingText:draw(105, 218 - heightLoadingText - 5)
+	end
+	
+	self.loadingDrawClearCallback = function()
+		self.imageWheelLoading:clear(playdate.graphics.kColorClear)
+		self.loadingText:clear(playdate.graphics.kColorClear)
+	end
 end
 
 function GameScene:load(level)
 	Scene.load(self)
-	
-	-- Draw loading wheel
-	playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
-	local imageWheelLoading = playdate.graphics.image.new(kAssetsImages.wheelLoading):invertedImage()
-	imageWheelLoading:draw(30, 170)
-	
-	playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeFillWhite)
-	local loadingText = createTextImage("LOADING..."):scaledImage(2)
-	local _, heightLoadingText = loadingText:getSize()
-	loadingText:draw(105, 218 - heightLoadingText - 5)
-	
-	function clearLoading()
-		imageWheelLoading:clear(playdate.graphics.kColorClear)
-		loadingText:clear(playdate.graphics.kColorClear)
-	end
 	
 	-- Level nil check for restarting after Game Over
 	if level ~= nil then
@@ -166,10 +173,7 @@ function GameScene:load(level)
 		self.spritesLoaded = true
 	end
 	
-	playdate.timer.performAfterDelay(100, function()
-		clearLoading()
-		self:loadComplete()
-	end)
+	self:loadComplete()
 end
 
 function GameScene:present()

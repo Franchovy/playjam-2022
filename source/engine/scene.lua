@@ -27,6 +27,8 @@ function Scene:init()
 	self._state = sceneState.initialized
 	self.isFinishedTransitioning = true
 	
+	self.loadingDrawCallback = nil
+	self.loadingDrawClearCallback = nil
 	self.loadCompleteCallback = nil
 end
 
@@ -35,6 +37,10 @@ function Scene:load()
 end
 
 function Scene:loadComplete()
+	if self.loadingDrawClearCallback ~= nil then
+		self.loadingDrawClearCallback()
+	end
+	
 	if self.loadCompleteCallback ~= nil then
 		self.loadCompleteCallback()
 	end

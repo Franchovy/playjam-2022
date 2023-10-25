@@ -50,8 +50,12 @@ function SceneManager:switchScene(scene, onComplete, ...)
 				loadCompleteCallback()
 			end
 			
-			-- Begin scene load
-			self.currentScene:load(table.unpack(args))
+			self.currentScene:loadingDrawCallback()
+			
+			playdate.timer.performAfterDelay(1, function()
+				-- Begin scene load
+				self.currentScene:load(table.unpack(args))
+			end)
 		end,
 		function ()
 			if onComplete ~= nil then
