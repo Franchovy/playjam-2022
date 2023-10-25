@@ -14,6 +14,8 @@ end
 function GameOverScene:load()
 	Scene.load(self)
 	
+	-- TODO: these should be images (draw), not sprites.
+	
 	-- Titles
 	
 	self.gameOverTextSprite = sizedTextSprite("*Game Over*", 2)
@@ -31,6 +33,8 @@ end
 function GameOverScene:present()
 	Scene.present(self)
 	
+	playdate.graphics.setBackgroundColor(playdate.graphics.kColorWhite)
+	
 	-- Start running blinker
 	
 	self.pressAIndicatorBlinker:startLoop()
@@ -40,6 +44,7 @@ function GameOverScene:present()
 	self.tryAgainTextSprite:add()
 	self.pressAIndicatorTextSprite:add()
 	self.gameOverTextSprite:add()
+	
 	
 end
 
@@ -62,6 +67,7 @@ end
 function GameOverScene:dismiss()
 	Scene.dismiss(self)
 	
+	playdate.graphics.setBackgroundColor(playdate.graphics.kColorClear)
 end
 
 function GameOverScene:destroy()

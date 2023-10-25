@@ -61,6 +61,9 @@ function MenuScene:load()
 end
 
 function MenuScene:present()
+	playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
+	playdate.graphics.setBackgroundColor(playdate.graphics.kColorWhite)
+	
 	Scene.present(self)
 	
 	-- Print SpriteMenu Options
