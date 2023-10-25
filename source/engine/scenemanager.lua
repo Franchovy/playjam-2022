@@ -60,10 +60,6 @@ function SceneManager:switchScene(scene, onComplete, ...)
 				self.currentScene:present()
 			end
 			
-			-- Set background color
-			
-			playdate.graphics.setBackgroundColor(playdate.graphics.kColorBlack)
-			
 			-- Draw loading screen
 			
 			if self.currentScene.loadingDrawCallback ~= nil then
@@ -139,7 +135,7 @@ function SceneManager:createTransitionSprite()
 	local filledRect = gfx.image.new(400, 240, gfx.kColorBlack)
 	local transitionSprite = gfx.sprite.new(filledRect)
 	transitionSprite:moveTo(200, 120)
-	--transitionSprite:setZIndex(1)
+	transitionSprite:setZIndex(1)
 	transitionSprite:setIgnoresDrawOffset(true)
 	transitionSprite:add()
 	self.transitionSprite = transitionSprite

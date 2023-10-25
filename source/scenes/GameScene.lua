@@ -42,6 +42,10 @@ function GameScene:init()
 	self.loadingText = nil
 	
 	self.loadingDrawCallback = function()
+		
+		-- Set background color
+		playdate.graphics.setBackgroundColor(playdate.graphics.kColorClear)
+		
 		-- Draw loading wheel
 		playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
 		self.imageWheelLoading = playdate.graphics.image.new(kAssetsImages.wheelLoading):invertedImage()
@@ -57,6 +61,9 @@ function GameScene:init()
 	end
 	
 	self.loadingDrawClearCallback = function()
+		-- Clear background color
+		playdate.graphics.setBackgroundColor(playdate.graphics.kColorClear)
+		
 		self.imageWheelLoading:clear(playdate.graphics.kColorClear)
 		self.loadingText:clear(playdate.graphics.kColorClear)
 	end
