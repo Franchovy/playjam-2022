@@ -43,14 +43,34 @@ function SceneManager:switchScene(scene, onComplete, ...)
 	
 	-- Start animated transition
 	self:startTransition(
-		function (loadCompleteCallback) 
+		function (loadCompleteTransitionCallback) 
+			-- Setup
+			
 			self.currentScene.loadCompleteCallback = function() 
-				self.currentScene:present()
+				-- clear background color
 				
-				loadCompleteCallback()
+				playdate.graphics.setBackgroundColor(playdate.graphics.kColorClear)
+				
+				-- wipe transition
+				
+				loadCompleteTransitionCallback()
+				
+				-- scene present
+				
+				self.currentScene:present()
 			end
 			
-			self.currentScene:loadingDrawCallback()
+			-- Set background color
+			
+			playdate.graphics.setBackgroundColor(playdate.graphics.kColorBlack)
+			
+			-- Draw loading screen
+			
+			if self.currentScene.loadingDrawCallback ~= nil then
+				self.currentScene:loadingDrawCallback()
+			end
+			
+			-- Start Loading after a short delay - allowing for draw
 			
 			playdate.timer.performAfterDelay(1, function()
 				-- Begin scene load
@@ -99,11 +119,8 @@ function SceneManager:startTransition(onHalfWay, onFinished)
 			end
 		end
 		
-		playdate.graphics.setBackgroundColor(playdate.graphics.kColorBlack)
 		-- Call on half way completion
 		onHalfWay(loadCompleteCallback)
-		
-		playdate.graphics.setBackgroundColor(playdate.graphics.kColorClear)
 	end
 end
 

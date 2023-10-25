@@ -51,6 +51,9 @@ function GameScene:init()
 		self.loadingText = createTextImage("LOADING..."):scaledImage(2)
 		local _, heightLoadingText = self.loadingText:getSize()
 		self.loadingText:draw(105, 218 - heightLoadingText - 5)
+		
+		-- Reset draw mode
+		playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
 	end
 	
 	self.loadingDrawClearCallback = function()
