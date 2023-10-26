@@ -37,8 +37,6 @@ function playdate.update()
 	-- State management
 	
 	updateScenes()
-	
-	playdate.drawFPS(10, 10)
 end
 
 function isGameSceneOver()

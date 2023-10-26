@@ -59,6 +59,11 @@ function Wheel:resetValues()
 	self.hasReachedLevelEnd = false
 	self.hasTouchedNewCheckpoint = false
 	self._recentCheckpoint = nil
+	self._coinCountUpdate = 0
+end
+
+function Wheel:getCoinCountUpdate()
+	return self._coinCountUpdate
 end
 
 function Wheel:setIsDead() 
@@ -121,6 +126,7 @@ function Wheel:update()
 	-- Reset values that get re-calculated
 	
 	self.touchingGround = false
+	self._coinCountUpdate = 0
 	
 	-- Update position according to velocity
 	
@@ -147,7 +153,9 @@ function Wheel:update()
 		elseif target.type == kSpriteTypes.coin then
 			if target:isVisible() and self:alphaCollision(target) then
 				-- Win some points
-				self:onGrabbedCoin(target)
+				sampleplayer:playSample("coin")
+				target:isGrabbed()
+				self._coinCountUpdate += 1
 			end
 		elseif target.type == kSpriteTypes.killBlock then
 			if self:alphaCollision(target) then
@@ -195,15 +203,5 @@ function Wheel:setAwaitingInput()
 	self.isAwaitingInput = true
 end
 
-function Wheel:getScoreText()
-	return "Score: ".. self.score
-end
-
-function Wheel:onGrabbedCoin(coin)
-	self.score += scorePerCoin
-	sampleplayer:playSample("coin")
-	
-	coin:isGrabbed()
-end
 
 

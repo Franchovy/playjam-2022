@@ -30,7 +30,6 @@ function GameScene:init()
 	--
 	
 	self.wheel = nil
-	self.textImageScore = nil
 	
 	self.gameState = gameStates.created
 	
@@ -153,6 +152,17 @@ function GameScene:load(level)
 		count = 1
 	})
 	
+	-- Level config
+	
+	levelConfig.objectives = {
+		coins = 100,
+		time = 120,
+		{
+			coins = 150,
+			time = 40
+		}
+	}
+	
 	self.config = levelConfig
 	
 	-- Draw Background
@@ -174,13 +184,14 @@ function GameScene:load(level)
 	
 	if not self.spritesLoaded then
 		
-		-- Draw Score Text
-		
-		self.textImageScore = Score.new("Score: 0")
-		
 		-- Generate Level
 		
 		self.spritesLoaded = true
+		
+		-- HUD
+		
+		self.hud = Hud()
+		self.hud:moveTo(3, 2)
 	end
 	
 	self:loadComplete()
@@ -190,10 +201,6 @@ function GameScene:present()
 	Scene.present(self)
 	
 	print("Game Scene Present")
-	
-	-- Position Sprites
-	
-	self.textImageScore:add()
 	
 	-- Start periodicBlinker for flashing animations
 	
@@ -230,6 +237,23 @@ function GameScene:present()
 		
 		self.filePlayer:play()
 	end
+	
+	-- Set up level timer 
+	
+	self.hud:add()
+	
+	self.levelTimerCounter = 0
+	self.coinCount = 0
+	
+	local levelTimer = playdate.timer.keyRepeatTimerWithDelay(10, 10, function(timer)
+		self.levelTimerCounter += timer.currentTime
+				
+		self.hud:updateTimer(self.levelTimerCounter)
+	end)
+	
+	levelTimer:pause()
+	
+	self.levelTimer = levelTimer
 end
 
 function GameScene:update()
@@ -257,7 +281,12 @@ function GameScene:update()
 	if self.gameState == gameStates.readyToStart then
 		-- Awaiting player input (jump / crank)
 		if playdate.buttonIsPressed(playdate.kButtonA) or (math.abs(playdate.getCrankChange()) > 5) then
+			
+			-- Start game
+			
 			self.wheel:startGame()
+			
+			self.levelTimer:start()
 			
 			self.gameState = gameStates.playing
 		end
@@ -281,11 +310,19 @@ function GameScene:update()
 			self.previousLoadPoint = { x = position.x / GRID_SIZE, y = position.y / GRID_SIZE }
 		end
 		
+		local updatedCoinCount = self.wheel:getCoinCountUpdate()
+		if updatedCoinCount > 0 then
+			self.coinCount += updatedCoinCount
+			self.hud:updateCoinCount(self.coinCount)
+		end
+		
 		-- Level End Trigger
 		
 		if self.wheel.hasReachedLevelEnd and levelCompleteSprite == nil then
 			
 			self:onLevelComplete()
+			
+			self.levelTimer:pause()
 		end
 		
 		-- Camera movement based on wheel position
@@ -295,15 +332,15 @@ function GameScene:update()
 		-- Game State checking
 		
 		if self.wheel.hasJustDied then
+			self.levelTimer:pause()
+			
 			self.gameState = gameStates.playerDied
 		end
 		
-		-- Update image score
-		
-		self.textImageScore:setScoreText(self.wheel:getScoreText())
 	end
 	
 	if self.gameState == gameStates.levelEnd then
+		print("Completed level with time: ".. self.levelTimerCounter)
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			sceneManager:switchScene(scenes.menu, function() self:destroy() end)
 		elseif playdate.buttonJustPressed(playdate.kButtonB) then
@@ -321,6 +358,9 @@ function GameScene:dismiss()
 	if AppConfig.enableBackgroundMusic and self.theme ~= nil then
 		self.filePlayer:stop()
 	end
+	
+	self.levelTimer:remove()
+	self.hud:remove()
 	
 	self.periodicBlinker:destroy()
 end
