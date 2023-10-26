@@ -12,9 +12,14 @@ kAssetsImages = {
 	killBlock = dirImages.."sprites/killBlock",
 	platform = dirImages.."sprites/platform",
 	levelEnd = dirImages.."sprites/portal",
-	wheel = dirImages.."sprites/wheel",
+	wheel = dirImages.."sprites/wheel/wheel",
 	wheelLoading = dirImages.."sprites/wheel/0",
 	star = dirImages.."sprites/star/star",
+	particles = dirImages.."sprites/particles",
+	background = dirImages.."sprites/background",
+	background2 = dirImages.."sprites/background2",
+	background3 = dirImages.."sprites/background3",
+	background4 = dirImages.."sprites/background4"
 }
 
 kAssetsSounds = {
