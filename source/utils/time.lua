@@ -11,12 +11,16 @@ function convertToTimeString(timeValueMs, decimalsCount)
 		decimal = "0"..decimal
 	end
 	
-	if seconds < 59 then
-		
+	if seconds < 60 then
 		return string.sub(seconds, -2, -1).."."..string.sub(decimal, -decimalsCount, -1)
 	else 
 		local minutes = math.floor(seconds / 60)
+		local secondsOnly = seconds % 60
 		
-		return minutes..":"..seconds.."."..decimal
+		if secondsOnly < 10 then
+			secondsOnly = "0"..secondsOnly
+		end
+		
+		return minutes..":"..string.sub(secondsOnly, -2, -1).."."..string.sub(decimal, -decimalsCount, -1)
 	end
 end

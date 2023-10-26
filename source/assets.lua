@@ -2,6 +2,7 @@ local dirFonts = "assets/fonts/"
 local dirImages = "assets/images/"
 local dirSounds = "assets/sounds/"
 local dirTracks = "assets/tracks/"
+local dirLevels = "assets/levels/"
 
 kAssetsImages = {
 	menuWheel = dirImages.."menu/wheel",
@@ -32,4 +33,10 @@ kAssetsTracks = {
 kAssetsFonts = {
 	twinbee = dirFonts.."Twinbee (1)",
 	marbleMadness = dirFonts.."Marble Madness [unused 1] (1)"
+}
+
+kAssetsLevels = {
+	mountain = dirLevels.."1_mountain",
+	space = dirLevels.."2_space",
+	city = dirLevels.."3_city",
 }

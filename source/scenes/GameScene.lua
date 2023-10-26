@@ -132,8 +132,7 @@ function GameScene:load(level)
 	
 	-- Load Level Config
 	
-	local path = kFilePath.levels.."/"..self.level
-	local levelConfig = json.decodeFile(path)
+	local levelConfig = json.decodeFile(self.level)
 	
 	assert(levelConfig)
 	
@@ -521,10 +520,13 @@ function drawLevelClearSprite(stars, coins, targetCoins, time, targetTime)
 	
 	-- Stars
 	
+	local starAnimationTimer = playdate.timer.new(200)
+	starAnimationTimer:pause()
+	
 	local imageTable = playdate.graphics.imagetable.new(kAssetsImages.star)
-	local star1 = playdate.graphics.animation.loop.new(200, imageTable)
-	local star2 = playdate.graphics.animation.loop.new(200, imageTable)
-	local star3 = playdate.graphics.animation.loop.new(200, imageTable)
+	local star1 = playdate.graphics.animation.loop.new(200, imageTable, false)
+	local star2 = playdate.graphics.animation.loop.new(200, imageTable, false)
+	local star3 = playdate.graphics.animation.loop.new(200, imageTable, false)
 	star1.paused = true
 	star2.paused = true
 	star3.paused = true

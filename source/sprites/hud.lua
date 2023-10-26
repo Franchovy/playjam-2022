@@ -10,7 +10,6 @@ function Hud:init()
 	
 	self:setSize(250, 80)
 	self:setCenter(0, 0)
-	self:setAlwaysRedraw(true)
 	self:setIgnoresDrawOffset(true)
 	self:setZIndex(1)
 	
@@ -22,10 +21,12 @@ end
 
 function Hud:updateCoinCount(value)
 	self.coinCountValue = value
+	self:markDirty()
 end
 
 function Hud:updateTimer(timerValueMs)
 	self.timerValueString = convertToTimeString(timerValueMs)
+	self:markDirty()
 end
 
 function Hud:draw()
