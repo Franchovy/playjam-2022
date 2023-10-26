@@ -3,6 +3,7 @@ import "config"
 import "utils/themes"
 import "utils/text"
 import "utils/rect"
+import "utils/time"
 
 class('GameScene').extends(Scene)
 
@@ -154,15 +155,6 @@ function GameScene:load(level)
 	
 	-- Level config
 	
-	levelConfig.objectives = {
-		coins = 100,
-		time = 120,
-		{
-			coins = 150,
-			time = 40
-		}
-	}
-	
 	self.config = levelConfig
 	
 	-- Draw Background
@@ -245,11 +237,16 @@ function GameScene:present()
 	self.levelTimerCounter = 0
 	self.coinCount = 0
 	
-	local levelTimer = playdate.timer.keyRepeatTimerWithDelay(10, 10, function(timer)
-		self.levelTimerCounter += timer.currentTime
-				
+	local levelTimer = playdate.timer.new(999000)
+	levelTimer.updateCallback = function(timer)
+		self.levelTimerCounter = timer.currentTime
+		
 		self.hud:updateTimer(self.levelTimerCounter)
-	end)
+	end
+	levelTimer.timerEndedCallback = function()
+		-- TODO: Trigger game over
+		print("Game over!")
+	end
 	
 	levelTimer:pause()
 	
@@ -340,7 +337,6 @@ function GameScene:update()
 	end
 	
 	if self.gameState == gameStates.levelEnd then
-		print("Completed level with time: ".. self.levelTimerCounter)
 		if playdate.buttonJustPressed(playdate.kButtonA) then
 			sceneManager:switchScene(scenes.menu, function() self:destroy() end)
 		elseif playdate.buttonJustPressed(playdate.kButtonB) then
@@ -390,7 +386,41 @@ function GameScene:onLevelComplete(nextLevel)
 			levelCompleteSprite:remove()
 			levelCompleteSprite = nil
 			
-			drawLevelClearSprite()
+			local stars = 1
+			
+			print("Coins: ".. self.coinCount)
+			print("Time: ".. (self.levelTimerCounter / 100).. " seconds")
+			
+			local displayObjectiveCoins = self.config.objectives[1].coins
+			local displayObjectiveTime = self.config.objectives[2].time
+			
+			for _, objective in pairs(self.config.objectives) do
+				local objectiveReached = true
+				
+				print("Objective: ")
+				
+				if objective.coins ~= nil then
+					print(objective.coins.. " coins")
+					
+					objectiveReached = objectiveReached and self.coinCount >= objective.coins
+				end
+				
+				if objective.time ~= nil then
+					print(objective.time.. " seconds")
+					
+					objectiveReached = objectiveReached and self.levelTimerCounter <= (objective.time * 1000)
+				end
+				
+				if objectiveReached == true then
+					stars += 1
+				end
+			end
+			
+			print("Got ".. stars.. " stars!")
+			
+			local stringTime = convertToTimeString(self.levelTimerCounter, 1)
+			local stringTimeObjective = convertToTimeString(displayObjectiveTime * 1000, 1)
+			drawLevelClearSprite(stars, self.coinCount, displayObjectiveCoins, stringTime, stringTimeObjective)
 		end
 	)
 end
@@ -408,7 +438,7 @@ function addLevelCompleteSprite()
 	blinker:startLoop()
 end
 
-function drawLevelClearSprite()
+function drawLevelClearSprite(stars, coins, targetCoins, time, targetTime)
 	local bounds = playdate.display.getRect()
 	local x1, y1, width1, height1 = rectInsetBy(bounds, 30, 30)
 	local x2, y2, width2, height2 = rectInsetBy(bounds, 34, 36)
@@ -442,8 +472,8 @@ function drawLevelClearSprite()
 	local textImageCoinsLabel = createTextImage("COINS"):scaledImage(1)
 	local textImageTimeLabel = createTextImage("TIME"):scaledImage(1)
 	gfx.setFontTracking(0)
-	local textImageCoinsValue = createTextImage("".. 40 .. "/".. 40):scaledImage(2)
-	local textImageTimeValue = createTextImage("02:00".. "/".. "02:00"):scaledImage(2)
+	local textImageCoinsValue = createTextImage(coins .. "/".. targetCoins):scaledImage(2)
+	local textImageTimeValue = createTextImage(time.. "/".. targetTime):scaledImage(2)
 	
 	local widthTitle, _ = textImageTitle:getSize()
 	textImageTitle:draw((width1 - widthTitle) / 2, 10)

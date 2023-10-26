@@ -1,7 +1,7 @@
 import "playdate"
 import "assets"
 import "utils/text"
-
+import "utils/time"
 
 class("Hud").extends(playdate.graphics.sprite)
 
@@ -25,21 +25,7 @@ function Hud:updateCoinCount(value)
 end
 
 function Hud:updateTimer(timerValueMs)
-	local decimal = math.floor(timerValueMs / 10)
-	local seconds = math.floor(decimal / 100)
-	
-	if decimal < 10 then
-		decimal = "0"..decimal
-	end
-	
-	if seconds < 59 then
-		
-		self.timerValueString = string.sub(seconds, -2, -1).."."..string.sub(decimal, -2, -1)
-	else 
-		local minutes = math.floor(seconds / 60)
-		
-		self.timerValueString = minutes..":"..seconds.."."..decimal
-	end
+	self.timerValueString = convertToTimeString(timerValueMs)
 end
 
 function Hud:draw()
