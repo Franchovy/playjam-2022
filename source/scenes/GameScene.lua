@@ -22,7 +22,6 @@ local GRID_SIZE = 24
 
 local LEVEL_COMPLETE_SIZE = 3500
 
-local spriteCycler = nil
 local levelCompleteSprite = nil
 
 function GameScene:init()
@@ -48,8 +47,24 @@ function GameScene:init()
 		
 		-- Draw loading wheel
 		playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
-		self.imageWheelLoading = playdate.graphics.image.new(kAssetsImages.wheelLoading):invertedImage()
-		self.imageWheelLoading:draw(30, 170)
+		self.imageWheelLoading = playdate.graphics.image.new(kAssetsImages.wheelLoading)
+		
+		-- Timer to draw rotating wheel
+		self.loadingImageTimer = playdate.timer.new(100)
+		self.loadingImageTimer.discardOnCompletion = false
+		self.loadingImageTimer.repeats = true
+		
+		local rotation = 0
+		
+		self.loadingImageTimer.timerEndedCallback = function(timer)
+			rotation += (timer.currentTime / 4)
+			playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeInverted)
+			self.imageWheelLoading:drawRotated(60, 190, rotation)
+			playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
+		end
+		
+		-- Call once manually for initial draw
+		self.loadingImageTimer.timerEndedCallback(self.loadingImageTimer)
 		
 		playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeFillWhite)
 		self.loadingText = createTextImage("LOADING..."):scaledImage(2)
@@ -64,13 +79,13 @@ function GameScene:init()
 		-- Clear background color
 		playdate.graphics.setBackgroundColor(playdate.graphics.kColorClear)
 		
+		self.loadingImageTimer:remove()
 		self.imageWheelLoading:clear(playdate.graphics.kColorClear)
 		self.loadingText:clear(playdate.graphics.kColorClear)
 	end
 end
 
 function GameScene:load(level)
-	Scene.load(self)
 	
 	-- Level nil check for restarting after Game Over
 	if level ~= nil then
@@ -81,111 +96,115 @@ function GameScene:load(level)
 	
 	self.gameState = gameStates.loading
 	
-	-- Create periodic blinker
-	
-	self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
-	
-	-- Set up spritecycler
-	
-	local chunkLength = AppConfig["chunkLength"]
-	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint"}
-	spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, config, spriteToRecycle)
-		local sprite = spriteToRecycle;
+	Scene.loadAsynchronously(self,
+		function()
+			self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
+			return true
+		end,
+		function()
+			local chunkLength = AppConfig["chunkLength"]
+			local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint"}
 			
-		if sprite == nil then
-			-- Create sprites
-			if id == "platform" then
-				sprite = Platform.new(GRID_SIZE, GRID_SIZE, false)
-			elseif id == "killBlock" then
-				sprite = KillBlock.new(self.periodicBlinker)
-			elseif id == "coin" then
-				sprite = Coin.new()
-			elseif id == "checkpoint" then
-				sprite = Checkpoint.new()
-			elseif id == "player" then
-				sprite = Wheel.new()
-				sprite:resetValues()
-				sprite:setAwaitingInput()
-				self.wheel = sprite
-				
-				if self.previousLoadPoint ~= nil then
-					position = self.previousLoadPoint
+			self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, config, spriteToRecycle)
+				local sprite = spriteToRecycle;
+					
+				if sprite == nil then
+					-- Create sprites
+					if id == "platform" then
+						sprite = Platform.new(GRID_SIZE, GRID_SIZE, false)
+					elseif id == "killBlock" then
+						sprite = KillBlock.new(self.periodicBlinker)
+					elseif id == "coin" then
+						sprite = Coin.new()
+					elseif id == "checkpoint" then
+						sprite = Checkpoint.new()
+					elseif id == "player" then
+						sprite = Wheel.new()
+						sprite:resetValues()
+						sprite:setAwaitingInput()
+						self.wheel = sprite
+						
+						if self.previousLoadPoint ~= nil then
+							position = self.previousLoadPoint
+						end
+					elseif id == "levelEnd" then
+						sprite = LevelEnd.new()
+					else 
+						print("Unrecognized ID: ".. id)
+					end
 				end
-			elseif id == "levelEnd" then
-				sprite = LevelEnd.new()
-			else 
-				print("Unrecognized ID: ".. id)
+				
+				if config ~= nil then
+					sprite:loadConfig(config)
+				end
+				
+				if position ~= nil then
+					sprite:moveTo(GRID_SIZE * position.x, GRID_SIZE * position.y)
+					sprite:add()
+				end
+				
+				return sprite
+			end)
+			
+			return true
+		end,
+		function()
+			self.config = json.decodeFile(self.level)
+			
+			assert(self.config)
+			
+			return true
+		end,
+		function()
+			self.spriteCycler:load(self.config)
+			
+			return true
+		end,
+		function()
+			self.spriteCycler:preloadSprites({
+				id = "platform",
+				count = 120
+			}, {
+				id = "killBlock",
+				count = 40
+			}, {
+				id = "coin",
+				count = 30
+			}, {
+				id = "checkpoint",
+				count = 1
+			})
+			
+			return true
+		end,
+		function()
+			
+			local themeId = self.config.theme
+			
+			if themeId ~= 0 then
+				self.theme = kThemes[themeId]
 			end
+			
+			if AppConfig.enableParalaxBackground and self.theme ~= nil then
+				self.background = ParalaxBackground.new()
+				self.background:loadTheme(self.theme)
+				
+				self.background:setParalaxDrawingRatios()
+			end
+			
+			return true
+		end,
+		function()
+			if not self.spritesLoaded then
+				self.spritesLoaded = true
+				
+				self.hud = Hud()
+				self.hud:moveTo(3, 2)
+			end
+			
+			return true
 		end
-		
-		if config ~= nil then
-			sprite:loadConfig(config)
-		end
-		
-		if position ~= nil then
-			sprite:moveTo(GRID_SIZE * position.x, GRID_SIZE * position.y)
-			sprite:add()
-		end
-		
-		return sprite
-	end)
-	
-	-- Load Level Config
-	
-	local levelConfig = json.decodeFile(self.level)
-	
-	assert(levelConfig)
-	
-	spriteCycler:load(levelConfig)
-	
-	spriteCycler:preloadSprites({
-		id = "platform",
-		count = 120
-	}, {
-		id = "killBlock",
-		count = 40
-	}, {
-		id = "coin",
-		count = 30
-	}, {
-		id = "checkpoint",
-		count = 1
-	})
-	
-	-- Level config
-	
-	self.config = levelConfig
-	
-	-- Draw Background
-	
-	local themeId = self.config.theme
-	
-	if themeId ~= 0 then
-		self.theme = kThemes[themeId]
-	end
-	
-	if AppConfig.enableParalaxBackground and self.theme ~= nil then
-		self.background = ParalaxBackground.new()
-		self.background:loadTheme(self.theme)
-		
-		self.background:setParalaxDrawingRatios()
-	end
-	
-	-- set up other sprites
-	
-	if not self.spritesLoaded then
-		
-		-- Generate Level
-		
-		self.spritesLoaded = true
-		
-		-- HUD
-		
-		self.hud = Hud()
-		self.hud:moveTo(3, 2)
-	end
-	
-	self:loadComplete()
+	)
 end
 
 function GameScene:present()
@@ -213,8 +232,8 @@ function GameScene:present()
 	
 	-- Initialize sprite cycling using initial wheel position
 	
-	local initialChunk = spriteCycler:getFirstInstanceChunk("player")
-	spriteCycler:loadInitialSprites(initialChunk, 1)
+	local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
+	self.spriteCycler:loadInitialSprites(initialChunk, 1)
 	
 	-- Set camera to center on wheel
 	
@@ -266,7 +285,7 @@ function GameScene:update()
 	end
 	
 	-- Updates sprites cycling
-	spriteCycler:update(-drawOffsetX / GRID_SIZE, drawOffsetY / GRID_SIZE)
+	self.spriteCycler:update(-drawOffsetX / GRID_SIZE, drawOffsetY / GRID_SIZE)
 	
 	if not self.isFinishedTransitioning then
 		return
@@ -348,7 +367,7 @@ end
 function GameScene:dismiss()
 	Scene.dismiss(self)
 	
-	spriteCycler:unloadAll()
+	self.spriteCycler:unloadAll()
 	
 	if AppConfig.enableBackgroundMusic and self.theme ~= nil then
 		self.filePlayer:stop()
@@ -387,26 +406,17 @@ function GameScene:onLevelComplete(nextLevel)
 			
 			local stars = 1
 			
-			print("Coins: ".. self.coinCount)
-			print("Time: ".. (self.levelTimerCounter / 100).. " seconds")
-			
 			local displayObjectiveCoins = self.config.objectives[1].coins
 			local displayObjectiveTime = self.config.objectives[2].time
 			
 			for _, objective in pairs(self.config.objectives) do
 				local objectiveReached = true
 				
-				print("Objective: ")
-				
 				if objective.coins ~= nil then
-					print(objective.coins.. " coins")
-					
 					objectiveReached = objectiveReached and self.coinCount >= objective.coins
 				end
 				
 				if objective.time ~= nil then
-					print(objective.time.. " seconds")
-					
 					objectiveReached = objectiveReached and self.levelTimerCounter <= (objective.time * 1000)
 				end
 				
@@ -520,38 +530,43 @@ function drawLevelClearSprite(stars, coins, targetCoins, time, targetTime)
 	
 	-- Stars
 	
-	local starAnimationTimer = playdate.timer.new(200)
-	starAnimationTimer:pause()
-	
 	local imageTable = playdate.graphics.imagetable.new(kAssetsImages.star)
-	local star1 = playdate.graphics.animation.loop.new(200, imageTable, false)
-	local star2 = playdate.graphics.animation.loop.new(200, imageTable, false)
-	local star3 = playdate.graphics.animation.loop.new(200, imageTable, false)
-	star1.paused = true
-	star2.paused = true
-	star3.paused = true
+	local starLoops = {}
+	for i=1,stars do
+		local starLoop = playdate.graphics.animation.loop.new(200, imageTable, true)
+		starLoop.paused = true
+		table.insert(starLoops, starLoop)
+	end
 	
-	local marginStar = 20
+	local marginStar
+	if stars < 4 then
+		marginStar = 20
+	else
+		marginStar = 5
+	end 
+	
 	local starWidth, starHeight = imageTable:getImage(1):getSize()
 	
 	local starSprite = playdate.graphics.sprite.new()
-	starSprite:setSize(starWidth * 3 + marginStar * 2, starHeight)
+	starSprite:setSize(starWidth * stars + marginStar * (stars - 1), starHeight)
 	starSprite:setCenter(0, 0)
 	starSprite:setIgnoresDrawOffset(true)
 	starSprite:setAlwaysRedraw(true)
 	
-	star1.paused = false
-	star2.paused = false
-	star3.paused = false
+	for _, star in pairs(starLoops) do
+		star.paused = false
+	end
 	
 	starSprite.draw = function (self, x, y)
-		star1:draw(0, 0)
-		star2:draw(starWidth + marginStar, 0)
-		star3:draw((starWidth + marginStar) * 2, 0)
+		for i, star in ipairs(starLoops) do
+			if stars >= i then
+				star:draw((starWidth + marginStar) * (i - 1), 0)
+			end
+		end
 	end
 	
 	starSprite:add()
-	starSprite:moveTo(70, 65)
+	starSprite:moveTo(50 + marginStar, 65)
 	
 	-- Animations
 	

@@ -36,6 +36,41 @@ function Scene:load()
 	self._state = sceneState.isLoaded
 end
 
+function Scene:loadAsynchronously(...)
+	local loadFunctions = {...}
+	
+	print(#loadFunctions.. " Loading functions...")
+	
+	local timer = playdate.timer.new(5)
+	timer.repeats = true
+	timer.discardOnCompletion = false
+	
+	local loadFunctionComplete = true
+	
+	timer.timerEndedArgs = { loadFunctionComplete }
+	
+	timer.timerEndedCallback = function(loadFunctionComplete)
+		print("timer callback")
+		if loadFunctionComplete then
+			print("load function complete!")
+				
+			if #loadFunctions == 0 then
+				print("all load functions complete. Ready to play")
+				
+				timer:remove()
+				self:loadComplete()
+			else
+				local loadFunction = table.remove(loadFunctions, 1)
+				
+				print("Loading next function. Left: ".. #loadFunctions)
+				
+				loadFunctionComplete = loadFunction(loadFunctionComplete)
+				assert(loadFunctionComplete, "Error: load function did not return 'true', was this a mistake?")
+			end
+		end
+	end
+end
+
 function Scene:loadComplete()
 	if self.loadingDrawClearCallback ~= nil then
 		self.loadingDrawClearCallback()
