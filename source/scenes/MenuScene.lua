@@ -9,30 +9,29 @@ class('MenuScene').extends(Scene)
 
 local menu = nil
 
+local levels = {
+	{
+		title = "MOUNTAIN",
+		path = kAssetsLevels.mountain
+		-- data = { unlocked = false, complete = nil } -- complete = { stars = nil, coins = nil, time = nil }
+	},
+	{
+		title = "SPACE",
+		path = kAssetsLevels.space
+	},
+	{
+		title = "CITY",
+		path = kAssetsLevels.city
+	}
+}
+
 options = {
 	{
 		title = "PLAY",
-		callback = function() end
+		callback = function() startGame(levels[1].path) end
 	},
 	{
-		title = "SELECT LEVEL",
-		menu = {
-			{
-				title = "1 COUNTRY",
-				callback = function() end
-			},
-			{
-				title = "2 SPACE",
-				callback = function() end
-			},
-			{
-				title = "3 CITY",
-				callback = function() end
-			},
-		}
-	},
-	{
-		title = "CUSTOM LEVELS"
+		title = "LEVEL SELECT",
 	}
 }
 
@@ -55,7 +54,7 @@ function MenuScene:load()
 	
 	menu = Menu(options)
 	
-	options[3].menu = loadCustomLevels()
+	options[2].menu = loadCustomLevels()
 	
 	self:loadComplete()
 end
@@ -88,10 +87,10 @@ end
 
 -- Local Functions
 
-function startCustomGame(fileName)
+function startGame(levelPath)
 	loadAllScenes()
 	
-	sceneManager:switchScene(scenes.game, nil, fileName)
+	sceneManager:switchScene(scenes.game, nil, levelPath..".json")
 end
 
 function makeBackgroundImage()	
@@ -124,21 +123,12 @@ function makeBackgroundImage()
 	return image
 end
 
-function loadCustomLevels()
-	playdate.file.mkdirIfNeeded(kFilePath.levels)
-	
-	local levels = playdate.file.listFiles(kFilePath.levels)
-	
-	if #levels == 0 then
-		return nil
-	end
-	
+function loadCustomLevels()	
 	local submenu = {}
 	for _, level in pairs(levels) do
-		local levelName = level:match("(.+).json$"):upper()
 		local option = {
-			title = levelName,
-			callback = function() startCustomGame(level) end
+			title = level.title,
+			callback = function() startGame(level.path) end
 		}
 		
 		table.insert(submenu, option)
