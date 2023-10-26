@@ -34,7 +34,7 @@ end
 
 function Menu:activate() 	
 	local entries = table.map(self.options, function (value) return value.title end)
-	local w, h = gfx.getTextSize("AAAAAAAAAAAAA")
+	local w, h = playdate.graphics.getTextSize("AAAAAAAAAAAAA")
 	menuWidth = w * SIZE + selectedEntryMargin
 	textHeight = h * SIZE
 	
@@ -154,7 +154,7 @@ function getMenuImage(entries, selectedIndex)
 	-- Create Menu Image using entries
 	
 	local height = textHeight * (#entries + MARGIN) - MARGIN
-	local menuImage = gfx.image.new(menuWidth, height)
+	local menuImage = playdate.graphics.image.new(menuWidth, height)
 	
 	-- Create images for entries
 	
@@ -166,7 +166,7 @@ function getMenuImage(entries, selectedIndex)
 		
 	-- Draw entry images on menu
 			
-	gfx.pushContext(menuImage)
+	playdate.graphics.pushContext(menuImage)
 	
 	for i, imageEntry in pairs(entryImages) do
 		-- Draw individual text (scaled)
@@ -174,25 +174,26 @@ function getMenuImage(entries, selectedIndex)
 		imageEntry:scaledImage(SIZE):draw(0, y)
 	end
 	
-	gfx.popContext()
+	playdate.graphics.popContext()
 			
 	return menuImage
 end
 
 function getMenuItemImage(text, isSelected)
+	playdate.graphics.setColor(playdate.graphics.kColorBlack)
 	local textSpacingX = isSelected and selectedEntryMargin or 0
-	local textImage = gfx.image.new(menuWidth, textHeight)
+	local textImage = playdate.graphics.image.new(menuWidth, textHeight)
 	
-	gfx.pushContext(textImage)
+	playdate.graphics.pushContext(textImage)
 	
 	if isSelected then
 		local triangleHeight = 7
-		gfx.fillTriangle(0, 0, 10, (textHeight - triangleHeight) / 2 , 0, textHeight - triangleHeight)
+		playdate.graphics.fillTriangle(0, 0, 10, (textHeight - triangleHeight) / 2 , 0, textHeight - triangleHeight)
 	end
 	
-	gfx.drawTextAligned(text, textSpacingX, 0, textAlignment.left)
+	playdate.graphics.drawTextAligned(text, textSpacingX, 0, textAlignment.left)
 	
-	gfx.popContext()
+	playdate.graphics.popContext()
 	
 	return textImage
 end

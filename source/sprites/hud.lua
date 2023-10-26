@@ -12,6 +12,7 @@ function Hud:init()
 	self:setCenter(0, 0)
 	self:setAlwaysRedraw(true)
 	self:setIgnoresDrawOffset(true)
+	self:setZIndex(1)
 	
 	self.coinImage = playdate.graphics.image.new(kAssetsImages.coin)
 	
@@ -61,7 +62,4 @@ function Hud:draw()
 	coinCountImage:draw(0, 0)
 	self.coinImage:draw(coinCountImageWidth, 4)
 	timerImage:draw(coinCountImageWidth + coinImageWidth, 0)
-	
-	playdate.graphics.setColor(playdate.graphics.kColorBlack)
-	playdate.graphics.setDitherPattern(1.0)
 end
