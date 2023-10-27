@@ -18,6 +18,8 @@ local textImageInverted
 
 local pressStart
 
+local painter
+
 function initialize()
 	gfx.setFont(gfx.font.new(kAssetsFonts.twinbee))
 	gfx.setFontTracking(1)
@@ -32,6 +34,53 @@ function initialize()
 	textImageInverted = textImage:invertedImage()
 	
 	pressStart = playdate.graphics.imageWithText("PRESS A", 200, 60):scaledImage(2)
+	
+	
+	local painterButtonFill = Painter(function(tick)
+		if tick == 0 then
+			-- press a button fill
+			playdate.graphics.setColor(playdate.graphics.kColorWhite)
+			playdate.graphics.setDitherPattern(0.8, playdate.graphics.image.kDitherTypeDiagonalLine)
+			playdate.graphics.fillRoundRect(125 - 10, 210, 160, 27, 6)
+		else
+			-- press a button fill
+			playdate.graphics.setColor(playdate.graphics.kColorWhite)
+			playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
+			playdate.graphics.fillRoundRect(125 - 10, 210, 160, 27, 6)
+		end
+	end)
+	
+	local painterButtonOutline = Painter(function(tick)
+		if tick == 0 then
+			-- press a button outline
+			playdate.graphics.setColor(playdate.graphics.kColorBlack)
+			playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
+			playdate.graphics.setLineWidth(3)
+			playdate.graphics.drawRoundRect(125 - 10, 210, 160, 27, 6)
+		else
+			-- press a button outline
+			playdate.graphics.setColor(playdate.graphics.kColorBlack)
+			playdate.graphics.setLineWidth(3)
+			playdate.graphics.drawRoundRect(125 - 10, 210, 160, 27, 6)
+		end
+	end)
+	
+	local painterButtonPressStart = Painter(function(tick)
+		if tick == 0 then
+			-- press a text
+			pressStart:drawFaded(130, 215, 0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
+		else
+			-- press a text
+			pressStart:draw(130, 215)
+		end
+	end)
+	
+	painter = Painter(function(tick) 
+		painterButtonFill:draw(tick)
+		painterButtonOutline:draw(tick)
+		painterButtonPressStart:draw(tick)
+	end)
+	
 	-- Create game state manager
 	--scenes.menu = MenuScene()
 	
@@ -49,54 +98,50 @@ function playdate.update()
 		tick = tick == 0 and 1 or 0
 	end
 	
+	-- state
+	--painter.setState({index = index, tick = tick})
+	
 	playdate.graphics.clear()
 	
+	-- background
 	playdate.graphics.setDitherPattern(0.4, playdate.graphics.image.kDitherTypeDiagonalLine)
 	playdate.graphics.fillRect(0, 0, 400, 240)
 	
+	-- background - right hill
 	backgroundImage3:drawFaded(0, -10, 0.2, playdate.graphics.image.kDitherTypeBayer8x8)
 	
+	-- background - flashing lights
 	if tick == 0 then
 		backgroundImage2:drawFaded(5, 0, 0.7, playdate.graphics.image.kDitherTypeDiagonalLine)
 	else
 		backgroundImage2:invertedImage():drawFaded(5, 0, 0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
 	end
 	
+	-- background - left hill
 	backgroundImage4:drawFaded(-20, 120, 0.8, playdate.graphics.image.kDitherTypeBayer4x4)
 	backgroundImage:draw(200,30)
 	
+	-- animated particles
 	imagetable:getImage((index % 36) + 1):scaledImage(2):draw(-60, -25)
+	-- animated wheel
 	wheelImageTable:getImage((-index % 12) + 1):scaledImage(2):draw(70, 50)
 	
+	-- title rectangle outline
 	playdate.graphics.setColor(playdate.graphics.kColorBlack)
 	playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
 	playdate.graphics.fillRect(0, 150, 400, 57)
 	
+	-- title rectangle fill
 	playdate.graphics.setColor(playdate.graphics.kColorWhite)
 	playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
 	playdate.graphics.fillRect(0, 160, 400, 37)
 	
+	-- title white shadow
 	textImageInverted:draw(39, 166)
+	-- title 
 	textImage:draw(40, 165)
 	
-	if tick == 0 then
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.setDitherPattern(0.8, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRoundRect(125 - 10, 210, 160, 27, 6)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.setLineWidth(3)
-		playdate.graphics.drawRoundRect(125 - 10, 210, 160, 27, 6)
-		pressStart:drawFaded(130, 215, 0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
-	else
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRoundRect(125 - 10, 210, 160, 27, 6)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setLineWidth(3)
-		playdate.graphics.drawRoundRect(125 - 10, 210, 160, 27, 6)
-		pressStart:draw(130, 215)
-	end
+	painter:draw(tick)
 end
 
 function placeholder()
