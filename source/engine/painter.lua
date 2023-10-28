@@ -22,11 +22,14 @@ end
 
 -- TODO: efficient implementation of table state checking
 function Painter:_drawState(state)
-	if self.stateImages[state] == nil then
+	local _, image = self:_contains(self.stateImages, state)
+	
+	if image == nil then
 		self.stateImages[state] = self:_drawImage(state)
+		image = self.stateImages[state]
 	end
 	
-	self.stateImages[state]:draw(self.offset.x, self.offset.y)
+	image:draw(self.offset.x, self.offset.y)
 end
 
 function Painter:_draw()
@@ -43,4 +46,24 @@ function Painter:_drawImage(state)
 	self.drawFunction(state)
 	playdate.graphics.popContext()
 	return image
+end
+
+function Painter:_contains(set, t)
+	for table, image in pairs(set) do
+		if self:_shallowEqual(t, table) then
+			return table, image
+		end
+	end
+	
+	return nil
+end
+
+function Painter:_shallowEqual(table1, table2)
+	for k, v in pairs(table1) do
+		if table2[k] == nil or table1[k] ~= table2[k] then
+			return false
+		end
+	end
+	
+	return true
 end
