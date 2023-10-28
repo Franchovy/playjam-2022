@@ -4,6 +4,12 @@ class("Painter").extends()
 function Painter:init(drawFunction)
 	self.drawFunction = drawFunction
 	self.stateImages = {}
+	self.offset = { x = 0, y = 0 }
+end
+
+function Painter:offsetBy(x, y)
+	self.offset = { x = x, y = y }
+	return self
 end
 
 function Painter:draw(state)
@@ -20,7 +26,7 @@ function Painter:_drawState(state)
 		self.stateImages[state] = self:_drawImage(state)
 	end
 	
-	self.stateImages[state]:draw(0,0)
+	self.stateImages[state]:draw(self.offset.x, self.offset.y)
 end
 
 function Painter:_draw()
@@ -28,7 +34,7 @@ function Painter:_draw()
 		self.image = self:_drawImage()
 	end
 	
-	self.image:draw(0,0)
+	self.image:draw(self.offset.x, self.offset.y)
 end
 
 function Painter:_drawImage(state)
