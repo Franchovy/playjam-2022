@@ -40,64 +40,66 @@ function initialize()
 	
 	-- Painter Button
 	
-	local painterButtonFill = Painter(function(state)
+	local painterButtonFill = Painter(function(rect, state)
 		if state.tick == 0 then
 			-- press a button fill
 			playdate.graphics.setColor(playdate.graphics.kColorWhite)
 			playdate.graphics.setDitherPattern(0.8, playdate.graphics.image.kDitherTypeDiagonalLine)
-			playdate.graphics.fillRoundRect(125 - 10, 210, 160, 27, 6)
+			playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
 		else
 			-- press a button fill
 			playdate.graphics.setColor(playdate.graphics.kColorWhite)
 			playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
-			playdate.graphics.fillRoundRect(125 - 10, 210, 160, 27, 6)
+			playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
 		end
 	end)
 	
-	local painterButtonOutline = Painter(function(state)
+	local painterButtonOutline = Painter(function(rect, state)
 		if state.tick == 0 then
 			-- press a button outline
 			playdate.graphics.setColor(playdate.graphics.kColorBlack)
 			playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
 			playdate.graphics.setLineWidth(3)
-			playdate.graphics.drawRoundRect(125 - 10, 210, 160, 27, 6)
+			playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
 		else
 			-- press a button outline
 			playdate.graphics.setColor(playdate.graphics.kColorBlack)
 			playdate.graphics.setLineWidth(3)
-			playdate.graphics.drawRoundRect(125 - 10, 210, 160, 27, 6)
+			playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
 		end
 	end)
 	
-	local painterButtonPressStart = Painter(function(state)
+	local painterButtonPressStart = Painter(function(rect, state)
 		if state.tick == 0 then
 			-- press a text
-			pressStart:drawFaded(130, 215, 0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
+			pressStart:drawFaded(rect.x, rect.y, 0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
 		else
 			-- press a text
-			pressStart:draw(130, 215)
+			pressStart:draw(rect.x, rect.y)
 		end
 	end)
 	
-	painterButton = Painter(function(state) 
-		painterButtonFill:draw(state)
-		painterButtonOutline:draw(state)
-		painterButtonPressStart:draw(state)
+	painterButton = Painter(function(rect, state) 
+		painterButtonFill:draw({ x = 0, y = 0, w = rect.w, h = rect.h }, state)
+		painterButtonOutline:draw({ x = 0, y = 0, w = rect.w, h = rect.h }, state)
+		
+		local imageSizePressStartW, imageSizePressStartH = pressStart:getSize()
+		painterButtonPressStart:draw({x = 15, y = 5, w = imageSizePressStartW, h = imageSizePressStartH}, state)
 	end)
 	
 	-- Painter Background
 	
-	local painterBackground1 = Painter(function(state)
+	local painterBackground1 = Painter(function(rect, state)
 		playdate.graphics.setDitherPattern(0.4, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.fillRect(0, 0, 400, 240)
 	end)
 	
-	local painterBackground2 = Painter(function(state)
+	local painterBackground2 = Painter(function(rect, state)
 		-- background - right hill
 		backgroundImage3:drawFaded(0, -10, 0.2, playdate.graphics.image.kDitherTypeBayer8x8)
 	end)
 	
-	local painterBackground3 = Painter(function(state)
+	local painterBackground3 = Painter(function(rect, state)
 		-- background - flashing lights
 		if state.tick == 0 then
 			backgroundImage2:drawFaded(5, 0, 0.7, playdate.graphics.image.kDitherTypeDiagonalLine)
@@ -106,49 +108,49 @@ function initialize()
 		end
 	end)
 	
-	local painterBackground4 = Painter(function(state)
+	local painterBackground4 = Painter(function(rect, state)
 		-- background - left hill
 		backgroundImage4:drawFaded(-20, 120, 0.8, playdate.graphics.image.kDitherTypeBayer4x4)
 		backgroundImage:draw(200,30)
 	end)
 	
-	painterBackground = Painter(function(state)
-		painterBackground1:draw()
-		painterBackground2:draw()
-		painterBackground3:draw(state)
-		painterBackground4:draw()
+	painterBackground = Painter(function(rect, state)
+		painterBackground1:draw(rect)
+		painterBackground2:draw(rect)
+		painterBackground3:draw(rect, state)
+		painterBackground4:draw(rect)
 	end)
 	
 	-- Painter Text
 	
-	local painterTitleRectangleOutline = Painter(function(state)
+	local painterTitleRectangleOutline = Painter(function(rect, state)
 		-- title rectangle outline
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
 		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.fillRect(0, 150, 400, 57)
 	end)
 	
-	local painterTitleRectangleFill = Painter(function(state)
+	local painterTitleRectangleFill = Painter(function(rect, state)
 		-- title rectangle fill
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
 		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.fillRect(0, 160, 400, 37)
 	end)
 	
-	local painterTitleText = Painter(function(state)
+	local painterTitleText = Painter(function(rect, state)
 		-- title white shadow
 		textImageInverted:draw(39, 166)
 		-- title 
 		textImage:draw(40, 165)
 	end)
 	
-	painterTitle = Painter(function(state)
-		painterTitleRectangleOutline:draw()
-		painterTitleRectangleFill:draw()
-		painterTitleText:draw()
+	painterTitle = Painter(function(rect, state)
+		painterTitleRectangleOutline:draw(rect)
+		painterTitleRectangleFill:draw(rect)
+		painterTitleText:draw(rect)
 	end)
 	
-	painterWheel = Painter(function(state)
+	painterWheel = Painter(function(rect, state)
 		-- animated particles
 		imagetable:getImage((state.index % 36) + 1):scaledImage(2):draw(-60, -25)
 		
@@ -176,16 +178,18 @@ function playdate.update()
 	-- state
 	--painter.setState({index = index, tick = tick})
 	
-	playdate.graphics.clear()
+	--playdate.graphics.clear()
 	
+	local w, h = playdate.display.getSize()
+	local maxRect = { x = 0, y = 0, w = w, h = h }
 	-- background
-	painterBackground:draw({ tick = tick })
+	--painterBackground:draw(maxRect, { tick = tick })
 	
-	painterWheel:draw({ index = index % 36 })
+	--painterWheel:draw(maxRect, { index = index % 36 })
 	
-	painterTitle:draw()
+	--painterTitle:draw(maxRect)
 	
-	painterButton:draw({ tick = tick})
+	painterButton:draw({x = 115, y = 210, w = 160, h = 27}, { tick = tick})
 end
 
 function placeholder()
