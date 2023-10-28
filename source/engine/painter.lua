@@ -4,6 +4,7 @@ class("Painter").extends()
 function Painter:init(drawFunction)
 	self.drawFunction = drawFunction
 	self.stateImages = {}
+	self.state = nil
 end
 
 function Painter:draw(rect, state)
@@ -16,7 +17,7 @@ end
 
 -- TODO: efficient implementation of table state checking
 function Painter:_drawState(rect, state)
-	local _, image = self:_contains(self.stateImages, state)
+	local stateExisting, image = self:_contains(self.stateImages, state)
 	
 	if image == nil then
 		self.stateImages[state] = self:_drawImage(rect, state)

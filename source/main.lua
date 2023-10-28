@@ -175,21 +175,18 @@ function playdate.update()
 		tick = tick == 0 and 1 or 0
 	end
 	
-	-- state
-	--painter.setState({index = index, tick = tick})
+	playdate.graphics.sprite.setBackgroundDrawingCallback(function()
+		local w, h = playdate.display.getSize()
+		local maxRect = { x = 0, y = 0, w = w, h = h }
+		
+		painterBackground:draw(maxRect, { tick = tick })
+		painterWheel:draw(maxRect, { index = index % 36 })
+		painterTitle:draw(maxRect)
+		painterButton:draw({x = 115, y = 210, w = 160, h = 27}, { tick = tick })
+	end)
 	
-	--playdate.graphics.clear()
-	
-	local w, h = playdate.display.getSize()
-	local maxRect = { x = 0, y = 0, w = w, h = h }
-	-- background
-	--painterBackground:draw(maxRect, { tick = tick })
-	
-	--painterWheel:draw(maxRect, { index = index % 36 })
-	
-	--painterTitle:draw(maxRect)
-	
-	painterButton:draw({x = 115, y = 210, w = 160, h = 27}, { tick = tick})
+	sprite.update()
+	playdate.graphics.sprite.redrawBackground()
 end
 
 function placeholder()
