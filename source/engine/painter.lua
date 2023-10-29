@@ -8,39 +8,40 @@ function Painter:init(drawFunction)
 end
 
 function Painter:draw(rect, state)
-	if state ~= nil then
-		self:_drawState(rect, state)
-	else 
-		self:_draw(rect)
-	end
-end
-
--- TODO: efficient implementation of table state checking
-function Painter:_drawState(rect, state)
-	local stateExisting, image = self:_contains(self.stateImages, state)
+	local image = self:_getImage(state)
 	
 	if image == nil then
-		self.stateImages[state] = self:_drawImage(rect, state)
-		image = self.stateImages[state]
+		image = playdate.graphics.image.new(rect.w, rect.h)
+		
+		playdate.graphics.pushContext(image)
+		self.drawFunction({x = 0, y = 0, w = rect.w, h = rect.h }, state)
+		playdate.graphics.popContext()
+		
+		self:_setImage(image, state)
 	end
 	
 	image:draw(rect.x, rect.y)
 end
 
-function Painter:_draw(rect)
-	if self.image == nil then
-		self.image = self:_drawImage(rect)
+function Painter:_getImage(state)
+	if state ~= nil then
+		local _, image = self:_contains(self.stateImages, state)
+		if image ~= nil then
+			return image
+		end
+	elseif self.image ~= nil then
+		return self.image
 	end
 	
-	self.image:draw(rect.x, rect.y)
+	return nil
 end
 
-function Painter:_drawImage(rect, state)
-	local image = playdate.graphics.image.new(rect.w, rect.h)
-	playdate.graphics.pushContext(image)
-	self.drawFunction({x = 0, y = 0, w = rect.w, h = rect.h }, state)
-	playdate.graphics.popContext()
-	return image
+function Painter:_setImage(image, state)
+	if state ~= nil then
+		self.stateImages[state] = image
+	else
+		self.image = image
+	end
 end
 
 function Painter:_contains(set, t)
