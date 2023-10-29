@@ -1,12 +1,20 @@
 class("Title").extends()
 
 -- Called from main
-function Title:init()
+function Title:init()	
 	self.images = {}
 	self.painters = {}
 	
 	self.index = 0
 	self.tick = 0
+	
+	self.kStates = {
+		default = 0,
+		menu = 1
+	}
+
+	self:setState(self.kStates.default)
+	print(self.state)
 end
 
 -- Called from main (first update)
@@ -86,19 +94,22 @@ function Title:load()
 	-- Painter Background
 	
 	local painterBackground1 = Painter(function(rect, state)
+		playdate.graphics.setColor(playdate.graphics.kColorWhite)
+		playdate.graphics.fillRect(0, 0, 400, 240)
+		playdate.graphics.setColor(playdate.graphics.kColorBlack)
 		playdate.graphics.setDitherPattern(0.4, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.fillRect(0, 0, 400, 240)
 	end)
 	
 	local painterBackground2 = Painter(function(rect, state)
 		-- background - right hill
-		self.images.backgroundImage3:drawFaded(0, -10, 0.2, playdate.graphics.image.kDitherTypeBayer8x8)
+		self.images.backgroundImage3:drawFaded(0, -10, 0.4, playdate.graphics.image.kDitherTypeBayer8x8)
 	end)
 	
 	local painterBackground3 = Painter(function(rect, state)
 		-- background - flashing lights
 		if state.tick == 0 then
-			self.images.backgroundImage2:drawFaded(5, 0, 0.7, playdate.graphics.image.kDitherTypeDiagonalLine)
+			self.images.backgroundImage2:drawFaded(5, 0, 0.6, playdate.graphics.image.kDitherTypeDiagonalLine)
 		else
 			self.images.backgroundImage2:invertedImage():drawFaded(5, 0, 0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
 		end
@@ -106,22 +117,26 @@ function Title:load()
 	
 	local painterBackground4 = Painter(function(rect, state)
 		-- background - left hill
-		self.images.backgroundImage4:drawFaded(-20, 120, 0.8, playdate.graphics.image.kDitherTypeBayer4x4)
+		self.images.backgroundImage4:drawFaded(-20, 120, 0.9, playdate.graphics.image.kDitherTypeBayer4x4)
+	end)
+	
+	local painterBackgroundAssets = Painter(function(rect, state)
+		-- background assets (coin, platforms, kill-block)
 		self.images.backgroundImage:draw(200,30)
 	end)
 	
 	self.painters.painterBackground = Painter(function(rect, state)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		
-		local rectOffset = Rect.offset(rect, 0, -20)
-		painterBackground1:draw(rectOffset)
-		painterBackground2:draw(rectOffset)
-		painterBackground3:draw(rectOffset, state)
-		painterBackground4:draw(rectOffset)
+		local animationValue = state.animationValue
 		
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
 		playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeBayer4x4)
-		playdate.graphics.fillRect(rect.x, (rect.y + rect.h) - 20, rect.w, 20)
+		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
+		
+		painterBackground1:draw(Rect.offset(rect, 0, -20 - animationValue))
+		painterBackground2:draw(Rect.offset(rect, animationValue, -20))
+		painterBackground3:draw(Rect.offset(rect, 0, -20 - animationValue), state)
+		painterBackground4:draw(Rect.offset(rect, -animationValue, -20))
+		painterBackgroundAssets:draw(Rect.offset(rect, animationValue, -20))
 	end)
 	
 	-- Painter Text
@@ -169,16 +184,25 @@ function Title:load()
 	end)
 	
 	playdate.graphics.sprite.setBackgroundDrawingCallback(function()
+		if self.animators == nil then
+			self.animators = {}
+			self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
+			self.animators.animator2 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outExpo, 500)
+			self.animators.animator3 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outCirc, 1000)
+			-- Placeholder animator for use on transition out
+			self.animators.animatorOut = playdate.graphics.animator.new(0, 0, 0, playdate.easingFunctions.outCirc, 0)
+		end
+		
 		local w, h = playdate.display.getSize()
 		
 		Painter.clearGlobal()
 		
-		self.painters.painterBackground:draw({ x = 0, y = 0, w = w, h = h }, { tick = self.tick })
+		self.painters.painterBackground:draw({ x = 0, y = 0, w = w, h = h }, { tick = self.tick, animationValue = self.animators.animator1:currentValue() + self.animators.animatorOut:currentValue() })
 		
 		self.painters.painterWheel:draw({x = 70, y = 30, w = 150, h = 150}, { index = self.index % 36 })
 		
-		self.painters.painterTitle:draw({x = 0, y = 130, w = 400, h = 57})
-		self.painters.painterButton:draw({x = 115, y = 200, w = 160, h = 27}, { tick = self.tick })
+		self.painters.painterTitle:draw({x = 0, y = 130 + self.animators.animator2:currentValue() + self.animators.animatorOut:currentValue(), w = 400, h = 57})
+		self.painters.painterButton:draw({x = 115, y = 200 + self.animators.animator3:currentValue() + self.animators.animatorOut:currentValue(), w = 160, h = 27}, { tick = self.tick })
 		
 		Painter.drawGlobal()
 	end)
@@ -193,5 +217,45 @@ function Title:update()
 	
 	if playdate.buttonIsPressed(playdate.kButtonA) then
 		self.tick = 0
+		self:setState(self.kStates.menu)
+	end
+	
+	if playdate.buttonIsPressed(playdate.kButtonB) then
+		self.tick = 0
+		self:setState(self.kStates.default)
+	end
+end
+
+function Title:setState(state)
+	if self.state == nil then
+		-- Set Initial State
+		self.state = state
+		return
+	end
+
+	-- Call state transition
+	self:changeState(self.state, state)
+	
+	self.state = state
+end
+
+function Title:changeState(stateFrom, stateTo)
+	if stateFrom == self.kStates.default and stateTo == self.kStates.menu then
+		self.animators.animatorOut = playdate.graphics.animator.new(
+			800, 
+			math.max(0, self.animators.animatorOut:currentValue()), 
+			240, 
+			playdate.easingFunctions.inExpo, 200
+		)
+	end
+	
+	if stateFrom == self.kStates.menu and stateTo == self.kStates.default then
+		self.animators.animatorOut = playdate.graphics.animator.new(
+			800, 
+			math.min(240, self.animators.animatorOut:currentValue()), 
+			0, 
+			playdate.easingFunctions.outExpo, 
+			200
+		)
 	end
 end
