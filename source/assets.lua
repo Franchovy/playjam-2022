@@ -28,7 +28,8 @@ kAssetsSounds = {
 	playerDied = dirSounds.."death",
 	menuSelectFail = dirSounds.."menu-fail",
 	menuSelect = dirSounds.."menu-select",
-	wheelMovement = dirSounds.."wheel_movement"
+	wheelMovement = dirSounds.."wheel_movement",
+	click = dirSounds.."click"
 }
 
 kAssetsTracks = {

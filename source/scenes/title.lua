@@ -14,7 +14,8 @@ function Title:init()
 	}
 
 	self:setState(self.kStates.default)
-	print(self.state)
+	
+	self.samples = {}
 end
 
 -- Called from main (first update)
@@ -38,9 +39,7 @@ function Title:load()
 		self.images.pressStart = playdate.graphics.imageWithText("PRESS A", 200, 60):scaledImage(2)
 	--end)
 	
-	-- Listen to key press once loading is finished, else wait for end of animation
-	
-	-- self:loadFinished()
+	self.samples.click = playdate.sound.sampleplayer.new(kAssetsSounds.click)
 	
 	-- Painter Button
 	
@@ -199,7 +198,7 @@ function Title:load()
 		
 		self.painters.painterBackground:draw({ x = 0, y = 0, w = w, h = h }, { tick = self.tick, animationValue = self.animators.animator1:currentValue() + self.animators.animatorOut:currentValue() })
 		
-		self.painters.painterWheel:draw({x = 70, y = 30, w = 150, h = 150}, { index = self.index % 36 })
+		self.painters.painterWheel:draw({x = 70, y = 30, w = 150 + self.animators.animatorOut:currentValue(), h = 150}, { index = self.index % 36 })
 		
 		self.painters.painterTitle:draw({x = 0, y = 130 + self.animators.animator2:currentValue() + self.animators.animatorOut:currentValue(), w = 400, h = 57})
 		self.painters.painterButton:draw({x = 115, y = 200 + self.animators.animator3:currentValue() + self.animators.animatorOut:currentValue(), w = 160, h = 27}, { tick = self.tick })
@@ -241,6 +240,8 @@ end
 
 function Title:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.default and stateTo == self.kStates.menu then
+		self.samples.click:play()
+		
 		self.animators.animatorOut = playdate.graphics.animator.new(
 			800, 
 			math.max(0, self.animators.animatorOut:currentValue()), 
@@ -250,6 +251,8 @@ function Title:changeState(stateFrom, stateTo)
 	end
 	
 	if stateFrom == self.kStates.menu and stateTo == self.kStates.default then
+		self.samples.click:play()
+		
 		self.animators.animatorOut = playdate.graphics.animator.new(
 			800, 
 			math.min(240, self.animators.animatorOut:currentValue()), 
