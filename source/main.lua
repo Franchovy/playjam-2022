@@ -23,6 +23,9 @@ local painterBackground
 local painterTitle
 local painterWheel
 
+local index = 0
+local tick = 0
+
 function initialize()
 	gfx.setFont(gfx.font.new(kAssetsFonts.twinbee))
 	gfx.setFontTracking(1)
@@ -175,16 +178,6 @@ function initialize()
 	-- Create Scene
 	-- * calls load and present
 	--sceneManager:setCurrentScene(scenes.menu)
-end
-
-local index = 0
-local tick = 0
-function playdate.update()
-	index += 2
-	
-	if index % 40 > 32 then
-		tick = tick == 0 and 1 or 0
-	end
 	
 	playdate.graphics.sprite.setBackgroundDrawingCallback(function()
 		local w, h = playdate.display.getSize()
@@ -201,6 +194,15 @@ function playdate.update()
 		
 		Painter.drawGlobal()
 	end)
+	
+end
+
+function playdate.update()
+	index += 2
+	
+	if index % 40 > 32 then
+		tick = tick == 0 and 1 or 0
+	end
 	
 	sprite.update()
 	playdate.graphics.sprite.redrawBackground()
