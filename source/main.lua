@@ -115,10 +115,15 @@ function initialize()
 	end)
 	
 	painterBackground = Painter(function(rect, state)
-		painterBackground1:draw(rect)
-		painterBackground2:draw(rect)
-		painterBackground3:draw(rect, state)
-		painterBackground4:draw(rect)
+		local rectOffset = Rect.offset(rect, 0, -20)
+		painterBackground1:draw(rectOffset)
+		painterBackground2:draw(rectOffset)
+		painterBackground3:draw(rectOffset, state)
+		painterBackground4:draw(rectOffset)
+		
+		playdate.graphics.setColor(playdate.graphics.kColorBlack)
+		playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeBayer4x4)
+		playdate.graphics.fillRect(rect.x, (rect.y + rect.h) - 20, rect.w, 20)
 	end)
 	
 	-- Painter Text
@@ -127,37 +132,43 @@ function initialize()
 		-- title rectangle outline
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
 		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRect(0, 150, 400, 57)
+		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
 	end)
 	
 	local painterTitleRectangleFill = Painter(function(rect, state)
 		-- title rectangle fill
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
 		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRect(0, 160, 400, 37)
+		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
 	end)
 	
 	local painterTitleText = Painter(function(rect, state)
-		-- title white shadow
-		textImageInverted:draw(39, 166)
-		-- title 
-		textImage:draw(40, 165)
+		textImage:draw(rect.x, rect.y)
 	end)
 	
 	painterTitle = Painter(function(rect, state)
 		painterTitleRectangleOutline:draw(rect)
-		painterTitleRectangleFill:draw(rect)
-		painterTitleText:draw(rect)
+		painterTitleRectangleFill:draw(Rect.inset(rect, 0, 10))
+		local titleTextSizeW, titleTextSizeH = textImage:getSize()
+		painterTitleText:draw({x = 40, y = 15, w = titleTextSizeW, h = titleTextSizeH })
 	end)
 	
-	painterWheel = Painter(function(rect, state)
+	painterParticles = Painter(function(rect, state) 
 		-- animated particles
-		imagetable:getImage((state.index % 36) + 1):scaledImage(2):draw(-60, -25)
-		
-		-- animated wheel
-		wheelImageTable:getImage((-state.index % 12) + 1):scaledImage(2):draw(70, 50)
+		imagetable:getImage((state.index % 36) + 1):scaledImage(2):draw(rect.x, rect.y)
 	end)
 	
+	painterWheel = Painter(function(rect, state, globals)
+		table.insert(globals, { 
+			fn = function() 
+				painterParticles:draw({ x = rect.x - 55, y = rect.y - 35, w = 150, h = 150}, state, { absolute = true })
+			end,
+			state = state
+		})
+
+		-- animated wheel
+		wheelImageTable:getImage((-state.index % 12) + 1):scaledImage(2):draw(rect.x, rect.y)
+	end)
 	-- Create game state manager
 	--scenes.menu = MenuScene()
 	
@@ -169,20 +180,26 @@ end
 local index = 0
 local tick = 0
 function playdate.update()
-	index += 3
+	index += 2
 	
-	if index % 40 > 30 then
+	if index % 40 > 32 then
 		tick = tick == 0 and 1 or 0
 	end
 	
 	playdate.graphics.sprite.setBackgroundDrawingCallback(function()
 		local w, h = playdate.display.getSize()
-		local maxRect = { x = 0, y = 0, w = w, h = h }
+		local maxRect = 
 		
-		painterBackground:draw(maxRect, { tick = tick })
-		painterWheel:draw(maxRect, { index = index % 36 })
-		painterTitle:draw(maxRect)
-		painterButton:draw({x = 115, y = 210, w = 160, h = 27}, { tick = tick })
+		Painter.clearGlobal()
+		
+		painterBackground:draw({ x = 0, y = 0, w = w, h = h }, { tick = tick })
+		
+		painterWheel:draw({x = 70, y = 30, w = 150, h = 150}, { index = index % 36 })
+		
+		painterTitle:draw({x = 0, y = 130, w = 400, h = 57})
+		painterButton:draw({x = 115, y = 200, w = 160, h = 27}, { tick = tick })
+		
+		Painter.drawGlobal()
 	end)
 	
 	sprite.update()
