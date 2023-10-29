@@ -2,6 +2,7 @@ import "engine"
 import "MenuScene"
 import "GameScene"
 import "GameOverScene"
+import "title"
 
 scenes = {
 	menu = nil,
