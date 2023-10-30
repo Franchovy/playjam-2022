@@ -12,8 +12,11 @@ function initialize()
 	gfx.setFont(gfx.font.new(kAssetsFonts.twinbee))
 	gfx.setFontTracking(1)
 	
+	Widget.setBackgroundDrawingCallback()
+	
 	title = Title()
 	title:load()
+	Widget.topLevelWidget = title
 	-- Create game state manager
 	--scenes.menu = MenuScene()
 	
@@ -23,7 +26,7 @@ function initialize()
 end
 
 function playdate.update()
-	title:update()
+	Widget.update()
 	
 	sprite.update()
 	playdate.graphics.sprite.redrawBackground()

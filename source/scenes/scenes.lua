@@ -3,6 +3,7 @@ import "MenuScene"
 import "GameScene"
 import "GameOverScene"
 import "title"
+import "levelSelect"
 
 scenes = {
 	menu = nil,

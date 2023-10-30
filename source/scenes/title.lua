@@ -1,7 +1,57 @@
-class("Title").extends()
+class("Widget").extends()
+
+Widget.topLevelWidget = nil
+
+function Widget:init()
+	self.children = {}
+end
+
+function Widget.setBackgroundDrawingCallback()
+	playdate.graphics.sprite.setBackgroundDrawingCallback(
+		function( x, y, width, height )
+			Widget.draw()
+		end
+	)
+end
+
+function Widget:addChild(child)
+	table.insert(self.children, child)
+end
+
+function Widget.update(self)
+	if self == nil then
+		if Widget.topLevelWidget == nil then
+			return
+		end
+		
+		Widget.topLevelWidget:update()
+	else 
+		for _, child in pairs(self.children) do
+			child:update()
+		end
+	end
+end
+
+function Widget.draw(self)
+	if self == nil then
+		if Widget.topLevelWidget == nil then
+			return
+		end
+		
+		Widget.topLevelWidget:draw()
+	else
+		for _, child in pairs(self.children) do
+			child:draw()
+		end
+	end
+end
+
+class("Title").extends(Widget)
 
 -- Called from main
 function Title:init()	
+	Title.super.init(self)
+	
 	self.images = {}
 	self.painters = {}
 	
@@ -183,30 +233,32 @@ function Title:load()
 		-- animated wheel
 		self.images.wheelImageTable:getImage((-state.index % 12) + 1):scaledImage(2):draw(rect.x, rect.y)
 	end)
+end
+
+function Title:draw()
+	if self.animators == nil then
+		self.animators = {}
+		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
+		self.animators.animator2 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outExpo, 500)
+		self.animators.animator3 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outCirc, 1000)
+		-- Placeholder animator for use on transition out
+		self.animators.animatorOut = playdate.graphics.animator.new(0, 0, 0, playdate.easingFunctions.outCirc, 0)
+	end
 	
-	playdate.graphics.sprite.setBackgroundDrawingCallback(function()
-		if self.animators == nil then
-			self.animators = {}
-			self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
-			self.animators.animator2 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outExpo, 500)
-			self.animators.animator3 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outCirc, 1000)
-			-- Placeholder animator for use on transition out
-			self.animators.animatorOut = playdate.graphics.animator.new(0, 0, 0, playdate.easingFunctions.outCirc, 0)
-		end
-		
-		local w, h = playdate.display.getSize()
-		
-		Painter.clearGlobal()
-		
-		self.painters.painterBackground:draw({ x = 0, y = 0, w = w, h = h }, { tick = self.tick, animationValue = self.animators.animator1:currentValue() + self.animators.animatorOut:currentValue() })
-		
-		self.painters.painterWheel:draw({x = 70, y = 30, w = 150 + self.animators.animatorOut:currentValue(), h = 150}, { index = self.index % 36 })
-		
-		self.painters.painterTitle:draw({x = 0, y = 130 + self.animators.animator2:currentValue() + self.animators.animatorOut:currentValue(), w = 400, h = 57})
-		self.painters.painterButton:draw({x = 115, y = 200 + self.animators.animator3:currentValue() + self.animators.animatorOut:currentValue(), w = 160, h = 27}, { tick = self.tick })
-		
-		Painter.drawGlobal()
-	end)
+	local w, h = playdate.display.getSize()
+	
+	Painter.clearGlobal()
+	
+	self.painters.painterBackground:draw({ x = 0, y = 0, w = w, h = h }, { tick = self.tick, animationValue = self.animators.animator1:currentValue() + self.animators.animatorOut:currentValue() })
+	
+	self.painters.painterWheel:draw({x = 70, y = 30, w = 150 + self.animators.animatorOut:currentValue(), h = 150}, { index = self.index % 36 })
+	
+	self.painters.painterTitle:draw({x = 0, y = 130 + self.animators.animator2:currentValue() + self.animators.animatorOut:currentValue(), w = 400, h = 57})
+	self.painters.painterButton:draw({x = 115, y = 200 + self.animators.animator3:currentValue() + self.animators.animatorOut:currentValue(), w = 160, h = 27}, { tick = self.tick })
+	
+	Painter.drawGlobal()
+	
+	Title.super.draw(self)
 end
 
 function Title:update()
@@ -225,6 +277,13 @@ function Title:update()
 		self.tick = 0
 		self:setState(self.kStates.default)
 	end
+	
+	if self.state == self.kStates.menu and self.animators.animatorOut:ended() then
+		--self.levelSelect = LevelSelect()
+		--levelSelect:load()
+	end
+	
+	Title.super.update(self)
 end
 
 function Title:setState(state)
