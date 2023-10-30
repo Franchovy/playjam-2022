@@ -142,6 +142,8 @@ function Title:load()
 	
 	local painterTitleRectangleOutline = Painter(function(rect, state)
 		-- title rectangle outline
+		playdate.graphics.setColor(playdate.graphics.kColorWhite)
+		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
 		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
