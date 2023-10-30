@@ -2,6 +2,7 @@ import "engine"
 import "MenuScene"
 import "GameScene"
 import "GameOverScene"
+import "widget"
 import "title"
 import "levelSelect"
 
