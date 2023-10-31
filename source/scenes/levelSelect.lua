@@ -16,6 +16,7 @@ function LevelSelect:load()
 	}
 	
 	for _, entry in pairs(self.entries) do
+		entry:load()
 		self:addChild(entry)
 	end
 end
