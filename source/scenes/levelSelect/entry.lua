@@ -20,27 +20,32 @@ function LevelSelectEntry:load()
 	
 	self.painters.outline = Painter(function(rect, state)
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
+		playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.setLineWidth(1)
-		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 4)
+		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		
+		playdate.graphics.setDitherPattern(0.8, playdate.graphics.image.kDitherTypeScreen)
+		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
 	end)
 	
 	self.painters.outlineSelected = Painter(function(rect, state)
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		--playdate.graphics.setDitherPattern(0.2, playdate.graphics.kDitherTypeScreen)
 		playdate.graphics.setLineWidth(3)
-		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 4)
+		playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
+		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
 	end)
 end
 
 function LevelSelectEntry:draw(position)
 	LevelSelect.super.draw(self)
 	
-	self.images.title:draw(position.x, position.y)
+	self.images.title:draw(position.x + 20, position.y + 2)
 	
+	local outlineRect = Rect.inset(Rect.make(position.x, position.y, 190, 20), 0, -10)
 	if not self.state.selected then
-		self.painters.outline:draw(Rect.make(position.x, position.y, 100, 20))
+		self.painters.outline:draw(outlineRect)
 	else
-		self.painters.outlineSelected:draw(position.x, position.y, 100, 20)
+		self.painters.outlineSelected:draw(outlineRect)
 	end
 end
 

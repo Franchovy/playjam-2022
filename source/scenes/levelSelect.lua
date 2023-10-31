@@ -32,6 +32,16 @@ end
 
 function LevelSelect:update()
 	LevelSelect.super.update(self)
+	
+	if playdate.buttonJustPressed(playdate.kButtonA) then
+		for i, entry in ipairs(self.entries) do
+			 entry.state.selected = true
+		end
+	elseif playdate.buttonJustReleased(playdate.kButtonA) then
+		for i, entry in ipairs(self.entries) do
+			 entry.state.selected = false
+		end
+	end
 end
 
 function LevelSelect:changeState(stateFrom, stateTo)
