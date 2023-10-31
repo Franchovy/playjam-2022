@@ -155,7 +155,7 @@ function Title:load()
 		painterTitleText:draw({x = 40, y = 15, w = titleTextSizeW, h = titleTextSizeH })
 	end)
 	
-	self.painters.painterWheel = Painter(function(rect, state, globals)
+	self.painters.painterWheel = Painter(function(rect, state)
 		self.images.imagetable:getImage((state.index % 36) + 1):scaledImage(2):draw(10, -70)
 		
 		self.images.wheelImageTable:getImage((-state.index % 12) + 1):draw(140, 0)
@@ -182,8 +182,6 @@ function Title:draw()
 	
 	local w, h = playdate.display.getSize()
 	
-	Painter.clearGlobal()
-	
 	local rect = { x = 0, y = 0, w = w, h = h }
 	
 	playdate.graphics.setColor(playdate.graphics.kColorBlack)
@@ -203,8 +201,6 @@ function Title:draw()
 	
 	self.painters.painterTitle:draw({x = 0, y = 130 + self.animators.animator2:currentValue() + self.animators.animatorOut:currentValue(), w = 400, h = 57})
 	self.painters.painterButton:draw({x = 115, y = 200 + self.animators.animator3:currentValue() + self.animators.animatorOut:currentValue(), w = 160, h = 27}, { tick = self.tick })
-	
-	Painter.drawGlobal()
 	
 	Title.super.draw(self)
 end

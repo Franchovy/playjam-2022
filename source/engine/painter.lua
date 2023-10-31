@@ -5,58 +5,22 @@ function Painter:init(drawFunction)
 	self.drawFunction = drawFunction
 	self.stateImages = {}
 	self.state = nil
-	self.globals = {}
 end
 
-local globalImage = playdate.graphics.image.new(400, 240)
-
-function Painter.clearGlobal() 
-	globalImage:clear(playdate.graphics.kColorClear)
-end
-
-function Painter.drawGlobal() 
-	globalImage:draw(0, 0)
-end
-
-function Painter:draw(rect, state, config)
-	local absolute = self:_getConfig(config)
+function Painter:draw(rect, state)
 	local image = self:_getImage(state)
 	
 	if image == nil then
 		image = playdate.graphics.image.new(rect.w, rect.h)
 		
 		playdate.graphics.pushContext(image)
-		self.drawFunction({x = rect.x, y = rect.y, w = rect.w, h = rect.h }, state, self.globals)
+		self.drawFunction({x = rect.x, y = rect.y, w = rect.w, h = rect.h }, state)
 		playdate.graphics.popContext()
 		
 		self:_setImage(image, state)
 	end
 	
-	for _, global in pairs(self.globals) do
-		if self:_shallowEqual(global.state, state) then
-			global.fn()
-		end
-	end
-	
-	if absolute then
-		playdate.graphics.lockFocus(globalImage)
-		image:draw(rect.x, rect.y)
-		playdate.graphics.unlockFocus()
-	else
-		image:draw(rect.x, rect.y)
-	end
-end
-
-function Painter:_getConfig(config)
-	local absolute = false
-	
-	if config ~= nil then
-		if config.absolute ~= nil then
-			absolute = config.absolute
-		end
-	end
-	
-	return absolute
+	image:draw(rect.x, rect.y)
 end
 
 function Painter:_getImage(state)
