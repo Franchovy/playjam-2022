@@ -222,14 +222,6 @@ function Title:update()
 		self:setState(self.kStates.default)
 	end
 	
-	if self.state == self.kStates.menu and self.animators.animatorOut:ended() then
-		self.levelSelect = LevelSelect()
-		
-		self.levelSelect:load()
-		
-		--self:addChild(self.levelSelect)
-	end
-	
 	Title.super.update(self)
 end
 
@@ -263,10 +255,25 @@ function Title:changeState(stateFrom, stateTo)
 			playdate.easingFunctions.inQuad, 
 			500
 		)
+		
+		if self.levelSelect == nil then
+			self.levelSelect = LevelSelect()
+			self.levelSelect:load()
+		end
+		
+		playdate.timer.performAfterDelay(1200, function()
+			if self.state == self.kStates.menu then
+				self:addChild(self.levelSelect)
+			end
+		end)
 	end
 	
 	if stateFrom == self.kStates.menu and stateTo == self.kStates.default then
 		self.samples.click:play()
+		
+		if self.levelSelect then
+			self:removeChild(self.levelSelect)
+		end
 		
 		self.animators.animatorOut = playdate.graphics.animator.new(
 			800, 

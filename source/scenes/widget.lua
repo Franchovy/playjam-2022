@@ -18,6 +18,10 @@ function Widget:addChild(child)
 	table.insert(self.children, child)
 end
 
+function Widget:removeChild(child)
+	table.removevalue(self.children, child)	
+end
+
 function Widget.update(self)
 	if self == nil then
 		if Widget.topLevelWidget == nil then

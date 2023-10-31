@@ -30,6 +30,7 @@ function playdate.update()
 	
 	sprite.update()
 	playdate.graphics.sprite.redrawBackground()
+	timer.updateTimers()
 end
 
 function placeholder()
