@@ -4,6 +4,7 @@ Widget.topLevelWidget = nil
 
 function Widget:init()
 	self.children = {}
+	self.position = { x = 0, y = 0 }
 end
 
 function Widget.setBackgroundDrawingCallback()
@@ -12,6 +13,14 @@ function Widget.setBackgroundDrawingCallback()
 			Widget.draw()
 		end
 	)
+end
+
+function Widget:load()
+	
+end
+
+function Widget:setPosition(x, y)
+	self.position = { x = x, y = y }
 end
 
 function Widget:addChild(child)
@@ -42,10 +51,6 @@ function Widget.draw(self)
 			return
 		end
 		
-		Widget.topLevelWidget:draw()
-	else
-		for _, child in pairs(self.children) do
-			child:draw()
-		end
+		Widget.topLevelWidget:draw(Widget.topLevelWidget.position, Widget.topLevelWidget.children)
 	end
 end

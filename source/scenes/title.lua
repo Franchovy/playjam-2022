@@ -1,3 +1,6 @@
+import "utils/rect"
+import "utils/position"
+
 class("Title").extends(Widget)
 
 -- Called from main
@@ -162,7 +165,7 @@ function Title:load()
 	end)
 end
 
-function Title:draw()
+function Title:draw(position, children)
 	if self.animators == nil then
 		self.animators = {}
 		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
@@ -202,7 +205,12 @@ function Title:draw()
 	self.painters.painterTitle:draw({x = 0, y = 130 + self.animators.animator2:currentValue() + self.animators.animatorOut:currentValue(), w = 400, h = 57})
 	self.painters.painterButton:draw({x = 115, y = 200 + self.animators.animator3:currentValue() + self.animators.animatorOut:currentValue(), w = 160, h = 27}, { tick = self.tick })
 	
-	Title.super.draw(self)
+	-- Paint children
+	
+	local levelSelect = table.unpack(children)
+	if levelSelect ~= nil then
+		levelSelect:draw(Position.zero(), levelSelect.children)
+	end
 end
 
 function Title:update()
