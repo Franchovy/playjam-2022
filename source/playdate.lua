@@ -13,6 +13,7 @@ import "playdate/extensions/file"
 
 import "CoreLibs/graphics"
 
+import "playdate/extensions/imagetable"
 import "playdate/extensions/graphics"
 
 -- Sprites

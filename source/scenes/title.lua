@@ -32,7 +32,7 @@ function Title:load()
 	
 	--self:loadCallback(function() 
 		self.images.imagetable = playdate.graphics.imagetable.new(kAssetsImages.particles)
-		self.images.wheelImageTable = playdate.graphics.imagetable.new(kAssetsImages.wheel)
+		self.images.wheelImageTable = playdate.graphics.imagetable.new(kAssetsImages.wheel):scaled(2)
 		self.images.backgroundImage = playdate.graphics.image.new(kAssetsImages.background)
 		self.images.backgroundImage2 = playdate.graphics.image.new(kAssetsImages.background2)
 		self.images.backgroundImage3 = playdate.graphics.image.new(kAssetsImages.background3)
@@ -50,12 +50,12 @@ function Title:load()
 			-- press a button fill
 			playdate.graphics.setColor(playdate.graphics.kColorWhite)
 			playdate.graphics.setDitherPattern(0.8, playdate.graphics.image.kDitherTypeDiagonalLine)
-			playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
+			playdate.graphics.fillRoundRect(0, 0, rect.w, rect.h, 6)
 		else
 			-- press a button fill
 			playdate.graphics.setColor(playdate.graphics.kColorWhite)
 			playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
-			playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
+			playdate.graphics.fillRoundRect(0, 0, rect.w, rect.h, 6)
 		end
 	end)
 	
@@ -65,22 +65,22 @@ function Title:load()
 			playdate.graphics.setColor(playdate.graphics.kColorBlack)
 			playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
 			playdate.graphics.setLineWidth(3)
-			playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
+			playdate.graphics.drawRoundRect(0, 0, rect.w, rect.h, 6)
 		else
 			-- press a button outline
 			playdate.graphics.setColor(playdate.graphics.kColorBlack)
 			playdate.graphics.setLineWidth(3)
-			playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
+			playdate.graphics.drawRoundRect(0, 0, rect.w, rect.h, 6)
 		end
 	end)
 	
 	local painterButtonPressStart = Painter(function(rect, state)
 		if state.tick == 0 then
 			-- press a text
-			self.images.pressStart:drawFaded(rect.x, rect.y, 0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
+			self.images.pressStart:drawFaded(0, 0, 0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
 		else
 			-- press a text
-			self.images.pressStart:draw(rect.x, rect.y)
+			self.images.pressStart:draw(0, 0)
 		end
 	end)
 	
@@ -94,7 +94,7 @@ function Title:load()
 	
 	-- Painter Background
 	
-	local painterBackground1 = Painter(function(rect, state)
+	self.painterBackground1 = Painter(function(rect, state)
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
 		playdate.graphics.fillRect(0, 0, 400, 240)
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
@@ -102,12 +102,12 @@ function Title:load()
 		playdate.graphics.fillRect(0, 0, 400, 240)
 	end)
 	
-	local painterBackground2 = Painter(function(rect, state)
+	self.painterBackground2 = Painter(function(rect, state)
 		-- background - right hill
 		self.images.backgroundImage3:drawFaded(0, -10, 0.4, playdate.graphics.image.kDitherTypeBayer8x8)
 	end)
 	
-	local painterBackground3 = Painter(function(rect, state)
+	self.painterBackground3 = Painter(function(rect, state)
 		-- background - flashing lights
 		if state.tick == 0 then
 			self.images.backgroundImage2:drawFaded(5, 0, 0.6, playdate.graphics.image.kDitherTypeDiagonalLine)
@@ -116,28 +116,14 @@ function Title:load()
 		end
 	end)
 	
-	local painterBackground4 = Painter(function(rect, state)
+	self.painterBackground4 = Painter(function(rect, state)
 		-- background - left hill
 		self.images.backgroundImage4:drawFaded(-20, 120, 0.9, playdate.graphics.image.kDitherTypeBayer4x4)
 	end)
 	
-	local painterBackgroundAssets = Painter(function(rect, state)
+	self.painterBackgroundAssets = Painter(function(rect, state)
 		-- background assets (coin, platforms, kill-block)
 		self.images.backgroundImage:draw(200,30)
-	end)
-	
-	self.painters.painterBackground = Painter(function(rect, state)
-		local animationValue = state.animationValue
-		
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeBayer4x4)
-		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
-		
-		painterBackground1:draw(Rect.offset(rect, 0, -20 - animationValue))
-		painterBackground2:draw(Rect.offset(rect, animationValue, -20))
-		painterBackground3:draw(Rect.offset(rect, 0, -20 - animationValue), state)
-		painterBackground4:draw(Rect.offset(rect, -animationValue, -20))
-		painterBackgroundAssets:draw(Rect.offset(rect, animationValue, -20))
 	end)
 	
 	-- Painter Text
@@ -145,33 +131,33 @@ function Title:load()
 	local painterTitleRectangleOutline = Painter(function(rect, state)
 		-- title rectangle outline
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
+		playdate.graphics.fillRect(0, 0, rect.w, rect.h)
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
 		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
+		playdate.graphics.fillRect(0, 0, rect.w, rect.h)
 	end)
 	
 	local painterTitleRectangleFill = Painter(function(rect, state)
 		-- title rectangle fill
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
 		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
+		playdate.graphics.fillRect(0, 0, rect.w, rect.h)
 	end)
 	
 	local painterTitleText = Painter(function(rect, state)
-		self.images.textImage:draw(rect.x, rect.y)
+		self.images.textImage:draw(0, 0)
 	end)
 	
 	self.painters.painterTitle = Painter(function(rect, state)
-		painterTitleRectangleOutline:draw(rect)
-		painterTitleRectangleFill:draw(Rect.inset(rect, 0, 10))
+		painterTitleRectangleOutline:draw(Rect.at(rect, 0, 0))
+		painterTitleRectangleFill:draw(Rect.inset(Rect.at(rect, 0, 0), 0, 10))
 		local titleTextSizeW, titleTextSizeH = self.images.textImage:getSize()
 		painterTitleText:draw({x = 40, y = 15, w = titleTextSizeW, h = titleTextSizeH })
 	end)
 	
 	local painterParticles = Painter(function(rect, state) 
 		-- animated particles
-		self.images.imagetable:getImage((state.index % 36) + 1):scaledImage(2):draw(rect.x, rect.y)
+		self.images.imagetable:getImage((state.index % 36) + 1):scaledImage(2):draw(0, 0)
 	end)
 	
 	self.painters.painterWheel = Painter(function(rect, state, globals)
@@ -183,7 +169,7 @@ function Title:load()
 		})
 	
 		-- animated wheel
-		self.images.wheelImageTable:getImage((-state.index % 12) + 1):scaledImage(2):draw(rect.x, rect.y)
+		self.images.wheelImageTable:getImage((-state.index % 12) + 1):draw(0, 0)
 	end)
 end
 
@@ -193,17 +179,39 @@ function Title:draw()
 		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
 		self.animators.animator2 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outExpo, 500)
 		self.animators.animator3 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outCirc, 1000)
+		self.animators.animatorWheel = playdate.graphics.animator.new(
+			800, 
+			playdate.geometry.point.new(-150, -60), 
+			playdate.geometry.point.new(0, 0), 
+			playdate.easingFunctions.outQuad, 
+			800
+		)
 		-- Placeholder animator for use on transition out
 		self.animators.animatorOut = playdate.graphics.animator.new(0, 0, 0, playdate.easingFunctions.outCirc, 0)
+		self.animators.animatorOutWheel = playdate.graphics.animator.new(0, playdate.geometry.point.new(0, 0), playdate.geometry.point.new(0, 0), playdate.easingFunctions.outCirc, 0)
 	end
 	
 	local w, h = playdate.display.getSize()
 	
 	Painter.clearGlobal()
 	
-	self.painters.painterBackground:draw({ x = 0, y = 0, w = w, h = h }, { tick = self.tick, animationValue = self.animators.animator1:currentValue() + self.animators.animatorOut:currentValue() })
+	local rect = { x = 0, y = 0, w = w, h = h }
 	
-	self.painters.painterWheel:draw({x = 70, y = 30, w = 150 + self.animators.animatorOut:currentValue(), h = 150}, { index = self.index % 36 })
+	playdate.graphics.setColor(playdate.graphics.kColorBlack)
+	playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeBayer4x4)
+	playdate.graphics.fillRect(0, 0, rect.w, rect.h)
+	
+	local animationValue = self.animators.animator1:currentValue() + self.animators.animatorOut:currentValue()
+	
+	self.painterBackground1:draw(Rect.offset(rect, 0, -20 - animationValue))
+	self.painterBackground2:draw(Rect.offset(rect, animationValue, -20))
+	self.painterBackground3:draw(Rect.offset(rect, 0, -20 - animationValue), { tick = self.tick })
+	self.painterBackground4:draw(Rect.offset(rect, -animationValue, -20))
+	self.painterBackgroundAssets:draw(Rect.offset(rect, animationValue, -20))
+	
+	local animationWheelValue = self.animators.animatorWheel:currentValue():offsetBy(self.animators.animatorOutWheel:currentValue().x, self.animators.animatorOutWheel:currentValue().y)
+	local imageSizeW, imageSizeH = self.images.wheelImageTable[1]:getSize()
+	self.painters.painterWheel:draw({x = 70, y = 30, w = imageSizeW, h = imageSizeH}, { index = self.index % 36 })
 	
 	self.painters.painterTitle:draw({x = 0, y = 130 + self.animators.animator2:currentValue() + self.animators.animatorOut:currentValue(), w = 400, h = 57})
 	self.painters.painterButton:draw({x = 115, y = 200 + self.animators.animator3:currentValue() + self.animators.animatorOut:currentValue(), w = 160, h = 27}, { tick = self.tick })
@@ -235,7 +243,7 @@ function Title:update()
 		
 		self.levelSelect:load()
 		
-		self:addChild(self.levelSelect)
+		--self:addChild(self.levelSelect)
 	end
 	
 	Title.super.update(self)
@@ -264,6 +272,13 @@ function Title:changeState(stateFrom, stateTo)
 			240, 
 			playdate.easingFunctions.inExpo, 200
 		)
+		self.animators.animatorOutWheel = playdate.graphics.animator.new(
+			800, 
+			playdate.geometry.point.new(0, 0), 
+			playdate.geometry.point.new(350, 100),  
+			playdate.easingFunctions.inQuad, 
+			800
+		)
 	end
 	
 	if stateFrom == self.kStates.menu and stateTo == self.kStates.default then
@@ -276,5 +291,6 @@ function Title:changeState(stateFrom, stateTo)
 			playdate.easingFunctions.outExpo, 
 			200
 		)
+		self.animators.animatorWheel:reset()
 	end
 end
