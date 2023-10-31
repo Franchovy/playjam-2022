@@ -9,8 +9,8 @@ local acceptsRestart = false
 local title = nil
 
 function initialize()
-	gfx.setFont(gfx.font.new(kAssetsFonts.twinbee))
-	gfx.setFontTracking(1)
+	playdate.graphics.setFont(playdate.graphics.font.new(kAssetsFonts.twinbee))
+	playdate.graphics.setFontTracking(1)
 	
 	Widget.setBackgroundDrawingCallback()
 	
@@ -34,7 +34,7 @@ function playdate.update()
 end
 
 function placeholder()
-	gfx.sprite.redrawBackground()
+	playdate.graphics.sprite.redrawBackground()
 
 	-- Random Seed (for generating random numbers)
 	math.randomseed(playdate.getSecondsSinceEpoch())
@@ -70,6 +70,6 @@ function updateScenes()
 	end
 end
 
--- Start Game
+-- Start game
 
 initialize()
