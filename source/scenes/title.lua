@@ -155,21 +155,10 @@ function Title:load()
 		painterTitleText:draw({x = 40, y = 15, w = titleTextSizeW, h = titleTextSizeH })
 	end)
 	
-	local painterParticles = Painter(function(rect, state) 
-		-- animated particles
-		self.images.imagetable:getImage((state.index % 36) + 1):scaledImage(2):draw(0, 0)
-	end)
-	
 	self.painters.painterWheel = Painter(function(rect, state, globals)
-		table.insert(globals, { 
-			fn = function() 
-				painterParticles:draw({ x = rect.x - 55, y = rect.y - 35, w = 150, h = 150}, state, { absolute = true })
-			end,
-			state = state
-		})
-	
-		-- animated wheel
-		self.images.wheelImageTable:getImage((-state.index % 12) + 1):draw(0, 0)
+		self.images.imagetable:getImage((state.index % 36) + 1):scaledImage(2):draw(10, -70)
+		
+		self.images.wheelImageTable:getImage((-state.index % 12) + 1):draw(140, 0)
 	end)
 end
 
@@ -181,7 +170,7 @@ function Title:draw()
 		self.animators.animator3 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outCirc, 1000)
 		self.animators.animatorWheel = playdate.graphics.animator.new(
 			800, 
-			playdate.geometry.point.new(-150, -60), 
+			playdate.geometry.point.new(-200, -30), 
 			playdate.geometry.point.new(0, 0), 
 			playdate.easingFunctions.outQuad, 
 			800
@@ -210,8 +199,7 @@ function Title:draw()
 	self.painterBackgroundAssets:draw(Rect.offset(rect, animationValue, -20))
 	
 	local animationWheelValue = self.animators.animatorWheel:currentValue():offsetBy(self.animators.animatorOutWheel:currentValue().x, self.animators.animatorOutWheel:currentValue().y)
-	local imageSizeW, imageSizeH = self.images.wheelImageTable[1]:getSize()
-	self.painters.painterWheel:draw({x = 70, y = 30, w = imageSizeW, h = imageSizeH}, { index = self.index % 36 })
+	self.painters.painterWheel:draw({x = animationWheelValue.x - 60, y = 30 + animationWheelValue.y, w = 280, h = 120}, { index = self.index % 36 })
 	
 	self.painters.painterTitle:draw({x = 0, y = 130 + self.animators.animator2:currentValue() + self.animators.animatorOut:currentValue(), w = 400, h = 57})
 	self.painters.painterButton:draw({x = 115, y = 200 + self.animators.animator3:currentValue() + self.animators.animatorOut:currentValue(), w = 160, h = 27}, { tick = self.tick })
@@ -275,9 +263,9 @@ function Title:changeState(stateFrom, stateTo)
 		self.animators.animatorOutWheel = playdate.graphics.animator.new(
 			800, 
 			playdate.geometry.point.new(0, 0), 
-			playdate.geometry.point.new(350, 100),  
+			playdate.geometry.point.new(450, 100),  
 			playdate.easingFunctions.inQuad, 
-			800
+			500
 		)
 	end
 	
@@ -291,6 +279,7 @@ function Title:changeState(stateFrom, stateTo)
 			playdate.easingFunctions.outExpo, 
 			200
 		)
+		self.animators.animatorOutWheel = playdate.graphics.animator.new(0, playdate.geometry.point.new(0, 0), playdate.geometry.point.new(0, 0), playdate.easingFunctions.outCirc, 0)
 		self.animators.animatorWheel:reset()
 	end
 end

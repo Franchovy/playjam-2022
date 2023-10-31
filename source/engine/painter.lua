@@ -26,7 +26,7 @@ function Painter:draw(rect, state, config)
 		image = playdate.graphics.image.new(rect.w, rect.h)
 		
 		playdate.graphics.pushContext(image)
-		self.drawFunction({x = 0, y = 0, w = rect.w, h = rect.h }, state, self.globals)
+		self.drawFunction({x = rect.x, y = rect.y, w = rect.w, h = rect.h }, state, self.globals)
 		playdate.graphics.popContext()
 		
 		self:_setImage(image, state)

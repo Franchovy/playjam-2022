@@ -12,3 +12,7 @@ end
 function Rect.offset(rect, x, y)
 	return { x = rect.x + x, y = rect.y + y, w = rect.w, h = rect.h }
 end
+
+function Rect.at(rect, x, y)
+	return { x = x, y = y + y, w = rect.w, h = rect.h }
+end
