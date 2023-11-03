@@ -7,6 +7,8 @@ function LevelSelect:init()
 	LevelSelect.super.init(self)
 	
 	self.state = {}
+	self.state.selection = 1
+	
 	self.painters = {}
 	self.children = {}
 	
@@ -15,7 +17,6 @@ end
 
 function LevelSelect:load()
 	--LevelSelect.super.load(self)
-	self.state.selection = 1
 	
 	self.children.entries = {
 		LevelSelectEntry({ text = "MOUNTAIN" }),
@@ -24,11 +25,7 @@ function LevelSelect:load()
 		LevelSelectEntry({ text = "SETTINGS", showOutline = false })
 	}
 	
-	self.children.preview = {
-		LevelSelectPreview(),
-		LevelSelectPreview(),
-		LevelSelectPreview()
-	}
+	self.children.preview = LevelSelectPreview()
 	
 	self.painters.background = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
@@ -48,9 +45,7 @@ function LevelSelect:load()
 		child:load()
 	end
 	
-	for _, child in pairs(self.children.preview) do
-		child:load()
-	end
+	self.children.preview:load()
 end
 
 function LevelSelect:draw(rect)
@@ -63,21 +58,33 @@ function LevelSelect:draw(rect)
  		entry:draw(Rect.make(rect.x, rect.y + i * 45, width, 40))
 	end
 	
-	if self.state.selection ~= nil then
-		self.children.preview[self.state.selection]:draw(Rect.with(rect, { x = width, w = rect.w - width }))
-	end
+	self.children.preview:draw(Rect.with(rect, { x = width, w = rect.w - width }))
 end
 
 function LevelSelect:update()
 	LevelSelect.super.update(self)
 	
-	if playdate.buttonJustPressed(playdate.kButtonA) then
-		for i, entry in ipairs(self.children.entries) do
-			 entry.state.selected = true
+	-- TODO: Add Crank
+	local scrollUp = playdate.buttonJustPressed(playdate.kButtonUp)
+	local scrollDown = playdate.buttonJustPressed(playdate.kButtonDown)
+	
+	if scrollUp then
+		if self.state.selection > 1 then
+			self.state.selection -= 1
 		end
-	elseif playdate.buttonJustReleased(playdate.kButtonA) then
-		for i, entry in ipairs(self.children.entries) do
-			 entry.state.selected = false
+	end
+	
+	if scrollDown then
+		if self.state.selection < #self.children.entries then
+			self.state.selection += 1
+		end
+	end
+	
+	for i, entry in ipairs(self.children.entries) do
+		if i == self.state.selection then
+			entry:setState({ selected = true })
+		elseif entry.state.selected == true then
+			entry:setState({ selected = false })
 		end
 	end
 end

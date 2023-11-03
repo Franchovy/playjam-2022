@@ -227,7 +227,9 @@ function Title:update()
 		self:setState(self.kStates.default)
 	end
 	
-	Title.super.update(self)
+	if self.children.levelSelect ~= nil and self.children.levelSelect.hidden == false then
+		self.children.levelSelect:update()
+	end
 end
 
 function Title:setState(state)

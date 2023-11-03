@@ -15,13 +15,13 @@ function LevelSelectPreview:load()
 	
 	self.painters.scoreCard = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.9, playdate.graphics.image.kDitherTypeDiagonalLine)
+		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeScreen)
 		playdate.graphics.setLineWidth(2)
-		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
 		local fillRect = Rect.inset(rect, 2, 2)
-		playdate.graphics.fillRoundRect(fillRect.x, fillRect.y, fillRect.w, fillRect.h, 6)
+		playdate.graphics.fillRoundRect(fillRect.x, fillRect.y - 1, fillRect.w, fillRect.h, 6)
 	end)
 end
 
