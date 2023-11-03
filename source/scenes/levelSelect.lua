@@ -23,6 +23,10 @@ function LevelSelect:load()
 		LevelSelectEntry("CITY"),
 	}
 	
+	local settings = LevelSelectEntry("SETTINGS")
+	settings.config.showOutline = false
+	table.insert(self.children.entries, settings)
+	
 	self.children.preview = {
 		LevelSelectPreview(),
 		LevelSelectPreview(),
@@ -53,13 +57,13 @@ function LevelSelect:load()
 end
 
 function LevelSelect:draw(rect)
-	local width = 235
+	local width = 220
 	
 	self.painters.background:draw(rect)
 	self.painters.card:draw(Rect.with(rect, { w = width }))
 	
 	for i, entry in ipairs(self.children.entries) do
- 		entry:draw(Rect.make(rect.x + 10, rect.y + 20 + i * 45, width, 60))
+ 		entry:draw(Rect.make(rect.x, rect.y + i * 45, width, 40))
 	end
 	
 	if self.state.selection ~= nil then

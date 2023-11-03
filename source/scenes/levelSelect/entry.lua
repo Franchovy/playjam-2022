@@ -11,6 +11,9 @@ function LevelSelectEntry:init(label, value)
 	
 	self.images = {}
 	self.painters = {}
+	
+	self.config = {}
+	self.config.showOutline = true
 end
 
 function LevelSelectEntry:load()
@@ -36,16 +39,19 @@ function LevelSelectEntry:load()
 	end)
 end
 
-function LevelSelectEntry:draw(position)
+function LevelSelectEntry:draw(rect)
 	LevelSelect.super.draw(self)
 	
-	self.images.title:draw(position.x + 20, position.y + 2)
+	local outlineRect = Rect.inset(rect, 20, 0)
 	
-	local outlineRect = Rect.inset(Rect.make(position.x, position.y, 190, 20), 0, -10)
-	if not self.state.selected then
-		self.painters.outline:draw(outlineRect)
-	else
-		self.painters.outlineSelected:draw(outlineRect)
+	self.images.title:draw(outlineRect.x + 10, outlineRect.y + 12)
+	
+	if self.config.showOutline then
+		if not self.state.selected then
+			self.painters.outline:draw(outlineRect)
+		else
+			self.painters.outlineSelected:draw(outlineRect)
+		end
 	end
 end
 
