@@ -52,18 +52,18 @@ function LevelSelect:load()
 	end
 end
 
-function LevelSelect:draw(position)
+function LevelSelect:draw(rect)
 	local width = 235
 	
-	self.painters.background:draw(Rect.position(position, 400, 240))
-	self.painters.card:draw(Rect.position(position, width, 240))
+	self.painters.background:draw(rect)
+	self.painters.card:draw(Rect.with(rect, { w = width }))
 	
 	for i, entry in ipairs(self.children.entries) do
- 		entry:draw(Position.offset(position, 10, 20 + i * 45))
+ 		entry:draw(Rect.make(rect.x + 10, rect.y + 20 + i * 45, width, 60))
 	end
 	
 	if self.state.selection ~= nil then
-		self.children.preview[self.state.selection]:draw(Position.make(width, 0))
+		self.children.preview[self.state.selection]:draw(Rect.with(rect, { x = width, w = rect.w - width }))
 	end
 end
 

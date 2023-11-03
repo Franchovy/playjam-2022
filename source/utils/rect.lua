@@ -13,6 +13,23 @@ function Rect.position(position, w, h)
 	return { x = position.x, y = position.y, w = w, h = h }
 end
 
+function Rect.with(rect, properties)
+	local rect = table.shallowcopy(rect)
+	if properties.x ~= nil then
+		rect.x = properties.x
+	end
+	if properties.y ~= nil then
+		rect.y = properties.y
+	end
+	if properties.w ~= nil then
+		rect.w = properties.w
+	end
+	if properties.h ~= nil then
+		rect.h = properties.h
+	end
+	return rect
+end
+
 function Rect.array(rect)
 	return { rect.x, rect.y, rect.w, rect.h }
 end

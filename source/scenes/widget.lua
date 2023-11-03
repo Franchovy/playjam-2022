@@ -30,6 +30,7 @@ function Widget.draw(self)
 			return
 		end
 		
-		Widget.topLevelWidget:draw(Widget.topLevelWidget.position)
+		local rect = playdate.display.getRect()
+		Widget.topLevelWidget:draw(Rect.make(rect.x, rect.y, rect.width, rect.height))
 	end
 end

@@ -8,12 +8,12 @@ function LevelSelectPreview:load()
 	--LevelSelectPreview.super.load(self)
 end
 
-function LevelSelectPreview:draw(position)
+function LevelSelectPreview:draw(rect)
 	LevelSelect.super.draw(self)
 	
 	playdate.graphics.setColor(playdate.graphics.kColorBlack)
 	playdate.graphics.setDitherPattern(0.5, playdate.graphics.image.kDitherTypeDiagonalLine)
-	playdate.graphics.fillRect(position.x, position.y, 140, 240)
+	playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
 end
 
 function LevelSelectPreview:update()

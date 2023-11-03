@@ -166,7 +166,7 @@ function Title:load()
 	end)
 end
 
-function Title:draw(position)
+function Title:draw(rect)
 	if self.animators == nil then
 		self.animators = {}
 		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
@@ -183,10 +183,6 @@ function Title:draw(position)
 		self.animators.animatorOut = playdate.graphics.animator.new(0, 0, 0, playdate.easingFunctions.outCirc, 0)
 		self.animators.animatorOutWheel = playdate.graphics.animator.new(0, playdate.geometry.point.new(0, 0), playdate.geometry.point.new(0, 0), playdate.easingFunctions.outCirc, 0)
 	end
-	
-	local w, h = playdate.display.getSize()
-	
-	local rect = { x = 0, y = 0, w = w, h = h }
 	
 	playdate.graphics.setColor(playdate.graphics.kColorBlack)
 	playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeBayer4x4)
@@ -210,7 +206,7 @@ function Title:draw(position)
 	
 	if self.children.levelSelect ~= nil 
 			and (self.children.levelSelect.hidden == false) then
-		self.children.levelSelect:draw(Position.zero())
+		self.children.levelSelect:draw(rect)
 	end
 end
 
