@@ -13,10 +13,15 @@ function LevelSelect:init()
 	self.children = {}
 	
 	self.hidden = false
+	
+	self.samples = {}
 end
 
 function LevelSelect:load()
 	--LevelSelect.super.load(self)
+	
+	self.samples.select = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelect)
+	self.samples.selectFail = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelectFail)
 	
 	self.children.entries = {
 		LevelSelectEntry({ text = "MOUNTAIN" }),
@@ -71,12 +76,18 @@ function LevelSelect:update()
 	if scrollUp then
 		if self.state.selection > 1 then
 			self.state.selection -= 1
+			self.samples.select:play()
+		else
+			self.samples.selectFail:play()
 		end
 	end
 	
 	if scrollDown then
 		if self.state.selection < #self.children.entries then
 			self.state.selection += 1
+			self.samples.select:play()
+		else
+			self.samples.selectFail:play()
 		end
 	end
 	
