@@ -9,6 +9,10 @@ function Rect.make(x, y, w, h)
 	return { x = x, y = y, w = w, h = h }
 end
 
+function Rect.position(position, w, h)
+	return { x = position.x, y = position.y, w = w, h = h }
+end
+
 function Rect.array(rect)
 	return { rect.x, rect.y, rect.w, rect.h }
 end

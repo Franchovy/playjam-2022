@@ -9,6 +9,7 @@ function Title:init()
 	
 	self.images = {}
 	self.painters = {}
+	self.children = {}
 	
 	self.index = 0
 	self.tick = 0
@@ -165,7 +166,7 @@ function Title:load()
 	end)
 end
 
-function Title:draw(position, children)
+function Title:draw(position)
 	if self.animators == nil then
 		self.animators = {}
 		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
@@ -207,9 +208,9 @@ function Title:draw(position, children)
 	
 	-- Paint children
 	
-	local levelSelect = table.unpack(children)
-	if levelSelect ~= nil then
-		levelSelect:draw(Position.zero(), levelSelect.children)
+	if self.children.levelSelect ~= nil 
+			and (self.children.levelSelect.hidden == false) then
+		self.children.levelSelect:draw(Position.zero())
 	end
 end
 
@@ -264,23 +265,22 @@ function Title:changeState(stateFrom, stateTo)
 			500
 		)
 		
-		if self.levelSelect == nil then
-			self.levelSelect = LevelSelect()
-			self.levelSelect:load()
+		if self.children.levelSelect == nil then
+			self.children.levelSelect = LevelSelect()
+			self.children.levelSelect.hidden = true
+			self.children.levelSelect:load()
 		end
 		
 		playdate.timer.performAfterDelay(1200, function()
-			if self.state == self.kStates.menu then
-				self:addChild(self.levelSelect)
-			end
+			self.children.levelSelect.hidden = false
 		end)
 	end
 	
 	if stateFrom == self.kStates.menu and stateTo == self.kStates.default then
 		self.samples.click:play()
 		
-		if self.levelSelect then
-			self:removeChild(self.levelSelect)
+		if self.children.levelSelect then
+			self.children.levelSelect.hidden = true
 		end
 		
 		self.animators.animatorOut = playdate.graphics.animator.new(
