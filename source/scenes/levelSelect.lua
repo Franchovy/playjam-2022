@@ -18,14 +18,11 @@ function LevelSelect:load()
 	self.state.selection = 1
 	
 	self.children.entries = {
-		LevelSelectEntry("MOUNTAIN"),
-		LevelSelectEntry("SPACE"),
-		LevelSelectEntry("CITY"),
+		LevelSelectEntry({ text = "MOUNTAIN" }),
+		LevelSelectEntry({ text = "SPACE" }),
+		LevelSelectEntry({ text = "CITY" }),
+		LevelSelectEntry({ text = "SETTINGS", showOutline = false })
 	}
-	
-	local settings = LevelSelectEntry("SETTINGS")
-	settings.config.showOutline = false
-	table.insert(self.children.entries, settings)
 	
 	self.children.preview = {
 		LevelSelectPreview(),

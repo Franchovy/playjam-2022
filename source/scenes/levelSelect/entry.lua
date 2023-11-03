@@ -1,10 +1,9 @@
+import "utils/value"
+
 class("LevelSelectEntry").extends(Widget)
 
-function LevelSelectEntry:init(label, value)
+function LevelSelectEntry:init(config)
 	LevelSelect.super.init(self)
-	
-	self.label = label
-	self.value = value
 	
 	self.state = {}
 	self.state.selected = false
@@ -13,13 +12,14 @@ function LevelSelectEntry:init(label, value)
 	self.painters = {}
 	
 	self.config = {}
-	self.config.showOutline = true
+	self.config.text = config.text
+	self.config.showOutline = value.default(config.showOutline, true)
 end
 
 function LevelSelectEntry:load()
 	--LevelSelect.super.load(self)
 	
-	self.images.title = playdate.graphics.imageWithText(self.label, 200, 70):scaledImage(2)
+	self.images.title = playdate.graphics.imageWithText(self.config.text, 200, 70):scaledImage(2)
 	
 	self.painters.outline = Painter(function(rect, state)
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
@@ -46,12 +46,12 @@ function LevelSelectEntry:draw(rect)
 	
 	self.images.title:draw(outlineRect.x + 10, outlineRect.y + 12)
 	
-	if self.config.showOutline then
-		if not self.state.selected then
+	if not self.state.selected then
+		if self.config.showOutline then	
 			self.painters.outline:draw(outlineRect)
-		else
-			self.painters.outlineSelected:draw(outlineRect)
 		end
+	else
+		self.painters.outlineSelected:draw(outlineRect)
 	end
 end
 
