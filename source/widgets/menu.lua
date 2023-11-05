@@ -25,13 +25,6 @@ function WidgetMenu:init()
 end
 
 function WidgetMenu:load()
-	playdate.graphics.setColor(playdate.graphics.kColorBlack)
-	playdate.graphics.fillRect(0, 0, 400, 240)
-	playdate.graphics.setColor(playdate.graphics.kColorWhite)
-	
-	local loadingText = playdate.graphics.imageWithText("LOADING...", 400, 240):scaledImage(2)
-	loadingText:draw(40, 110)
-	
 	self.images.imagetable = playdate.graphics.imagetable.new(kAssetsImages.particles)
 	self.images.wheelImageTable = playdate.graphics.imagetable.new(kAssetsImages.wheel):scaled(2)
 	self.images.backgroundImage = playdate.graphics.image.new(kAssetsImages.background)

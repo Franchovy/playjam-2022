@@ -14,6 +14,10 @@ function initialize()
 	playdate.graphics.setFontTracking(1)
 	
 	Widget.init(WidgetMain())
+	
+	playdate.timer.performAfterDelay(1, function()
+		Widget.topLevelWidget:load()
+	end)
 end
 
 function playdate.update()
