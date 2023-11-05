@@ -15,6 +15,7 @@ kAssetsImages = {
 	wheel = dirImages.."sprites/wheel/wheel",
 	wheelLoading = dirImages.."sprites/wheel/0",
 	star = dirImages.."sprites/star/star",
+	starMenu = dirImages.."sprites/starMenu",
 	particles = dirImages.."sprites/particles",
 	background = dirImages.."sprites/background",
 	background2 = dirImages.."sprites/background2",
