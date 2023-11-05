@@ -4,25 +4,16 @@ import "scenes/scenes"
 import "sprites/lib"
 import "notify"
 import "config"
+import "widgets"
 
 local acceptsRestart = false
-local title = nil
+local mainWidget = nil
 
 function initialize()
 	playdate.graphics.setFont(playdate.graphics.font.new(kAssetsFonts.twinbee))
 	playdate.graphics.setFontTracking(1)
 	
-	Widget.setBackgroundDrawingCallback()
-	
-	title = Title()
-	title:load()
-	Widget.topLevelWidget = title
-	-- Create game state manager
-	--scenes.menu = MenuScene()
-	
-	-- Create Scene
-	-- * calls load and present
-	--sceneManager:setCurrentScene(scenes.menu)
+	mainWidget = WidgetMain()
 end
 
 function playdate.update()

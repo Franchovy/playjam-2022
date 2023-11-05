@@ -18,8 +18,6 @@ function LevelSelect:init()
 end
 
 function LevelSelect:load()
-	--LevelSelect.super.load(self)
-	
 	self.samples.select = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelect)
 	self.samples.selectFail = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelectFail)
 	

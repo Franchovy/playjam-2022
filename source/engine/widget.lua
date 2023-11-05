@@ -2,6 +2,33 @@ class("Widget").extends()
 
 Widget.topLevelWidget = nil
 
+Widget.kDeps = {
+	children = 1,
+	state = 2
+}
+
+function Widget.supply(widget, dep)
+	if dep == Widget.kDeps.children then
+		widget:_supplyDepChildren()
+	elseif dep == Widget.kDeps.state then
+		widget:_supplyDepState()
+	end
+end
+
+function Widget._supplyDepChildren(self)
+	self.children = {}
+end
+
+function Widget._supplyDepState(self)
+	function self:setState(targetState)
+		if self.changeState ~= nil then
+			self:changeState(self.state, targetState)
+			
+			self.state = targetState
+		end
+	end
+end
+
 function Widget:init()
 	
 end

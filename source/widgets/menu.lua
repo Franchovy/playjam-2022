@@ -1,11 +1,11 @@
 import "utils/rect"
 import "utils/position"
+import "menu/levelSelect"
 
-class("Title").extends(Widget)
+class("WidgetMenu").extends(Widget)
 
--- Called from main
-function Title:init()	
-	Title.super.init(self)
+function WidgetMenu:init()	
+	WidgetMenu.super.init(self)
 	
 	self.images = {}
 	self.painters = {}
@@ -24,26 +24,22 @@ function Title:init()
 	self.samples = {}
 end
 
--- Called from main (first update)
-function Title:load()
-	-- Show loading animation
+function WidgetMenu:load()
 	playdate.graphics.setColor(playdate.graphics.kColorBlack)
 	playdate.graphics.fillRect(0, 0, 400, 240)
-	
 	playdate.graphics.setColor(playdate.graphics.kColorWhite)
+	
 	local loadingText = playdate.graphics.imageWithText("LOADING...", 400, 240):scaledImage(2)
 	loadingText:draw(40, 110)
 	
-	--self:loadCallback(function() 
-		self.images.imagetable = playdate.graphics.imagetable.new(kAssetsImages.particles)
-		self.images.wheelImageTable = playdate.graphics.imagetable.new(kAssetsImages.wheel):scaled(2)
-		self.images.backgroundImage = playdate.graphics.image.new(kAssetsImages.background)
-		self.images.backgroundImage2 = playdate.graphics.image.new(kAssetsImages.background2)
-		self.images.backgroundImage3 = playdate.graphics.image.new(kAssetsImages.background3)
-		self.images.backgroundImage4 = playdate.graphics.image.new(kAssetsImages.background4)
-		self.images.textImage = playdate.graphics.imageWithText("WHEEL RUNNER", 400, 100):scaledImage(3)
-		self.images.pressStart = playdate.graphics.imageWithText("PRESS A", 200, 60):scaledImage(2)
-	--end)
+	self.images.imagetable = playdate.graphics.imagetable.new(kAssetsImages.particles)
+	self.images.wheelImageTable = playdate.graphics.imagetable.new(kAssetsImages.wheel):scaled(2)
+	self.images.backgroundImage = playdate.graphics.image.new(kAssetsImages.background)
+	self.images.backgroundImage2 = playdate.graphics.image.new(kAssetsImages.background2)
+	self.images.backgroundImage3 = playdate.graphics.image.new(kAssetsImages.background3)
+	self.images.backgroundImage4 = playdate.graphics.image.new(kAssetsImages.background4)
+	self.images.textImage = playdate.graphics.imageWithText("WHEEL RUNNER", 400, 100):scaledImage(3)
+	self.images.pressStart = playdate.graphics.imageWithText("PRESS A", 200, 60):scaledImage(2)
 	
 	self.samples.click = playdate.sound.sampleplayer.new(kAssetsSounds.click)
 	
@@ -166,7 +162,7 @@ function Title:load()
 	end)
 end
 
-function Title:draw(rect)
+function WidgetMenu:draw(rect)
 	if self.animators == nil then
 		self.animators = {}
 		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
@@ -210,7 +206,7 @@ function Title:draw(rect)
 	end
 end
 
-function Title:update()
+function WidgetMenu:update()
 	self.index += 2
 	
 	if self.index % 40 > 32 then
@@ -232,7 +228,7 @@ function Title:update()
 	end
 end
 
-function Title:setState(state)
+function WidgetMenu:setState(state)
 	if self.state == nil then
 		-- Set Initial State
 		self.state = state
@@ -245,7 +241,7 @@ function Title:setState(state)
 	self.state = state
 end
 
-function Title:changeState(stateFrom, stateTo)
+function WidgetMenu:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.default and stateTo == self.kStates.menu then
 		self.samples.click:play()
 		
