@@ -10,21 +10,15 @@ function WidgetMenu:init()
 	
 	self.images = {}
 	self.painters = {}
+	self.samples = {}
+	
+	self:setStateInitial({default = 1, menu = 2}, 1)
 	
 	self.index = 0
 	self.tick = 0
-	
-	self.kStates = {
-		default = 0,
-		menu = 1
-	}
-	
-	self.state = self.kStates.default
-
-	self.samples = {}
 end
 
-function WidgetMenu:load()
+function WidgetMenu:_load()
 	self.images.imagetable = playdate.graphics.imagetable.new(kAssetsImages.particles)
 	self.images.wheelImageTable = playdate.graphics.imagetable.new(kAssetsImages.wheel):scaled(2)
 	self.images.backgroundImage = playdate.graphics.image.new(kAssetsImages.background)
@@ -155,7 +149,7 @@ function WidgetMenu:load()
 	end)
 end
 
-function WidgetMenu:draw(rect)
+function WidgetMenu:_draw(rect)
 	if self.animators == nil then
 		self.animators = {}
 		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
@@ -199,7 +193,7 @@ function WidgetMenu:draw(rect)
 	end
 end
 
-function WidgetMenu:update()
+function WidgetMenu:_update()
 	self.index += 2
 	
 	if self.index % 40 > 32 then
@@ -214,10 +208,6 @@ function WidgetMenu:update()
 	if playdate.buttonIsPressed(playdate.kButtonB) then
 		self.tick = 0
 		self:setState(self.kStates.default)
-	end
-	
-	if self.children.levelSelect ~= nil and self.children.levelSelect.hidden == false then
-		self.children.levelSelect:update()
 	end
 end
 
@@ -240,7 +230,7 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 		)
 		
 		if self.children.levelSelect == nil then
-			self.children.levelSelect = LevelSelect()
+			self.children.levelSelect = Widget.new(LevelSelect)
 			self.children.levelSelect.hidden = true
 			self.children.levelSelect:load()
 		end

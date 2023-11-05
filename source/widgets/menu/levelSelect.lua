@@ -15,18 +15,22 @@ function LevelSelect:init()
 	self.hidden = false
 end
 
-function LevelSelect:load()
+function LevelSelect:_load()
 	self.samples.select = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelect)
 	self.samples.selectFail = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelectFail)
 	
-	self.children.entries = {
-		LevelSelectEntry({ text = "MOUNTAIN" }),
-		LevelSelectEntry({ text = "SPACE" }),
-		LevelSelectEntry({ text = "CITY" }),
-		LevelSelectEntry({ text = "SETTINGS", showOutline = false })
+	self.entries = {
+		Widget.new(LevelSelectEntry, { text = "MOUNTAIN" }),
+		Widget.new(LevelSelectEntry, { text = "SPACE" }),
+		Widget.new(LevelSelectEntry, { text = "CITY" }),
+		Widget.new(LevelSelectEntry, { text = "SETTINGS", showOutline = false })
 	}
 	
-	self.children.preview = LevelSelectPreview()
+	self.children.entry1 = self.entries[1]
+	self.children.entry2 = self.entries[2]
+	self.children.entry3 = self.entries[3]
+	self.children.entry4 = self.entries[4]
+	self.children.preview = Widget.new(LevelSelectPreview)
 	
 	self.painters.background = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
@@ -62,27 +66,30 @@ function LevelSelect:load()
 		painterCardOutline:draw(rect)
 	end)
 	
-	for _, child in pairs(self.children.entries) do
+	for _, child in pairs(self.children) do
 		child:load()
 	end
-	
-	self.children.preview:load()
 end
 
-function LevelSelect:draw(rect)
+function LevelSelect:_draw(rect)
 	local width = 220
 	
 	--self.painters.background:draw(rect)
-	self.painters.card:draw(Rect.with(rect, { w = width }))
+	self.painters.card:draw(Rect.offset(Rect.with(rect, { w = width }), self.animators.card:currentValue(), 0))
 	
-	for i, entry in ipairs(self.children.entries) do
+	for i, entry in ipairs(self.entries) do
  		entry:draw(Rect.make(rect.x - 5, rect.y + i * 45 - 25, width, 40))
 	end
 	
 	self.children.preview:draw(Rect.with(rect, { x = width, w = rect.w - width }))
 end
 
-function LevelSelect:update()
+function LevelSelect:_update()
+	if self.animators == nil then
+		self.animators = {}
+		self.animators.card = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo)
+	end
+	
 	-- TODO: Add Crank
 	local scrollUp = playdate.buttonJustPressed(playdate.kButtonUp)
 	local scrollDown = playdate.buttonJustPressed(playdate.kButtonDown)
@@ -98,7 +105,7 @@ function LevelSelect:update()
 	end
 	
 	if scrollDown then
-		if self.state < #self.children.entries then
+		if self.state < #self.entries then
 			self:setState(self.state + 1)
 			
 			self.samples.select:play()
@@ -107,7 +114,7 @@ function LevelSelect:update()
 		end
 	end
 	
-	for i, entry in ipairs(self.children.entries) do
+	for i, entry in ipairs(self.entries) do
 		if i == self.state then
 			entry:setState({ selected = true })
 		elseif entry.state.selected == true then
@@ -116,6 +123,6 @@ function LevelSelect:update()
 	end
 end
 
-function LevelSelect:changeState(_, _)
+function LevelSelect:changeState(_, stateTo)
 	
 end

@@ -9,19 +9,15 @@ function WidgetMain:init()
 	
 	self.kStates = { menu = 1, play = 2 }
 	self.state = self.kStates.menu
-	
-	self.initialLoad = false
 end
 
-function WidgetMain:load()
-	self.children.menu = WidgetMenu()
+function WidgetMain:_load()
+	self.children.menu = Widget.new(WidgetMenu)
 	self.children.menu:load()
-	
-	self.initialLoad = true
 end
 
-function WidgetMain:draw(rect)
-	if self.initialLoad == false then 
+function WidgetMain:_draw(rect)
+	if self:isLoaded() == false then 
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
 		playdate.graphics.fillRect(0, 0, 400, 240)
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
@@ -33,17 +29,14 @@ function WidgetMain:draw(rect)
 		loadingText:draw(centerRect.x, centerRect.y)
 	end
 	
-	if self.initialLoad and self.state == self.kStates.menu then
+	if (self:isLoaded() == true) and (self.state == self.kStates.menu) then
 		self.children.menu:draw(rect)
 	end
 end
 
-function WidgetMain:update()
-	if self.initialLoad and self.state == self.kStates.menu then
-		self.children.menu:update()
-	end
+function WidgetMain:_update()
 end
 
-function WidgetMain:input()
+function WidgetMain:_input()
 	
 end

@@ -4,7 +4,7 @@ function LevelSelectPreview:init()
 	self.painters = {}
 end
 
-function LevelSelectPreview:load()
+function LevelSelectPreview:_load()
 	self.painters.background = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
 		playdate.graphics.setDitherPattern(0.5, playdate.graphics.image.kDitherTypeDiagonalLine)
@@ -23,12 +23,12 @@ function LevelSelectPreview:load()
 	end)
 end
 
-function LevelSelectPreview:draw(rect)
+function LevelSelectPreview:_draw(rect)
 	self.painters.background:draw(rect)
 	self.painters.scoreCard:draw(Rect.inset(rect, 8, 45))
 end
 
-function LevelSelectPreview:update()
+function LevelSelectPreview:_update()
 	
 end
 

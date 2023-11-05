@@ -14,7 +14,7 @@ function LevelSelectEntry:init(config)
 	self.config.showOutline = value.default(config.showOutline, true)
 end
 
-function LevelSelectEntry:load()
+function LevelSelectEntry:_load()
 	self.images.title = playdate.graphics.imageWithText(self.config.text, 200, 70):scaledImage(2)
 	
 	self.painters.outline = Painter(function(rect, state)
@@ -35,7 +35,7 @@ function LevelSelectEntry:load()
 	end)
 end
 
-function LevelSelectEntry:draw(rect)
+function LevelSelectEntry:_draw(rect)
 	local outlineRect = Rect.inset(rect, 20, 0)
 	
 	self.images.title:draw(outlineRect.x + 10, outlineRect.y + 12)
@@ -49,7 +49,7 @@ function LevelSelectEntry:draw(rect)
 	end
 end
 
-function LevelSelectEntry:update()
+function LevelSelectEntry:_update()
 	
 end
 
