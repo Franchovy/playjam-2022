@@ -26,12 +26,16 @@ function Widget._supplyDepChildren(self)
 end
 
 function Widget._supplyDepState(self)
+	function self:setStateInitial(states, state)
+		self.kStates = states
+		self.state = state
+	end
 	function self:setState(targetState)
 		if self.changeState ~= nil then
 			self:changeState(self.state, targetState)
-			
-			self.state = targetState
 		end
+		
+		self.state = targetState
 	end
 end
 
