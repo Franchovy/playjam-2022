@@ -4,8 +4,6 @@ import "levelSelect/preview"
 class("LevelSelect").extends(Widget)
 
 function LevelSelect:init()
-	LevelSelect.super.init(self)
-	
 	self.state = {}
 	self.state.selection = 1
 	
@@ -65,8 +63,6 @@ function LevelSelect:draw(rect)
 end
 
 function LevelSelect:update()
-	LevelSelect.super.update(self)
-	
 	-- TODO: Add Crank
 	local scrollUp = playdate.buttonJustPressed(playdate.kButtonUp)
 	local scrollDown = playdate.buttonJustPressed(playdate.kButtonDown)
@@ -96,8 +92,4 @@ function LevelSelect:update()
 			entry:setState({ selected = false })
 		end
 	end
-end
-
-function LevelSelect:changeState(stateFrom, stateTo)
-	
 end

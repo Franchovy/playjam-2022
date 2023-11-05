@@ -1,8 +1,6 @@
 class("LevelSelectPreview").extends(Widget)
 
 function LevelSelectPreview:init()
-	LevelSelect.super.init(self)
-	
 	self.painters = {}
 end
 
@@ -26,14 +24,12 @@ function LevelSelectPreview:load()
 end
 
 function LevelSelectPreview:draw(rect)
-	LevelSelect.super.draw(self)
-	
 	self.painters.background:draw(rect)
 	self.painters.scoreCard:draw(Rect.inset(rect, 8, 45))
 end
 
 function LevelSelectPreview:update()
-	LevelSelect.super.update(self)
+	
 end
 
 function LevelSelectPreview:changeState(stateFrom, stateTo)

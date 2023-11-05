@@ -7,6 +7,12 @@ Widget.kDeps = {
 	state = 2
 }
 
+function Widget.init(topLevelWidget)
+	Widget.setBackgroundDrawingCallback()
+	
+	Widget.topLevelWidget = topLevelWidget
+end
+
 function Widget.supply(widget, dep)
 	if dep == Widget.kDeps.children then
 		widget:_supplyDepChildren()

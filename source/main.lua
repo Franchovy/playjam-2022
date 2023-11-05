@@ -13,7 +13,7 @@ function initialize()
 	playdate.graphics.setFont(playdate.graphics.font.new(kAssetsFonts.twinbee))
 	playdate.graphics.setFontTracking(1)
 	
-	mainWidget = WidgetMain()
+	Widget.init(WidgetMain())
 end
 
 function playdate.update()

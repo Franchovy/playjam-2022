@@ -3,10 +3,7 @@ import "menu"
 
 class("WidgetMain").extends(Widget)
 
-function WidgetMain:init()
-	Widget.setBackgroundDrawingCallback()
-	Widget.topLevelWidget = self
-	
+function WidgetMain:init()	
 	self:supply(Widget.kDeps.children)
 	self:supply(Widget.kDeps.state)
 	

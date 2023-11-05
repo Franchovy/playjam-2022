@@ -3,8 +3,6 @@ import "utils/value"
 class("LevelSelectEntry").extends(Widget)
 
 function LevelSelectEntry:init(config)
-	LevelSelect.super.init(self)
-	
 	self.state = {}
 	self.state.selected = false
 	
@@ -17,8 +15,6 @@ function LevelSelectEntry:init(config)
 end
 
 function LevelSelectEntry:load()
-	--LevelSelect.super.load(self)
-	
 	self.images.title = playdate.graphics.imageWithText(self.config.text, 200, 70):scaledImage(2)
 	
 	self.painters.outline = Painter(function(rect, state)
@@ -40,8 +36,6 @@ function LevelSelectEntry:load()
 end
 
 function LevelSelectEntry:draw(rect)
-	LevelSelect.super.draw(self)
-	
 	local outlineRect = Rect.inset(rect, 20, 0)
 	
 	self.images.title:draw(outlineRect.x + 10, outlineRect.y + 12)
@@ -56,7 +50,7 @@ function LevelSelectEntry:draw(rect)
 end
 
 function LevelSelectEntry:update()
-	LevelSelect.super.update(self)
+	
 end
 
 function LevelSelectEntry:setState(state)
