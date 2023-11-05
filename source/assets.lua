@@ -19,7 +19,8 @@ kAssetsImages = {
 	background = dirImages.."sprites/background",
 	background2 = dirImages.."sprites/background2",
 	background3 = dirImages.."sprites/background3",
-	background4 = dirImages.."sprites/background4"
+	background4 = dirImages.."sprites/background4",
+	screw = dirImages.."menu/screw"
 }
 
 kAssetsSounds = {
