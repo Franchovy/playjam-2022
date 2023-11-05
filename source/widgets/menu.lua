@@ -4,12 +4,12 @@ import "menu/levelSelect"
 
 class("WidgetMenu").extends(Widget)
 
-function WidgetMenu:init()	
-	WidgetMenu.super.init(self)
+function WidgetMenu:init()
+	self:supply(Widget.kDeps.children)
+	self:supply(Widget.kDeps.state)
 	
 	self.images = {}
 	self.painters = {}
-	self.children = {}
 	
 	self.index = 0
 	self.tick = 0
@@ -18,9 +18,9 @@ function WidgetMenu:init()
 		default = 0,
 		menu = 1
 	}
-
-	self:setState(self.kStates.default)
 	
+	self.state = self.kStates.default
+
 	self.samples = {}
 end
 
@@ -226,19 +226,6 @@ function WidgetMenu:update()
 	if self.children.levelSelect ~= nil and self.children.levelSelect.hidden == false then
 		self.children.levelSelect:update()
 	end
-end
-
-function WidgetMenu:setState(state)
-	if self.state == nil then
-		-- Set Initial State
-		self.state = state
-		return
-	end
-
-	-- Call state transition
-	self:changeState(self.state, state)
-	
-	self.state = state
 end
 
 function WidgetMenu:changeState(stateFrom, stateTo)

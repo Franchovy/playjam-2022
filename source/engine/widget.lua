@@ -29,10 +29,6 @@ function Widget._supplyDepState(self)
 	end
 end
 
-function Widget:init()
-	
-end
-
 function Widget.setBackgroundDrawingCallback()
 	playdate.graphics.sprite.setBackgroundDrawingCallback(
 		function( x, y, width, height )
