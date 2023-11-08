@@ -15,24 +15,51 @@ function LevelSelect:init()
 	self.samples = {}
 	
 	self.hidden = false
+	
+	self.kLevels = {
+		{
+			title = "MOUNTAIN",
+			menuImagePath = kAssetsImages.menuMountain,
+			filename = "1_mountain"
+		},
+		{
+			title = "SPACE",
+			menuImagePath = kAssetsImages.menuSpace,
+			filename = "2_space"
+		},
+		{
+			title = "CITY",
+			menuImagePath = kAssetsImages.menuCity,
+			filename = "3_city"
+		}
+	}
+
 end
 
 function LevelSelect:_load()
 	self.samples.select = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelect)
 	self.samples.selectFail = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelectFail)
 	
-	self.entries = {
-		Widget.new(LevelSelectEntry, { text = "MOUNTAIN" }),
-		Widget.new(LevelSelectEntry, { text = "SPACE" }),
-		Widget.new(LevelSelectEntry, { text = "CITY" }),
-		Widget.new(LevelSelectEntry, { text = "SETTINGS", showOutline = false })
-	}
+	self.entries = {}
+	self.previews = {}
 	
-	self.children.entry1 = self.entries[1]
-	self.children.entry2 = self.entries[2]
-	self.children.entry3 = self.entries[3]
-	self.children.entry4 = self.entries[4]
-	self.children.preview = Widget.new(LevelSelectPreview)
+	for i, v in ipairs(self.kLevels) do
+		local entry = Widget.new(LevelSelectEntry, { text = v.title })
+		table.insert(self.entries, entry)
+		self.children["entry"..i] = entry
+		
+		local preview = Widget.new(LevelSelectPreview, { 
+			name = v.title,
+			image = playdate.graphics.image.new(v.menuImagePath),
+			highscore = nil
+		})
+		table.insert(self.previews, preview)
+		self.children["preview"..i] = preview
+	end
+	
+	local entrySettings = Widget.new(LevelSelectEntry, { text = "SETTINGS", showOutline = false })
+	table.insert(self.entries, entrySettings)
+	self.children.entrySettings = entrySettings
 	
 	self.images.screw1 = playdate.graphics.image.new(kAssetsImages.screw)
 	self.images.screw2 = playdate.graphics.image.new(kAssetsImages.screw):rotatedImage(45)
@@ -92,7 +119,9 @@ function LevelSelect:_draw(rect)
  		entry:draw(Rect.make(rect.x - 5 - self.animators.card:currentValue(), rect.y + i * 45 - 25, width, 40))
 	end
 	
-	self.children.preview:draw(Rect.with(rect, { x = width, w = rect.w - width }))
+	if self.previews[self.state] ~= nil then
+		self.previews[self.state]:draw(Rect.with(rect, { x = width, w = rect.w - width }))
+	end
 end
 
 function LevelSelect:_update()

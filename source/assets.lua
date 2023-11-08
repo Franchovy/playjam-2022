@@ -21,6 +21,9 @@ kAssetsImages = {
 	background2 = dirImages.."sprites/background2",
 	background3 = dirImages.."sprites/background3",
 	background4 = dirImages.."sprites/background4",
+	menuMountain = dirImages.."backgrounds/menu-mountain",
+	menuSpace = dirImages.."backgrounds/menu-space",
+	menuCity = dirImages.."backgrounds/menu-city",
 	screw = dirImages.."menu/screw"
 }
 
