@@ -20,17 +20,17 @@ function LevelSelect:init()
 		{
 			title = "MOUNTAIN",
 			menuImagePath = kAssetsImages.menuMountain,
-			filename = "1_mountain"
+			levelFileName = "1_mountain"
 		},
 		{
 			title = "SPACE",
 			menuImagePath = kAssetsImages.menuSpace,
-			filename = "2_space"
+			levelFileName = "2_space"
 		},
 		{
 			title = "CITY",
 			menuImagePath = kAssetsImages.menuCity,
-			filename = "3_city"
+			levelFileName = "3_city"
 		}
 	}
 
@@ -128,6 +128,20 @@ function LevelSelect:_update()
 	if self.animators == nil then
 		self.animators = {}
 		self.animators.card = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 1500)
+	end
+	
+	if self.animators.card:currentValue() < 100 then
+		local selectButtonPressed = playdate.buttonJustPressed(playdate.kButtonA)
+		if selectButtonPressed then
+			local index = self.state
+			if index <= #self.kLevels then
+				-- Load level
+				print(self.kLevels[index].levelFileName)
+			elseif index == 4 then
+				-- Settings
+				print("Settings")
+			end
+		end
 	end
 	
 	-- TODO: Add Crank
