@@ -10,6 +10,8 @@ function WidgetMenu:init()
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.samples)
 	
+	self.painters = {}
+	
 	self:setStateInitial({default = 1, menu = 2}, 1)
 	
 	self.index = 0
@@ -24,6 +26,8 @@ function WidgetMenu:_load()
 		printTable(args)
 	end
 	
+	self.painters.background = PainterBackground()
+	
 	self.children.title = Widget.new(WidgetTitle)
 	self.children.title:load()
 	
@@ -37,6 +41,8 @@ end
 function WidgetMenu:_draw(rect)
 	-- Paint children
 	
+	self.painters.background:draw(rect)
+	
 	self.children.title:draw(rect)
 	self.children.levelSelect:draw(rect)
 end
@@ -48,25 +54,22 @@ function WidgetMenu:_update()
 		self.tick = self.tick == 0 and 1 or 0
 	end
 	
-	if playdate.buttonIsPressed(playdate.kButtonA) then
+	if playdate.buttonJustPressed(playdate.kButtonA) then
 		self.tick = 0
 		self:setState(self.kStates.menu)
 		
-		
-		self.children.title:animate(WidgetLevelSelect.kAnimations.animateOut)
-		
-		playdate.timer.performAfterDelay(1800, function()
-			self.children.title:setIsHidden(true)
-			self.children.levelSelect:setIsHidden(false)
+		self.children.title:animate(WidgetLevelSelect.kAnimations.animateOut, function(animationChanged)
+			if not animationChanged then
+				self.children.title:setIsHidden(true)
+				self.children.levelSelect:setIsHidden(false)
+			end
 		end)
-		
 	end
 	
-	if playdate.buttonIsPressed(playdate.kButtonB) then
+	if playdate.buttonJustPressed(playdate.kButtonB) then
 		self.tick = 0
 		self:setState(self.kStates.default)
 		self.children.title:setIsHidden(false)
-		
 		self.children.levelSelect:setIsHidden(true)
 		
 		self.children.title:animate(WidgetLevelSelect.kAnimations.animateBackIn)

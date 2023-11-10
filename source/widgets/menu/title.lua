@@ -1,5 +1,6 @@
 import "utils/rect"
 import "utils/position"
+import "common/painters/background"
 
 class("WidgetTitle").extends(Widget)
 
@@ -148,11 +149,29 @@ function WidgetTitle:_load()
 	end)
 end
 
-function WidgetTitle:animate(animation)
-	self:_animate(animation)
+function WidgetTitle:animate(animation, finishedCallback)
+	local previousAnimation = {
+		animation = animation,
+		timestamp = playdate.getCurrentTimeMilliseconds()
+	}
+	
+	self._previousAnimation = previousAnimation
+	
+	function finishedCallbackAfterDelay(delay)
+		if finishedCallback ~= nil then
+			playdate.timer.performAfterDelay(delay, function() 
+				local animationChanged = (previousAnimation.animation ~= self._previousAnimation.animation) 
+					or (previousAnimation.timestamp ~= self._previousAnimation.timestamp)
+				
+				finishedCallback(animationChanged) 
+			end)
+		end
+	end
+	
+	self:_animate(animation, finishedCallbackAfterDelay)
 end
 
-function WidgetTitle:_animate(animation)
+function WidgetTitle:_animate(animation, finishedCallbackAfterDelay)
 	if animation == WidgetLevelSelect.kAnimations.animateIn then
 		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
 		self.animators.animator2 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outExpo, 500)
@@ -169,7 +188,7 @@ function WidgetTitle:_animate(animation)
 		self.animators.animatorOut = playdate.graphics.animator.new(0, 0, 0, playdate.easingFunctions.outCirc, 0)
 		self.animators.animatorOutWheel = playdate.graphics.animator.new(0, playdate.geometry.point.new(0, 0), playdate.geometry.point.new(0, 0), playdate.easingFunctions.outCirc, 0)
 		
-		
+		finishedCallbackAfterDelay(1800)
 	elseif animation == WidgetLevelSelect.kAnimations.animateBackIn then
 		self.animators.animatorOut = playdate.graphics.animator.new(
 			800, 
@@ -180,6 +199,8 @@ function WidgetTitle:_animate(animation)
 		)
 		self.animators.animatorOutWheel = playdate.graphics.animator.new(0, playdate.geometry.point.new(0, 0), playdate.geometry.point.new(0, 0), playdate.easingFunctions.outCirc, 0)
 		self.animators.animatorWheel:reset()
+		
+		finishedCallbackAfterDelay(1000)
 	elseif animation == WidgetLevelSelect.kAnimations.animateOut then
 		self.animators.animatorOut = playdate.graphics.animator.new(
 			800, 
@@ -194,14 +215,12 @@ function WidgetTitle:_animate(animation)
 			playdate.easingFunctions.inQuad, 
 			500
 		)
+		
+		finishedCallbackAfterDelay(1300)
 	end
 end
 
-function WidgetTitle:_draw(rect)
-	playdate.graphics.setColor(playdate.graphics.kColorBlack)
-	playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeBayer4x4)
-	playdate.graphics.fillRect(0, 0, rect.w, rect.h)
-	
+function WidgetTitle:_draw(rect)	
 	local animationValue = self.animators.animator1:currentValue() + self.animators.animatorOut:currentValue()
 	
 	self.painterBackground1:draw(Rect.offset(rect, 0, -20 - animationValue))
