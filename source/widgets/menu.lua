@@ -18,6 +18,8 @@ function WidgetMenu:init(config)
 	
 	self.index = 0
 	self.tick = 0
+	
+	self.transitioningOut = true
 end
 
 function WidgetMenu:_load()
@@ -60,22 +62,11 @@ function WidgetMenu:_update()
 	if playdate.buttonJustPressed(playdate.kButtonA) then
 		self.tick = 0
 		self:setState(self.kStates.menu)
-		
-		self.children.title:animate(WidgetLevelSelect.kAnimations.animateOut, function(animationChanged)
-			if not animationChanged then
-				self.children.title:setIsHidden(true)
-				self.children.levelSelect:setIsHidden(false)
-			end
-		end)
 	end
 	
 	if playdate.buttonJustPressed(playdate.kButtonB) then
 		self.tick = 0
 		self:setState(self.kStates.default)
-		self.children.title:setIsHidden(false)
-		self.children.levelSelect:setIsHidden(true)
-		
-		self.children.title:animate(WidgetLevelSelect.kAnimations.animateBackIn)
 	end
 end
 
@@ -87,9 +78,21 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 			self.children.levelSelect = Widget.new(LevelSelect)
 			self.children.levelSelect:load()
 		end
+		
+		self.children.title:animate(WidgetLevelSelect.kAnimations.animateOut, function(animationChanged)
+			if not animationChanged then
+				self.children.title:setIsHidden(true)
+				self.children.levelSelect:setIsHidden(false)
+			end
+		end)
 	end
 	
 	if stateFrom == self.kStates.menu and stateTo == self.kStates.default then
 		self:playSample(kAssetsSounds.click)
+		
+		self.children.title:setIsHidden(false)
+		self.children.levelSelect:setIsHidden(true)
+		
+		self.children.title:animate(WidgetLevelSelect.kAnimations.animateBackIn)
 	end
 end

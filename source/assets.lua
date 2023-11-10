@@ -13,7 +13,6 @@ kAssetsImages = {
 	platform = dirImages.."sprites/platform",
 	levelEnd = dirImages.."sprites/portal",
 	wheel = dirImages.."sprites/wheel/wheel",
-	wheelLoading = dirImages.."sprites/menu/wheel",
 	star = dirImages.."sprites/star/star",
 	starMenu = dirImages.."sprites/menu/star",
 	particles = dirImages.."sprites/particles",
