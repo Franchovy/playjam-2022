@@ -1,199 +1,127 @@
-import "engine"
-import "config"
-import "utils/themes"
-import "utils/text"
-import "utils/rect"
-import "utils/time"
+class("WidgetLevel").extends(Widget)
 
-class('GameScene').extends(Scene)
+function WidgetLevel:init(config)
+	self.filePathLevel = config.filePathLevel
+	
+	self:supply(Widget.kDeps.state)
+	
+	self:setStateInitial({
+		stopped = 1,
+		playing = 2,
+	}, 1)
+	
+	self.sprites = {}
+end
 
-gameStates = {
-	created = "Created",
-	loading = "Loading",
-	readyToStart = "ReadyToStart",
-	playing = "Playing",
-	playerDied = "PlayerDied",
-	levelEnd = "LevelEnd"
-}
-
-local MAX_CHUNKS = 16
-local CHUNK_LENGTH = 1000
-local GRID_SIZE = 24
-
-local LEVEL_COMPLETE_SIZE = 3500
-
-local levelCompleteSprite = nil
-
-function GameScene:init()
-	Scene.init(self)
+function WidgetLevel:_load()
+	
+	-- Periodic Blinker
+	
+	self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
+	
+	-- Sprite Cycler
+	
+	local chunkLength = AppConfig["chunkLength"]
+	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint"}
+	
+	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, config, spriteToRecycle)
+		local sprite = spriteToRecycle;
+			
+		if sprite == nil then
+			-- Create sprites
+			if id == "platform" then
+				sprite = Platform.new()
+			elseif id == "killBlock" then
+				sprite = KillBlock.new(self.periodicBlinker)
+			elseif id == "coin" then
+				sprite = Coin.new()
+			elseif id == "checkpoint" then
+				sprite = Checkpoint.new()
+			elseif id == "player" then
+				sprite = Wheel.new()
+				sprite:resetValues()
+				sprite:setAwaitingInput()
+				self.wheel = sprite
+				
+				if self.previousLoadPoint ~= nil then
+					position = self.previousLoadPoint
+				end
+			elseif id == "levelEnd" then
+				sprite = LevelEnd.new()
+			else 
+				print("Unrecognized ID: ".. id)
+			end
+		end
+		
+		if config ~= nil then
+			sprite:loadConfig(config)
+		end
+		
+		if position ~= nil then
+			sprite:moveTo(kGame.gridSize * position.x, kGame.gridSize * position.y)
+			sprite:add()
+		end
+		
+		return sprite
+	end)
+	
+	-- Load level file
+	
+	self.config = json.decodeFile(self.filePathLevel)
+	
+	assert(self.config)
+	
+	-- Load level into spritecycler
+	
+	self.spriteCycler:load(self.config)
 	
 	--
 	
-	self.wheel = nil
+	self.spriteCycler:preloadSprites({
+		id = "platform",
+		count = 120
+	}, {
+		id = "killBlock",
+		count = 40
+	}, {
+		id = "coin",
+		count = 30
+	}, {
+		id = "checkpoint",
+		count = 1
+	})
 	
-	self.gameState = gameStates.created
+	-- Load theme (Parallax BG)
 	
-	self.spritesLoaded = false
+	local themeId = self.config.theme
 	
-	-- Loading screen drawing & clearing
-	
-	self.imageWheelLoading = nil
-	self.loadingText = nil
-	
-	self.loadingDrawCallback = function()
-		
+	if themeId ~= 0 then
+		self.theme = kThemes[themeId]
 	end
-	
-	self.loadingDrawClearCallback = function()
-		
-	end
-end
-
-function GameScene:load(level)
-	
-	-- Level nil check for restarting after Game Over
-	if level ~= nil then
-		self.level = level
-	end
-	
-	print("Game Scene Load")
-	
-	self.gameState = gameStates.loading
-	
-	Scene.loadAsynchronously(self,
-		function()
-			self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
-			return true
-		end,
-		function()
-			
-			
-			return true
-		end,
-		function()
-			self.config = json.decodeFile(self.level)
-			
-			assert(self.config)
-			
-			return true
-		end,
-		function()
-			self.spriteCycler:load(self.config)
-			
-			return true
-		end,
-		function()
-			self.spriteCycler:preloadSprites({
-				id = "platform",
-				count = 120
-			}, {
-				id = "killBlock",
-				count = 40
-			}, {
-				id = "coin",
-				count = 30
-			}, {
-				id = "checkpoint",
-				count = 1
-			})
-			
-			return true
-		end,
-		function()
-			
-			local themeId = self.config.theme
-			
-			if themeId ~= 0 then
-				self.theme = kThemes[themeId]
-			end
-			
-			if AppConfig.enableParalaxBackground and self.theme ~= nil then
-				self.background = ParalaxBackground.new()
-				self.background:loadTheme(self.theme)
-				
-				self.background:setParalaxDrawingRatios()
-			end
-			
-			return true
-		end,
-		function()
-			if not self.spritesLoaded then
-				self.spritesLoaded = true
-				
-				self.hud = Hud()
-				self.hud:moveTo(3, 2)
-			end
-			
-			return true
-		end
-	)
-end
-
-function GameScene:present()
-	Scene.present(self)
-	
-	print("Game Scene Present")
-	
-	-- Start periodicBlinker for flashing animations
-	
-	self.periodicBlinker:start()
-	
-	-- Set background drawing callback
 	
 	if AppConfig.enableParalaxBackground and self.theme ~= nil then
-		local callback = self.background:getBackgroundDrawingCallback()
+		self.background = ParalaxBackground.new()
+		self.background:loadTheme(self.theme)
 		
-		gfx.sprite.setBackgroundDrawingCallback(callback)
-		
-		self.background:add()
+		self.background:setParalaxDrawingRatios()
 	end
 	
-	-- Set game as ready to start
+	-- Add HUD
 	
-	self.gameState = gameStates.readyToStart
-	
-	-- Initialize sprite cycling using initial wheel position
-	
-	local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
-	self.spriteCycler:loadInitialSprites(initialChunk, 1)
-	
-	-- Set camera to center on wheel
-	
-	self:updateDrawOffset()
-	
-	-- Play music
-	
-	if AppConfig.enableBackgroundMusic and self.theme ~= nil then
-		local musicFilePath = getMusicFilepathForTheme(self.theme)
-		self.filePlayer = FilePlayer(musicFilePath)
+	if not self.spritesLoaded then
+		self.spritesLoaded = true
 		
-		self.filePlayer:play()
+		self.hud = Hud()
+		self.hud:moveTo(3, 2)
 	end
-	
-	-- Set up level timer 
-	
-	self.hud:add()
-	
-	self.levelTimerCounter = 0
-	self.coinCount = 0
-	
-	local levelTimer = playdate.timer.new(999000)
-	levelTimer.updateCallback = function(timer)
-		self.levelTimerCounter = timer.currentTime
-		
-		self.hud:updateTimer(self.levelTimerCounter)
-	end
-	levelTimer.timerEndedCallback = function()
-		-- TODO: Trigger game over
-		print("Game over!")
-	end
-	
-	levelTimer:pause()
-	
-	self.levelTimer = levelTimer
 end
 
-function GameScene:update()
+function WidgetLevel:_draw(rect)
+	
+end
+
+function WidgetLevel:_update()
+	
 	local drawOffsetX, drawOffsetY = gfx.getDrawOffset()
 	
 	-- Update periodicBlinker
@@ -207,7 +135,7 @@ function GameScene:update()
 	end
 	
 	-- Updates sprites cycling
-	self.spriteCycler:update(-drawOffsetX / GRID_SIZE, drawOffsetY / GRID_SIZE)
+	self.spriteCycler:update(-drawOffsetX / kGame.gridSize, drawOffsetY / kGame.gridSize)
 	
 	if not self.isFinishedTransitioning then
 		return
@@ -244,7 +172,7 @@ function GameScene:update()
 		
 		if self.wheel.hasTouchedNewCheckpoint == true then
 			local position = self.wheel:getRecentCheckpoint()
-			self.previousLoadPoint = { x = position.x / GRID_SIZE, y = position.y / GRID_SIZE }
+			self.previousLoadPoint = { x = position.x / kGame.gridSize, y = position.y / kGame.gridSize }
 		end
 		
 		local updatedCoinCount = self.wheel:getCoinCountUpdate()
@@ -273,7 +201,6 @@ function GameScene:update()
 			
 			self.gameState = gameStates.playerDied
 		end
-		
 	end
 	
 	if self.gameState == gameStates.levelEnd then
@@ -284,28 +211,74 @@ function GameScene:update()
 			sceneManager:switchScene(scenes.game, function () end)
 		end
 	end
+	
 end
 
-function GameScene:dismiss()
-	Scene.dismiss(self)
-	
-	self.spriteCycler:unloadAll()
-	
-	if AppConfig.enableBackgroundMusic and self.theme ~= nil then
-		self.filePlayer:stop()
+function WidgetLevel:stateChanged(stateFrom, stateTo)
+	if stateFrom == self.kStates.stopped and (stateTo == self.kStates.play) then
+		
+		-- Start periodicBlinker for flashing animations
+		
+		self.periodicBlinker:start()
+		
+		-- Set background drawing callback
+		
+		if AppConfig.enableParalaxBackground and self.theme ~= nil then
+			local callback = self.background:getBackgroundDrawingCallback()
+			
+			gfx.sprite.setBackgroundDrawingCallback(callback)
+			
+			self.background:add()
+		end
+		
+		-- Set game as ready to start
+		
+		self.gameState = gameStates.readyToStart
+		
+		-- Initialize sprite cycling using initial wheel position
+		
+		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
+		self.spriteCycler:loadInitialSprites(initialChunk, 1)
+		
+		-- Set camera to center on wheel
+		
+		self:updateDrawOffset()
+		
+		-- Play music
+		
+		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
+			local musicFilePath = getMusicFilepathForTheme(self.theme)
+			self.filePlayer = FilePlayer(musicFilePath)
+			
+			self.filePlayer:play()
+		end
+		
+		-- Set up level timer 
+		
+		self.hud:add()
+		
+		self.levelTimerCounter = 0
+		self.coinCount = 0
+		
+		local levelTimer = playdate.timer.new(999000)
+		levelTimer.updateCallback = function(timer)
+			self.levelTimerCounter = timer.currentTime
+			
+			self.hud:updateTimer(self.levelTimerCounter)
+		end
+		levelTimer.timerEndedCallback = function()
+			-- TODO: Trigger game over
+			print("Game over!")
+		end
+		
+		levelTimer:pause()
+		
+		self.levelTimer = levelTimer
 	end
-	
-	self.levelTimer:remove()
-	self.hud:remove()
-	
-	self.periodicBlinker:destroy()
 end
 
-function GameScene:destroy()
-	Scene.destroy(self)
-end
 
-function GameScene:updateDrawOffset()
+function WidgetLevel:updateDrawOffset()
 	local drawOffset = gfx.getDrawOffset()
 	local relativeX = self.wheel.x + drawOffset
 	if relativeX > 150 then
@@ -315,7 +288,7 @@ function GameScene:updateDrawOffset()
 	end
 end
 
-function GameScene:onLevelComplete(nextLevel)
+function WidgetLevel:onLevelComplete(nextLevel)
 
 	addLevelCompleteSprite()
 		

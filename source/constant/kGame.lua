@@ -1,0 +1,3 @@
+kGame = {
+	gridSize = 24
+}

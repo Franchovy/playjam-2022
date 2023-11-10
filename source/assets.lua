@@ -46,7 +46,7 @@ kAssetsFonts = {
 }
 
 kAssetsLevels = {
-	mountain = dirLevels.."1_mountain",
-	space = dirLevels.."2_space",
-	city = dirLevels.."3_city",
+	mountain = dirLevels.."1_mountain.json",
+	space = dirLevels.."2_space.json",
+	city = dirLevels.."3_city.json",
 }

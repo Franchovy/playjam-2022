@@ -14,9 +14,8 @@ end
 
 function WidgetMain:_load()
 	self.playCallback = function(levelPath)
-		print(levelPath)
 		if self.children.play == nil then
-			self.children.play = Widget.new(WidgetPlay)
+			self.children.play = Widget.new(WidgetPlay, { filePathLevel = levelPath })
 			self.children.play:load()
 		end
 	end

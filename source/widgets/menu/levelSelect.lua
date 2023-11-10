@@ -26,17 +26,17 @@ function WidgetLevelSelect:init(config)
 		{
 			title = "MOUNTAIN",
 			menuImagePath = kAssetsImages.menuMountain,
-			levelFileName = "1_mountain"
+			levelFileName = kAssetsLevels.mountain
 		},
 		{
 			title = "SPACE",
 			menuImagePath = kAssetsImages.menuSpace,
-			levelFileName = "2_space"
+			levelFileName = kAssetsLevels.space
 		},
 		{
 			title = "CITY",
 			menuImagePath = kAssetsImages.menuCity,
-			levelFileName = "3_city"
+			levelFileName = kAssetsLevels.city
 		}
 	}
 
