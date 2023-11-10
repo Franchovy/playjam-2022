@@ -4,7 +4,8 @@ Widget.topLevelWidget = nil
 
 Widget.kDeps = {
 	children = 1,
-	state = 2
+	state = 2,
+	samples = 3
 }
 
 function Widget.main(topLevelWidgetClass, ...)
@@ -18,7 +19,8 @@ function Widget.new(class, ...)
 	
 	widget._state = {
 		isLoaded = false,
-		isDrawable = false
+		isDrawable = false,
+		isHidden = false
 	}
 	
 	return widget
@@ -29,6 +31,8 @@ function Widget.supply(widget, dep)
 		widget:_supplyDepChildren()
 	elseif dep == Widget.kDeps.state then
 		widget:_supplyDepState()
+	elseif dep == Widget.kDeps.samples then
+		widget:_supplyDepSamples()
 	end
 end
 
@@ -50,6 +54,19 @@ function Widget._supplyDepState(self)
 	end
 end
 
+function Widget._supplyDepSamples(self)
+	self.samples = {}
+	function self:loadSample(path, key)
+		if key == nil then
+			key = path
+		end
+		self.samples[path] = playdate.sound.sampleplayer.new(path)
+	end
+	function self:playSample(key, ...)
+		self.samples[key]:play(...)
+	end
+end
+
 function Widget.setBackgroundDrawingCallback()
 	playdate.graphics.sprite.setBackgroundDrawingCallback(
 		function( x, y, width, height )
@@ -64,6 +81,22 @@ function Widget.load(self)
 	self._state.isLoaded = true
 end
 
+function Widget.setIsHidden(self, isHidden)
+	if isHidden == nil then
+		isHidden = false
+	end
+		
+	self._state.isHidden = isHidden
+end
+
+function Widget.isHidden(self)
+	return self._state.isHidden
+end
+
+function Widget.unload(self)
+	self._state.isLoaded = false
+end
+
 function Widget:isLoaded()
 	return self._state.isLoaded	
 end
@@ -76,7 +109,7 @@ function Widget.update(self)
 		
 		Widget.topLevelWidget:update()
 	else
-		if self._state.isLoaded == false then
+		if self._state.isLoaded == false or (self._state.isHidden == true) then
 			return
 		end
 		
@@ -100,7 +133,7 @@ function Widget.draw(self, rect)
 		local rect = playdate.display.getRect()
 		Widget.topLevelWidget:draw(Rect.make(rect.x, rect.y, rect.width, rect.height))
 	else
-		if self._state.isLoaded == false then
+		if self._state.isLoaded == false or (self._state.isHidden == true) then
 			return
 		end
 

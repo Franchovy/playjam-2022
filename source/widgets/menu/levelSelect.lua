@@ -1,9 +1,14 @@
 import "levelSelect/entry"
 import "levelSelect/preview"
 
-class("LevelSelect").extends(Widget)
+class("WidgetLevelSelect").extends(Widget)
 
-function LevelSelect:init()
+WidgetLevelSelect.kMenuActionType = {
+	play = "play",
+	menu = "menu"
+}
+
+function WidgetLevelSelect:init(config)
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.children)
 	
@@ -14,8 +19,9 @@ function LevelSelect:init()
 	
 	self.samples = {}
 	
-	self.hidden = false
+	self.selectCallback = config.menuSelectCallback
 	
+	-- TODO: Feed these from higher up. Same with settings
 	self.kLevels = {
 		{
 			title = "MOUNTAIN",
@@ -36,7 +42,7 @@ function LevelSelect:init()
 
 end
 
-function LevelSelect:_load()
+function WidgetLevelSelect:_load()
 	self.samples.select = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelect)
 	self.samples.selectFail = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelectFail)
 	
@@ -110,7 +116,7 @@ function LevelSelect:_load()
 	end
 end
 
-function LevelSelect:_draw(rect)
+function WidgetLevelSelect:_draw(rect)
 	local width = 220
 	
 	self.painters.card:draw(Rect.offset(Rect.with(rect, { w = width }), -self.animators.card:currentValue(), 0))
@@ -124,7 +130,7 @@ function LevelSelect:_draw(rect)
 	end
 end
 
-function LevelSelect:_update()
+function WidgetLevelSelect:_update()
 	if self.animators == nil then
 		self.animators = {}
 		self.animators.card = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 1500)
@@ -136,10 +142,10 @@ function LevelSelect:_update()
 			local index = self.state
 			if index <= #self.kLevels then
 				-- Load level
-				print(self.kLevels[index].levelFileName)
+				self.selectCallback({ type = WidgetLevelSelect.kMenuActionType.play, path = self.kLevels[index].levelFileName })
 			elseif index == 4 then
 				-- Settings
-				print("Settings")
+				self.selectCallback({ type = WidgetLevelSelect.kMenuActionType.menu, name = "settings" })
 			end
 		end
 	end
@@ -179,6 +185,6 @@ function LevelSelect:_update()
 	end
 end
 
-function LevelSelect:changeState(_, stateTo)
+function WidgetLevelSelect:changeState(_, stateTo)
 	
 end
