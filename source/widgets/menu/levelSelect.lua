@@ -133,7 +133,7 @@ end
 function WidgetLevelSelect:_update()
 	if self.animators == nil then
 		self.animators = {}
-		self.animators.card = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 1500)
+		self.animators.card = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo)
 	end
 	
 	if self.animators.card:currentValue() < 100 then
