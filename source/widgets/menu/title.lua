@@ -3,12 +3,14 @@ import "utils/position"
 
 class("WidgetTitle").extends(Widget)
 
+WidgetLevelSelect.kAnimations = {
+	animateIn = 1,
+	animateOut = 2,
+	animateBackIn = 3
+}
+
 function WidgetTitle:init()
 	self.animators = {}
-	self.kAnimations = {
-		in = 1,
-		out = 2
-	}
 	
 	self.images = {}
 	self.painters = {}
@@ -146,17 +148,12 @@ function WidgetTitle:_load()
 	end)
 end
 
-function WidgetTitle:_animate(animation)
-	if animation == self.kAnimations.in then
-		
-	elseif animation == self.kAnimations.out then
-		
-	end
+function WidgetTitle:animate(animation)
+	self:_animate(animation)
 end
 
-function WidgetTitle:_draw(rect)
-	if self.animators == nil then
-		self.animators = {}
+function WidgetTitle:_animate(animation)
+	if animation == WidgetLevelSelect.kAnimations.animateIn then
 		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
 		self.animators.animator2 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outExpo, 500)
 		self.animators.animator3 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outCirc, 1000)
@@ -167,11 +164,40 @@ function WidgetTitle:_draw(rect)
 			playdate.easingFunctions.outQuad, 
 			800
 		)
+		
 		-- Placeholder animator for use on transition out
 		self.animators.animatorOut = playdate.graphics.animator.new(0, 0, 0, playdate.easingFunctions.outCirc, 0)
 		self.animators.animatorOutWheel = playdate.graphics.animator.new(0, playdate.geometry.point.new(0, 0), playdate.geometry.point.new(0, 0), playdate.easingFunctions.outCirc, 0)
+		
+		
+	elseif animation == WidgetLevelSelect.kAnimations.animateBackIn then
+		self.animators.animatorOut = playdate.graphics.animator.new(
+			800, 
+			math.min(240, self.animators.animatorOut:currentValue()), 
+			0, 
+			playdate.easingFunctions.outExpo, 
+			200
+		)
+		self.animators.animatorOutWheel = playdate.graphics.animator.new(0, playdate.geometry.point.new(0, 0), playdate.geometry.point.new(0, 0), playdate.easingFunctions.outCirc, 0)
+		self.animators.animatorWheel:reset()
+	elseif animation == WidgetLevelSelect.kAnimations.animateOut then
+		self.animators.animatorOut = playdate.graphics.animator.new(
+			800, 
+			math.max(0, self.animators.animatorOut:currentValue()), 
+			240, 
+			playdate.easingFunctions.inExpo, 200
+		)
+		self.animators.animatorOutWheel = playdate.graphics.animator.new(
+			800, 
+			playdate.geometry.point.new(0, 0), 
+			playdate.geometry.point.new(450, 100),  
+			playdate.easingFunctions.inQuad, 
+			500
+		)
 	end
-	
+end
+
+function WidgetTitle:_draw(rect)
 	playdate.graphics.setColor(playdate.graphics.kColorBlack)
 	playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeBayer4x4)
 	playdate.graphics.fillRect(0, 0, rect.w, rect.h)

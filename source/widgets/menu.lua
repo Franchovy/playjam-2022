@@ -30,6 +30,8 @@ function WidgetMenu:_load()
 	self.children.levelSelect = Widget.new(WidgetLevelSelect, { menuSelectCallback = menuSelectCallback })
 	self.children.levelSelect:load()
 	self.children.levelSelect:setIsHidden(true)
+	
+	self.children.title:animate(WidgetLevelSelect.kAnimations.animateIn)
 end
 
 function WidgetMenu:_draw(rect)
@@ -49,15 +51,25 @@ function WidgetMenu:_update()
 	if playdate.buttonIsPressed(playdate.kButtonA) then
 		self.tick = 0
 		self:setState(self.kStates.menu)
-		self.children.title:setIsHidden(true)
-		self.children.levelSelect:setIsHidden(false)
+		
+		
+		self.children.title:animate(WidgetLevelSelect.kAnimations.animateOut)
+		
+		playdate.timer.performAfterDelay(1800, function()
+			self.children.title:setIsHidden(true)
+			self.children.levelSelect:setIsHidden(false)
+		end)
+		
 	end
 	
 	if playdate.buttonIsPressed(playdate.kButtonB) then
 		self.tick = 0
 		self:setState(self.kStates.default)
 		self.children.title:setIsHidden(false)
+		
 		self.children.levelSelect:setIsHidden(true)
+		
+		self.children.title:animate(WidgetLevelSelect.kAnimations.animateBackIn)
 	end
 end
 
