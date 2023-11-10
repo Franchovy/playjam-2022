@@ -30,6 +30,14 @@ function Rect.with(rect, properties)
 	return rect
 end
 
+function Rect.bottom(rect)
+	return rect.y + rect.h
+end
+
+function Rect.right(rect)
+	return rect.x + rect.w
+end
+
 function Rect.center(rect, rectContainer)
 	return { x = (rectContainer.w - rect.w) / 2, y = (rectContainer.h - rect.h) / 2, w = rect.w, h = rect.h }
 end

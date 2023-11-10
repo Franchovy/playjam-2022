@@ -5,7 +5,9 @@ import "menu/title"
 
 class("WidgetMenu").extends(Widget)
 
-function WidgetMenu:init()
+function WidgetMenu:init(config)
+	self.playCallback = config.playCallback
+	
 	self:supply(Widget.kDeps.children)
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.samples)
@@ -22,8 +24,9 @@ function WidgetMenu:_load()
 	self:loadSample(kAssetsSounds.click)
 	
 	local menuSelectCallback = function(args)
-		print("Selected menu options:")
-		printTable(args)
+		if args.type == WidgetLevelSelect.kMenuActionType.play and (args.path ~= nil) then
+			self.playCallback(args.path)
+		end
 	end
 	
 	self.painters.background = PainterBackground()

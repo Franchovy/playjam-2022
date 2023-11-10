@@ -1,5 +1,6 @@
 import "engine"
 import "menu"
+import "play"
 
 class("WidgetMain").extends(Widget)
 
@@ -12,7 +13,15 @@ function WidgetMain:init()
 end
 
 function WidgetMain:_load()
-	self.children.menu = Widget.new(WidgetMenu)
+	self.playCallback = function(levelPath)
+		print(levelPath)
+		if self.children.play == nil then
+			self.children.play = Widget.new(WidgetPlay)
+			self.children.play:load()
+		end
+	end
+	
+	self.children.menu = Widget.new(WidgetMenu, { playCallback = self.playCallback })
 	self.children.menu:load()
 end
 
@@ -32,9 +41,14 @@ function WidgetMain:_draw(rect)
 	if (self:isLoaded() == true) and (self.state == self.kStates.menu) then
 		self.children.menu:draw(rect)
 	end
+	
+	if self.children.play ~= nil then
+		self.children.play:draw(rect)
+	end
 end
 
 function WidgetMain:_update()
+	
 end
 
 function WidgetMain:_input()
