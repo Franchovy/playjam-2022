@@ -4,6 +4,12 @@ import "utils/position"
 class("WidgetTitle").extends(Widget)
 
 function WidgetTitle:init()
+	self.animators = {}
+	self.kAnimations = {
+		in = 1,
+		out = 2
+	}
+	
 	self.images = {}
 	self.painters = {}
 	
@@ -138,6 +144,14 @@ function WidgetTitle:_load()
 		
 		self.images.wheelImageTable:getImage((-state.index % 12) + 1):draw(140, 0)
 	end)
+end
+
+function WidgetTitle:_animate(animation)
+	if animation == self.kAnimations.in then
+		
+	elseif animation == self.kAnimations.out then
+		
+	end
 end
 
 function WidgetTitle:_draw(rect)
