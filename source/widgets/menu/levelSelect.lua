@@ -150,7 +150,6 @@ function WidgetLevelSelect:_update()
 		end
 	end
 	
-	-- TODO: Add Crank
 	local scrollUp = playdate.buttonJustPressed(playdate.kButtonUp)
 	local scrollDown = playdate.buttonJustPressed(playdate.kButtonDown)
 	
@@ -161,7 +160,8 @@ function WidgetLevelSelect:_update()
 			self.samples.select:play()
 		else
 			self.samples.selectFail:play()
-			self.animators.card = playdate.graphics.animator.new(50, 5, 0, playdate.easingFunctions.outExpo)
+			self.animators.card = playdate.graphics.animator.new(50, 0, 16, playdate.easingFunctions.outInBack)
+			self.animators.card.reverses = true
 		end
 	end
 	
@@ -172,7 +172,8 @@ function WidgetLevelSelect:_update()
 			self.samples.select:play()
 		else
 			self.samples.selectFail:play()
-			self.animators.card = playdate.graphics.animator.new(50, 5, 0, playdate.easingFunctions.outExpo)
+			self.animators.card = playdate.graphics.animator.new(50, 0, 16, playdate.easingFunctions.outInBack)
+			self.animators.card.reverses = true
 		end
 	end
 	
