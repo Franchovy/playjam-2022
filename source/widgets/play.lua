@@ -1,3 +1,4 @@
+import "play/state"
 import "play/loading"
 import "play/level"
 
@@ -9,12 +10,7 @@ function WidgetPlay:init(config)
 	self:supply(Widget.kDeps.children)
 	self:supply(Widget.kDeps.state)
 	
-	self:setStateInitial({
-		starting = 1,
-		playing = 2,
-		dead = 3,
-		complete = 4
-	}, 1)
+	self:setStateInitial(kPlayStates, 1)
 end
 
 function WidgetPlay:_load()

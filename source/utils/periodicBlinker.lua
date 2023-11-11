@@ -47,6 +47,9 @@ function periodicBlinker(blinkerConfig, delay)
 	end
 	
 	function periodicBlinker.update(self)
+		if self.blinker == nil or self.timer == nil then
+			return
+		end
 		if self.previousValue ~= self.blinker.on then
 			self.hasChanged = true
 		else 

@@ -22,8 +22,9 @@ end
 function Wheel:init()
 	Wheel.super.init(self)
 	
-	images = getImageTable(kAssetsImages.wheel, 12)
-	self:setImage(images[1])
+	self.imagetable = playdate.graphics.imagetable.new(kAssetsImages.wheel)
+	
+	self:setImage(self.imagetable[1])
 	self:setCenter(0, 0)
 	
 	self.type = kSpriteTypes.player
@@ -192,7 +193,7 @@ function Wheel:update()
 	
 	local imageIndex = math.floor(self.angle)
 
-	self:setImage(images[imageIndex])
+	self:setImage(self.imagetable[imageIndex])
 end
 
 function Wheel:hasReachedLevelEnd()

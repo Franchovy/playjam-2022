@@ -5,10 +5,7 @@ function WidgetLevel:init(config)
 	
 	self:supply(Widget.kDeps.state)
 	
-	self:setStateInitial({
-		stopped = 1,
-		playing = 2,
-	}, 1)
+	self:setStateInitial(kPlayStates, 1)
 	
 	self.sprites = {}
 end
@@ -23,6 +20,11 @@ function WidgetLevel:_load()
 	
 	local chunkLength = AppConfig["chunkLength"]
 	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint"}
+	
+	
+	-- self:supply(kDeps:sprite)
+	-- addSprite(SpriteClass)
+	-- 
 	
 	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, config, spriteToRecycle)
 		local sprite = spriteToRecycle;
@@ -114,6 +116,63 @@ function WidgetLevel:_load()
 		self.hud = Hud()
 		self.hud:moveTo(3, 2)
 	end
+	
+	
+	-- Start periodicBlinker for flashing animations
+	
+	if self.periodicBlinker ~= nil then
+		self.periodicBlinker:start()
+	end
+	
+	-- Set background drawing callback
+	
+	if AppConfig.enableParalaxBackground and self.theme ~= nil then
+		local callback = self.background:getBackgroundDrawingCallback()
+		
+		gfx.sprite.setBackgroundDrawingCallback(callback)
+		
+		self.background:add()
+	end
+	
+	-- Initialize sprite cycling using initial wheel position
+	
+	local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
+	self.spriteCycler:loadInitialSprites(initialChunk, 1)
+	
+	-- Set camera to center on wheel
+	
+	self:updateDrawOffset()
+	
+	-- Play music
+	
+	if AppConfig.enableBackgroundMusic and self.theme ~= nil then
+		local musicFilePath = getMusicFilepathForTheme(self.theme)
+		self.filePlayer = FilePlayer(musicFilePath)
+		
+		self.filePlayer:play()
+	end
+	
+	-- Set up level timer 
+	
+	self.hud:add()
+	
+	self.levelTimerCounter = 0
+	self.coinCount = 0
+	
+	local levelTimer = playdate.timer.new(999000)
+	levelTimer.updateCallback = function(timer)
+		self.levelTimerCounter = timer.currentTime
+		
+		self.hud:updateTimer(self.levelTimerCounter)
+	end
+	levelTimer.timerEndedCallback = function()
+		-- TODO: Trigger game over
+		print("Game over!")
+	end
+	
+	levelTimer:pause()
+	
+	self.levelTimer = levelTimer
 end
 
 function WidgetLevel:_draw(rect)
@@ -127,7 +186,7 @@ function WidgetLevel:_update()
 	-- Update periodicBlinker
 	
 	self.periodicBlinker:update()
-	
+
 	-- Update background parallax based on current offset
 	
 	if AppConfig.enableParalaxBackground and self.theme ~= nil then
@@ -137,23 +196,18 @@ function WidgetLevel:_update()
 	-- Updates sprites cycling
 	self.spriteCycler:update(-drawOffsetX / kGame.gridSize, drawOffsetY / kGame.gridSize)
 	
-	if not self.isFinishedTransitioning then
-		return
-	end
-	
 	-- On game start
 	
-	if self.state == self.kStates.stopped then
+	if self.state == self.kStates.start then
 		-- Awaiting player input (jump / crank)
 		if playdate.buttonIsPressed(playdate.kButtonA) or (math.abs(playdate.getCrankChange()) > 5) then
-			
 			-- Start game
 			
 			self.wheel:startGame()
 			
 			self.levelTimer:start()
 			
-			self.gameState = gameStates.playing
+			self:setState(self.kStates.playing)
 		end
 	end
 	
@@ -163,8 +217,8 @@ function WidgetLevel:_update()
 		
 		if blinker ~= nil then
 			blinker:update()
-			if levelCompleteSprite ~= nil then	
-				levelCompleteSprite:setVisible(blinker.on)
+			if self.levelCompleteSprite ~= nil then	
+				self.levelCompleteSprite:setVisible(blinker.on)
 			end
 		end
 		
@@ -183,7 +237,7 @@ function WidgetLevel:_update()
 		
 		-- Level End Trigger
 		
-		if self.wheel.hasReachedLevelEnd and levelCompleteSprite == nil then
+		if self.wheel.hasReachedLevelEnd and self.levelCompleteSprite == nil then
 			
 			self:onLevelComplete()
 			
@@ -199,7 +253,7 @@ function WidgetLevel:_update()
 		if self.wheel.hasJustDied then
 			self.levelTimer:pause()
 			
-			self.gameState = gameStates.playerDied
+			self:setState(self.kStates.stopped)
 		end
 	end
 	
@@ -214,30 +268,37 @@ function WidgetLevel:_update()
 			end
 		end
 	end
+	
+	if self.state == self.kStates.stopped then
+		if playdate.buttonIsPressed(playdate.kButtonA) then
+			self:setState(self.kStates.start)
+		end
+	end
 end
 
-function WidgetLevel:stateChanged(stateFrom, stateTo)
-	if stateFrom == self.kStates.stopped and (stateTo == self.kStates.play) then
+function WidgetLevel:changeState(stateFrom, stateTo)
+	if stateFrom == self.kStates.start and (stateTo == self.kStates.playing) then
+	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.stopped) then
 		
-		-- Start periodicBlinker for flashing animations
+		self.spriteCycler:unloadAll()
 		
-		self.periodicBlinker:start()
-		
-		-- Set background drawing callback
-		
-		if AppConfig.enableParalaxBackground and self.theme ~= nil then
-			local callback = self.background:getBackgroundDrawingCallback()
-			
-			gfx.sprite.setBackgroundDrawingCallback(callback)
-			
-			self.background:add()
+		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
+			self.filePlayer:stop()
 		end
 		
-		-- Set game as ready to start
+		self.levelTimer:remove()
+		self.hud:remove()
 		
-		self.gameState = gameStates.readyToStart
+		self.periodicBlinker:destroy()
+		
+		self.wheel:remove()
+		
+	elseif stateFrom == self.kStates.stopped and (stateTo == self.kStates.start) then
+		self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
 		
 		-- Initialize sprite cycling using initial wheel position
+		
+		self.spriteCycler:load(self.config)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		self.spriteCycler:loadInitialSprites(initialChunk, 1)
@@ -254,28 +315,6 @@ function WidgetLevel:stateChanged(stateFrom, stateTo)
 			
 			self.filePlayer:play()
 		end
-		
-		-- Set up level timer 
-		
-		self.hud:add()
-		
-		self.levelTimerCounter = 0
-		self.coinCount = 0
-		
-		local levelTimer = playdate.timer.new(999000)
-		levelTimer.updateCallback = function(timer)
-			self.levelTimerCounter = timer.currentTime
-			
-			self.hud:updateTimer(self.levelTimerCounter)
-		end
-		levelTimer.timerEndedCallback = function()
-			-- TODO: Trigger game over
-			print("Game over!")
-		end
-		
-		levelTimer:pause()
-		
-		self.levelTimer = levelTimer
 	end
 end
 
@@ -290,16 +329,14 @@ function WidgetLevel:updateDrawOffset()
 	end
 end
 
-function WidgetLevel:onLevelComplete(nextLevel)
+function WidgetLevel:onLevelComplete()
 
-	addLevelCompleteSprite()
+	self:addLevelCompleteSprite()
 		
 	timer.performAfterDelay(3000,
 		function ()
-			self.gameState = gameStates.levelEnd
-			
-			levelCompleteSprite:remove()
-			levelCompleteSprite = nil
+			self.levelCompleteSprite:remove()
+			--self.levelCompleteSprite = nil
 			
 			local stars = 1
 			
@@ -331,14 +368,14 @@ function WidgetLevel:onLevelComplete(nextLevel)
 	)
 end
 
-function addLevelCompleteSprite()
-	levelCompleteSprite = sizedTextSprite("LEVEL COMPLETE", 3)
+function WidgetLevel:addLevelCompleteSprite()
+	self.levelCompleteSprite = sizedTextSprite("LEVEL COMPLETE", 3)
 	
-	levelCompleteSprite:setImage(levelCompleteSprite:getImage())
-	levelCompleteSprite:setIgnoresDrawOffset(true)
+	self.levelCompleteSprite:setImage(self.levelCompleteSprite:getImage())
+	self.levelCompleteSprite:setIgnoresDrawOffset(true)
 	
-	levelCompleteSprite:add()
-	levelCompleteSprite:moveTo(10, 110)
+	self.levelCompleteSprite:add()
+	self.levelCompleteSprite:moveTo(10, 110)
 
 	blinker = playdate.graphics.animation.blinker.new(300, 100)
 	blinker:startLoop()
