@@ -14,6 +14,8 @@ end
 
 function WidgetMain:_load()
 	self.playCallback = function(levelPath)
+		self.children.menu:setVisible(false)
+		
 		if self.children.play == nil then
 			self.children.play = Widget.new(WidgetPlay, { filePathLevel = levelPath })
 			self.children.play:load()

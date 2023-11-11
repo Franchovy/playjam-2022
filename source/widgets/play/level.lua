@@ -143,7 +143,7 @@ function WidgetLevel:_update()
 	
 	-- On game start
 	
-	if self.gameState == gameStates.readyToStart then
+	if self.state == self.kStates.stopped then
 		-- Awaiting player input (jump / crank)
 		if playdate.buttonIsPressed(playdate.kButtonA) or (math.abs(playdate.getCrankChange()) > 5) then
 			
@@ -157,7 +157,7 @@ function WidgetLevel:_update()
 		end
 	end
 	
-	if self.gameState == gameStates.playing then
+	if self.state == self.kStates.playing then
 		
 		-- Update Blinker
 		
@@ -203,15 +203,17 @@ function WidgetLevel:_update()
 		end
 	end
 	
-	if self.gameState == gameStates.levelEnd then
-		if playdate.buttonJustPressed(playdate.kButtonA) then
-			sceneManager:switchScene(scenes.menu, function() self:destroy() end)
-		elseif playdate.buttonJustPressed(playdate.kButtonB) then
-			self.previousLoadPoint = nil
-			sceneManager:switchScene(scenes.game, function () end)
+	-- TODO: Level End
+	if false then
+		if self.state == self.kStates.levelEnd then
+			if playdate.buttonJustPressed(playdate.kButtonA) then
+				sceneManager:switchScene(scenes.menu, function() self:destroy() end)
+			elseif playdate.buttonJustPressed(playdate.kButtonB) then
+				self.previousLoadPoint = nil
+				sceneManager:switchScene(scenes.game, function () end)
+			end
 		end
 	end
-	
 end
 
 function WidgetLevel:stateChanged(stateFrom, stateTo)

@@ -23,18 +23,26 @@ function WidgetPlay:_load()
 	
 	-- Async load
 	
-	self.children.level = Widget.new(WidgetLevel, { filePathLevel = self.filePathLevel })
-	self.children.level:load()
+	playdate.timer.performAfterDelay(100, function()
+		self.children.level = Widget.new(WidgetLevel, { filePathLevel = self.filePathLevel })
+		self.children.level:load()
+		
+		self.children.loading:setVisible(false)
+	end)
 end
 
 function WidgetPlay:_draw(rect)
 	self.children.loading:draw(rect)
 	
-	self.children.level:draw()
+	if self.children.level ~= nil then
+		self.children.level:draw()
+	end
 end
 
 function WidgetPlay:_update()
 	self.children.loading:update()
 	
-	self.children.level:update()
+	if self.children.level ~= nil then
+		self.children.level:update()
+	end
 end 

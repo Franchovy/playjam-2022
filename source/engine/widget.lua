@@ -20,7 +20,7 @@ function Widget.new(class, ...)
 	widget._state = {
 		isLoaded = false,
 		isDrawable = false,
-		isHidden = false
+		isVisible = true
 	}
 	
 	return widget
@@ -81,16 +81,12 @@ function Widget.load(self)
 	self._state.isLoaded = true
 end
 
-function Widget.setIsHidden(self, isHidden)
-	if isHidden == nil then
-		isHidden = false
-	end
-		
-	self._state.isHidden = isHidden
+function Widget.setVisible(self, isVisible)
+	self._state.isVisible = isVisible
 end
 
-function Widget.isHidden(self)
-	return self._state.isHidden
+function Widget.isVisible(self)
+	return self._state.isVisible
 end
 
 function Widget.unload(self)
@@ -109,7 +105,7 @@ function Widget.update(self)
 		
 		Widget.topLevelWidget:update()
 	else
-		if self._state.isLoaded == false or (self._state.isHidden == true) then
+		if self._state.isLoaded == false or (self._state.isVisible == false) then
 			return
 		end
 		
@@ -133,7 +129,7 @@ function Widget.draw(self, rect)
 		local rect = playdate.display.getRect()
 		Widget.topLevelWidget:draw(Rect.make(rect.x, rect.y, rect.width, rect.height))
 	else
-		if self._state.isLoaded == false or (self._state.isHidden == true) then
+		if self._state.isLoaded == false or (self._state.isVisible == false) then
 			return
 		end
 

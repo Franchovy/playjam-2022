@@ -38,7 +38,7 @@ function WidgetMenu:_load()
 	
 	self.children.levelSelect = Widget.new(WidgetLevelSelect, { menuSelectCallback = menuSelectCallback })
 	self.children.levelSelect:load()
-	self.children.levelSelect:setIsHidden(true)
+	self.children.levelSelect:setVisible(false)
 	
 	self.children.title:animate(WidgetLevelSelect.kAnimations.animateIn)
 end
@@ -81,8 +81,8 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 		
 		self.children.title:animate(WidgetLevelSelect.kAnimations.animateOut, function(animationChanged)
 			if not animationChanged then
-				self.children.title:setIsHidden(true)
-				self.children.levelSelect:setIsHidden(false)
+				self.children.title:setVisible(false)
+				self.children.levelSelect:setVisible(true)
 			end
 		end)
 	end
@@ -90,8 +90,8 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.menu and stateTo == self.kStates.default then
 		self:playSample(kAssetsSounds.click)
 		
-		self.children.title:setIsHidden(false)
-		self.children.levelSelect:setIsHidden(true)
+		self.children.title:setVisible(true)
+		self.children.levelSelect:setVisible(false)
 		
 		self.children.title:animate(WidgetLevelSelect.kAnimations.animateBackIn)
 	end
