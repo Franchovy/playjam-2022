@@ -26,6 +26,8 @@ function playdate.update()
 	sprite.update()
 	playdate.graphics.sprite.redrawBackground()
 	timer.updateTimers()
+	playdate.graphics.animation.blinker.updateAll()
+
 end
 
 function placeholder()
@@ -37,7 +39,6 @@ function placeholder()
 	-- Game Update
 
 	Scene.update()
-	playdate.graphics.animation.blinker.updateAll()
 	timer.updateTimers()
 	sprite.update()
 	frameTimer.updateTimers()

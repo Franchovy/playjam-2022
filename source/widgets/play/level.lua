@@ -117,13 +117,6 @@ function WidgetLevel:_load()
 		self.hud:moveTo(3, 2)
 	end
 	
-	
-	-- Start periodicBlinker for flashing animations
-	
-	if self.periodicBlinker ~= nil then
-		self.periodicBlinker:start()
-	end
-	
 	-- Set background drawing callback
 	
 	if AppConfig.enableParalaxBackground and self.theme ~= nil then
@@ -278,6 +271,7 @@ end
 
 function WidgetLevel:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.start and (stateTo == self.kStates.playing) then
+		self.periodicBlinker:start()
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.stopped) then
 		
 		self.spriteCycler:unloadAll()
@@ -289,15 +283,19 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		self.levelTimer:remove()
 		self.hud:remove()
 		
-		self.periodicBlinker:destroy()
+		self.periodicBlinker:stop()
 		
 		self.wheel:remove()
 		
 	elseif stateFrom == self.kStates.stopped and (stateTo == self.kStates.start) then
-		self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
+		
+		--self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
+		self.periodicBlinker:start()
 		
 		-- Initialize sprite cycling using initial wheel position
 		
+		self.config = json.decodeFile(self.filePathLevel)
+			
 		self.spriteCycler:load(self.config)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
