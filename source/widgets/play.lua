@@ -36,9 +36,9 @@ function WidgetPlay:_draw(rect)
 end
 
 function WidgetPlay:_update()
-	self.children.loading:update()
+	--self.children.loading:update()
 	
 	if self.children.level ~= nil then
-		self.children.level:update()
+		--self.children.level:update()
 	end
 end 
