@@ -1,6 +1,7 @@
 import "play/state"
 import "play/loading"
 import "play/level"
+import "play/levelComplete"
 
 class("WidgetPlay").extends(Widget)
 
@@ -25,6 +26,11 @@ function WidgetPlay:_load()
 		
 		self.children.loading:setVisible(false)
 	end)
+	
+	playdate.timer.performAfterDelay(3000, function()
+		self.children.levelComplete = Widget.new(LevelComplete)
+		self.children.levelComplete:load()
+	end)
 end
 
 function WidgetPlay:_draw(rect)
@@ -32,6 +38,11 @@ function WidgetPlay:_draw(rect)
 	
 	if self.children.level ~= nil then
 		self.children.level:draw()
+	end
+	
+	if self.children.levelComplete ~= nil then
+		local insetRect = Rect.inset(rect, 30, 30)
+		self.children.levelComplete:draw(insetRect)
 	end
 end
 
