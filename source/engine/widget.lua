@@ -9,9 +9,28 @@ Widget.kDeps = {
 }
 
 function Widget.main(topLevelWidgetClass, ...)
-	Widget.setBackgroundDrawingCallback()
+	Widget.drawList = {}
 	
-	Widget.topLevelWidget = Widget.new(topLevelWidgetClass, ...)
+	local topLevelWidget = Widget.new(topLevelWidgetClass, ...)
+	local sprite = topLevelWidget:addWidgetDrawingCallback()
+	
+	table.insert(Widget.drawList, topLevelWidget)
+end
+
+function Widget:addWidgetDrawingCallback()
+	local sprite = gfx.sprite.new()
+	sprite:setSize(playdate.display.getSize())
+	sprite:setCenter(0, 0)
+	sprite:moveTo(0, 0)
+	sprite:setZIndex(-32768)
+	sprite:setIgnoresDrawOffset(true)
+	sprite:setUpdatesEnabled(false)
+	sprite.setAlwaysRedraw(true)
+	sprite.draw = function(s, x, y, w, h)
+		self:draw(Rect.make(x, y, w, h), self.state)
+	end
+	sprite:add()
+	self.sprite = sprite
 end
 
 function Widget.new(class, ...)
@@ -65,14 +84,6 @@ function Widget._supplyDepSamples(self)
 	function self:playSample(key, ...)
 		self.samples[key]:play(...)
 	end
-end
-
-function Widget.setBackgroundDrawingCallback()
-	playdate.graphics.sprite.setBackgroundDrawingCallback(
-		function( x, y, width, height )
-			Widget.draw()
-		end
-	)
 end
 
 function Widget.load(self)

@@ -7,27 +7,27 @@ import "config"
 import "widgets"
 
 local acceptsRestart = false
-local mainWidget = nil
+local topLevelWidget
 
 function initialize()
 	playdate.graphics.setFont(playdate.graphics.font.new(kAssetsFonts.twinbee))
 	playdate.graphics.setFontTracking(1)
 	
-	Widget.main(WidgetMain)
+	topLevelWidget = Widget.new(WidgetMain)
+	topLevelWidget:addWidgetDrawingCallback()
 	
 	playdate.timer.performAfterDelay(1, function()
-		Widget.topLevelWidget:load()
+		topLevelWidget:load()
 	end)
 end
 
 function playdate.update()
-	Widget.update()
+	topLevelWidget:update()
 	
 	sprite.update()
-	playdate.graphics.sprite.redrawBackground()
+	
 	timer.updateTimers()
 	playdate.graphics.animation.blinker.updateAll()
-
 end
 
 function placeholder()
