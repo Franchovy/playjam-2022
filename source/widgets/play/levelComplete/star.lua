@@ -4,12 +4,12 @@ function WidgetStar:init(config)
 	local initialDelay = config.initialDelay
 	
 	self.imagetables = {}
-	self.frametimers = {}
+	self.timers = {}
 	
 	self.tick = 1
 	
 	local tickValues = {
-		initialDelay, 40, 40, 40, 300
+		initialDelay, 90, 90, 120, 360
 	}
 	local tickValuesSum = {}
 	local sum = 0
@@ -19,8 +19,10 @@ function WidgetStar:init(config)
 	end
 	
 	self.timerDuration = sum
-	self.tickFunction = function(frametimer)
-		if frametimer.value > tickValuesSum[self.tick] then
+	self.tickFunction = function(timer)
+		if self.tick > #tickValuesSum then 
+			timer:remove()
+		elseif timer.currentTime >= tickValuesSum[self.tick] then
 			self.tick += 1
 		end
 	end
@@ -29,7 +31,8 @@ end
 function WidgetStar:_load()
 	self.imagetables.star = playdate.graphics.imagetable.new(kAssetsImages.star)
 	
-	self.frametimers.frametimer = playdate.frameTimer.new(self.timerDuration)
+	self.timers.timer = playdate.timer.new(self.timerDuration)
+	self.timers.timer:pause()
 end
 
 function WidgetStar:_draw(rect)
@@ -37,5 +40,7 @@ function WidgetStar:_draw(rect)
 end
 
 function WidgetStar:_update()
-	self.tickFunction(self.frametimers.frametimer)
+	if not self.timers.timer.paused then
+		self.tickFunction(self.timers.timer)
+	end
 end

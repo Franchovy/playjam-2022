@@ -34,7 +34,7 @@ function WidgetPlay:_load()
 	end)
 	
 	playdate.timer.performAfterDelay(3000, function()
-		self.children.levelComplete = Widget.new(LevelComplete, { levelDarkMode = levelDarkMode, numStars = 1 })
+		self.children.levelComplete = Widget.new(LevelComplete, { levelDarkMode = levelDarkMode, numStars = 3 })
 		self.children.levelComplete:load()
 		
 		playdate.timer.performAfterDelay(5000, function()

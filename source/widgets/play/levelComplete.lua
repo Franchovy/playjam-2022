@@ -189,7 +189,7 @@ function LevelComplete:_load()
 	
 	self.stars = {}
 	for i=1, self.numStars do
-		local star = Widget.new(WidgetStar, { initialDelay = 400 + i * 1000 })
+		local star = Widget.new(WidgetStar, { initialDelay = 100 + i * 700 })
 		star:load()
 		table.insert(self.stars, star)
 		self.children["star"..i] = star
@@ -208,25 +208,39 @@ function LevelComplete:_draw(rect)
 		
 		self.images.title:drawCentered(rect.x + rect.w / 2, rect.y + 17)
 		
-		local starImageWidth, starImageHeight = self.stars[1].imagetables.star[1]:getSize()
-		local starMargin = 20
+		local starImageWidth, starImageHeight = self.stars[1].imagetables.star:getImage(1):getSize()
+		local starMargin
+		local starContainerWidth
 		
 		function starsContentWidth(numStars)
 			return (starImageWidth * numStars) + starMargin * (numStars - 1)
 		end
 		
-		local starContainerWidthMin = starsContentWidth(3)
-		local starContainerWidth = math.max(starContainerWidthMin, starsContentWidth(self.numStars))
+		if self.numStars <= 3 then 
+			starMargin = 20
+			starContainerWidth = starsContentWidth(3)
+		elseif self.numStars == 4 then
+			starMargin = 5
+			starContainerWidth = starsContentWidth(4)
+		end
 		
 		for i, star in ipairs(self.stars) do
 			local contentRect = Rect.size(starContainerWidth, starImageHeight)
 			local centeredRect = Rect.center(contentRect, rect)
 			
-			self.stars[i]:draw(Rect.make(centeredRect.x + starMargin * (i - 1), rect.y + 30, starImageWidth, starImageHeight))
+			self.stars[i]:draw(Rect.make(centeredRect.x + (starImageWidth + starMargin) * (i - 1), rect.y + 38, starImageWidth, starImageHeight))
 		end
 	end
 end
 
 function LevelComplete:_update()
 	
+end
+
+function LevelComplete:changeState(stateFrom, stateTo)
+	if stateFrom == self.kStates.text and (stateTo == self.kStates.overlay) then
+		for _, star in pairs(self.stars) do
+			star.timers.timer:start()
+		end
+	end
 end
