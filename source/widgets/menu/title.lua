@@ -14,6 +14,7 @@ function WidgetTitle:init()
 	self.animators = {}
 	
 	self.images = {}
+	self.imagetables = {}
 	self.painters = {}
 	
 	self.index = 0
@@ -21,8 +22,8 @@ function WidgetTitle:init()
 end
 
 function WidgetTitle:_load()
-	self.images.imagetable = playdate.graphics.imagetable.new(kAssetsImages.particles)
-	self.images.wheelImageTable = playdate.graphics.imagetable.new(kAssetsImages.wheel):scaled(2)
+	self.imagetables.particles = playdate.graphics.imagetable.new(kAssetsImages.particles)
+	self.imagetables.wheel = playdate.graphics.imagetable.new(kAssetsImages.wheel):scaled(2)
 	self.images.backgroundImage = playdate.graphics.image.new(kAssetsImages.background)
 	self.images.backgroundImage2 = playdate.graphics.image.new(kAssetsImages.background2)
 	self.images.backgroundImage3 = playdate.graphics.image.new(kAssetsImages.background3)
@@ -143,9 +144,9 @@ function WidgetTitle:_load()
 	end)
 	
 	self.painters.painterWheel = Painter(function(rect, state)
-		self.images.imagetable:getImage((state.index % 36) + 1):scaledImage(2):draw(10, -70)
+		self.imagetables.particles:getImage((state.index % 36) + 1):scaledImage(2):draw(10, -70)
 		
-		self.images.wheelImageTable:getImage((-state.index % 12) + 1):draw(140, 0)
+		self.imagetables.wheel:getImage((-state.index % 12) + 1):draw(140, 0)
 	end)
 end
 

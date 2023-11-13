@@ -39,7 +39,7 @@ function Rect.right(rect)
 end
 
 function Rect.center(rect, rectContainer)
-	return { x = (rectContainer.w - rect.w) / 2, y = (rectContainer.h - rect.h) / 2, w = rect.w, h = rect.h }
+	return { x = rectContainer.x + (rectContainer.w - rect.w) / 2, y = rectContainer.y + (rectContainer.h - rect.h) / 2, w = rect.w, h = rect.h }
 end
 
 function Rect.size(w, h)

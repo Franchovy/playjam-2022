@@ -34,8 +34,12 @@ function WidgetPlay:_load()
 	end)
 	
 	playdate.timer.performAfterDelay(3000, function()
-		self.children.levelComplete = Widget.new(LevelComplete, { levelDarkMode = levelDarkMode })
+		self.children.levelComplete = Widget.new(LevelComplete, { levelDarkMode = levelDarkMode, numStars = 1 })
 		self.children.levelComplete:load()
+		
+		playdate.timer.performAfterDelay(5000, function()
+			self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
+		end)
 	end)
 	
 	if AppConfig.enableParalaxBackground and (theme ~= nil) then

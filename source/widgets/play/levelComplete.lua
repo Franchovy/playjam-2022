@@ -1,3 +1,4 @@
+import "levelComplete/star"
 
 function drawLevelClearSprite(stars, coins, targetCoins, time, targetTime)
 	local bounds = playdate.display.getRect()
@@ -143,47 +144,86 @@ class("LevelComplete").extends(Widget)
 
 function LevelComplete:init(config)
 	self.levelDarkMode = config.levelDarkMode
+	self.numStars = config.numStars
 	
 	self:supply(Widget.kDeps.state)
 	
-	self.setStateInitial({
-		inGame = 1,
-		screen = 2
+	self:setStateInitial({
+		text = 1,
+		overlay = 2
 	}, 1)
 	
 	self.painters = {}
 	self.images = {}
 	self.blinkers = {}
+	self.children = {}
 end
 
 function LevelComplete:_load()
-	
 	self.images.titleInGame = playdate.graphics.imageWithText("LEVEL COMPLETE", 200, 70):scaledImage(3)
-	self.images.titleInGame:setInverted(self.levelDarkMode)
+	self.images.titleInGame:setInverted(self.levelDarkMode) 
+
+	self.images.title = playdate.graphics.imageWithText("LEVEL COMPLETE!", 200, 70):scaledImage(2)
 
 	self.blinkers.blinkerTitle = playdate.graphics.animation.blinker.new(300, 100)
 	self.blinkers.blinkerTitle:startLoop()
 	
 	self.painters.background = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 18)
+		playdate.graphics.setLineWidth(6)
+		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 16)
 		
-		local insetRect = Rect.inset(rect, 4, 6)
+		local insetRect = Rect.inset(rect, 4, 4)
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 16)
+		playdate.graphics.setLineWidth(4)
+		playdate.graphics.drawRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 4)
 		
-		playdate.graphics.setColor(playdate.graphics.kColorClear)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 18)
+		playdate.graphics.setColor(playdate.graphics.kColorWhite)
+		playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeDiagonalLine)
+		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
 	end)
+	
+	self.painters.title = Painter(function(rect)
+		
+	end)
+	
+	self.stars = {}
+	for i=1, self.numStars do
+		local star = Widget.new(WidgetStar, { initialDelay = 400 + i * 1000 })
+		star:load()
+		table.insert(self.stars, star)
+		self.children["star"..i] = star
+	end
 end
 
 function LevelComplete:_draw(rect)
-	self.painters.background:draw(rect)
+	if self.state == self.kStates.text then
+		if self.blinkers.blinkerTitle.on then
+			self.images.titleInGame:drawCentered(rect.x + rect.w / 2, rect.y + 100)
+		end
+	end
 	
-	if self.blinkers.blinkerTitle.on then
-		local imageRect = Rect.size(self.images.titleInGame:getSize())
-		local imageRectCentered = Rect.center(imageRect, rect)
-		self.images.titleInGame:draw(rect.x + imageRectCentered.x, rect.y + imageRectCentered.y)
+	if self.state == self.kStates.overlay then
+		self.painters.background:draw(rect)
+		
+		self.images.title:drawCentered(rect.x + rect.w / 2, rect.y + 17)
+		
+		local starImageWidth, starImageHeight = self.stars[1].imagetables.star[1]:getSize()
+		local starMargin = 20
+		
+		function starsContentWidth(numStars)
+			return (starImageWidth * numStars) + starMargin * (numStars - 1)
+		end
+		
+		local starContainerWidthMin = starsContentWidth(3)
+		local starContainerWidth = math.max(starContainerWidthMin, starsContentWidth(self.numStars))
+		
+		for i, star in ipairs(self.stars) do
+			local contentRect = Rect.size(starContainerWidth, starImageHeight)
+			local centeredRect = Rect.center(contentRect, rect)
+			
+			self.stars[i]:draw(Rect.make(centeredRect.x + starMargin * (i - 1), rect.y + 30, starImageWidth, starImageHeight))
+		end
 	end
 end
 

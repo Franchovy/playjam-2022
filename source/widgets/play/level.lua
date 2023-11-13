@@ -348,7 +348,7 @@ function WidgetLevel:onLevelComplete()
 			
 			local stringTime = convertToTimeString(self.levelTimerCounter, 1)
 			local stringTimeObjective = convertToTimeString(displayObjectiveTime * 1000, 1)
-			drawLevelClearSprite(stars, self.coinCount, displayObjectiveCoins, stringTime, stringTimeObjective)
+			--drawLevelClearSprite(stars, self.coinCount, displayObjectiveCoins, stringTime, stringTimeObjective)
 		end
 	)
 end
