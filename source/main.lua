@@ -14,7 +14,8 @@ function initialize()
 	playdate.graphics.setFontTracking(1)
 	
 	topLevelWidget = Widget.new(WidgetMain)
-	topLevelWidget:addWidgetDrawingCallback()
+	topLevelWidget:createSprite()
+	topLevelWidget.sprite:add()
 	
 	playdate.timer.performAfterDelay(1, function()
 		topLevelWidget:load()
@@ -22,12 +23,10 @@ function initialize()
 end
 
 function playdate.update()
-	topLevelWidget:update()
-	
 	sprite.update()
-	
 	timer.updateTimers()
 	playdate.graphics.animation.blinker.updateAll()
+	topLevelWidget:update()
 end
 
 function placeholder()

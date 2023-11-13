@@ -8,6 +8,7 @@ function WidgetLevel:init(config)
 	self:setStateInitial(kPlayStates, 1)
 	
 	self.sprites = {}
+	self.children = {}
 end
 
 function WidgetLevel:_load()
@@ -170,6 +171,11 @@ end
 
 function WidgetLevel:_draw(rect)
 	
+	if self.state == self.kStates.stopped then
+		if self.children.gameOver ~= nil then
+			self.children.gameOver:draw(rect)
+		end
+	end
 end
 
 function WidgetLevel:_update()
@@ -274,6 +280,13 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		self.periodicBlinker:start()
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.stopped) then
 		
+		if self.children.gameOver == nil then
+			self.children.gameOver = Widget.new(WidgetGameOver)
+			self.children.gameOver:load()
+		end
+		
+		self.children.gameOver.sprite:add()
+		
 		self.spriteCycler:unloadAll()
 		
 		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
@@ -288,8 +301,8 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		self.wheel:remove()
 		
 	elseif stateFrom == self.kStates.stopped and (stateTo == self.kStates.start) then
+		self.children.gameOver.sprite:remove()
 		
-		--self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
 		self.periodicBlinker:start()
 		
 		-- Initialize sprite cycling using initial wheel position

@@ -1,6 +1,6 @@
 class("Widget").extends()
 
-Widget.topLevelWidget = nil
+Widget.drawList = {}
 
 Widget.kDeps = {
 	children = 1,
@@ -8,29 +8,22 @@ Widget.kDeps = {
 	samples = 3
 }
 
-function Widget.main(topLevelWidgetClass, ...)
-	Widget.drawList = {}
-	
-	local topLevelWidget = Widget.new(topLevelWidgetClass, ...)
-	local sprite = topLevelWidget:addWidgetDrawingCallback()
-	
-	table.insert(Widget.drawList, topLevelWidget)
-end
-
-function Widget:addWidgetDrawingCallback()
-	local sprite = gfx.sprite.new()
-	sprite:setSize(playdate.display.getSize())
-	sprite:setCenter(0, 0)
-	sprite:moveTo(0, 0)
-	sprite:setZIndex(-32768)
-	sprite:setIgnoresDrawOffset(true)
-	sprite:setUpdatesEnabled(false)
-	sprite.setAlwaysRedraw(true)
-	sprite.draw = function(s, x, y, w, h)
-		self:draw(Rect.make(x, y, w, h), self.state)
+function Widget:createSprite()
+	if self.sprite == nil then
+		local sprite = gfx.sprite.new()
+		sprite:setSize(playdate.display.getSize())
+		sprite:setCenter(0, 0)
+		sprite:moveTo(0, 0)
+		sprite:setZIndex(-32768)
+		sprite:setIgnoresDrawOffset(true)
+		sprite:setUpdatesEnabled(false)
+		sprite.setAlwaysRedraw(true)
+		sprite.draw = function(s, x, y, w, h)
+			self:draw(Rect.make(x, y, w, h), self.state)
+		end
+		
+		self.sprite = sprite
 	end
-	sprite:add()
-	self.sprite = sprite
 end
 
 function Widget.new(class, ...)
@@ -108,42 +101,24 @@ function Widget:isLoaded()
 	return self._state.isLoaded	
 end
 
-function Widget.update(self)
-	if self == nil then
-		if Widget.topLevelWidget == nil then
-			return
-		end
-		
-		Widget.topLevelWidget:update()
-	else
-		if self._state.isLoaded == false or (self._state.isVisible == false) then
-			return
-		end
-		
-		self:_update()
-		
-		if self.children ~= nil then
-			for _, child in pairs(self.children) do
-				child:update()
-			end
+function Widget:update()
+	if self._state.isLoaded == false or (self._state.isVisible == false) then
+		return
+	end
+	
+	self:_update()
+	
+	if self.children ~= nil then
+		for _, child in pairs(self.children) do
+			child:update()
 		end
 	end
 end
 
-function Widget.draw(self, rect)
-	if self == nil then
-		if Widget.topLevelWidget == nil then
-			return
-		end
-		
-		-- Draw Hierarchy
-		local rect = playdate.display.getRect()
-		Widget.topLevelWidget:draw(Rect.make(rect.x, rect.y, rect.width, rect.height))
-	else
-		if self._state.isLoaded == false or (self._state.isVisible == false) then
-			return
-		end
-
-		self:_draw(rect)
+function Widget:draw(rect)
+	if self._state.isLoaded == false or (self._state.isVisible == false) then
+		return
 	end
+
+	self:_draw(rect)
 end

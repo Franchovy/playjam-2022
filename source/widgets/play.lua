@@ -2,6 +2,7 @@ import "play/state"
 import "play/loading"
 import "play/level"
 import "play/levelComplete"
+import "play/gameOver"
 
 class("WidgetPlay").extends(Widget)
 
@@ -37,7 +38,7 @@ function WidgetPlay:_draw(rect)
 	self.children.loading:draw(rect)
 	
 	if self.children.level ~= nil then
-		self.children.level:draw()
+		self.children.level:draw(rect)
 	end
 	
 	if self.children.levelComplete ~= nil then
