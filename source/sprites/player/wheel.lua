@@ -99,29 +99,28 @@ function Wheel:update()
 	
 	-- Ignore input 
 	
-	if self.ignoresPlayerInput then
-		return
-	end
+	local crankTicks
 	
-	-- Player Input
-	
-	-- Has just pressed jump
-	-- Is holding jump (Jump timer)
+	if not self.ignoresPlayerInput then
+		-- Player Input
+		
+		-- Has just pressed jump
+		-- Is holding jump (Jump timer)
 
-	if (playdate.buttonJustReleased(playdate.kButtonUp) or playdate.buttonJustReleased(playdate.kButtonB)) and self:isJumping() then
-		self:endJump()
-	end
-	
-	if (playdate.buttonIsPressed(playdate.kButtonUp) or playdate.buttonIsPressed(playdate.kButtonB)) then
-		self:applyJump()
+		if (playdate.buttonJustReleased(playdate.kButtonUp) or playdate.buttonJustReleased(playdate.kButtonB)) and self:isJumping() then
+			self:endJump()
+		end
+		
+		if (playdate.buttonIsPressed(playdate.kButtonUp) or playdate.buttonIsPressed(playdate.kButtonB)) then
+			self:applyJump()
+		end
+		
+		crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
+	else
+		crankTicks = 0
 	end
 	
 	self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
-	
-	-- Update velocity according to acceleration
-	
-	local crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
-	
 	self.velocityX = self:calculateSpeed(crankTicks, self.velocityX)
 	
 	-- Reset values that get re-calculated

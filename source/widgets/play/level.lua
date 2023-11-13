@@ -2,6 +2,7 @@ class("WidgetLevel").extends(Widget)
 
 function WidgetLevel:init(config)
 	self.filePathLevel = config.filePathLevel
+	self.levelCompleteCallback = config.levelCompleteCallback
 	
 	self:supply(Widget.kDeps.state)
 	
@@ -207,18 +208,13 @@ function WidgetLevel:_update()
 		end
 		
 		-- Level End Trigger
-		
-		timer.performAfterDelay(3000, function()
-			self:onLevelComplete()
-			
-			self.levelTimer:pause()
-		end)
-		
+
 		if self.wheel.hasReachedLevelEnd and self.levelCompleteSprite == nil then
-			
-			self:onLevelComplete()
-			
 			self.levelTimer:pause()
+			self.wheel.ignoresPlayerInput = true
+			
+			local objectives = self:getLevelObjectives()
+			self.levelCompleteCallback(objectives)
 		end
 		
 		-- Camera movement based on wheel position
@@ -318,37 +314,36 @@ function WidgetLevel:updateDrawOffset()
 	end
 end
 
-function WidgetLevel:onLevelComplete()
+function WidgetLevel:getLevelObjectives()
+	local stars = 1
+	
+	local coinCountObjective = self.config.objectives[1].coins
+	local timeObjective = self.config.objectives[2].time
+	
+	for _, objective in pairs(self.config.objectives) do
+		local objectiveReached = true
 		
-	timer.performAfterDelay(3000,
-		function ()
-			
-			local stars = 1
-			
-			local displayObjectiveCoins = self.config.objectives[1].coins
-			local displayObjectiveTime = self.config.objectives[2].time
-			
-			for _, objective in pairs(self.config.objectives) do
-				local objectiveReached = true
-				
-				if objective.coins ~= nil then
-					objectiveReached = objectiveReached and self.coinCount >= objective.coins
-				end
-				
-				if objective.time ~= nil then
-					objectiveReached = objectiveReached and self.levelTimerCounter <= (objective.time * 1000)
-				end
-				
-				if objectiveReached == true then
-					stars += 1
-				end
-			end
-			
-			print("Got ".. stars.. " stars!")
-			
-			local stringTime = convertToTimeString(self.levelTimerCounter, 1)
-			local stringTimeObjective = convertToTimeString(displayObjectiveTime * 1000, 1)
-			--drawLevelClearSprite(stars, self.coinCount, displayObjectiveCoins, stringTime, stringTimeObjective)
+		if objective.coins ~= nil then
+			objectiveReached = objectiveReached and self.coinCount >= objective.coins
 		end
-	)
+		
+		if objective.time ~= nil then
+			objectiveReached = objectiveReached and self.levelTimerCounter <= (objective.time * 1000)
+		end
+		
+		if objectiveReached == true then
+			stars += 1
+		end
+	end
+	
+	local timeString = convertToTimeString(self.levelTimerCounter, 1)
+	local timeStringObjective = convertToTimeString(timeObjective * 1000, 1)
+
+	return {
+		stars = stars,
+		timeString = timeString,
+		coinCount = self.coinCount,
+		timeStringObjective = timeStringObjective,
+		coinCountObjective = coinCountObjective
+	}
 end

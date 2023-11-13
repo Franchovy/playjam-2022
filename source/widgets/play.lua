@@ -16,37 +16,33 @@ function WidgetPlay:init(config)
 	self:setStateInitial(kPlayStates, 1)
 	
 	self.children = {}
+	
+	self.objectives = nil
 end
 
 function WidgetPlay:_load()
 	self.children.loading = Widget.new(WidgetLoading)
 	self.children.loading:load()
 	
+	local levelCompleteCallback = function(objectives)
+		self.objectives = objectives
+		self:setState(kPlayStates.stopped)
+	end
+	
 	self.config = json.decodeFile(self.filePathLevel)
-	local theme = self.config.theme
-	local levelDarkMode = self.config.theme ~= 1
 	
 	playdate.timer.performAfterDelay(100, function()
-		self.children.level = Widget.new(WidgetLevel, { filePathLevel = self.filePathLevel })
+		self.children.level = Widget.new(WidgetLevel, { filePathLevel = self.filePathLevel, levelCompleteCallback = levelCompleteCallback })
 		self.children.level:load()
+		self:setState(kPlayStates.playing)
 		
 		self.children.loading:setVisible(false)
 	end)
 	
-	playdate.timer.performAfterDelay(3000, function()
-		self.children.levelComplete = Widget.new(LevelComplete, { levelDarkMode = levelDarkMode, numStars = 3 })
-		self.children.levelComplete:load()
-		
-		playdate.timer.performAfterDelay(5000, function()
-			self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
-		end)
-	end)
-	
-	if AppConfig.enableParalaxBackground and (theme ~= nil) then
-		self.children.background = Widget.new(WidgetBackground, { theme = theme })
+	if AppConfig.enableParalaxBackground and (self.config.theme ~= nil) then
+		self.children.background = Widget.new(WidgetBackground, { theme = self.config.theme })
 		self.children.background:load()
 	end
-	
 end
 
 function WidgetPlay:_draw(rect)
@@ -57,7 +53,7 @@ function WidgetPlay:_draw(rect)
 	end
 	
 	if self.children.levelComplete ~= nil then
-		local insetRect = Rect.inset(rect, 30, 30)
+		local insetRect = Rect.inset(rect, 30, 20)
 		self.children.levelComplete:draw(insetRect)
 	end
 end
@@ -74,6 +70,19 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 	elseif stateFrom == kPlayStates.stopped and (stateTo == kPlayStates.playing) then
 			
 	elseif stateFrom == kPlayStates.playing and (stateTo == kPlayStates.stopped) then
-		
+		if self.objectives ~= nil then
+			-- Level Complete
+			local config = table.shallowcopy(self.objectives)
+			config.levelDarkMode = self.config.theme ~= 1
+			
+			self.children.levelComplete = Widget.new(LevelComplete, config)
+			self.children.levelComplete:load()
+			
+			playdate.timer.performAfterDelay(5000, function()
+				self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
+			end)
+		else 
+			-- Player died
+		end
 	end
 end

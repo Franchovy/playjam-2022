@@ -144,7 +144,11 @@ class("LevelComplete").extends(Widget)
 
 function LevelComplete:init(config)
 	self.levelDarkMode = config.levelDarkMode
-	self.numStars = config.numStars
+	self.numStars = config.stars
+	self.coins = config.coinCount
+	self.coinsObjective = config.coinCountObjective
+	self.time = config.timeString
+	self.timeObjective = config.timeStringObjective
 	
 	self:supply(Widget.kDeps.state)
 	
@@ -164,6 +168,16 @@ function LevelComplete:_load()
 	self.images.titleInGame:setInverted(self.levelDarkMode) 
 
 	self.images.title = playdate.graphics.imageWithText("LEVEL COMPLETE!", 200, 70):scaledImage(2)
+	
+	self.images.coin = playdate.graphics.image.new(kAssetsImages.coin):scaledImage(0.45)
+	
+	self.images.textLabelCoins = playdate.graphics.imageWithText("COINS", 60, 100)
+	self.images.textLabelTime = playdate.graphics.imageWithText("TIME", 60, 100)
+	
+	local coinsText = self.coins .. "/".. self.coinsObjective
+	local timeText = self.time .. "/".. self.timeObjective
+	self.images.textCoins = playdate.graphics.imageWithText(coinsText, 100, 40):scaledImage(2)
+	self.images.textTime = playdate.graphics.imageWithText(timeText, 100, 40):scaledImage(2)
 
 	self.blinkers.blinkerTitle = playdate.graphics.animation.blinker.new(300, 100)
 	self.blinkers.blinkerTitle:startLoop()
@@ -181,10 +195,6 @@ function LevelComplete:_load()
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
 		playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
-	end)
-	
-	self.painters.title = Painter(function(rect)
-		
 	end)
 	
 	self.stars = {}
@@ -224,12 +234,30 @@ function LevelComplete:_draw(rect)
 			starContainerWidth = starsContentWidth(4)
 		end
 		
+		local starImageY = rect.y + 33
+		
 		for i, star in ipairs(self.stars) do
 			local contentRect = Rect.size(starContainerWidth, starImageHeight)
 			local centeredRect = Rect.center(contentRect, rect)
 			
-			self.stars[i]:draw(Rect.make(centeredRect.x + (starImageWidth + starMargin) * (i - 1), rect.y + 38, starImageWidth, starImageHeight))
+			self.stars[i]:draw(Rect.make(centeredRect.x + (starImageWidth + starMargin) * (i - 1), starImageY, starImageWidth, starImageHeight))
 		end
+		
+		local textCoinsWidth, textHeight = self.images.textCoins:getSize()
+		local textTimeWidth, _ = self.images.textTime:getSize()
+		local textImagesY = starImageY + starImageHeight + 26
+		local sideMarginText = 12
+		
+		self.images.textCoins:draw(rect.x + sideMarginText, textImagesY)
+		self.images.textTime:draw(rect.x + rect.w - sideMarginText - textTimeWidth, textImagesY)
+		
+		local coinImageWidth, coinImageHeight = self.images.coin:getSize()
+		local labelWidth, labelHeight = self.images.textLabelCoins:getSize()
+		
+		self.images.coin:draw(rect.x + sideMarginText + (textCoinsWidth - labelWidth) / 2, textImagesY - 8 - (labelHeight + coinImageHeight) / 2)
+		
+		self.images.textLabelCoins:draw(rect.x + sideMarginText + coinImageWidth + 5 + (textCoinsWidth - labelWidth) / 2, textImagesY - 8 - labelHeight)
+		self.images.textLabelTime:draw(rect.x + rect.w - sideMarginText - (textTimeWidth + labelWidth) / 2, textImagesY - 8 - labelHeight)
 	end
 end
 
