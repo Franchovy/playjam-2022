@@ -208,6 +208,12 @@ function WidgetLevel:_update()
 		
 		-- Level End Trigger
 		
+		timer.performAfterDelay(3000, function()
+			self:onLevelComplete()
+			
+			self.levelTimer:pause()
+		end)
+		
 		if self.wheel.hasReachedLevelEnd and self.levelCompleteSprite == nil then
 			
 			self:onLevelComplete()
@@ -313,13 +319,9 @@ function WidgetLevel:updateDrawOffset()
 end
 
 function WidgetLevel:onLevelComplete()
-
-	self:addLevelCompleteSprite()
 		
 	timer.performAfterDelay(3000,
 		function ()
-			self.levelCompleteSprite:remove()
-			--self.levelCompleteSprite = nil
 			
 			local stars = 1
 			
@@ -349,17 +351,4 @@ function WidgetLevel:onLevelComplete()
 			drawLevelClearSprite(stars, self.coinCount, displayObjectiveCoins, stringTime, stringTimeObjective)
 		end
 	)
-end
-
-function WidgetLevel:addLevelCompleteSprite()
-	self.levelCompleteSprite = sizedTextSprite("LEVEL COMPLETE", 3)
-	
-	self.levelCompleteSprite:setImage(self.levelCompleteSprite:getImage())
-	self.levelCompleteSprite:setIgnoresDrawOffset(true)
-	
-	self.levelCompleteSprite:add()
-	self.levelCompleteSprite:moveTo(10, 110)
-
-	blinker = playdate.graphics.animation.blinker.new(300, 100)
-	blinker:startLoop()
 end

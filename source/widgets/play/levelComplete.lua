@@ -141,11 +141,29 @@ end
 
 class("LevelComplete").extends(Widget)
 
-function LevelComplete:init()
+function LevelComplete:init(config)
+	self.levelDarkMode = config.levelDarkMode
+	
+	self:supply(Widget.kDeps.state)
+	
+	self.setStateInitial({
+		inGame = 1,
+		screen = 2
+	}, 1)
+	
 	self.painters = {}
+	self.images = {}
+	self.blinkers = {}
 end
 
 function LevelComplete:_load()
+	
+	self.images.titleInGame = playdate.graphics.imageWithText("LEVEL COMPLETE", 200, 70):scaledImage(3)
+	self.images.titleInGame:setInverted(self.levelDarkMode)
+
+	self.blinkers.blinkerTitle = playdate.graphics.animation.blinker.new(300, 100)
+	self.blinkers.blinkerTitle:startLoop()
+	
 	self.painters.background = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
 		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 18)
@@ -161,6 +179,12 @@ end
 
 function LevelComplete:_draw(rect)
 	self.painters.background:draw(rect)
+	
+	if self.blinkers.blinkerTitle.on then
+		local imageRect = Rect.size(self.images.titleInGame:getSize())
+		local imageRectCentered = Rect.center(imageRect, rect)
+		self.images.titleInGame:draw(rect.x + imageRectCentered.x, rect.y + imageRectCentered.y)
+	end
 end
 
 function LevelComplete:_update()

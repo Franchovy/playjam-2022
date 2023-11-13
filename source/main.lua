@@ -14,9 +14,6 @@ function initialize()
 	playdate.graphics.setFontTracking(1)
 	
 	topLevelWidget = Widget.new(WidgetMain)
-	topLevelWidget:createSprite()
-	topLevelWidget.sprite:add()
-	topLevelWidget.sprite:setZIndex(0)
 	
 	playdate.timer.performAfterDelay(1, function()
 		topLevelWidget:load()

@@ -22,7 +22,9 @@ function WidgetPlay:_load()
 	self.children.loading = Widget.new(WidgetLoading)
 	self.children.loading:load()
 	
-	-- Async load
+	self.config = json.decodeFile(self.filePathLevel)
+	local theme = self.config.theme
+	local levelDarkMode = self.config.theme ~= 1
 	
 	playdate.timer.performAfterDelay(100, function()
 		self.children.level = Widget.new(WidgetLevel, { filePathLevel = self.filePathLevel })
@@ -32,12 +34,9 @@ function WidgetPlay:_load()
 	end)
 	
 	playdate.timer.performAfterDelay(3000, function()
-		self.children.levelComplete = Widget.new(LevelComplete)
+		self.children.levelComplete = Widget.new(LevelComplete, { levelDarkMode = levelDarkMode })
 		self.children.levelComplete:load()
 	end)
-	
-	self.config = json.decodeFile(self.filePathLevel)
-	local theme = self.config.theme
 	
 	if AppConfig.enableParalaxBackground and (theme ~= nil) then
 		self.children.background = Widget.new(WidgetBackground, { theme = theme })

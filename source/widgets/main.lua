@@ -10,6 +10,10 @@ function WidgetMain:init()
 	
 	self.kStates = { menu = 1, play = 2 }
 	self.state = self.kStates.menu
+	
+	self:createSprite()
+	self.sprite:setZIndex(1)
+	self.sprite:add()
 end
 
 function WidgetMain:_load()
