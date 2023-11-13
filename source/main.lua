@@ -16,6 +16,7 @@ function initialize()
 	topLevelWidget = Widget.new(WidgetMain)
 	topLevelWidget:createSprite()
 	topLevelWidget.sprite:add()
+	topLevelWidget.sprite:setZIndex(0)
 	
 	playdate.timer.performAfterDelay(1, function()
 		topLevelWidget:load()
@@ -27,6 +28,7 @@ function playdate.update()
 	timer.updateTimers()
 	playdate.graphics.animation.blinker.updateAll()
 	topLevelWidget:update()
+	playdate.drawFPS(10, 10)
 end
 
 function placeholder()
