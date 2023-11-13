@@ -1,145 +1,5 @@
 import "levelComplete/star"
 
-function drawLevelClearSprite(stars, coins, targetCoins, time, targetTime)
-	local bounds = playdate.display.getRect()
-	local x1, y1, width1, height1 = rectInsetBy(bounds, 30, 30)
-	local x2, y2, width2, height2 = rectInsetBy(bounds, 34, 36)
-	
-	local imageCardBackground = playdate.graphics.image.new(width2, height2)
-	
-	playdate.graphics.pushContext(imageCardBackground)
-	
-	playdate.graphics.setColor(playdate.graphics.kColorWhite)
-	playdate.graphics.fillRoundRect(0, 0, width2, height2, 18)
-	
-	playdate.graphics.popContext()
-	
-	local imageCard = playdate.graphics.image.new(width1, height1)
-	
-	playdate.graphics.pushContext(imageCard)
-	
-	-- Frame
-	
-	playdate.graphics.setColor(playdate.graphics.kColorBlack)
-	playdate.graphics.fillRoundRect(0, 0, width1, height1, 16)
-	playdate.graphics.setColor(playdate.graphics.kColorClear)
-	playdate.graphics.fillRoundRect(x2 - x1, (y2 - y1) / 2, width2, height2, 18)
-	
-	imageCardBackground:fadedImage(0.8, playdate.graphics.image.kDitherTypeDiagonalLine):draw(x2 - x1, (y2 - y1) / 2)
-	
-	gfx.setFontTracking(1)
-	local textImageTitle = createTextImage("LEVEL COMPLETE!"):scaledImage(2)
-	
-	gfx.setFontTracking(1)
-	local textImageCoinsLabel = createTextImage("COINS"):scaledImage(1)
-	local textImageTimeLabel = createTextImage("TIME"):scaledImage(1)
-	gfx.setFontTracking(0)
-	local textImageCoinsValue = createTextImage(coins .. "/".. targetCoins):scaledImage(2)
-	local textImageTimeValue = createTextImage(time.. "/".. targetTime):scaledImage(2)
-	
-	local widthTitle, _ = textImageTitle:getSize()
-	textImageTitle:draw((width1 - widthTitle) / 2, 10)
-	
-	local widthCoinsLabel, heightCoinsLabel = textImageCoinsLabel:getSize()
-	local widthCoinsValue, heightCoinsValue = textImageCoinsValue:getSize()
-	textImageCoinsLabel:draw(20 + (widthCoinsValue - widthCoinsLabel) / 2, height1 - heightCoinsLabel - 15 - heightCoinsValue - 20)
-	textImageCoinsValue:draw(20, height1 - heightCoinsValue - 20)
-	
-	local widthTimeLabel, heightTimeLabel = textImageTimeLabel:getSize()
-	local widthTimeValue, heightTimeValue = textImageTimeValue:getSize()
-	textImageTimeLabel:draw(width1 - widthTimeValue + (widthTimeValue - widthTimeLabel) / 2 - 20, height1 - heightTimeLabel - 15 - heightCoinsValue - 20)
-	textImageTimeValue:draw(width1 - widthTimeValue - 20, height1 - heightTimeValue - (heightCoinsValue - heightTimeValue) / 2 - 20)
-	
-	playdate.graphics.popContext()
-	
-	local sprite = playdate.graphics.sprite.new(imageCard)
-	sprite:add()
-	sprite:setCenter(0, 0)
-	sprite:setIgnoresDrawOffset(true)
-	
-	-- Button Labels
-	
-	local buttonALabelText = createTextImage("B - RETRY")
-	local buttonALabel = createRoundedRectFrame(buttonALabelText, 4, 8, 5)
-	
-	local buttonBLabelText = createTextImage("A - LEVELS")
-	local buttonBLabel = createRoundedRectFrame(buttonBLabelText, 4, 8, 5)
-	
-	local buttonBLabelWidth, buttonBLabelHeight = buttonBLabel:getSize()
-	local buttonsImage = playdate.graphics.image.new(360, buttonBLabelHeight)
-	
-	playdate.graphics.pushContext(buttonsImage)
-	local margin = 44
-	buttonALabel:draw(0, 0)
-	buttonBLabel:draw(bounds.width - (margin * 2) - buttonBLabelWidth, 0)
-	
-	playdate.graphics.popContext(buttonsImage)
-	
-	local spriteButtons = playdate.graphics.sprite.new(buttonsImage)
-	spriteButtons:add()
-	spriteButtons:setCenter(0, 0)
-	spriteButtons:setIgnoresDrawOffset(true)
-	spriteButtons:moveTo(margin, bounds.height - 6 - buttonBLabelHeight)
-	
-	-- Stars
-	
-	local imageTable = playdate.graphics.imagetable.new(kAssetsImages.star)
-	local starLoops = {}
-	for i=1,stars do
-		local starLoop = playdate.graphics.animation.loop.new(200, imageTable, true)
-		starLoop.paused = true
-		table.insert(starLoops, starLoop)
-	end
-	
-	local marginStar
-	if stars < 4 then
-		marginStar = 20
-	else
-		marginStar = 5
-	end 
-	
-	local starWidth, starHeight = imageTable:getImage(1):getSize()
-	
-	local starSprite = playdate.graphics.sprite.new()
-	starSprite:setSize(starWidth * stars + marginStar * (stars - 1), starHeight)
-	starSprite:setCenter(0, 0)
-	starSprite:setIgnoresDrawOffset(true)
-	starSprite:setAlwaysRedraw(true)
-	
-	for _, star in pairs(starLoops) do
-		star.paused = false
-	end
-	
-	starSprite.draw = function (self, x, y)
-		for i, star in ipairs(starLoops) do
-			if stars >= i then
-				star:draw((starWidth + marginStar) * (i - 1), 0)
-			end
-		end
-	end
-	
-	starSprite:add()
-	starSprite:moveTo(50 + marginStar, 65)
-	
-	-- Animations
-	
-	local animationStartPosition = 240
-	local animationEndPosition = y1
-	
-	sprite:moveTo(x1, animationStartPosition)
-	
-	local animationTimer = playdate.timer.new(400, animationStartPosition, animationEndPosition, playdate.easingFunctions.inQuad)
-	
-	animationTimer.updateCallback = function(timer)
-		sprite:moveTo(x1, timer.value)
-	end
-	
-	animationTimer.timerEndedCallback = function(timer)
-		sprite:moveTo(x1, animationEndPosition)
-		timer:remove()
-	end
-end
-
 class("LevelComplete").extends(Widget)
 
 function LevelComplete:init(config)
@@ -178,9 +38,14 @@ function LevelComplete:_load()
 	local timeText = self.time .. "/".. self.timeObjective
 	self.images.textCoins = playdate.graphics.imageWithText(coinsText, 100, 40):scaledImage(2)
 	self.images.textTime = playdate.graphics.imageWithText(timeText, 100, 40):scaledImage(2)
+	
+	self.images.textPressAButton = playdate.graphics.imageWithText("PRESS A", 80, 40):scaledImage(2)
 
 	self.blinkers.blinkerTitle = playdate.graphics.animation.blinker.new(300, 100)
 	self.blinkers.blinkerTitle:startLoop()
+	
+	self.blinkers.blinkerPressAButton1 = playdate.graphics.animation.blinker.new(800, 100)
+	self.blinkers.blinkerPressAButton2 = playdate.graphics.animation.blinker.new(700, 200)
 	
 	self.painters.background = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
@@ -195,6 +60,31 @@ function LevelComplete:_load()
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
 		playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
+	end)
+	
+	self.painters.pressAButton = Painter(function(rect, state)
+		local fgColor
+		local drawMode
+		
+		if state.inverted == false then
+			fgColor = playdate.graphics.kColorBlack
+			drawMode = playdate.graphics.kDrawModeCopy
+		elseif state.inverted == true then 
+			fgColor = playdate.graphics.kColorWhite
+			drawMode = playdate.graphics.kDrawModeInverted
+		end
+		
+		playdate.graphics.setColor(playdate.graphics.kColorBlack)
+		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 4)
+		
+		local insetRect = Rect.inset(rect, 2, 2)
+		playdate.graphics.setColor(fgColor)
+		playdate.graphics.setDitherPattern(0.4, playdate.graphics.image.kDitherTypeDiagonalLine)
+		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 2)
+		
+		playdate.graphics.setImageDrawMode(drawMode)
+		self.images.textPressAButton:invertedImage():draw(rect.x + 12, rect.y + 4)
+		playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
 	end)
 	
 	self.stars = {}
@@ -216,7 +106,8 @@ function LevelComplete:_draw(rect)
 	if self.state == self.kStates.overlay then
 		self.painters.background:draw(rect)
 		
-		self.images.title:drawCentered(rect.x + rect.w / 2, rect.y + 22)
+		local titleImageY = rect.y + 8
+		self.images.title:drawCentered(rect.x + rect.w / 2, rect.y + titleImageY)
 		
 		local starImageWidth, starImageHeight = self.stars[1].imagetables.star:getImage(1):getSize()
 		local starMargin
@@ -234,7 +125,7 @@ function LevelComplete:_draw(rect)
 			starContainerWidth = starsContentWidth(4)
 		end
 		
-		local starImageY = rect.y + 29
+		local starImageY = rect.y + titleImageY + 12
 		
 		for i, star in ipairs(self.stars) do
 			local contentRect = Rect.size(starContainerWidth, starImageHeight)
@@ -258,6 +149,15 @@ function LevelComplete:_draw(rect)
 		
 		self.images.textLabelCoins:draw(rect.x + sideMarginText + coinImageWidth + 5 + (textCoinsWidth - labelWidth) / 2, textImagesY - 8 - labelHeight)
 		self.images.textLabelTime:draw(rect.x + rect.w - sideMarginText - (textTimeWidth + labelWidth) / 2, textImagesY - 8 - labelHeight)
+		
+		local buttonTextWidth, buttonTextHeight = self.images.textPressAButton:getSize()
+		local buttonRect = Rect.with(Rect.center(Rect.inset(Rect.size(buttonTextWidth, buttonTextHeight), -12, -4), rect), { y = rect.y + rect.h - buttonTextHeight - 19 })
+		
+		local blinker1 = self.blinkers.blinkerPressAButton1.on
+		local blinker2 = self.blinkers.blinkerPressAButton2.on
+		self.painters.pressAButton:draw(buttonRect, { 
+			inverted = (not blinker1 and blinker2) or (not blinker2 and blinker1) 
+		})
 	end
 end
 
@@ -267,8 +167,15 @@ end
 
 function LevelComplete:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.text and (stateTo == self.kStates.overlay) then
+		self.blinkers.blinkerTitle:remove()
+		
 		for _, star in pairs(self.stars) do
 			star.timers.timer:start()
 		end
+		
+		playdate.timer.performAfterDelay(100 + #self.stars * 700 + 700, function()
+			self.blinkers.blinkerPressAButton1:startLoop()
+			self.blinkers.blinkerPressAButton2:startLoop()
+		end)
 	end
 end
