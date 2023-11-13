@@ -3,6 +3,7 @@ import "play/loading"
 import "play/level"
 import "play/levelComplete"
 import "play/gameOver"
+import "play/background"
 
 class("WidgetPlay").extends(Widget)
 
@@ -13,6 +14,8 @@ function WidgetPlay:init(config)
 	self:supply(Widget.kDeps.state)
 	
 	self:setStateInitial(kPlayStates, 1)
+	
+	self.children = {}
 end
 
 function WidgetPlay:_load()
@@ -32,6 +35,15 @@ function WidgetPlay:_load()
 		self.children.levelComplete = Widget.new(LevelComplete)
 		self.children.levelComplete:load()
 	end)
+	
+	self.config = json.decodeFile(self.filePathLevel)
+	local theme = self.config.theme
+	
+	if AppConfig.enableParalaxBackground and (theme ~= nil) then
+		self.children.background = Widget.new(WidgetBackground, { theme = theme })
+		self.children.background:load()
+	end
+	
 end
 
 function WidgetPlay:_draw(rect)
@@ -48,5 +60,17 @@ function WidgetPlay:_draw(rect)
 end
 
 function WidgetPlay:_update()
-	
-end 
+	if self.children.background ~= nil then
+		self.children.background:update()
+	end
+end
+
+function WidgetPlay:changeState(stateFrom, stateTo)
+	if stateFrom == kPlayStates.start and (stateTo == kPlayStates.playing) then
+		
+	elseif stateFrom == kPlayStates.stopped and (stateTo == kPlayStates.playing) then
+			
+	elseif stateFrom == kPlayStates.playing and (stateTo == kPlayStates.stopped) then
+		
+	end
+end

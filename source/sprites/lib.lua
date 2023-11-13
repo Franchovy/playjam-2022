@@ -1,4 +1,3 @@
-import "background"
 import "coin"
 import "killBlock"
 import "platform"

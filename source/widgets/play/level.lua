@@ -22,11 +22,6 @@ function WidgetLevel:_load()
 	local chunkLength = AppConfig["chunkLength"]
 	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint"}
 	
-	
-	-- self:supply(kDeps:sprite)
-	-- addSprite(SpriteClass)
-	-- 
-	
 	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, config, spriteToRecycle)
 		local sprite = spriteToRecycle;
 			
@@ -102,13 +97,6 @@ function WidgetLevel:_load()
 		self.theme = kThemes[themeId]
 	end
 	
-	if AppConfig.enableParalaxBackground and self.theme ~= nil then
-		self.background = ParalaxBackground.new()
-		self.background:loadTheme(self.theme)
-		
-		self.background:setParalaxDrawingRatios()
-	end
-	
 	-- Add HUD
 	
 	if not self.spritesLoaded then
@@ -116,16 +104,6 @@ function WidgetLevel:_load()
 		
 		self.hud = Hud()
 		self.hud:moveTo(3, 2)
-	end
-	
-	-- Set background drawing callback
-	
-	if AppConfig.enableParalaxBackground and self.theme ~= nil then
-		local callback = self.background:getBackgroundDrawingCallback()
-		
-		gfx.sprite.setBackgroundDrawingCallback(callback)
-		
-		self.background:add()
 	end
 	
 	-- Initialize sprite cycling using initial wheel position
@@ -185,12 +163,6 @@ function WidgetLevel:_update()
 	-- Update periodicBlinker
 	
 	self.periodicBlinker:update()
-
-	-- Update background parallax based on current offset
-	
-	if AppConfig.enableParalaxBackground and self.theme ~= nil then
-		self.background:setParalaxDrawOffset(drawOffsetX)
-	end
 	
 	-- Updates sprites cycling
 	self.spriteCycler:update(-drawOffsetX / kGame.gridSize, drawOffsetY / kGame.gridSize)
