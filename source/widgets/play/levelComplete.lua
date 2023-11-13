@@ -216,7 +216,7 @@ function LevelComplete:_draw(rect)
 	if self.state == self.kStates.overlay then
 		self.painters.background:draw(rect)
 		
-		self.images.title:drawCentered(rect.x + rect.w / 2, rect.y + 17)
+		self.images.title:drawCentered(rect.x + rect.w / 2, rect.y + 22)
 		
 		local starImageWidth, starImageHeight = self.stars[1].imagetables.star:getImage(1):getSize()
 		local starMargin
@@ -234,7 +234,7 @@ function LevelComplete:_draw(rect)
 			starContainerWidth = starsContentWidth(4)
 		end
 		
-		local starImageY = rect.y + 33
+		local starImageY = rect.y + 29
 		
 		for i, star in ipairs(self.stars) do
 			local contentRect = Rect.size(starContainerWidth, starImageHeight)
@@ -246,7 +246,7 @@ function LevelComplete:_draw(rect)
 		local textCoinsWidth, textHeight = self.images.textCoins:getSize()
 		local textTimeWidth, _ = self.images.textTime:getSize()
 		local textImagesY = starImageY + starImageHeight + 26
-		local sideMarginText = 12
+		local sideMarginText = 8
 		
 		self.images.textCoins:draw(rect.x + sideMarginText, textImagesY)
 		self.images.textTime:draw(rect.x + rect.w - sideMarginText - textTimeWidth, textImagesY)
