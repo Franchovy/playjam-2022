@@ -3,6 +3,7 @@ import "levelComplete/star"
 class("LevelComplete").extends(Widget)
 
 function LevelComplete:init(config)
+	
 	self.levelDarkMode = config.levelDarkMode
 	self.numStars = config.stars
 	self.coins = config.coinCount
@@ -10,6 +11,7 @@ function LevelComplete:init(config)
 	self.time = config.timeString
 	self.timeObjective = config.timeStringObjective
 	
+	self:supply(Widget.kDeps.samples)
 	self:supply(Widget.kDeps.state)
 	
 	self:setStateInitial({
@@ -21,9 +23,15 @@ function LevelComplete:init(config)
 	self.images = {}
 	self.blinkers = {}
 	self.children = {}
+	
+	self.previousBlink = false
 end
 
 function LevelComplete:_load()
+	
+	self:loadSample(kAssetsSounds.levelCompleteBlink, 0.7)
+	self:loadSample(kAssetsSounds.levelCompleteCard, 0.7)
+	
 	self.images.titleInGame = playdate.graphics.imageWithText("LEVEL COMPLETE", 200, 70):scaledImage(3)
 	self.images.titleInGame:setInverted(self.levelDarkMode) 
 
@@ -99,7 +107,14 @@ end
 function LevelComplete:_draw(rect)
 	if self.state == self.kStates.text then
 		if self.blinkers.blinkerTitle.on then
+			if self.previousBlink == false then
+				self:playSample(kAssetsSounds.levelCompleteBlink)
+				self.previousBlink = true
+			end
+			
 			self.images.titleInGame:drawCentered(rect.x + rect.w / 2, rect.y + 100)
+		else 
+			self.previousBlink = false
 		end
 	end
 	
@@ -167,6 +182,8 @@ end
 
 function LevelComplete:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.text and (stateTo == self.kStates.overlay) then
+		self:playSample(kAssetsSounds.levelCompleteCard)
+		
 		self.blinkers.blinkerTitle:remove()
 		
 		for _, star in pairs(self.stars) do

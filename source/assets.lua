@@ -41,7 +41,9 @@ kAssetsSounds = {
 	bump = dirSounds.."bump",
 	land = dirSounds.."land",
 	rev = dirSounds.."rev",
-	menuAccept = dirSounds.."menu-accept"
+	menuAccept = dirSounds.."menu-accept",
+	levelCompleteBlink = dirSounds.."levelCompleteBlink",
+	levelCompleteCard = dirSounds.."levelCompleteCard"
 }
 
 kAssetsTracks = {
