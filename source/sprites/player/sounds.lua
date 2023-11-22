@@ -3,7 +3,7 @@ function Wheel:initializeSamples()
 	-- Load sound assets
 	
 	--sampleplayer:addSample("hurt", kAssetsSounds.death1)
-	sampleplayer:addSample("coin", kAssetsSounds.coin, 0.8)
+	sampleplayer:addSample("coin", kAssetsSounds.coin, 0.5)
 	sampleplayer:addSample("bump", kAssetsSounds.bump, 0.3)
 	sampleplayer:addSample("land", kAssetsSounds.land, 0.2)
 	sampleplayer:addSample("jump", kAssetsSounds.jump, 0.2)
@@ -31,9 +31,10 @@ function Wheel:playMovementBasedSounds(velocityFactor)
 		synth:setDecay(decay)
 	end
 	
-	local volume = 0.15
+	local volume = 0.35
 	local frequencyFactor = (velocityFactor + 1) * 2.5
+	local volumeFactor = (velocityFactor + 1) * volume
 	
-	synth:setVolume(volume)
+	synth:setVolume(volume * volumeFactor)
 	synth:playNote(frequency * frequencyFactor)
 end

@@ -28,6 +28,8 @@ function WidgetMenu:_load()
 	
 	local menuSelectCallback = function(args)
 		if args.type == WidgetLevelSelect.kMenuActionType.play and (args.path ~= nil) then
+			self:playSample(kAssetsSounds.menuAccept)
+			
 			self.playCallback(args.path)
 		end
 	end
