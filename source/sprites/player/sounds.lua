@@ -3,10 +3,10 @@ function Wheel:initializeSamples()
 	-- Load sound assets
 	
 	--sampleplayer:addSample("hurt", kAssetsSounds.death1)
-	sampleplayer:addSample("coin", kAssetsSounds.coin)
-	sampleplayer:addSample("bump", kAssetsSounds.bump)
-	sampleplayer:addSample("land", kAssetsSounds.land)
-	sampleplayer:addSample("jump", kAssetsSounds.jump)
+	sampleplayer:addSample("coin", kAssetsSounds.coin, 0.8)
+	sampleplayer:addSample("bump", kAssetsSounds.bump, 0.3)
+	sampleplayer:addSample("land", kAssetsSounds.land, 0.2)
+	sampleplayer:addSample("jump", kAssetsSounds.jump, 0.2)
 end
 
 local synth = nil
@@ -17,8 +17,6 @@ local maxVolume = 1.0
 local minVolume = 0.1
 
 local volumeChangeSpeed = 0.3
-local frequencyChangeSpeed = 15
-local previousVolume = nil
 local previousFrequency = nil
 
 function Wheel:playMovementBasedSounds(velocityFactor)
@@ -33,23 +31,9 @@ function Wheel:playMovementBasedSounds(velocityFactor)
 		synth:setDecay(decay)
 	end
 	
-	local volume = math.max(velocityFactor * maxVolume, minVolume)
-	local frequencyFactor = (velocityFactor + 1) * 0.7
+	local volume = 0.15
+	local frequencyFactor = (velocityFactor + 1) * 2.5
 	
-	-- update frequency and volume
-	if previousVolume ~= nil then
-		previousVolume = math.approach(previousVolume, volume, velocityFactor * volumeChangeSpeed)
-	else
-		previousVolume = volume
-	end
-	
-	local newFrequency = frequency * frequencyFactor
-	if previousFrequency ~= nil then
-		previousFrequency = math.approach(previousFrequency, newFrequency, velocityFactor * frequencyChangeSpeed)
-	else
-		previousFrequency = newFrequency
-	end
-	
-	synth:setVolume(previousVolume)
-	--synth:playNote(previousFrequency)
+	synth:setVolume(volume)
+	synth:playNote(frequency * frequencyFactor)
 end
