@@ -34,6 +34,8 @@ function Wheel:applyJump()
 		
 		if self.touchingGround then
 			self.velocityY = -jumpSpeed
+			
+			sampleplayer:playSample("jump")
 		end
 	end
 	

@@ -59,6 +59,7 @@ function Wheel:resetValues()
 	self.ignoresPlayerInput = true
 	self.hasReachedLevelEnd = false
 	self.hasTouchedNewCheckpoint = false
+	self.hasJustTouchedGround = false
 	self._recentCheckpoint = nil
 	self._coinCountUpdate = 0
 end
@@ -74,7 +75,7 @@ function Wheel:setIsDead()
 	
 	self.ignoresPlayerInput = true
 	self.hasJustDied = true
-	sampleplayer:playSample("hurt")
+	--sampleplayer:playSample("hurt")
 end
 
 function Wheel:getRecentCheckpoint()
@@ -115,6 +116,7 @@ function Wheel:update()
 			self:applyJump()
 		end
 		
+		
 		crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
 	else
 		crankTicks = 0
@@ -143,6 +145,8 @@ function Wheel:update()
 			if collision.normal.x ~= 0 then 
 				--horizontal collision
 				self.velocityX = 0
+				
+				sampleplayer:playSample("bump")
 			end
 			if collision.normal.y == -1 then 
 				--top collision
@@ -174,6 +178,16 @@ function Wheel:update()
 				self.hasReachedLevelEnd = true
 			end
 		end
+	end
+	
+	if self.touchingGround == true then
+		self.hasJustTouchedGround = false
+	else
+		self.hasJustTouchedGround = true
+	end
+	
+	if self.hasJustTouchedGround == true then
+		sampleplayer:playSample("land")
 	end
 	
 	-- Play sounds based on movement

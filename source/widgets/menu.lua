@@ -23,7 +23,8 @@ function WidgetMenu:init(config)
 end
 
 function WidgetMenu:_load()
-	self:loadSample(kAssetsSounds.click)
+	self:loadSample(kAssetsSounds.menuAccept)
+	self:loadSample(kAssetsSounds.intro)
 	
 	local menuSelectCallback = function(args)
 		if args.type == WidgetLevelSelect.kMenuActionType.play and (args.path ~= nil) then
@@ -41,6 +42,10 @@ function WidgetMenu:_load()
 	self.children.levelSelect:setVisible(false)
 	
 	self.children.title:animate(WidgetLevelSelect.kAnimations.animateIn)
+	
+	playdate.timer.performAfterDelay(600, function()
+		self:playSample(kAssetsSounds.intro)
+	end)
 end
 
 function WidgetMenu:_draw(rect)
@@ -72,7 +77,7 @@ end
 
 function WidgetMenu:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.default and stateTo == self.kStates.menu then
-		self:playSample(kAssetsSounds.click)
+		self:playSample(kAssetsSounds.menuAccept)
 		
 		if self.children.levelSelect == nil then
 			self.children.levelSelect = Widget.new(LevelSelect)
@@ -88,7 +93,7 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 	end
 	
 	if stateFrom == self.kStates.menu and stateTo == self.kStates.default then
-		self:playSample(kAssetsSounds.click)
+		self:playSample(kAssetsSounds.menuAccept)
 		
 		self.children.title:setVisible(true)
 		self.children.levelSelect:setVisible(false)

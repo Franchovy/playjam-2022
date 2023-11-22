@@ -2,8 +2,11 @@
 function Wheel:initializeSamples()
 	-- Load sound assets
 	
-	sampleplayer:addSample("hurt", kAssetsSounds.playerDied)
+	--sampleplayer:addSample("hurt", kAssetsSounds.death1)
 	sampleplayer:addSample("coin", kAssetsSounds.coin)
+	sampleplayer:addSample("bump", kAssetsSounds.bump)
+	sampleplayer:addSample("land", kAssetsSounds.land)
+	sampleplayer:addSample("jump", kAssetsSounds.jump)
 end
 
 local synth = nil
@@ -24,7 +27,7 @@ function Wheel:playMovementBasedSounds(velocityFactor)
 	end
 	
 	if synth == nil then
-		local sample = playdate.sound.sample.new(kAssetsSounds.wheelMovement)
+		local sample = playdate.sound.sample.new(kAssetsSounds.rev)
 		synth = playdate.sound.synth.new(sample)
 		synth:setAttack(attack)
 		synth:setDecay(decay)
@@ -48,5 +51,5 @@ function Wheel:playMovementBasedSounds(velocityFactor)
 	end
 	
 	synth:setVolume(previousVolume)
-	synth:playNote(previousFrequency)
+	--synth:playNote(previousFrequency)
 end

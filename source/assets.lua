@@ -29,11 +29,19 @@ kAssetsImages = {
 kAssetsSounds = {
 	checkpointSet = dirSounds.."checkpoint",
 	coin = dirSounds.."coin",
-	playerDied = dirSounds.."death",
+	death1 = dirSounds.."death1",
+	death2 = dirSounds.."death2",
 	menuSelectFail = dirSounds.."menu-fail",
 	menuSelect = dirSounds.."menu-select",
 	wheelMovement = dirSounds.."wheel_movement",
-	click = dirSounds.."click"
+	click = dirSounds.."click",
+	jump = dirSounds.."jump",
+	intro = dirSounds.."intro",
+	land = dirSounds.."land",
+	bump = dirSounds.."bump",
+	land = dirSounds.."land",
+	rev = dirSounds.."rev",
+	menuAccept = dirSounds.."menu-accept"
 }
 
 kAssetsTracks = {
