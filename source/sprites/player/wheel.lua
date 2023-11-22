@@ -62,6 +62,11 @@ function Wheel:resetValues()
 	self.hasJustTouchedGround = false
 	self._recentCheckpoint = nil
 	self._coinCountUpdate = 0
+	self.normal = {
+		x = 0,
+		y = 0
+	}
+	self.normalPrevious = table.shallowcopy(self.normal)
 end
 
 function Wheel:getCoinCountUpdate()
@@ -75,7 +80,6 @@ function Wheel:setIsDead()
 	
 	self.ignoresPlayerInput = true
 	self.hasJustDied = true
-	--sampleplayer:playSample("hurt")
 end
 
 function Wheel:getRecentCheckpoint()
@@ -130,6 +134,9 @@ function Wheel:update()
 	self.touchingGround = false
 	self._coinCountUpdate = 0
 	
+	self.normalPrevious.x = self.normal.x
+	self.normalPrevious.y = self.normal.y
+	
 	-- Update position according to velocity
 	
 	local actualX, actualY, collisions, length = self:moveWithCollisions(
@@ -139,20 +146,26 @@ function Wheel:update()
 
 	-- Collisions-based updates
 	
+	local normalUpdate = { x = 0, y = 0 }
+	
 	for _, collision in pairs(collisions) do
 		local target = collision.other
 		if target.type == kSpriteTypes.platform then
 			if collision.normal.x ~= 0 then 
 				--horizontal collision
 				self.velocityX = 0
-				
-				sampleplayer:playSample("bump")
+				normalUpdate.x = collision.normal.x
 			end
+			
 			if collision.normal.y == -1 then 
 				--top collision
 				self.touchingGround = true
 				
 				self:resetJumpState()
+			end
+			
+			if collision.normal.y ~= 0 then
+				normalUpdate.y = collision.normal.y
 			end
 		elseif target.type == kSpriteTypes.coin then
 			if target:isVisible() and self:alphaCollision(target) then
@@ -180,14 +193,19 @@ function Wheel:update()
 		end
 	end
 	
-	if self.touchingGround == true then
-		self.hasJustTouchedGround = false
-	else
-		self.hasJustTouchedGround = true
+	self.normal.x = normalUpdate.x
+	self.normal.y = normalUpdate.y
+	
+	if self.normal.x ~= 0 and self.normalPrevious.x == 0 then
+		sampleplayer:playSample("bump")
 	end
 	
-	if self.hasJustTouchedGround == true then
+	if self.normal.y == -1 and self.normalPrevious.y == 0 then
 		sampleplayer:playSample("land")
+	end
+	
+	if self.normal.y == 1 and self.normalPrevious.y == 0 then
+		sampleplayer:playSample("bump")
 	end
 	
 	-- Play sounds based on movement
