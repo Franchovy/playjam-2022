@@ -18,6 +18,35 @@ function WidgetLevel:_load()
 	
 	self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
 	
+	-- Wheel setup
+	
+	function setupSpriteWheel(wheel)
+		self.wheel = wheel
+		
+		wheel.signals.onTouchCheckpoint = function()
+			local position = self.wheel:getRecentCheckpoint()
+			self.previousLoadPoint = { x = position.x / kGame.gridSize, y = position.y / kGame.gridSize }
+		end
+		
+		wheel.signals.onDeath = function()
+			self.levelTimer:pause()
+			
+			self:setState(self.kStates.stopped)
+		end
+		
+		wheel.signals.onLevelComplete = function()
+			if self.levelCompleteSprite ~= nil then
+				return
+			end
+			
+			self.levelTimer:pause()
+			self.wheel.ignoresPlayerInput = true
+			
+			local objectives = self:getLevelObjectives()
+			self.levelCompleteCallback(objectives)
+		end
+	end
+	
 	-- Sprite Cycler
 	
 	local chunkLength = AppConfig["chunkLength"]
@@ -40,7 +69,7 @@ function WidgetLevel:_load()
 				sprite = Wheel.new()
 				sprite:resetValues()
 				sprite:setAwaitingInput()
-				self.wheel = sprite
+				setupSpriteWheel(sprite)
 				
 				if self.previousLoadPoint ~= nil then
 					position = self.previousLoadPoint
@@ -196,38 +225,16 @@ function WidgetLevel:_update()
 		
 		-- Touch Checkpoint: set new load point
 		
-		if self.wheel.hasTouchedNewCheckpoint == true then
-			local position = self.wheel:getRecentCheckpoint()
-			self.previousLoadPoint = { x = position.x / kGame.gridSize, y = position.y / kGame.gridSize }
-		end
-		
 		local updatedCoinCount = self.wheel:getCoinCountUpdate()
 		if updatedCoinCount > 0 then
 			self.coinCount += updatedCoinCount
 			self.hud:updateCoinCount(self.coinCount)
 		end
 		
-		-- Level End Trigger
-
-		if self.wheel.hasReachedLevelEnd and self.levelCompleteSprite == nil then
-			self.levelTimer:pause()
-			self.wheel.ignoresPlayerInput = true
-			
-			local objectives = self:getLevelObjectives()
-			self.levelCompleteCallback(objectives)
-		end
-		
 		-- Camera movement based on wheel position
 		
 		self:updateDrawOffset()
 		
-		-- Game State checking
-		
-		if self.wheel.hasJustDied then
-			self.levelTimer:pause()
-			
-			self:setState(self.kStates.stopped)
-		end
 	end
 	
 	-- TODO: Level End
@@ -253,14 +260,6 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.start and (stateTo == self.kStates.playing) then
 		self.periodicBlinker:start()
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.stopped) then
-		
-		if self.children.gameOver == nil then
-			self.children.gameOver = Widget.new(WidgetGameOver)
-			self.children.gameOver:load()
-		end
-		
-		self.children.gameOver.sprite:add()
-		
 		self.spriteCycler:unloadAll()
 		
 		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
@@ -275,8 +274,6 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		self.wheel:remove()
 		
 	elseif stateFrom == self.kStates.stopped and (stateTo == self.kStates.start) then
-		self.children.gameOver.sprite:remove()
-		
 		self.periodicBlinker:start()
 		
 		-- Initialize sprite cycling using initial wheel position

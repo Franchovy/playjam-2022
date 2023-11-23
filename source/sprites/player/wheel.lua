@@ -39,6 +39,8 @@ function Wheel:init()
 		return kCollisionResponse.overlap
 	end
 	
+	self.signals = {}
+	
 	-- Samples
 	
 	self:initializeSamples()
@@ -80,6 +82,10 @@ function Wheel:setIsDead()
 	
 	self.ignoresPlayerInput = true
 	self.hasJustDied = true
+	
+	if self.signals.onDeath ~= nil then
+		self.signals.onDeath()
+	end
 end
 
 function Wheel:getRecentCheckpoint()
@@ -184,10 +190,15 @@ function Wheel:update()
 				target:set()
 				self.hasTouchedNewCheckpoint = true
 				self._recentCheckpoint = {x = target.x, y = target.y}
+				
+				self.signals.onTouchCheckpoint()
 			end
 		elseif target.type == kSpriteTypes.levelEnd then
 			if self:alphaCollision(target) then
-				-- Die
+				if self.hasReachedLevelEnd then
+					self.signals.onLevelComplete()
+				end
+				
 				self.hasReachedLevelEnd = true
 			end
 		end

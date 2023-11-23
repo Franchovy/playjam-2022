@@ -68,7 +68,9 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 	if stateFrom == kPlayStates.start and (stateTo == kPlayStates.playing) then
 		
 	elseif stateFrom == kPlayStates.stopped and (stateTo == kPlayStates.playing) then
-			
+		if self.children.gameOver.isAdded == true then
+			self.children.gameOver.sprite:remove()
+		end
 	elseif stateFrom == kPlayStates.playing and (stateTo == kPlayStates.stopped) then
 		if self.objectives ~= nil then
 			-- Level Complete
@@ -83,6 +85,14 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			end)
 		else 
 			-- Player died
+			
+			if self.children.gameOver == nil then
+				self.children.gameOver = Widget.new(WidgetGameOver)
+				self.children.gameOver:load()
+			end
+			
+			self.children.gameOver.sprite:add()
+			self.children.gameOver.isAdded = true
 		end
 	end
 end
