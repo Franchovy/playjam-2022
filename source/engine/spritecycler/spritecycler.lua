@@ -73,6 +73,11 @@ function SpriteCycler:loadInitialSprites(initialChunkX, initialChunkY)
 end
 
 function SpriteCycler:update(drawOffsetX, drawOffsetY)
+	-- Convert to grid coordinates
+	local drawOffsetX, drawOffsetY = (-drawOffsetX / kGame.gridSize), (drawOffsetY / kGame.gridSize)
+	
+	--
+	
 	local currentChunk = math.ceil(drawOffsetX / self.chunkLength) 
 	local chunksShouldLoad = chunksToGenerate(currentChunk, generationConfig)
 	

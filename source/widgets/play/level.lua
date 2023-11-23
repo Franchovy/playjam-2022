@@ -195,7 +195,7 @@ function WidgetLevel:_update()
 	self.periodicBlinker:update()
 	
 	-- Updates sprites cycling
-	self.spriteCycler:update(-drawOffsetX / kGame.gridSize, drawOffsetY / kGame.gridSize)
+	self.spriteCycler:update(gfx.getDrawOffset())
 	
 	-- On game start
 	
