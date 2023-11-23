@@ -21,11 +21,11 @@ function initialize()
 end
 
 function playdate.update()
+	topLevelWidget:update()
 	playdate.graphics.sprite.update()
 	playdate.timer.updateTimers()
 	playdate.frameTimer.updateTimers()
 	playdate.graphics.animation.blinker.updateAll()
-	topLevelWidget:update()
 	playdate.drawFPS(10, 10)
 end
 

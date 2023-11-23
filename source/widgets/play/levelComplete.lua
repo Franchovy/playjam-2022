@@ -177,7 +177,9 @@ function LevelComplete:_draw(rect)
 end
 
 function LevelComplete:_update()
-	
+	if playdate.buttonJustPressed(playdate.kButtonA) then
+		
+	end
 end
 
 function LevelComplete:changeState(stateFrom, stateTo)

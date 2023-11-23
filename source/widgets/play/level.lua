@@ -141,10 +141,6 @@ function WidgetLevel:_load()
 	local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 	self.spriteCycler:loadInitialSprites(initialChunk, 1)
 	
-	-- Set camera to center on wheel
-	
-	self:updateDrawOffset()
-	
 	-- Play music
 	
 	if AppConfig.enableBackgroundMusic and self.theme ~= nil then
@@ -167,10 +163,6 @@ function WidgetLevel:_load()
 		
 		self.hud:updateTimer(self.levelTimerCounter)
 	end
-	levelTimer.timerEndedCallback = function()
-		-- TODO: Trigger game over
-		print("Game over!")
-	end
 	
 	levelTimer:pause()
 	
@@ -179,22 +171,16 @@ end
 
 function WidgetLevel:_draw(rect)
 	
-	if self.state == self.kStates.stopped then
-		if self.children.gameOver ~= nil then
-			self.children.gameOver:draw(rect)
-		end
-	end
 end
 
 function WidgetLevel:_update()
-	
-	local drawOffsetX, drawOffsetY = gfx.getDrawOffset()
 	
 	-- Update periodicBlinker
 	
 	self.periodicBlinker:update()
 	
 	-- Updates sprites cycling
+	
 	self.spriteCycler:update(gfx.getDrawOffset())
 	
 	-- On game start
@@ -230,29 +216,16 @@ function WidgetLevel:_update()
 			self.coinCount += updatedCoinCount
 			self.hud:updateCoinCount(self.coinCount)
 		end
-		
-		-- Camera movement based on wheel position
-		
-		self:updateDrawOffset()
-		
 	end
 	
-	-- TODO: Level End
-	if false then
-		if self.state == self.kStates.levelEnd then
-			if playdate.buttonJustPressed(playdate.kButtonA) then
-				sceneManager:switchScene(scenes.menu, function() self:destroy() end)
-			elseif playdate.buttonJustPressed(playdate.kButtonB) then
-				self.previousLoadPoint = nil
-				sceneManager:switchScene(scenes.game, function () end)
-			end
-		end
-	end
+	-- Update draw offset
 	
-	if self.state == self.kStates.stopped then
-		if playdate.buttonIsPressed(playdate.kButtonA) then
-			self:setState(self.kStates.start)
-		end
+	local drawOffset = gfx.getDrawOffset()
+	local relativeX = self.wheel.x + drawOffset
+	if relativeX > 150 then
+		gfx.setDrawOffset(-self.wheel.x + 150, 0)
+	elseif relativeX < 80 then
+		gfx.setDrawOffset(-self.wheel.x + 80, 0)
 	end
 end
 
@@ -297,17 +270,6 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 			
 			self.filePlayer:play()
 		end
-	end
-end
-
-
-function WidgetLevel:updateDrawOffset()
-	local drawOffset = gfx.getDrawOffset()
-	local relativeX = self.wheel.x + drawOffset
-	if relativeX > 150 then
-		gfx.setDrawOffset(-self.wheel.x + 150, 0)
-	elseif relativeX < 80 then
-		gfx.setDrawOffset(-self.wheel.x + 80, 0)
 	end
 end
 

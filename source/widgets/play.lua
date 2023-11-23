@@ -56,11 +56,23 @@ function WidgetPlay:_draw(rect)
 		local insetRect = Rect.inset(rect, 30, 20)
 		self.children.levelComplete:draw(insetRect)
 	end
+	
+	if self.state == kPlayStates.stopped then
+		if self.children.gameOver ~= nil then
+			self.children.gameOver:draw(rect)
+		end
+	end
 end
 
 function WidgetPlay:_update()
 	if self.children.background ~= nil then
 		self.children.background:update()
+	end
+	
+	if self.state == kPlayStates.stopped then
+		if playdate.buttonIsPressed(playdate.kButtonA) then
+			self.children.level:setState(kPlayStates.start)
+		end
 	end
 end
 
