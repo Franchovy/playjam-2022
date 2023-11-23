@@ -4,6 +4,7 @@ import "play/level"
 import "play/levelComplete"
 import "play/gameOver"
 import "play/background"
+import "common/transition"
 
 class("WidgetPlay").extends(Widget)
 
@@ -16,25 +17,21 @@ function WidgetPlay:init(config)
 	self:setStateInitial(kPlayStates, 1)
 	
 	self.children = {}
-	
-	self.objectives = nil
 end
 
 function WidgetPlay:_load()
 	self.children.loading = Widget.new(WidgetLoading)
 	self.children.loading:load()
 	
-	local levelCompleteCallback = function(objectives)
-		self.objectives = objectives
-		self:setState(kPlayStates.stopped)
-	end
+	self.children.transition = Widget.new(Transition)
+	self.children.transition:load()
+	--self.children.transition:setVisible(false)
 	
 	self.config = json.decodeFile(self.filePathLevel)
 	
 	playdate.timer.performAfterDelay(100, function()
 		self.children.level = Widget.new(WidgetLevel, { filePathLevel = self.filePathLevel, levelCompleteCallback = levelCompleteCallback })
 		self.children.level:load()
-		self:setState(kPlayStates.playing)
 		
 		self.children.loading:setVisible(false)
 	end)
@@ -58,13 +55,21 @@ function WidgetPlay:_draw(rect)
 	end
 	
 	if self.state == kPlayStates.stopped then
-		if self.children.gameOver ~= nil then
-			self.children.gameOver:draw(rect)
-		end
+		
 	end
 end
 
 function WidgetPlay:_update()
+	-- Inherit state from level child
+	
+	if self.children.level ~= nil then
+		if self.children.level.state ~= self.state then
+			self:setState(self.children.level.state)
+		end
+	end
+	
+	--
+	
 	if self.children.background ~= nil then
 		self.children.background:update()
 	end
@@ -80,11 +85,10 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 	if stateFrom == kPlayStates.start and (stateTo == kPlayStates.playing) then
 		
 	elseif stateFrom == kPlayStates.stopped and (stateTo == kPlayStates.playing) then
-		if self.children.gameOver.isAdded == true then
-			self.children.gameOver.sprite:remove()
-		end
+		--self.children.transition:setVisible(false)
+		self.children.transition:setState(self.children.transition.kStates.outside)
 	elseif stateFrom == kPlayStates.playing and (stateTo == kPlayStates.stopped) then
-		if self.objectives ~= nil then
+		if self.children.level.objectives ~= nil then
 			-- Level Complete
 			local config = table.shallowcopy(self.objectives)
 			config.levelDarkMode = self.config.theme ~= 1
@@ -98,13 +102,8 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		else 
 			-- Player died
 			
-			if self.children.gameOver == nil then
-				self.children.gameOver = Widget.new(WidgetGameOver)
-				self.children.gameOver:load()
-			end
-			
-			self.children.gameOver.sprite:add()
-			self.children.gameOver.isAdded = true
+			self.children.transition:setVisible(true)
+			self.children.transition:setState(self.children.transition.kStates.inside)
 		end
 	end
 end

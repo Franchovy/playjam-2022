@@ -2,7 +2,6 @@ class("WidgetLevel").extends(Widget)
 
 function WidgetLevel:init(config)
 	self.filePathLevel = config.filePathLevel
-	self.levelCompleteCallback = config.levelCompleteCallback
 	
 	self:supply(Widget.kDeps.state)
 	
@@ -10,6 +9,7 @@ function WidgetLevel:init(config)
 	
 	self.sprites = {}
 	self.children = {}
+	self.signals = {}
 end
 
 function WidgetLevel:_load()
@@ -42,8 +42,9 @@ function WidgetLevel:_load()
 			self.levelTimer:pause()
 			self.wheel.ignoresPlayerInput = true
 			
-			local objectives = self:getLevelObjectives()
-			self.levelCompleteCallback(objectives)
+			self.objectives = self:getLevelObjectives()
+			
+			self:setState(self.kStates.stopped)
 		end
 	end
 	
@@ -233,19 +234,26 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.start and (stateTo == self.kStates.playing) then
 		self.periodicBlinker:start()
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.stopped) then
-		self.spriteCycler:unloadAll()
-		
-		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
-			self.filePlayer:stop()
+		if self.objectives == nil then
+			-- Player Died
+			
+			self.spriteCycler:unloadAll()
+			
+			if AppConfig.enableBackgroundMusic and self.theme ~= nil then
+				self.filePlayer:stop()
+			end
+			
+			self.levelTimer:remove()
+			self.hud:remove()
+			
+			self.periodicBlinker:stop()
+			
+			self.wheel:remove()
+		else
+			-- Level Complete
+			
+			
 		end
-		
-		self.levelTimer:remove()
-		self.hud:remove()
-		
-		self.periodicBlinker:stop()
-		
-		self.wheel:remove()
-		
 	elseif stateFrom == self.kStates.stopped and (stateTo == self.kStates.start) then
 		self.periodicBlinker:start()
 		
@@ -257,10 +265,6 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		self.spriteCycler:loadInitialSprites(initialChunk, 1)
-		
-		-- Set camera to center on wheel
-		
-		self:updateDrawOffset()
 		
 		-- Play music
 		
