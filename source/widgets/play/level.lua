@@ -31,7 +31,7 @@ function WidgetLevel:_load()
 		wheel.signals.onDeath = function()
 			self.levelTimer:pause()
 			
-			self:setState(self.kStates.stopped)
+			self.signals.playerDied()
 		end
 		
 		wheel.signals.onLevelComplete = function()
@@ -133,6 +133,7 @@ function WidgetLevel:_load()
 	if not self.spritesLoaded then
 		self.spritesLoaded = true
 		
+		-- TODO: Move HUD out of widget level into widget play
 		self.hud = Hud()
 		self.hud:moveTo(3, 2)
 	end
@@ -195,7 +196,7 @@ function WidgetLevel:_update()
 			
 			self.levelTimer:start()
 			
-			self:setState(self.kStates.playing)
+			self.signals.startPlaying()
 		end
 	end
 	
@@ -236,7 +237,6 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.stopped) then
 		if self.objectives == nil then
 			-- Player Died
-			
 			self.spriteCycler:unloadAll()
 			
 			if AppConfig.enableBackgroundMusic and self.theme ~= nil then

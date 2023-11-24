@@ -23,17 +23,33 @@ function WidgetPlay:_load()
 	self.children.loading = Widget.new(WidgetLoading)
 	self.children.loading:load()
 	
-	self.children.transition = Widget.new(WidgetTransition)
-	self.children.transition:load()
-	self.children.transition:setVisible(false)
-	
 	self.config = json.decodeFile(self.filePathLevel)
 	
 	playdate.timer.performAfterDelay(100, function()
+		self.children.transition = Widget.new(WidgetTransition)
+		self.children.transition:load()
+		self.children.transition:setVisible(false)
+		
 		self.children.level = Widget.new(WidgetLevel, { filePathLevel = self.filePathLevel, levelCompleteCallback = levelCompleteCallback })
 		self.children.level:load()
 		
 		self.children.loading:setVisible(false)
+		
+		self.children.level.signals.startPlaying = function()
+			self:setState(kPlayStates.playing)
+		end
+		
+		self.children.level.signals.playerDied = function()
+			playdate.timer.performAfterDelay(1200, function()
+				self:setState(kPlayStates.stopped)
+			end)
+		end
+		
+		self.children.level.signals.levelComplete = function()
+			playdate.timer.performAfterDelay(2500, function()
+				self:setState(kPlayStates.stopped)
+			end)
+		end
 	end)
 	
 	if AppConfig.enableParalaxBackground and (self.config.theme ~= nil) then
@@ -62,12 +78,6 @@ end
 function WidgetPlay:_update()
 	-- Inherit state from level child
 	
-	if self.children.level ~= nil then
-		if self.children.level.state ~= self.state then
-			self:setState(self.children.level.state)
-		end
-	end
-	
 	--
 	
 	if self.children.background ~= nil then
@@ -83,7 +93,7 @@ end
 
 function WidgetPlay:changeState(stateFrom, stateTo)
 	if stateFrom == kPlayStates.start and (stateTo == kPlayStates.playing) then
-		
+		self.children.level:setState(kPlayStates.playing)
 	elseif stateFrom == kPlayStates.stopped and (stateTo == kPlayStates.playing) then
 		self.children.transition:setVisible(false)
 		self.children.transition:setState(self.children.transition.kStates.outside)
@@ -104,6 +114,10 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			
 			self.children.transition:setVisible(true)
 			self.children.transition:setState(self.children.transition.kStates.inside)
+			
+			playdate.timer.performAfterDelay(500, function()
+				self.children.level:setState(kPlayStates.stopped)
+			end)
 		end
 	end
 end

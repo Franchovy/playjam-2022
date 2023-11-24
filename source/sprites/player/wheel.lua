@@ -64,6 +64,7 @@ function Wheel:resetValues()
 	self.hasJustTouchedGround = false
 	self._recentCheckpoint = nil
 	self._coinCountUpdate = 0
+	self.isFrozen = false
 	self.normal = {
 		x = 0,
 		y = 0
@@ -83,8 +84,10 @@ function Wheel:setIsDead()
 	local random = math.random(2)
 	sampleplayer:playSample("death"..random)
 	
+	-- Freeze all wheel behaviour, no movement or accepted input
 	self.ignoresPlayerInput = true
 	self.hasJustDied = true
+	self.isFrozen = true
 	
 	if self.signals.onDeath ~= nil then
 		self.signals.onDeath()
@@ -100,13 +103,21 @@ function Wheel:startGame()
 	self.ignoresPlayerInput = false
 end
 
+function Wheel:hasReachedLevelEnd()
+	return self.hasReachedLevelEnd
+end
+
+function Wheel:setAwaitingInput() 
+	self.isAwaitingInput = true
+end
+
 -- Movement
 
 function Wheel:update()
 	
 	-- Update if player has died
 	
-	if self.y > 260 then
+	if self.y > 260 and (self.hasJustDied == false) then
 		self:setIsDead()
 		return
 	end
@@ -115,7 +126,7 @@ function Wheel:update()
 	
 	local crankTicks
 	
-	if not self.ignoresPlayerInput then
+	if self.ignoresPlayerInput == false then
 		-- Player Input
 		
 		-- Has just pressed jump
@@ -129,14 +140,18 @@ function Wheel:update()
 			self:applyJump()
 		end
 		
-		
 		crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
 	else
 		crankTicks = 0
 	end
 	
-	self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
-	self.velocityX = self:calculateSpeed(crankTicks, self.velocityX)
+	if self.isFrozen == false then
+		self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
+		self.velocityX = self:calculateSpeed(crankTicks, self.velocityX)
+	else
+		self.velocityY = 0
+		self.velocityX = 0
+	end
 	
 	-- Reset values that get re-calculated
 	
@@ -207,23 +222,25 @@ function Wheel:update()
 		end
 	end
 	
-	self.normal.x = normalUpdate.x
-	self.normal.y = normalUpdate.y
-	
-	if self.normal.x ~= 0 and self.normalPrevious.x == 0 then
-		sampleplayer:playSample("bump")
+	if self.hasJustDied == false then	
+		self.normal.x = normalUpdate.x
+		self.normal.y = normalUpdate.y
+		
+		if self.normal.x ~= 0 and self.normalPrevious.x == 0 then
+			sampleplayer:playSample("bump")
+		end
+		
+		if self.normal.y == -1 and self.normalPrevious.y == 0 then
+			sampleplayer:playSample("land")
+		end
+		
+		if self.normal.y == 1 and self.normalPrevious.y == 0 then
+			sampleplayer:playSample("bump")
+		end
+		
+		-- Play sounds based on movement
+		self:playMovementSound()
 	end
-	
-	if self.normal.y == -1 and self.normalPrevious.y == 0 then
-		sampleplayer:playSample("land")
-	end
-	
-	if self.normal.y == 1 and self.normalPrevious.y == 0 then
-		sampleplayer:playSample("bump")
-	end
-	
-	-- Play sounds based on movement
-	self:playMovementSound()
 	
 	-- Update graphics
 	
@@ -240,14 +257,3 @@ function Wheel:update()
 
 	self:setImage(self.imagetable[imageIndex])
 end
-
-function Wheel:hasReachedLevelEnd()
-	return self.hasReachedLevelEnd
-end
-
-function Wheel:setAwaitingInput() 
-	self.isAwaitingInput = true
-end
-
-
-
