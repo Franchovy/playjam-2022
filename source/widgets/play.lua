@@ -25,32 +25,45 @@ function WidgetPlay:_load()
 	
 	self.config = json.decodeFile(self.filePathLevel)
 	
-	playdate.timer.performAfterDelay(100, function()
-		self.children.transition = Widget.new(WidgetTransition)
-		self.children.transition:load()
-		self.children.transition:setVisible(false)
+	self.children.transition = Widget.new(WidgetTransition)
+	self.children.transition:load()
+	self.children.transition:setVisible(false)
+	
+	self.children.level = Widget.new(WidgetLevel, { levelConfig = self.config, levelCompleteCallback = levelCompleteCallback })
+	self.children.level:load()
+	
+	self.children.loading:setVisible(false)
+	
+	self.children.level.signals.startPlaying = function()
+		self:setState(kPlayStates.playing)
+	end
+	
+	self.children.level.signals.playerDied = function()
+		self.filePlayer:stop()
 		
-		self.children.level = Widget.new(WidgetLevel, { filePathLevel = self.filePathLevel, levelCompleteCallback = levelCompleteCallback })
-		self.children.level:load()
+		playdate.timer.performAfterDelay(1200, function()
+			self:setState(kPlayStates.stopped)
+		end)
+	end
+	
+	self.children.level.signals.levelComplete = function()
+		playdate.timer.performAfterDelay(2500, function()
+			self:setState(kPlayStates.stopped)
+		end)
+	end
+	
+	-- Load theme for level
+	
+	if self.config.theme ~= nil then
+		self.theme = kThemes[self.config.theme]
+	end
+	
+	if AppConfig.enableBackgroundMusic and self.theme ~= nil then
+		local musicFilePath = getMusicFilepathForTheme(self.theme)
+		self.filePlayer = FilePlayer(musicFilePath)
 		
-		self.children.loading:setVisible(false)
-		
-		self.children.level.signals.startPlaying = function()
-			self:setState(kPlayStates.playing)
-		end
-		
-		self.children.level.signals.playerDied = function()
-			playdate.timer.performAfterDelay(1200, function()
-				self:setState(kPlayStates.stopped)
-			end)
-		end
-		
-		self.children.level.signals.levelComplete = function()
-			playdate.timer.performAfterDelay(2500, function()
-				self:setState(kPlayStates.stopped)
-			end)
-		end
-	end)
+		self.filePlayer:play()
+	end
 	
 	if AppConfig.enableParalaxBackground and (self.config.theme ~= nil) then
 		self.children.background = Widget.new(WidgetBackground, { theme = self.config.theme })

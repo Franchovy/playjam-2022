@@ -1,7 +1,7 @@
 class("WidgetLevel").extends(Widget)
 
 function WidgetLevel:init(config)
-	self.filePathLevel = config.filePathLevel
+	self.levelConfig = config.levelConfig
 	
 	self:supply(Widget.kDeps.state)
 	
@@ -94,15 +94,9 @@ function WidgetLevel:_load()
 		return sprite
 	end)
 	
-	-- Load level file
-	
-	self.config = json.decodeFile(self.filePathLevel)
-	
-	assert(self.config)
-	
 	-- Load level into spritecycler
 	
-	self.spriteCycler:load(self.config)
+	self.spriteCycler:load(self.levelConfig)
 	
 	--
 	
@@ -120,14 +114,6 @@ function WidgetLevel:_load()
 		count = 1
 	})
 	
-	-- Load theme (Parallax BG)
-	
-	local themeId = self.config.theme
-	
-	if themeId ~= 0 then
-		self.theme = kThemes[themeId]
-	end
-	
 	-- Add HUD
 	
 	if not self.spritesLoaded then
@@ -142,15 +128,6 @@ function WidgetLevel:_load()
 	
 	local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 	self.spriteCycler:loadInitialSprites(initialChunk, 1)
-	
-	-- Play music
-	
-	if AppConfig.enableBackgroundMusic and self.theme ~= nil then
-		local musicFilePath = getMusicFilepathForTheme(self.theme)
-		self.filePlayer = FilePlayer(musicFilePath)
-		
-		self.filePlayer:play()
-	end
 	
 	-- Set up level timer 
 	
@@ -260,20 +237,11 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		-- Initialize sprite cycling using initial wheel position
 		
 		self.config = json.decodeFile(self.filePathLevel)
-			
+
 		self.spriteCycler:load(self.config)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		self.spriteCycler:loadInitialSprites(initialChunk, 1)
-		
-		-- Play music
-		
-		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
-			local musicFilePath = getMusicFilepathForTheme(self.theme)
-			self.filePlayer = FilePlayer(musicFilePath)
-			
-			self.filePlayer:play()
-		end
 	end
 end
 
