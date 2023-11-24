@@ -6,7 +6,6 @@ import "notify"
 import "config"
 import "widgets"
 
-local acceptsRestart = false
 local topLevelWidget
 
 function initialize()
@@ -28,24 +27,6 @@ function playdate.update()
 	playdate.frameTimer.updateTimers()
 	playdate.graphics.animation.blinker.updateAll()
 	playdate.drawFPS(10, 10)
-end
-
-function isGameSceneOver()
-	return scenes.game.gameState == gameStates.playerDied
-end
-
-function transitionToGameOverScene()
-	local gameScene = sceneManager.currentScene
-	sceneManager:switchScene(scenes.gameover, function () gameScene:destroy() end)
-end
-
-
-function updateScenes()
-	if sceneManager.currentScene == scenes.game then
-		if isGameSceneOver() then
-			transitionToGameOverScene()
-		end
-	end
 end
 
 -- Start game
