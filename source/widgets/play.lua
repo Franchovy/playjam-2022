@@ -23,9 +23,9 @@ function WidgetPlay:_load()
 	self.children.loading = Widget.new(WidgetLoading)
 	self.children.loading:load()
 	
-	self.children.transition = Widget.new(Transition)
+	self.children.transition = Widget.new(WidgetTransition)
 	self.children.transition:load()
-	--self.children.transition:setVisible(false)
+	self.children.transition:setVisible(false)
 	
 	self.config = json.decodeFile(self.filePathLevel)
 	
@@ -85,7 +85,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 	if stateFrom == kPlayStates.start and (stateTo == kPlayStates.playing) then
 		
 	elseif stateFrom == kPlayStates.stopped and (stateTo == kPlayStates.playing) then
-		--self.children.transition:setVisible(false)
+		self.children.transition:setVisible(false)
 		self.children.transition:setState(self.children.transition.kStates.outside)
 	elseif stateFrom == kPlayStates.playing and (stateTo == kPlayStates.stopped) then
 		if self.children.level.objectives ~= nil then
