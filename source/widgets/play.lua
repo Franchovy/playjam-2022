@@ -82,9 +82,9 @@ function WidgetPlay:_draw(rect)
 		local insetRect = Rect.inset(rect, 30, 20)
 		self.children.levelComplete:draw(insetRect)
 	end
-	
-	if self.state == kPlayStates.stopped then
-		
+
+	if self.children.gameOver ~= nil then
+		self.children.gameOver:draw(rect)
 	end
 end
 
@@ -130,6 +130,13 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			
 			playdate.timer.performAfterDelay(500, function()
 				self.children.level:setState(kPlayStates.stopped)
+				
+				self.children.transition:setState(self.children.transition.kStates.outside)
+				
+				if self.children.gameOver == nil then
+					self.children.gameOver = Widget.new(WidgetGameOver)
+					self.children.gameOver:load()
+				end
 			end)
 		end
 	end

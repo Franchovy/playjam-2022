@@ -3,10 +3,7 @@ class("WidgetTransition").extends(Widget)
 function WidgetTransition:init()
 	self:supply(Widget.kDeps.state)
 	
-	self:createSprite()
-	self.sprite:add()
-	self.sprite:setZIndex(100)
-	self.sprite:setIgnoresDrawOffset(true)
+	self:createSprite(kZIndex.transition)
 	
 	self:setStateInitial({ outside = 1, inside = 2 }, 1)
 	

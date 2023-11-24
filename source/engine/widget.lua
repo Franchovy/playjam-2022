@@ -8,13 +8,19 @@ Widget.kDeps = {
 	samples = 3
 }
 
-function Widget:createSprite()
+function Widget:createSprite(zIndex)
 	if self.sprite == nil then
 		local sprite = gfx.sprite.new()
 		sprite:setSize(playdate.display.getSize())
 		sprite:setCenter(0, 0)
 		sprite:moveTo(0, 0)
-		sprite:setZIndex(-32768)
+		
+		if zIndex ~= nil then
+			sprite:setZIndex(zIndex)
+		else
+			sprite:setZIndex(-32768)
+		end
+		
 		sprite:setIgnoresDrawOffset(true)
 		sprite:setUpdatesEnabled(false)
 		sprite.setAlwaysRedraw(true)
@@ -22,6 +28,7 @@ function Widget:createSprite()
 			self:draw(Rect.make(x, y, w, h), self.state)
 		end
 		
+		sprite:add()
 		self.sprite = sprite
 	end
 end

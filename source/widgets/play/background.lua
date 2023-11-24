@@ -4,7 +4,7 @@ class("WidgetBackground").extends(Widget)
 function WidgetBackground:init(config)
 	self.theme = config.theme
 	
-	self:createSprite()
+	self:createSprite(kZIndex.background)
 	self.sprite:add()
 end
 

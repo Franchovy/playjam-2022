@@ -11,3 +11,7 @@ end
 function Position.offset(position, x, y)
 	return { x = position.x + x, y = position.y + y }
 end
+
+function Position.center(rect, x, y)
+	return { x = rect.x + rect.w / 2, y = rect.y + rect.h / 2 }
+end
