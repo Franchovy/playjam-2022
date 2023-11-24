@@ -21,30 +21,13 @@ function initialize()
 end
 
 function playdate.update()
+	math.randomseed(playdate.getSecondsSinceEpoch())
 	topLevelWidget:update()
 	playdate.graphics.sprite.update()
 	playdate.timer.updateTimers()
 	playdate.frameTimer.updateTimers()
 	playdate.graphics.animation.blinker.updateAll()
 	playdate.drawFPS(10, 10)
-end
-
-function placeholder()
-	playdate.graphics.sprite.redrawBackground()
-
-	-- Random Seed (for generating random numbers)
-	math.randomseed(playdate.getSecondsSinceEpoch())
-
-	-- Game Update
-
-	Scene.update()
-	timer.updateTimers()
-	sprite.update()
-	frameTimer.updateTimers()
-
-	-- State management
-	
-	updateScenes()
 end
 
 function isGameSceneOver()

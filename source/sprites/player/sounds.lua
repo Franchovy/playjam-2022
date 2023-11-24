@@ -7,6 +7,9 @@ function Wheel:initializeSamples()
 	sampleplayer:addSample("bump", kAssetsSounds.bump, 0.3)
 	sampleplayer:addSample("land", kAssetsSounds.land, 0.2)
 	sampleplayer:addSample("jump", kAssetsSounds.jump, 0.2)
+		
+	sampleplayer:addSample("death"..1, kAssetsSounds.death1, 0.6)
+	sampleplayer:addSample("death"..2, kAssetsSounds.death2, 0.6)
 end
 
 local synth = nil

@@ -80,6 +80,9 @@ function Wheel:setIsDead()
 		return
 	end
 	
+	local random = math.random(2)
+	sampleplayer:playSample("death"..random)
+	
 	self.ignoresPlayerInput = true
 	self.hasJustDied = true
 	
