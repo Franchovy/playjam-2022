@@ -52,6 +52,18 @@ function WidgetPlay:_load()
 		end)
 	end
 	
+	self.children.gameOver = Widget.new(WidgetGameOver, { 
+		reason = "YOU WERE KILLED"
+	})
+	self.children.gameOver:load()
+	self.children.gameOver:setVisible(false)
+	
+	self.children.gameOver.signals.restartCheckpoint = function(entry) 
+		self:setState(kPlayStates.playing)
+ 	end
+	self.children.gameOver.signals.restartLevel = function(entry) print("Selected restart level") end
+	self.children.gameOver.signals.returnToMenu = function(entry) print("Selected return to menu") end
+	
 	-- Load theme for level
 	
 	if self.config.theme ~= nil then
@@ -83,37 +95,29 @@ function WidgetPlay:_draw(rect)
 		self.children.levelComplete:draw(insetRect)
 	end
 
-	if self.children.gameOver ~= nil then
-		self.children.gameOver:draw(rect)
-	end
+	self.children.gameOver:draw(rect)
 end
 
 function WidgetPlay:_update()
-	-- Inherit state from level child
-	
-	--
-	
-	if self.children.background ~= nil then
-		--self.children.background:update()
-	end
-	
-	if self.children.gameOver ~= nil then
-		--self.children.gameOver:update()
-	end
-	
-	if self.state == kPlayStates.stopped then
-		if playdate.buttonIsPressed(playdate.kButtonA) then
-			self.children.level:setState(kPlayStates.start)
-		end
-	end
 end
 
 function WidgetPlay:changeState(stateFrom, stateTo)
 	if stateFrom == kPlayStates.start and (stateTo == kPlayStates.playing) then
 		self.children.level:setState(kPlayStates.playing)
 	elseif stateFrom == kPlayStates.stopped and (stateTo == kPlayStates.playing) then
-		self.children.transition:setVisible(false)
-		self.children.transition:setState(self.children.transition.kStates.outside)
+		self.children.transition:setVisible(true)
+		self.children.transition:setState(self.children.transition.kStates.inside)
+		
+		playdate.timer.performAfterDelay(500, function()
+			self.children.gameOver:setVisible(false)
+			self.children.transition:setState(self.children.transition.kStates.outside)
+			self.children.level:setState(kPlayStates.start)
+			
+			playdate.timer.performAfterDelay(500, function()
+				self.children.transition:setVisible(false)
+				self.children.level:setState(kPlayStates.playing)
+			end)
+		end)
 	elseif stateFrom == kPlayStates.playing and (stateTo == kPlayStates.stopped) then
 		if self.children.level.objectives ~= nil then
 			-- Level Complete
@@ -137,18 +141,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 				
 				self.children.transition:setState(self.children.transition.kStates.outside)
 				
-				if self.children.gameOver == nil then
-					self.children.gameOver = Widget.new(WidgetGameOver, { 
-						reason = "YOU WERE KILLED",
-						options = {
-							"CHECKPOINT",
-							"RESTART LEVEL",
-							"LEVEL SELECT"
-						},
-						entrySelectedCallback = function(entry) print("Selected entry: ".. entry) end
-					})
-					self.children.gameOver:load()
-				end
+				self.children.gameOver:setVisible(true)
 			end)
 		end
 	end

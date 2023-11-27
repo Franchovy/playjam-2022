@@ -37,7 +37,7 @@ function WidgetEntriesMenu:_draw(rect)
 end
 
 function WidgetEntriesMenu:_update()
-	if playdate.buttonJustPressed(playdate.kButtonB) then
+	if playdate.buttonJustPressed(playdate.kButtonA) then
 		self.signals.entrySelected(self.state)
 	end
 	

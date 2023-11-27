@@ -11,6 +11,16 @@ function WidgetGameOver:init(config)
 	self:supply(Widget.kDeps.children)
 	
 	self:createSprite(kZIndex.overlay)
+	
+	self.signals = {}
+	
+	-- 
+	
+	self.options = {
+		"CHECKPOINT",
+		"RESTART LEVEL",
+		"LEVEL SELECT"
+	}
 end
 
 function WidgetGameOver:_load()
@@ -38,11 +48,17 @@ function WidgetGameOver:_load()
 		self.images.gameOverReason:draw(gameOverReasonCenterRect.x, rect.y + 47)
 	end)
 	
-	self.children.entriesMenu = Widget.new(WidgetEntriesMenu, self.config.options)
+	self.children.entriesMenu = Widget.new(WidgetEntriesMenu, self.options)
 	self.children.entriesMenu:load()
 	
 	self.children.entriesMenu.signals.entrySelected = function(entry)
-		self.config.entrySelectedCallback(entry)
+		if entry == 1 then
+			self.signals.restartCheckpoint()
+		elseif entry == 2 then
+			self.signals.restartLevel()
+		elseif entry == 3 then
+			self.signals.returnToMenu()
+		end
 	end
 end
 
@@ -56,7 +72,5 @@ function WidgetGameOver:_draw(rect)
 end
 
 function WidgetGameOver:_update()
-	
-	--self.children.entriesMenu:update()
 	
 end
