@@ -97,6 +97,10 @@ function WidgetPlay:_update()
 		self.children.background:update()
 	end
 	
+	if self.children.gameOver ~= nil then
+		self.children.gameOver:update()
+	end
+	
 	if self.state == kPlayStates.stopped then
 		if playdate.buttonIsPressed(playdate.kButtonA) then
 			self.children.level:setState(kPlayStates.start)
@@ -134,7 +138,15 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 				self.children.transition:setState(self.children.transition.kStates.outside)
 				
 				if self.children.gameOver == nil then
-					self.children.gameOver = Widget.new(WidgetGameOver, {reason = "YOU WERE KILLED"})
+					self.children.gameOver = Widget.new(WidgetGameOver, { 
+						reason = "YOU WERE KILLED",
+						options = {
+							"CHECKPOINT",
+							"RESTART LEVEL",
+							"LEVEL SELECT"
+						},
+						entrySelectedCallback = function(entry) print("Selected entry: ".. entry) end
+					})
 					self.children.gameOver:load()
 				end
 			end)

@@ -54,8 +54,18 @@ function Rect.unpack(rect)
 	return rect.x, rect.y, rect.w, rect.h
 end
 
-function Rect.inset(rect, x, y)
-	return { x = rect.x + x, y = rect.y + y, w = rect.w - (x * 2), h = rect.h - (y * 2) }
+function Rect.inset(rect, x, y, w, h)
+	assert(x ~= nil, "x must not be nil")
+	if y == nil then
+		y = x
+	end
+	if w == nil then
+		w = x
+	end
+	if h == nil then
+		h = y
+	end
+	return { x = rect.x + x, y = rect.y + y, w = rect.w - (x + w), h = rect.h - (y + h) }
 end
 
 function Rect.offset(rect, x, y)

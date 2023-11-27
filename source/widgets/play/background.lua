@@ -34,6 +34,7 @@ function WidgetBackground:_draw(rect)
 		local imageOffset = self.imageOffsets[i]
 		local imageWidth = image:getSize()
 		-- Draw 2 copies of the image, one before and one after
+		-- TODO: Draw only the part of the image needed using [sourcerect]
 		image:draw(rect.x + imageOffset + imageWidth, rect.y)
 		image:draw(rect.x + imageOffset, rect.y)
 	end
