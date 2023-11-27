@@ -57,6 +57,6 @@ end
 
 function WidgetGameOver:_update()
 	
-	self.children.entriesMenu:update()
+	--self.children.entriesMenu:update()
 	
 end

@@ -94,11 +94,11 @@ function WidgetPlay:_update()
 	--
 	
 	if self.children.background ~= nil then
-		self.children.background:update()
+		--self.children.background:update()
 	end
 	
 	if self.children.gameOver ~= nil then
-		self.children.gameOver:update()
+		--self.children.gameOver:update()
 	end
 	
 	if self.state == kPlayStates.stopped then

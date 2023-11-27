@@ -236,9 +236,7 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		
 		-- Initialize sprite cycling using initial wheel position
 		
-		self.config = json.decodeFile(self.filePathLevel)
-
-		self.spriteCycler:load(self.config)
+		self.spriteCycler:load(self.levelConfig)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		self.spriteCycler:loadInitialSprites(initialChunk, 1)
