@@ -134,7 +134,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 				self.children.transition:setState(self.children.transition.kStates.outside)
 				
 				if self.children.gameOver == nil then
-					self.children.gameOver = Widget.new(WidgetGameOver)
+					self.children.gameOver = Widget.new(WidgetGameOver, {reason = "YOU WERE KILLED"})
 					self.children.gameOver:load()
 				end
 			end)
