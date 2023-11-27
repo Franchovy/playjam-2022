@@ -3,21 +3,10 @@ import "utils/value"
 class("WidgetEntriesMenuEntry").extends(Widget)
 
 function WidgetEntriesMenuEntry:init(config)
-	self.state = {}
-	self.state.selected = false
-	
-	self.images = {}
-	self.painters = {}
-	
-	self.config = {}
-	self.config.text = config.text
-	self.config.showOutline = value.default(config.showOutline, true)
-	
-	--
-	
-	self.config = {}
+	self.config = config
 	
 	self:supply(Widget.kDeps.state)
+	self:setStateInitial({ unselected = 1, selected = 2 }, 1)
 	
 	self.images = {}
 	self.painters = {}
@@ -25,36 +14,21 @@ end
 
 function WidgetEntriesMenuEntry:_load()
 	self.images.title = playdate.graphics.imageWithText(self.config.text, 200, 70):scaledImage(2)
-	
-	self.painters.outline = Painter(function(rect, state)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.setLineWidth(1)
-		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+	self.painters.circle = Painter(function(rect)
+		playdate.graphics.drawCircleInRect(rect.x, rect.y, rect.w, rect.h)
 		
-		playdate.graphics.setDitherPattern(0.8, playdate.graphics.image.kDitherTypeScreen)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
-	end)
-	
-	self.painters.outlineSelected = Painter(function(rect, state)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setLineWidth(3)
-		playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
+		playdate.graphics.setDitherPattern(0.5, playdate.graphics.image.kDitherTypeDiagonalLine)
+		playdate.graphics.fillCircleInRect(rect.x, rect.y, rect.w, rect.h)
 	end)
 end
 
 function WidgetEntriesMenuEntry:_draw(rect)
-	local outlineRect = Rect.inset(rect, 20, 0)
+	local insetRect = Rect.inset(rect, 28, 8, 5)
 	
-	self.images.title:draw(outlineRect.x + 10, outlineRect.y + 12)
+	self.images.title:draw(insetRect.x, insetRect.y)
 	
-	if not self.state.selected then
-		if self.config.showOutline then	
-			self.painters.outline:draw(outlineRect)
-		end
-	else
-		self.painters.outlineSelected:draw(outlineRect)
+	if self.state == self.kStates.selected then
+		self.painters.circle:draw(Rect.with(Rect.inset(rect, 5, 5), { w = 15 }))
 	end
 end
 

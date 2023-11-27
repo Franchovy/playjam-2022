@@ -52,7 +52,7 @@ function WidgetGameOver:_draw(rect)
 	local insetRect = Rect.inset(rect, 30, 30)
 	self.painters.content:draw(insetRect)
 	
-	self.children.entriesMenu:draw(Rect.inset(insetRect, 15, 60, 15, 15))
+	self.children.entriesMenu:draw(Rect.inset(insetRect, 10, 60, nil, 15))
 end
 
 function WidgetGameOver:_update()

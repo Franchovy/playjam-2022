@@ -54,7 +54,7 @@ function WidgetLevelSelect:_load()
 		table.insert(self.entries, entry)
 		self.children["entry"..i] = entry
 		
-		local preview = Widget.new(LevelSelectPreview, { 
+		local preview = Widget.new(LevelSelectPreview, {
 			name = v.title,
 			image = playdate.graphics.image.new(v.menuImagePath),
 			highscore = nil

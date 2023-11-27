@@ -20,6 +20,7 @@ end
 function WidgetEntriesMenu:_load()
 	for i=1,#self.config do
 		local entry = Widget.new(WidgetEntriesMenuEntry, { text = self.config[i] })
+		entry:load()
 		
 		self.children["entry"..i] = entry
 		self.entries[i] = entry
@@ -27,9 +28,12 @@ function WidgetEntriesMenu:_load()
 end
 
 function WidgetEntriesMenu:_draw(rect)
-	playdate.graphics.setColor(playdate.graphics.kColorBlack)
-	playdate.graphics.setDitherPattern(0.6, playdate.graphics.image.kDitherTypeDiagonalLine)
-	playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
+	local entryHeight = rect.h / #self.entries
+	
+	for i, entry in pairs(self.entries) do
+		local entryRect = Rect.with(rect, { h = entryHeight, y = rect.y + 10 + (entryHeight * (i - 1)) })
+		entry:draw(entryRect)
+	end
 end
 
 function WidgetEntriesMenu:_update()
