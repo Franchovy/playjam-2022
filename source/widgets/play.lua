@@ -27,21 +27,15 @@ function WidgetPlay:_load()
 	self.children.level:load()
 	
 	self.children.level.signals.startPlaying = function()
-		self:setState(kPlayStates.playing)
+		self:setState(self.kStates.playing)
 	end
 	
-	self.children.level.signals.playerDied = function()
-		self.filePlayer:stop()
-		
-		playdate.timer.performAfterDelay(1200, function()
-			self:setState(kPlayStates.stopped)
-		end)
+	self.children.level.signals.gameOver = function()
+		self:setState(self.kStates.gameOver)
 	end
 	
 	self.children.level.signals.levelComplete = function()
-		playdate.timer.performAfterDelay(2500, function()
-			self:setState(kPlayStates.stopped)
-		end)
+		self:setState(self.kStates.levelComplete)
 	end
 	
 	self.children.gameOver = Widget.new(WidgetGameOver, { 
@@ -51,7 +45,7 @@ function WidgetPlay:_load()
 	self.children.gameOver:setVisible(false)
 	
 	self.children.gameOver.signals.restartCheckpoint = function(entry) 
-		self:setState(kPlayStates.playing)
+		self:setState(self.kStates.playing)
  	end
 	self.children.gameOver.signals.restartLevel = function(entry) print("Selected restart level") end
 	self.children.gameOver.signals.returnToMenu = function(entry) print("Selected return to menu") end
@@ -92,47 +86,50 @@ function WidgetPlay:_update()
 end
 
 function WidgetPlay:changeState(stateFrom, stateTo)
-	if stateFrom == kPlayStates.start and (stateTo == kPlayStates.playing) then
-		self.children.level:setState(kPlayStates.playing)
-	elseif stateFrom == kPlayStates.stopped and (stateTo == kPlayStates.playing) then
+	if stateFrom == self.kStates.start and (stateTo == self.kStates.playing) then
+		self.children.level:setState(self.kStates.playing)
+	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.playing) then
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.inside)
 		
-		playdate.timer.performAfterDelay(500, function()
+		playdate.timer.performAfterDelay(400, function()
 			self.children.gameOver:setVisible(false)
 			self.children.transition:setState(self.children.transition.kStates.outside)
-			self.children.level:setState(kPlayStates.start)
+			self.children.level:setState(self.kStates.playing)
 			
-			playdate.timer.performAfterDelay(500, function()
+			playdate.timer.performAfterDelay(400, function()
 				self.children.transition:setVisible(false)
-				self.children.level:setState(kPlayStates.playing)
 			end)
 		end)
-	elseif stateFrom == kPlayStates.playing and (stateTo == kPlayStates.stopped) then
-		if self.children.level.objectives ~= nil then
-			-- Level Complete
-			local config = table.shallowcopy(self.objectives)
-			config.levelDarkMode = self.config.theme ~= 1
-			
-			self.children.levelComplete = Widget.new(LevelComplete, config)
-			self.children.levelComplete:load()
-			
-			playdate.timer.performAfterDelay(5000, function()
-				self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
-			end)
-		else 
-			-- Player died
-			
+	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.gameOver) then
+		self.filePlayer:stop()
+		
+		playdate.timer.performAfterDelay(1200, function()
 			self.children.transition:setVisible(true)
 			self.children.transition:setState(self.children.transition.kStates.inside)
 			
 			playdate.timer.performAfterDelay(500, function()
-				self.children.level:setState(kPlayStates.stopped)
+				self.children.level:setState(self.kStates.gameOver)
 				
 				self.children.transition:setState(self.children.transition.kStates.outside)
 				
 				self.children.gameOver:setVisible(true)
 			end)
-		end
+		end)
+	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.levelComplete) then
+		--playdate.timer.performAfterDelay(1500, function()
+			self.children.level:setState(self.kStates.levelComplete)
+			local objectives = table.shallowcopy(self.children.level.objectives)
+			
+			self.children.levelComplete = Widget.new(LevelComplete, {
+				objectives = objectives,
+				darkMode = self.config.theme ~= 1
+			})
+			self.children.levelComplete:load()
+			
+			playdate.timer.performAfterDelay(5000, function()
+				self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
+			end)
+		--end)
 	end
 end

@@ -29,9 +29,7 @@ function WidgetLevel:_load()
 		end
 		
 		wheel.signals.onDeath = function()
-			self.levelTimer:pause()
-			
-			self.signals.playerDied()
+			self.signals.gameOver()
 		end
 		
 		wheel.signals.onLevelComplete = function()
@@ -44,7 +42,7 @@ function WidgetLevel:_load()
 			
 			self.objectives = self:getLevelObjectives()
 			
-			self:setState(self.kStates.stopped)
+			self.signals.levelComplete()
 		end
 	end
 	
@@ -179,15 +177,6 @@ function WidgetLevel:_update()
 	
 	if self.state == self.kStates.playing then
 		
-		-- Update Blinker
-		
-		if blinker ~= nil then
-			blinker:update()
-			if self.levelCompleteSprite ~= nil then	
-				self.levelCompleteSprite:setVisible(blinker.on)
-			end
-		end
-		
 		-- Touch Checkpoint: set new load point
 		
 		local updatedCoinCount = self.wheel:getCoinCountUpdate()
@@ -211,27 +200,22 @@ end
 function WidgetLevel:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.start and (stateTo == self.kStates.playing) then
 		self.periodicBlinker:start()
-	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.stopped) then
-		if self.objectives == nil then
-			-- Player Died
-			self.spriteCycler:unloadAll()
-			
-			if AppConfig.enableBackgroundMusic and self.theme ~= nil then
-				self.filePlayer:stop()
-			end
-			
-			self.levelTimer:remove()
-			self.hud:remove()
-			
-			self.periodicBlinker:stop()
-			
-			self.wheel:remove()
-		else
-			-- Level Complete
-			
-			
+	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.gameOver) then
+		self.spriteCycler:unloadAll()
+		
+		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
+			self.filePlayer:stop()
 		end
-	elseif stateFrom == self.kStates.stopped and (stateTo == self.kStates.start) then
+		
+		self.levelTimer:pause()
+		self.hud:remove()
+		
+		self.periodicBlinker:stop()
+		
+		self.wheel:remove()	
+	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.levelComplete) then
+		
+	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.playing) then
 		self.periodicBlinker:start()
 		
 		-- Initialize sprite cycling using initial wheel position
@@ -240,6 +224,11 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		self.spriteCycler:loadInitialSprites(initialChunk, 1)
+		
+		self.hud:add()
+		self.wheel:startGame()
+		
+		self.levelTimer:start()
 	end
 end
 

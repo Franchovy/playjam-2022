@@ -4,12 +4,12 @@ class("LevelComplete").extends(Widget)
 
 function LevelComplete:init(config)
 	
-	self.levelDarkMode = config.levelDarkMode
-	self.numStars = config.stars
-	self.coins = config.coinCount
-	self.coinsObjective = config.coinCountObjective
-	self.time = config.timeString
-	self.timeObjective = config.timeStringObjective
+	self.levelDarkMode = config.darkMode
+	self.numStars = config.objectives.stars
+	self.coins = config.objectives.coinCount
+	self.coinsObjective = config.objectives.coinCountObjective
+	self.time = config.objectives.timeString
+	self.timeObjective = config.objectives.timeStringObjective
 	
 	self:supply(Widget.kDeps.samples)
 	self:supply(Widget.kDeps.state)
