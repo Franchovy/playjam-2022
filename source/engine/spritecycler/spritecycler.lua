@@ -31,11 +31,11 @@ function SpriteCycler:hasLoadedInitialLevel()
 	return self.data ~= nil
 end
 
-function SpriteCycler:load(levelConfig)
+function SpriteCycler:load(objects)
 	
 	-- Load chunks from level config
 	
-	local chunksData = getChunksDataForLevel(levelConfig.objects, self.chunkLength)
+	local chunksData = getChunksDataForLevel(objects, self.chunkLength)
 	
 	-- Create Empty chunks if needed
 	

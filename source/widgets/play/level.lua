@@ -1,7 +1,7 @@
 class("WidgetLevel").extends(Widget)
 
 function WidgetLevel:init(config)
-	self.levelConfig = config.levelConfig
+	self.config = config
 	
 	self:supply(Widget.kDeps.state)
 	
@@ -96,7 +96,7 @@ function WidgetLevel:_load()
 	
 	-- Load level into spritecycler
 	
-	self.spriteCycler:load(self.levelConfig)
+	self.spriteCycler:load(self.config.objects)
 	
 	--
 	
@@ -236,7 +236,7 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		
 		-- Initialize sprite cycling using initial wheel position
 		
-		self.spriteCycler:load(self.levelConfig)
+		self.spriteCycler:load(self.config.objects)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		self.spriteCycler:loadInitialSprites(initialChunk, 1)

@@ -1,5 +1,4 @@
 import "play/state"
-import "play/loading"
 import "play/level"
 import "play/levelComplete"
 import "play/gameOver"
@@ -9,7 +8,7 @@ import "common/transition"
 class("WidgetPlay").extends(Widget)
 
 function WidgetPlay:init(config)
-	self.filePathLevel = config.filePathLevel
+	self.config = config
 	
 	self:supply(Widget.kDeps.children)
 	self:supply(Widget.kDeps.state)
@@ -20,19 +19,12 @@ function WidgetPlay:init(config)
 end
 
 function WidgetPlay:_load()
-	self.children.loading = Widget.new(WidgetLoading)
-	self.children.loading:load()
-	
-	self.config = json.decodeFile(self.filePathLevel)
-	
 	self.children.transition = Widget.new(WidgetTransition)
 	self.children.transition:load()
 	self.children.transition:setVisible(false)
 	
-	self.children.level = Widget.new(WidgetLevel, { levelConfig = self.config, levelCompleteCallback = levelCompleteCallback })
+	self.children.level = Widget.new(WidgetLevel, { objects = self.config.objects, objectives = self.config.objectives })
 	self.children.level:load()
-	
-	self.children.loading:setVisible(false)
 	
 	self.children.level.signals.startPlaying = function()
 		self:setState(kPlayStates.playing)
@@ -84,8 +76,6 @@ function WidgetPlay:_load()
 end
 
 function WidgetPlay:_draw(rect)
-	self.children.loading:draw(rect)
-	
 	if self.children.level ~= nil then
 		self.children.level:draw(rect)
 	end

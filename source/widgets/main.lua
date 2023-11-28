@@ -1,6 +1,7 @@
 import "engine"
 import "menu"
 import "play"
+import "common/loading"
 
 class("WidgetMain").extends(Widget)
 
@@ -19,15 +20,22 @@ end
 function WidgetMain:_load()
 	self.playCallback = function(levelPath)
 		self.children.menu:setVisible(false)
+		self.children.loading:setVisible(true)
+		
+		local levelConfig = json.decodeFile(levelPath)
 		
 		if self.children.play == nil then
-			self.children.play = Widget.new(WidgetPlay, { filePathLevel = levelPath })
+			self.children.play = Widget.new(WidgetPlay, levelConfig)
 			self.children.play:load()
 		end
 	end
 	
 	self.children.menu = Widget.new(WidgetMenu, { playCallback = self.playCallback })
 	self.children.menu:load()
+	
+	self.children.loading = Widget.new(WidgetLoading)
+	self.children.loading:load()
+	self.children.loading:setVisible(false)
 end
 
 function WidgetMain:_draw(rect)
