@@ -65,8 +65,13 @@ function WidgetPlay:_load()
 		self:setState(self.kStates.playing)
  	end
 	
-	function self.restartLevel() print("Restart Level") end 
-	function self.returnToMenu() print("Selected return to menu") end
+	function self.restartLevel() 
+		self.children.level:setState(self.children.level.kStates.unload)
+ 	end
+	
+	function self.returnToMenu() 
+		self.children.level:setState(self.children.level.kStates.unload)
+	end
 	 
 	self.children.gameOver.signals.restartLevel = self.restartLevel
 	self.children.gameOver.signals.returnToMenu = self.returnToMenu
@@ -124,7 +129,7 @@ end
 
 function WidgetPlay:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.start and (stateTo == self.kStates.playing) then
-		self.children.level:setState(self.kStates.playing)
+		self.children.level:setState(self.children.level.kStates.playing)
 		self.timers.levelTimer:start()
 		self.children.hud:setState(self.children.hud.kStates.onScreen)
 	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.playing) then
@@ -136,7 +141,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		playdate.timer.performAfterDelay(400, function()
 			self.children.gameOver:setVisible(false)
 			self.children.transition:setState(self.children.transition.kStates.outside)
-			self.children.level:setState(self.kStates.playing)
+			self.children.level:setState(self.children.level.kStates.ready)
 			
 			playdate.timer.performAfterDelay(400, function()
 				self.timers.levelTimer:start()
@@ -154,7 +159,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			self.children.transition:setState(self.children.transition.kStates.inside)
 			
 			playdate.timer.performAfterDelay(500, function()
-				self.children.level:setState(self.kStates.gameOver)
+				self.children.level:setState(self.children.level.unloaded)
 				
 				self.children.transition:setState(self.children.transition.kStates.outside)
 				
@@ -166,7 +171,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.levelComplete) then
 		self.timers.levelTimer:pause()
 		
-		self.children.level:setState(self.kStates.levelComplete)
+		--self.children.level:setState(self.children.level.freeze)
 		
 		-- Calculate objectives reached
 		local stars = 1
@@ -209,6 +214,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		
 		self.children.levelComplete.signals.nextLevel = function()
 			print("Start next level")
+			self.children.level:setState(self.children.level.kStates.unloaded)
 		end
 		
 		self.children.levelComplete.signals.restartLevel = self.restartLevel
