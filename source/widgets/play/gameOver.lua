@@ -13,14 +13,7 @@ function WidgetGameOver:init(config)
 	self:createSprite(kZIndex.overlay)
 	
 	self.signals = {}
-	
-	-- 
-	
-	self.options = {
-		"CHECKPOINT",
-		"RESTART LEVEL",
-		"LEVEL SELECT"
-	}
+
 end
 
 function WidgetGameOver:_load()
@@ -48,7 +41,14 @@ function WidgetGameOver:_load()
 		self.images.gameOverReason:draw(gameOverReasonCenterRect.x, rect.y + 47)
 	end)
 	
-	self.children.entriesMenu = Widget.new(WidgetEntriesMenu, self.options)
+	self.children.entriesMenu = Widget.new(WidgetEntriesMenu, {
+		entries = {
+			"CHECKPOINT",
+			"RESTART LEVEL",
+			"LEVEL SELECT"
+		},
+		scaleFactor = 2
+	})
 	self.children.entriesMenu:load()
 	
 	self.children.entriesMenu.signals.entrySelected = function(entry)

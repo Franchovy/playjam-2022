@@ -18,8 +18,8 @@ function WidgetEntriesMenu:init(config)
 end
 
 function WidgetEntriesMenu:_load()
-	for i=1,#self.config do
-		local entry = Widget.new(WidgetEntriesMenuEntry, { text = self.config[i], selected = i == 1 })
+	for i=1,#self.config.entries do
+		local entry = Widget.new(WidgetEntriesMenuEntry, { text = self.config.entries[i], selected = i == 1, scale = self.config.scaleFactor })
 		entry:load()
 		
 		self.children["entry"..i] = entry

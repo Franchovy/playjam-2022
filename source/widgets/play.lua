@@ -119,7 +119,6 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		self.children.level:setState(self.kStates.playing)
 		self.timers.levelTimer:start()
 		self.children.hud:setState(self.children.hud.kStates.onScreen)
-		
 	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.playing) then
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.inside)

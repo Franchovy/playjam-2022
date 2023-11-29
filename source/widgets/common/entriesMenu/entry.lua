@@ -13,8 +13,12 @@ function WidgetEntriesMenuEntry:init(config)
 end
 
 function WidgetEntriesMenuEntry:_load()
-	self.images.title = playdate.graphics.imageWithText(self.config.text, 200, 70):scaledImage(2)
+	self.images.title = playdate.graphics.imageWithText(self.config.text, 200, 70):scaledImage(self.config.scale)
 	self.painters.circle = Painter(function(rect)
+		playdate.graphics.setColor(playdate.graphics.kColorWhite)
+		playdate.graphics.fillCircleInRect(rect.x, rect.y, rect.w, rect.h)
+		
+		playdate.graphics.setColor(playdate.graphics.kColorBlack)
 		playdate.graphics.drawCircleInRect(rect.x, rect.y, rect.w, rect.h)
 		
 		playdate.graphics.setDitherPattern(0.5, playdate.graphics.image.kDitherTypeDiagonalLine)
@@ -28,7 +32,8 @@ function WidgetEntriesMenuEntry:_draw(rect)
 	self.images.title:draw(insetRect.x, insetRect.y)
 	
 	if self.state == self.kStates.selected then
-		self.painters.circle:draw(Rect.with(Rect.inset(rect, 5, 5), { w = 15 }))
+		local insetRect = Rect.inset(rect, 5, 5)
+		self.painters.circle:draw(Rect.with(insetRect, { w = 15 }))
 	end
 end
 

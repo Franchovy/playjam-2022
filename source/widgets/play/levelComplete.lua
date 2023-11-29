@@ -13,16 +13,17 @@ function LevelComplete:init(config)
 	
 	self:supply(Widget.kDeps.samples)
 	self:supply(Widget.kDeps.state)
+	self:supply(Widget.kDeps.children)
 	
 	self:setStateInitial({
 		text = 1,
-		overlay = 2
+		overlay = 2,
+		menu = 3
 	}, 1)
 	
 	self.painters = {}
 	self.images = {}
 	self.blinkers = {}
-	self.children = {}
 	
 	self.previousBlink = false
 	
@@ -39,10 +40,10 @@ function LevelComplete:_load()
 
 	self.images.title = playdate.graphics.imageWithText("LEVEL COMPLETE!", 200, 70):scaledImage(2)
 	
-	self.images.coin = playdate.graphics.image.new(kAssetsImages.coin):scaledImage(0.45)
+	self.images.coin = playdate.graphics.image.new(kAssetsImages.coin)
 	
-	self.images.textLabelCoins = playdate.graphics.imageWithText("COINS", 60, 100)
-	self.images.textLabelTime = playdate.graphics.imageWithText("TIME", 60, 100)
+	self.images.textLabelCoins = playdate.graphics.imageWithText("COINS", 60, 100):scaledImage(1.5)
+	self.images.textLabelTime = playdate.graphics.imageWithText("TIME", 60, 100):scaledImage(1.5)
 	
 	local coinsText = self.coins .. "/".. self.coinsObjective
 	local timeText = self.time .. "/".. self.timeObjective
@@ -106,6 +107,22 @@ function LevelComplete:_load()
 	end
 	
 	self.animators.card = playdate.graphics.animator.new(0, 0, 0)	
+	
+	self.children.menu = Widget.new(WidgetEntriesMenu, {
+		entries = {
+			"NEXT LEVEL",
+			"RESTART",
+			"MAIN MENU"
+		},
+		scaleFactor = 1.5
+	})
+	
+	self.children.menu:load()
+	self.children.menu:setVisible(false)
+	
+	self.children.menu.signals.entrySelected = function(entry)
+		print("Pressed menu button")
+	end
 end
 
 function LevelComplete:_draw(rect)
@@ -122,7 +139,7 @@ function LevelComplete:_draw(rect)
 		end
 	end
 	
-	if self.state == self.kStates.overlay then
+	if self.state == self.kStates.overlay or (self.state == self.kStates.menu) then
 		local offsetRect = Rect.offset(rect, 0, self.animators.card:currentValue())
 		
 		self.painters.background:draw(offsetRect)
@@ -155,36 +172,41 @@ function LevelComplete:_draw(rect)
 			self.stars[i]:draw(Rect.make(centeredRect.x + (starImageWidth + starMargin) * (i - 1), starImageY, starImageWidth, starImageHeight))
 		end
 		
-		local textCoinsWidth, textHeight = self.images.textCoins:getSize()
-		local textTimeWidth, _ = self.images.textTime:getSize()
-		local textImagesY = starImageY + starImageHeight + 26
-		local sideMarginText = 8
+		local contentRect = Rect.inset(offsetRect, 8, starImageY + starImageHeight - 16, 8, 8)
 		
-		self.images.textCoins:draw(offsetRect.x + sideMarginText, textImagesY)
-		self.images.textTime:draw(offsetRect.x + offsetRect.w - sideMarginText - textTimeWidth, textImagesY)
-		
-		local coinImageWidth, coinImageHeight = self.images.coin:getSize()
-		local labelWidth, labelHeight = self.images.textLabelCoins:getSize()
-		
-		self.images.coin:draw(offsetRect.x + sideMarginText + (textCoinsWidth - labelWidth) / 2, textImagesY - 8 - (labelHeight + coinImageHeight) / 2)
-		
-		self.images.textLabelCoins:draw(offsetRect.x + sideMarginText + coinImageWidth + 5 + (textCoinsWidth - labelWidth) / 2, textImagesY - 8 - labelHeight)
-		self.images.textLabelTime:draw(offsetRect.x + offsetRect.w - sideMarginText - (textTimeWidth + labelWidth) / 2, textImagesY - 8 - labelHeight)
-		
-		local buttonTextWidth, buttonTextHeight = self.images.textPressAButton:getSize()
-		local buttonRect = Rect.with(Rect.center(Rect.inset(Rect.size(buttonTextWidth, buttonTextHeight), -12, -4), offsetRect), { y = offsetRect.y + offsetRect.h - buttonTextHeight - 19 })
-		
-		local blinker1 = self.blinkers.blinkerPressAButton1.on
-		local blinker2 = self.blinkers.blinkerPressAButton2.on
-		self.painters.pressAButton:draw(buttonRect, { 
-			inverted = (not blinker1 and blinker2) or (not blinker2 and blinker1) 
-		})
+		if self.state == self.kStates.overlay then
+			local labelCoinsWidth, labelCoinsHeight = self.images.textLabelCoins:getSize()
+			local labelTimeWidth, labelTimeHeight = self.images.textLabelTime:getSize()
+			local textCoinsWidth, textHeight = self.images.textCoins:getSize()
+			local textTimeWidth, _ = self.images.textTime:getSize()
+			local coinImageWidth, coinImageHeight = self.images.coin:getSize()
+			
+			self.images.textLabelCoins:draw(contentRect.x + coinImageWidth + 5 + (textCoinsWidth - labelCoinsWidth - coinImageHeight) / 2, contentRect.y)
+			self.images.coin:draw(contentRect.x + (textCoinsWidth - labelCoinsWidth - coinImageHeight) / 2, contentRect.y + (labelCoinsHeight - coinImageHeight) / 2)
+			self.images.textLabelTime:draw(contentRect.x + contentRect.w - (textTimeWidth + labelTimeWidth) / 2, contentRect.y)
+			
+			self.images.textCoins:draw(contentRect.x, contentRect.y + labelCoinsHeight + 12)
+			self.images.textTime:draw(contentRect.x + contentRect.w - textTimeWidth, contentRect.y + labelTimeHeight + 12)
+			
+			local buttonTextWidth, buttonTextHeight = self.images.textPressAButton:getSize()
+			local buttonRect = Rect.inset(Rect.size(buttonTextWidth, buttonTextHeight), -12, -4)
+			local buttonRectPositioned = Rect.with(buttonRect, { x = contentRect.x + (contentRect.w - buttonRect.w) / 2, y = contentRect.y + contentRect.h - buttonRect.h })
+			
+			local blinker1 = self.blinkers.blinkerPressAButton1.on
+			local blinker2 = self.blinkers.blinkerPressAButton2.on
+			self.painters.pressAButton:draw(buttonRectPositioned, { 
+				inverted = (not blinker1 and blinker2) or (not blinker2 and blinker1) 
+			})
+		elseif self.state == self.kStates.menu then
+			local offsetContentRect = Rect.offset(contentRect, 75, -8)
+			self.children.menu:draw(offsetContentRect)
+		end
 	end
 end
 
 function LevelComplete:_update()
 	if playdate.buttonJustPressed(playdate.kButtonA) then
-		
+		self:setState(self.kStates.menu)
 	end
 end
 
@@ -204,5 +226,7 @@ function LevelComplete:changeState(stateFrom, stateTo)
 			self.blinkers.blinkerPressAButton1:startLoop()
 			self.blinkers.blinkerPressAButton2:startLoop()
 		end)
+	elseif stateFrom == self.kStates.overlay and (stateTo == self.kStates.menu) then
+		self.children.menu:setVisible(true)
 	end
 end
