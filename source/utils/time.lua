@@ -14,7 +14,7 @@ function convertToTimeString(timeValueMs, decimalsCount)
 		end
 	else
 		local seconds = math.floor(timeInSeconds) % 60
-		local minutes = math.floor(seconds / 60)
+		local minutes = math.floor(timeInSeconds / 60)
 		
 		return string.format("%02d:%02d", minutes, seconds)
 	end
