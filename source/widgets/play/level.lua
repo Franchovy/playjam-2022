@@ -62,7 +62,12 @@ function WidgetLevel:_load()
 			elseif id == "checkpoint" then
 				sprite = Checkpoint.new()
 			elseif id == "player" then
-				sprite = Wheel.new()
+				if self.wheel == nil then
+					sprite = Wheel.new()
+				else
+					sprite = self.wheel
+				end
+				
 				sprite:resetValues()
 				sprite:setAwaitingInput()
 				setupSpriteWheel(sprite)
@@ -153,12 +158,12 @@ end
 function WidgetLevel:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.ready and (stateTo == self.kStates.playing) then
 		self.wheel.ignoresPlayerInput = false
-	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.unload) then
+	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.unloaded) then
 		self.spriteCycler:unloadAll()
 
 		self.periodicBlinker:stop()
 		
-		self.wheel:remove()	
+		self.wheel:remove()
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.ready) then
 		self.periodicBlinker:start()
 		
@@ -168,6 +173,8 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		self.spriteCycler:loadInitialSprites(initialChunk, 1)
+		
+		self:updateDrawOffset()
 	end
 end
 

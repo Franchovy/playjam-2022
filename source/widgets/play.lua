@@ -62,15 +62,15 @@ function WidgetPlay:_load()
 	self.children.gameOver:setVisible(false)
 	
 	self.children.gameOver.signals.restartCheckpoint = function() 
-		self:setState(self.kStates.playing)
+		self:setState(self.kStates.start)
  	end
 	
 	function self.restartLevel() 
-		self.children.level:setState(self.children.level.kStates.unload)
+		self.children.level:setState(self.children.level.kStates.unloaded)
  	end
 	
 	function self.returnToMenu() 
-		self.children.level:setState(self.children.level.kStates.unload)
+		self.children.level:setState(self.children.level.kStates.unloaded)
 	end
 	 
 	self.children.gameOver.signals.restartLevel = self.restartLevel
@@ -132,7 +132,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		self.children.level:setState(self.children.level.kStates.playing)
 		self.timers.levelTimer:start()
 		self.children.hud:setState(self.children.hud.kStates.onScreen)
-	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.playing) then
+	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.start) then
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.inside)
 		
@@ -144,10 +144,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			self.children.level:setState(self.children.level.kStates.ready)
 			
 			playdate.timer.performAfterDelay(400, function()
-				self.timers.levelTimer:start()
-				self.children.transition:setVisible(false)
-				
-				self.children.hud:setState(self.children.hud.kStates.onScreen)
+				self:setState(self.kStates.playing)
 			end)
 		end)
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.gameOver) then
@@ -159,7 +156,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			self.children.transition:setState(self.children.transition.kStates.inside)
 			
 			playdate.timer.performAfterDelay(500, function()
-				self.children.level:setState(self.children.level.unloaded)
+				self.children.level:setState(self.children.level.kStates.unloaded)
 				
 				self.children.transition:setState(self.children.transition.kStates.outside)
 				
