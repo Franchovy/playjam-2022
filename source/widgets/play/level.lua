@@ -33,15 +33,6 @@ function WidgetLevel:_load()
 		end
 		
 		wheel.signals.onLevelComplete = function()
-			if self.levelCompleteSprite ~= nil then
-				return
-			end
-			
-			self.levelTimer:pause()
-			self.wheel.ignoresPlayerInput = true
-			
-			self.objectives = self:getLevelObjectives()
-			
 			self.signals.levelComplete()
 		end
 	end
@@ -112,38 +103,11 @@ function WidgetLevel:_load()
 		count = 1
 	})
 	
-	-- Add HUD
-	
-	if not self.spritesLoaded then
-		self.spritesLoaded = true
-		
-		-- TODO: Move HUD out of widget level into widget play
-		self.hud = Hud()
-		self.hud:moveTo(3, 2)
-	end
-	
 	-- Initialize sprite cycling using initial wheel position
 	
 	local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 	self.spriteCycler:loadInitialSprites(initialChunk, 1)
 	
-	-- Set up level timer 
-	
-	self.hud:add()
-	
-	self.levelTimerCounter = 0
-	self.coinCount = 0
-	
-	local levelTimer = playdate.timer.new(999000)
-	levelTimer.updateCallback = function(timer)
-		self.levelTimerCounter = timer.currentTime
-		
-		self.hud:updateTimer(self.levelTimerCounter)
-	end
-	
-	levelTimer:pause()
-	
-	self.levelTimer = levelTimer
 end
 
 function WidgetLevel:_draw(rect)
@@ -151,7 +115,6 @@ function WidgetLevel:_draw(rect)
 end
 
 function WidgetLevel:_update()
-	
 	-- Update periodicBlinker
 	
 	self.periodicBlinker:update()
@@ -169,20 +132,14 @@ function WidgetLevel:_update()
 			
 			self.wheel:startGame()
 			
-			self.levelTimer:start()
-			
 			self.signals.startPlaying()
 		end
 	end
 	
 	if self.state == self.kStates.playing then
-		
-		-- Touch Checkpoint: set new load point
-		
 		local updatedCoinCount = self.wheel:getCoinCountUpdate()
 		if updatedCoinCount > 0 then
-			self.coinCount += updatedCoinCount
-			self.hud:updateCoinCount(self.coinCount)
+			self.signals.collectCoin(updatedCoinCount)
 		end
 	end
 	
@@ -200,16 +157,10 @@ end
 function WidgetLevel:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.start and (stateTo == self.kStates.playing) then
 		self.periodicBlinker:start()
+
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.gameOver) then
 		self.spriteCycler:unloadAll()
-		
-		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
-			self.filePlayer:stop()
-		end
-		
-		self.levelTimer:pause()
-		self.hud:remove()
-		
+
 		self.periodicBlinker:stop()
 		
 		self.wheel:remove()	
@@ -225,43 +176,6 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		self.spriteCycler:loadInitialSprites(initialChunk, 1)
 		
-		self.hud:add()
 		self.wheel:startGame()
-		
-		self.levelTimer:start()
 	end
-end
-
-function WidgetLevel:getLevelObjectives()
-	local stars = 1
-	
-	local coinCountObjective = self.config.objectives[1].coins
-	local timeObjective = self.config.objectives[2].time
-	
-	for _, objective in pairs(self.config.objectives) do
-		local objectiveReached = true
-		
-		if objective.coins ~= nil then
-			objectiveReached = objectiveReached and self.coinCount >= objective.coins
-		end
-		
-		if objective.time ~= nil then
-			objectiveReached = objectiveReached and self.levelTimerCounter <= (objective.time * 1000)
-		end
-		
-		if objectiveReached == true then
-			stars += 1
-		end
-	end
-	
-	local timeString = convertToTimeString(self.levelTimerCounter, 1)
-	local timeStringObjective = convertToTimeString(timeObjective * 1000, 1)
-
-	return {
-		stars = stars,
-		timeString = timeString,
-		coinCount = self.coinCount,
-		timeStringObjective = timeStringObjective,
-		coinCountObjective = coinCountObjective
-	}
 end

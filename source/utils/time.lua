@@ -21,6 +21,6 @@ function convertToTimeString(timeValueMs, decimalsCount)
 			secondsOnly = "0"..secondsOnly
 		end
 		
-		return minutes..":"..string.sub(secondsOnly, -2, -1).."."..string.sub(decimal, -decimalsCount, -1)
+		return minutes..":"..string.sub(secondsOnly, -2, -1)
 	end
 end
