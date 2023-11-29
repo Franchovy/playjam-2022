@@ -123,7 +123,6 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		
 		self.filePlayer:play()
 		
-		
 		playdate.timer.performAfterDelay(400, function()
 			self.children.gameOver:setVisible(false)
 			self.children.transition:setState(self.children.transition.kStates.outside)

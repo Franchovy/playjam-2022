@@ -47,7 +47,7 @@ function WidgetHUD:changeState(_, stateTo)
 end
 
 function WidgetHUD:refreshImages()
-	local timeLabelText = convertToTimeString(self.state.time, 1)
+	local timeLabelText = convertToTimeString(self.state.time, 2)
 	self.images.timeLabel = playdate.graphics.imageWithText(timeLabelText, 100, 15):scaledImage(2)
 	
 	self.images.coinsLabel = playdate.graphics.imageWithText(""..self.state.coins, 100, 15):scaledImage(2)
