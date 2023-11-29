@@ -87,6 +87,9 @@ function Widget._supplyDepSamples(self)
 	function self:playSample(key, ...)
 		self.samples[key]:play(...)
 	end
+	function self:unloadSample(key)
+		self.samples[key] = nil
+	end
 end
 
 function Widget.load(self)
@@ -105,6 +108,14 @@ end
 
 function Widget.unload(self)
 	self._state.isLoaded = false
+	
+	if self._state.isLoaded == false or (self._state.isVisible == false) then
+		return
+	end
+	
+	if self._unload ~= nil then
+		self:_unload()
+	end
 end
 
 function Widget:isLoaded()

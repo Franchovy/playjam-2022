@@ -50,7 +50,7 @@ function WidgetLevel:_load()
 	
 	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, config, spriteToRecycle)
 		local sprite = spriteToRecycle;
-			
+		
 		if sprite == nil then
 			-- Create sprites
 			if id == "platform" then

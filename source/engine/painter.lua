@@ -63,3 +63,9 @@ function Painter:_shallowEqual(table1, table2)
 	
 	return true
 end
+
+function Painter:unload()
+	self.stateImages = nil
+	self.image = nil
+	self.drawFunction = nil
+end

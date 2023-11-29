@@ -66,7 +66,9 @@ function WidgetPlay:_load()
  	end
 	
 	function self.restartLevel() 
-		self.children.level:setState(self.children.level.kStates.unloaded)
+		self.children.level.previousLoadPoint = nil
+		
+		self:setState(self.kStates.start)
  	end
 	
 	function self.returnToMenu() 
@@ -223,6 +225,25 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		
 		playdate.timer.performAfterDelay(5000, function()
 			self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
+		end)
+	elseif stateFrom == self.kStates.levelComplete and (stateTo == self.kStates.start) then
+		self.children.transition:setVisible(true)
+		self.children.transition:setState(self.children.transition.kStates.inside)
+		
+		playdate.timer.performAfterDelay(500, function()
+			--self.children.levelComplete:unload()
+			self.children.levelComplete = nil
+			
+			self.children.level:setState(self.children.level.kStates.unloaded)
+			self.children.level.previousLoadPoint = nil
+			
+			self.children.level:setState(self.children.level.kStates.ready)
+			
+			self.children.transition:setState(self.children.transition.kStates.outside)
+			
+			playdate.timer.performAfterDelay(500, function()
+				self.children.transition:setVisible(false)
+			end)
 		end)
 	end
 end

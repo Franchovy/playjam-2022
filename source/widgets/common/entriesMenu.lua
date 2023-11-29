@@ -59,3 +59,12 @@ function WidgetEntriesMenu:changeState(_, stateTo)
 		entry:setState(stateTo == i and entry.kStates.selected or entry.kStates.unselected)
 	end
 end
+
+function WidgetEntriesMenu:unload()
+	for i=1, #self.entries do
+		self.children["entry"..i] = nil
+		self.entries[i] = nil
+	end
+	
+	self.entries = nil
+end
