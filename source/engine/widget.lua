@@ -38,7 +38,6 @@ function Widget.new(class, ...)
 	
 	widget._state = {
 		isLoaded = false,
-		isDrawable = false,
 		isVisible = true
 	}
 	

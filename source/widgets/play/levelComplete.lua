@@ -206,7 +206,9 @@ end
 
 function LevelComplete:_update()
 	if playdate.buttonJustPressed(playdate.kButtonA) then
-		self:setState(self.kStates.menu)
+		if self.state == self.kStates.overlay then
+			self:setState(self.kStates.menu)
+		end
 	end
 end
 
@@ -227,6 +229,8 @@ function LevelComplete:changeState(stateFrom, stateTo)
 			self.blinkers.blinkerPressAButton2:startLoop()
 		end)
 	elseif stateFrom == self.kStates.overlay and (stateTo == self.kStates.menu) then
-		self.children.menu:setVisible(true)
+		playdate.timer.performAfterDelay(100, function()
+			self.children.menu:setVisible(true)
+		end)
 	end
 end
