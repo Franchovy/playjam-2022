@@ -109,7 +109,8 @@ end
 
 function WidgetPlay:_update()
 	if self.children.hud:isVisible() and (self.data.time ~= nil) and (self.data.coins ~= nil) then
-		self.children.hud:setState({ time = self.data.time, coins = self.data.coins })
+		self.children.hud.data.time = self.data.time
+		self.children.hud.data.coins = self.data.coins
 	end
 end
 
@@ -117,6 +118,8 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.start and (stateTo == self.kStates.playing) then
 		self.children.level:setState(self.kStates.playing)
 		self.timers.levelTimer:start()
+		self.children.hud:setState(self.children.hud.kStates.onScreen)
+		
 	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.playing) then
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.inside)
@@ -131,6 +134,8 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			playdate.timer.performAfterDelay(400, function()
 				self.timers.levelTimer:start()
 				self.children.transition:setVisible(false)
+				
+				self.children.hud:setState(self.children.hud.kStates.onScreen)
 			end)
 		end)
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.gameOver) then
@@ -147,6 +152,8 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 				self.children.transition:setState(self.children.transition.kStates.outside)
 				
 				self.children.gameOver:setVisible(true)
+				
+				self.children.hud:setState(self.children.hud.kStates.offScreen)
 			end)
 		end)
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.levelComplete) then
@@ -192,6 +199,10 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			darkMode = self.config.theme ~= 1
 		})
 		self.children.levelComplete:load()
+		
+		playdate.timer.performAfterDelay(4500, function()
+			self.children.hud:setState(self.children.hud.kStates.offScreen)
+		end)
 		
 		playdate.timer.performAfterDelay(5000, function()
 			self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
