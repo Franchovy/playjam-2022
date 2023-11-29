@@ -25,6 +25,8 @@ function LevelComplete:init(config)
 	self.children = {}
 	
 	self.previousBlink = false
+	
+	self.animators = {}
 end
 
 function LevelComplete:_load()
@@ -102,6 +104,8 @@ function LevelComplete:_load()
 		table.insert(self.stars, star)
 		self.children["star"..i] = star
 	end
+	
+	self.animators.card = playdate.graphics.animator.new(0, 0, 0)	
 end
 
 function LevelComplete:_draw(rect)
@@ -119,10 +123,12 @@ function LevelComplete:_draw(rect)
 	end
 	
 	if self.state == self.kStates.overlay then
-		self.painters.background:draw(rect)
+		local offsetRect = Rect.offset(rect, 0, self.animators.card:currentValue())
 		
-		local titleImageY = rect.y + 8
-		self.images.title:drawCentered(rect.x + rect.w / 2, rect.y + titleImageY)
+		self.painters.background:draw(offsetRect)
+		
+		local titleImageY = offsetRect.y + 8
+		self.images.title:drawCentered(offsetRect.x + offsetRect.w / 2, offsetRect.y + titleImageY)
 		
 		local starImageWidth, starImageHeight = self.stars[1].imagetables.star:getImage(1):getSize()
 		local starMargin
@@ -140,11 +146,11 @@ function LevelComplete:_draw(rect)
 			starContainerWidth = starsContentWidth(4)
 		end
 		
-		local starImageY = rect.y + titleImageY + 12
+		local starImageY = offsetRect.y + titleImageY + 12
 		
 		for i, star in ipairs(self.stars) do
 			local contentRect = Rect.size(starContainerWidth, starImageHeight)
-			local centeredRect = Rect.center(contentRect, rect)
+			local centeredRect = Rect.center(contentRect, offsetRect)
 			
 			self.stars[i]:draw(Rect.make(centeredRect.x + (starImageWidth + starMargin) * (i - 1), starImageY, starImageWidth, starImageHeight))
 		end
@@ -154,19 +160,19 @@ function LevelComplete:_draw(rect)
 		local textImagesY = starImageY + starImageHeight + 26
 		local sideMarginText = 8
 		
-		self.images.textCoins:draw(rect.x + sideMarginText, textImagesY)
-		self.images.textTime:draw(rect.x + rect.w - sideMarginText - textTimeWidth, textImagesY)
+		self.images.textCoins:draw(offsetRect.x + sideMarginText, textImagesY)
+		self.images.textTime:draw(offsetRect.x + offsetRect.w - sideMarginText - textTimeWidth, textImagesY)
 		
 		local coinImageWidth, coinImageHeight = self.images.coin:getSize()
 		local labelWidth, labelHeight = self.images.textLabelCoins:getSize()
 		
-		self.images.coin:draw(rect.x + sideMarginText + (textCoinsWidth - labelWidth) / 2, textImagesY - 8 - (labelHeight + coinImageHeight) / 2)
+		self.images.coin:draw(offsetRect.x + sideMarginText + (textCoinsWidth - labelWidth) / 2, textImagesY - 8 - (labelHeight + coinImageHeight) / 2)
 		
-		self.images.textLabelCoins:draw(rect.x + sideMarginText + coinImageWidth + 5 + (textCoinsWidth - labelWidth) / 2, textImagesY - 8 - labelHeight)
-		self.images.textLabelTime:draw(rect.x + rect.w - sideMarginText - (textTimeWidth + labelWidth) / 2, textImagesY - 8 - labelHeight)
+		self.images.textLabelCoins:draw(offsetRect.x + sideMarginText + coinImageWidth + 5 + (textCoinsWidth - labelWidth) / 2, textImagesY - 8 - labelHeight)
+		self.images.textLabelTime:draw(offsetRect.x + offsetRect.w - sideMarginText - (textTimeWidth + labelWidth) / 2, textImagesY - 8 - labelHeight)
 		
 		local buttonTextWidth, buttonTextHeight = self.images.textPressAButton:getSize()
-		local buttonRect = Rect.with(Rect.center(Rect.inset(Rect.size(buttonTextWidth, buttonTextHeight), -12, -4), rect), { y = rect.y + rect.h - buttonTextHeight - 19 })
+		local buttonRect = Rect.with(Rect.center(Rect.inset(Rect.size(buttonTextWidth, buttonTextHeight), -12, -4), offsetRect), { y = offsetRect.y + offsetRect.h - buttonTextHeight - 19 })
 		
 		local blinker1 = self.blinkers.blinkerPressAButton1.on
 		local blinker2 = self.blinkers.blinkerPressAButton2.on
@@ -185,6 +191,8 @@ end
 function LevelComplete:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.text and (stateTo == self.kStates.overlay) then
 		self:playSample(kAssetsSounds.levelCompleteCard)
+		
+		self.animators.card = playdate.graphics.animator.new(300, -240, 0, playdate.easingFunctions.outQuint)
 		
 		self.blinkers.blinkerTitle:remove()
 		
