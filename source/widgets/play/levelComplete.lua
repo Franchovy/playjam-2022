@@ -28,6 +28,7 @@ function LevelComplete:init(config)
 	self.previousBlink = false
 	
 	self.animators = {}
+	self.signals = {}
 end
 
 function LevelComplete:_load()
@@ -121,7 +122,13 @@ function LevelComplete:_load()
 	self.children.menu:setVisible(false)
 	
 	self.children.menu.signals.entrySelected = function(entry)
-		print("Pressed menu button")
+		if entry == 1 then
+			self.signals.nextLevel()
+		elseif entry == 2 then
+			self.signals.restartLevel()
+		elseif entry == 3 then
+			self.signals.returnToMenu()
+		end
 	end
 end
 

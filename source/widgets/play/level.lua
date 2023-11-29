@@ -5,7 +5,12 @@ function WidgetLevel:init(config)
 	
 	self:supply(Widget.kDeps.state)
 	
-	self:setStateInitial(kPlayStates, 1)
+	self:setStateInitial({
+		ready = 1,
+		playing = 2,
+		--frozen = 3,
+		unloaded = 4
+	}, 1)
 	
 	self.sprites = {}
 	self.children = {}
@@ -17,6 +22,7 @@ function WidgetLevel:_load()
 	-- Periodic Blinker
 	
 	self.periodicBlinker = periodicBlinker({onDuration = 50, offDuration = 50, cycles = 8}, 300)
+	self.periodicBlinker:start()
 	
 	-- Wheel setup
 	
@@ -108,6 +114,9 @@ function WidgetLevel:_load()
 	local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 	self.spriteCycler:loadInitialSprites(initialChunk, 1)
 	
+	--
+	
+	self:updateDrawOffset()
 end
 
 function WidgetLevel:_draw(rect)
@@ -115,36 +124,54 @@ function WidgetLevel:_draw(rect)
 end
 
 function WidgetLevel:_update()
-	-- Update periodicBlinker
 	
-	self.periodicBlinker:update()
-	
-	-- Updates sprites cycling
-	
-	self.spriteCycler:update(gfx.getDrawOffset())
-	
-	-- On game start
-	
-	if self.state == self.kStates.start then
-		-- Awaiting player input (jump / crank)
+	if self.state == self.kStates.ready then
+		self.spriteCycler:update(gfx.getDrawOffset())
+		self:updateDrawOffset()
+		
 		if playdate.buttonIsPressed(playdate.kButtonA) or (math.abs(playdate.getCrankChange()) > 5) then
-			-- Start game
-			
-			self.wheel:startGame()
-			
 			self.signals.startPlaying()
 		end
+		
+		return
 	end
+	
+	self.periodicBlinker:update()
+	self.spriteCycler:update(gfx.getDrawOffset())
 	
 	if self.state == self.kStates.playing then
 		local updatedCoinCount = self.wheel:getCoinCountUpdate()
+		
 		if updatedCoinCount > 0 then
 			self.signals.collectCoin(updatedCoinCount)
 		end
+		
+		self:updateDrawOffset()
 	end
-	
-	-- Update draw offset
-	
+end
+
+function WidgetLevel:changeState(stateFrom, stateTo)
+	if stateFrom == self.kStates.ready and (stateTo == self.kStates.playing) then
+		self.wheel.ignoresPlayerInput = false
+	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.unload) then
+		self.spriteCycler:unloadAll()
+
+		self.periodicBlinker:stop()
+		
+		self.wheel:remove()	
+	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.ready) then
+		self.periodicBlinker:start()
+		
+		-- Initialize sprite cycling using initial wheel position
+		
+		self.spriteCycler:load(self.config.objects)
+		
+		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
+		self.spriteCycler:loadInitialSprites(initialChunk, 1)
+	end
+end
+
+function WidgetLevel:updateDrawOffset()
 	local drawOffset = gfx.getDrawOffset()
 	local relativeX = self.wheel.x + drawOffset
 	if relativeX > 150 then
@@ -154,28 +181,3 @@ function WidgetLevel:_update()
 	end
 end
 
-function WidgetLevel:changeState(stateFrom, stateTo)
-	if stateFrom == self.kStates.start and (stateTo == self.kStates.playing) then
-		self.periodicBlinker:start()
-
-	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.gameOver) then
-		self.spriteCycler:unloadAll()
-
-		self.periodicBlinker:stop()
-		
-		self.wheel:remove()	
-	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.levelComplete) then
-		
-	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.playing) then
-		self.periodicBlinker:start()
-		
-		-- Initialize sprite cycling using initial wheel position
-		
-		self.spriteCycler:load(self.config.objects)
-		
-		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
-		self.spriteCycler:loadInitialSprites(initialChunk, 1)
-		
-		self.wheel:startGame()
-	end
-end

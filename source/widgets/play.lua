@@ -1,4 +1,3 @@
-import "play/state"
 import "play/level"
 import "play/levelComplete"
 import "play/gameOver"
@@ -14,7 +13,12 @@ function WidgetPlay:init(config)
 	self:supply(Widget.kDeps.children)
 	self:supply(Widget.kDeps.state)
 	
-	self:setStateInitial(kPlayStates, 1)
+	self:setStateInitial({
+		start = 1,
+		playing = 2,
+		gameOver = 3,
+		levelComplete = 4
+	}, 1)
 	
 	self.timers = {}
 	self.data = {}
@@ -30,8 +34,6 @@ function WidgetPlay:_load()
 	self.children.transition:setVisible(false)
 	self.children.level = Widget.new(WidgetLevel, { objects = self.config.objects, objectives = self.config.objectives })
 
-	self.children.level:load()
-	
 	self.children.level.signals.startPlaying = function()
 		self:setState(self.kStates.playing)
 	end
@@ -43,6 +45,8 @@ function WidgetPlay:_load()
 	self.children.level.signals.levelComplete = function()
 		self:setState(self.kStates.levelComplete)
 	end
+	
+	self.children.level:load()
 	
 	self.children.hud = Widget.new(WidgetHUD)
 	self.children.hud:load()
@@ -57,11 +61,15 @@ function WidgetPlay:_load()
 	self.children.gameOver:load()
 	self.children.gameOver:setVisible(false)
 	
-	self.children.gameOver.signals.restartCheckpoint = function(entry) 
+	self.children.gameOver.signals.restartCheckpoint = function() 
 		self:setState(self.kStates.playing)
  	end
-	self.children.gameOver.signals.restartLevel = function(entry) print("Selected restart level") end
-	self.children.gameOver.signals.returnToMenu = function(entry) print("Selected return to menu") end
+	
+	function self.restartLevel() print("Restart Level") end 
+	function self.returnToMenu() print("Selected return to menu") end
+	 
+	self.children.gameOver.signals.restartLevel = self.restartLevel
+	self.children.gameOver.signals.returnToMenu = self.returnToMenu
 	
 	-- Level Theme
 	
@@ -192,12 +200,19 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			timeStringObjective = timeStringObjective,
 			coinCountObjective = coinCountObjective
 		}
-
+		
 		self.children.levelComplete = Widget.new(LevelComplete, {
 			objectives = objectives,
 			darkMode = self.config.theme ~= 1
 		})
 		self.children.levelComplete:load()
+		
+		self.children.levelComplete.signals.nextLevel = function()
+			print("Start next level")
+		end
+		
+		self.children.levelComplete.signals.restartLevel = self.restartLevel
+		self.children.levelComplete.signals.returnToMenu = self.returnToMenu
 		
 		playdate.timer.performAfterDelay(4500, function()
 			self.children.hud:setState(self.children.hud.kStates.offScreen)
