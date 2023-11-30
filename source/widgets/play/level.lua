@@ -131,7 +131,7 @@ end
 function WidgetLevel:_update()
 	
 	if self.state == self.kStates.ready then
-		self.spriteCycler:update(gfx.getDrawOffset())
+		self.spriteCycler:update(playdate.graphics.getDrawOffset())
 		self:updateDrawOffset()
 		
 		if playdate.buttonIsPressed(playdate.kButtonA) or (math.abs(playdate.getCrankChange()) > 5) then
@@ -142,7 +142,7 @@ function WidgetLevel:_update()
 	end
 	
 	self.periodicBlinker:update()
-	self.spriteCycler:update(gfx.getDrawOffset())
+	self.spriteCycler:update(playdate.graphics.getDrawOffset())
 	
 	if self.state == self.kStates.playing then
 		local updatedCoinCount = self.wheel:getCoinCountUpdate()
@@ -179,12 +179,12 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 end
 
 function WidgetLevel:updateDrawOffset()
-	local drawOffset = gfx.getDrawOffset()
+	local drawOffset = playdate.graphics.getDrawOffset()
 	local relativeX = self.wheel.x + drawOffset
 	if relativeX > 150 then
-		gfx.setDrawOffset(-self.wheel.x + 150, 0)
+		playdate.graphics.setDrawOffset(-self.wheel.x + 150, 0)
 	elseif relativeX < 80 then
-		gfx.setDrawOffset(-self.wheel.x + 80, 0)
+		playdate.graphics.setDrawOffset(-self.wheel.x + 80, 0)
 	end
 end
 

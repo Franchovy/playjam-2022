@@ -1,9 +1,10 @@
+import "common/transition"
 import "play/level"
 import "play/levelComplete"
 import "play/gameOver"
 import "play/background"
 import "play/hud"
-import "common/transition"
+import "utils/themes"
 
 class("WidgetPlay").extends(Widget)
 
@@ -32,6 +33,7 @@ function WidgetPlay:_load()
 	self.children.transition = Widget.new(WidgetTransition)
 	self.children.transition:load()
 	self.children.transition:setVisible(false)
+	
 	self.children.level = Widget.new(WidgetLevel, { objects = self.config.objects, objectives = self.config.objectives })
 
 	self.children.level.signals.startPlaying = function()

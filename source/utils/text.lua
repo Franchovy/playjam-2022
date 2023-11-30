@@ -30,22 +30,22 @@ function createTextImage(text, marginHorizontal, marginVertical, marginRight, ma
 	local marginLeft = marginHorizontal or 0
 	local marginRight = marginRight or marginLeft
 
-	local textWidth, textHeight = gfx.getTextSize(text)
-	local image = gfx.image.new(textWidth + marginLeft + marginRight, textHeight + marginTop + marginBottom)
+	local textWidth, textHeight = playdate.graphics.getTextSize(text)
+	local image = playdate.graphics.image.new(textWidth + marginLeft + marginRight, textHeight + marginTop + marginBottom)
 	local width, height = image:getSize()
 	
-	gfx.pushContext(image)
+	playdate.graphics.pushContext(image)
 	
 	-- Draw Score text
-	gfx.drawTextAligned(text, marginLeft, marginTop, textAlignment.left)
-	gfx.popContext()
+	playdate.graphics.drawTextAligned(text, marginLeft, marginTop, textAlignment.left)
+	playdate.graphics.popContext()
 	
 	return image
 end
 
 function sizedTextSprite(text, size) 
 	local image = createTextImage(text):scaledImage(size)
-	local sprite = gfx.sprite.new(image)
+	local sprite = playdate.graphics.sprite.new(image)
 	
 	sprite:setCenter(0, 0)
 	return sprite

@@ -1,3 +1,5 @@
+import "utils/time"
+
 class("WidgetHUD").extends(Widget)
 
 function WidgetHUD:init()

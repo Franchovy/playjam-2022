@@ -1,6 +1,4 @@
 import "sampleplayer"
-import "scene"
-import "scenemanager"
 import "fileplayer"
 import "spritecycler/spritecycler"
 import "painter"

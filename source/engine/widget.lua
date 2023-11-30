@@ -10,7 +10,7 @@ Widget.kDeps = {
 
 function Widget:createSprite(zIndex)
 	if self.sprite == nil then
-		local sprite = gfx.sprite.new()
+		local sprite = playdate.graphics.sprite.new()
 		sprite:setSize(playdate.display.getSize())
 		sprite:setCenter(0, 0)
 		sprite:moveTo(0, 0)

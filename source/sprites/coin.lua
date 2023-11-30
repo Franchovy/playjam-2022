@@ -1,7 +1,7 @@
 import "engine"
 import "constant"
 
-class('Coin').extends(playdate.sprite)
+class('Coin').extends(playdate.graphics.sprite)
 
 function Coin.new() 
 	return Coin()
@@ -11,7 +11,7 @@ function Coin:init()
 	Coin.super.init(self)
 	self.type = kSpriteTypes.coin
 	
-	local image = gfx.image.new(kAssetsImages.coin)
+	local image = playdate.graphics.image.new(kAssetsImages.coin)
 	self:setImage(image)
 	self:setCenter(0, 0)
 	self:setCollideRect(self:getBounds())

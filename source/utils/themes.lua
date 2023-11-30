@@ -5,12 +5,12 @@ class("Theme").extends()
 
 function getParalaxImagesForTheme(theme)
 	local filePath = theme[3]
-	local backgroundImage = gfx.image.new(filePath.. "/".. 0)
+	local backgroundImage = playdate.graphics.image.new(filePath.. "/".. 0)
 	
 	local imageCount = theme[4]
 	local images = {}
 	for i=1,(imageCount-1) do
-		local image = gfx.image.new(filePath.. "/".. i)
+		local image = playdate.graphics.image.new(filePath.. "/".. i)
 		table.insert(images, image)
 	end
 	

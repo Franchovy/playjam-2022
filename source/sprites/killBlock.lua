@@ -3,11 +3,7 @@ import "constant"
 import "playdate"
 import "utils/periodicBlinker"
 
-class('KillBlock').extends(playdate.sprite)
-
--- Static instance
--- TODO: Manage lifecycle
-local timer, blinker, destroyTimerBlinker
+class('KillBlock').extends(playdate.graphics.sprite)
 
 function KillBlock.new(periodicBlinker) 
 	return KillBlock(periodicBlinker)
@@ -17,7 +13,7 @@ function KillBlock:init(periodicBlinker)
 	KillBlock.super.init(self)
 	self.type = kSpriteTypes.killBlock
 	
-	local image = gfx.image.new(kAssetsImages.killBlock)
+	local image = playdate.graphics.image.new(kAssetsImages.killBlock)
 	self:setImage(image)
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)

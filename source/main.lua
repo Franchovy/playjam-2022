@@ -1,6 +1,5 @@
 import "engine.lua"
 import "assets"
-import "scenes/scenes"
 import "sprites/lib"
 import "notify"
 import "config"

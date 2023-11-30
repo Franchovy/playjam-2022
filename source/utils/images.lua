@@ -18,7 +18,6 @@ function getImageTable(path, count)
 	return images
 end
 
--- Note: this would be a good sprite callback property, from (state) -> image.
 function getImageForState(imagePath, state)
 	local imagePathState = imagePath
 	for k, v in pairs(state) do

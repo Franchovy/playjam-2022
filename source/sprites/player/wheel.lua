@@ -3,7 +3,7 @@ import "constant"
 import "utils/images"
 import "playdate"
 
-class("Wheel").extends(playdate.sprite)
+class("Wheel").extends(playdate.graphics.sprite)
 
 import "speed"
 import "sounds"
