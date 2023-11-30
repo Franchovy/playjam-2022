@@ -28,7 +28,9 @@ function loadSpritesInChunksIfNeeded(self, chunksToLoad, loadIndex)
 			for _, object in pairs(chunkData) do
 				if self.spritesToRecycle[object.id] ~= nil or object.sprite == nil then
 					local spriteToRecycle = getRecycledSprite(self, object.id)
-					object.sprite = self.createSpriteCallback(object.id, object.position, object.config[loadIndex], spriteToRecycle)
+					
+					local config = getIndexedConfig(object.config, loadIndex)
+					object.sprite = self.createSpriteCallback(object.id, object.position, config, spriteToRecycle)
 					
 					count += 1
 					
@@ -62,7 +64,10 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload, loadIndex)
 				if shouldRecycle and object.sprite ~= nil then
 					local sprite = table.removekey(object, "sprite")
 					
-					object.config[loadIndex] = sprite:getConfig()
+					-- Save the active config to the active load index. Else, discard the active config.
+					if loadIndex ~= nil then
+						object.config[loadIndex] = sprite:getConfig()
+					end
 					
 					sprite:remove()
 					
@@ -116,4 +121,12 @@ function debugPrintRecycledSprites(self)
 	end
 	print("Sprites Recycled:")
 	printTable(printContents)
+end
+
+function getIndexedConfig(config, loadIndex)
+	for i=loadIndex, 0, -1 do
+		if config[i] ~= nil then
+			return config[i]
+		end
+	end
 end

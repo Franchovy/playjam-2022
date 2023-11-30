@@ -106,11 +106,42 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY, loadIndex)
 end
 
 function SpriteCycler:unloadAll()
-	local count = unloadSpritesInChunksIfNeeded(self, self.chunksLoaded, loadIndex)
+	local count = unloadSpritesInChunksIfNeeded(self, self.chunksLoaded, nil)
 	print("Unloaded ".. count.. " sprites from level.")
 	self.chunksLoaded = {}
 	
 	self.data = {}
 	self.chunksLoaded = {}
 	self.spritesToRecycle = {}
+end
+
+function SpriteCycler:saveConfigWithIndex(loadIndex)
+	local count = 0
+	for _, chunk in pairs(self.chunksLoaded) do
+		if chunkExists(self, chunk, 1) then
+			for _, object in pairs(self.data[chunk][1]) do
+				if object.sprite ~= nil then
+					local sprite = object.sprite
+
+					object.config[loadIndex] = sprite:getConfig()
+										
+					count += 1
+				end
+			end
+		end
+	end
+	
+	print("Saved config for ".. count.. " sprites.")
+end
+
+function SpriteCycler:discardConfigForIndexes(loadIndexes)
+	for _, i in pairs(loadIndexes) do
+		print("Discarding index: ".. i)
+		
+		for k, chunk in pairs(self.data) do
+			for _, object in pairs(chunk[1]) do
+				object.config[i] = nil
+			end
+		end
+	end
 end

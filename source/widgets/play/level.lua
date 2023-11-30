@@ -32,6 +32,10 @@ function WidgetLevel:_load()
 		wheel.signals.onTouchCheckpoint = function()
 			local position = self.wheel:getRecentCheckpoint()
 			self.previousLoadPoint = { x = position.x / kGame.gridSize, y = position.y / kGame.gridSize }
+			
+			self.spriteCycler:saveConfigWithIndex(self.loadIndex)
+			
+			self.loadIndex += 1
 		end
 		
 		wheel.signals.onDeath = function()
@@ -121,6 +125,7 @@ function WidgetLevel:_load()
 	
 	--
 	
+	self.loadIndex = 1
 	self:updateDrawOffset()
 end
 
@@ -141,7 +146,7 @@ function WidgetLevel:_update()
 	self.periodicBlinker:update()
 	
 	local drawOffsetX, drawOffsetY = playdate.graphics.getDrawOffset()
-	self.spriteCycler:update(drawOffsetX, drawOffsetY, 0)
+	self.spriteCycler:update(drawOffsetX, drawOffsetY, self.loadIndex)
 	
 	if self.state == self.kStates.playing then
 		local updatedCoinCount = self.wheel:getCoinCountUpdate()
@@ -158,12 +163,17 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.ready and (stateTo == self.kStates.playing) then
 		self.wheel.ignoresPlayerInput = false
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.unloaded) then
+		
+		self.spriteCycler:discardConfigForIndexes({self.loadIndex})
+		self.loadIndex -= 1
+		
 		self.spriteCycler:unloadAll()
 
 		self.periodicBlinker:stop()
 		
 		self.wheel:remove()
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.ready) then
+		
 		self.periodicBlinker:start()
 		
 		-- Initialize sprite cycling using initial wheel position
@@ -171,7 +181,10 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		self.spriteCycler:load(self.config.objects)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
-		self.spriteCycler:loadInitialSprites(initialChunk, 1, 0)
+		
+		self.spriteCycler:loadInitialSprites(initialChunk, 1, self.loadIndex)
+		
+		self.loadIndex += 1
 		
 		self:updateDrawOffset()
 	end
