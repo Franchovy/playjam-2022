@@ -19,9 +19,9 @@ function Checkpoint:init()
 	self.type = kSpriteTypes.checkpoint
 	self:setCenter(0, 0)
 	
-	-- State
-	
-	self:reset()
+	self.config = {
+		isSet = false
+	}
 	
 	-- Set Image
 	
@@ -34,57 +34,43 @@ function Checkpoint:init()
 end
 
 function Checkpoint:isSet()
-	return self:getStateValue(kStateKeys.isSet)
+	return self.config.isSet
 end
 
 function Checkpoint:set()
 	sampleplayer:playSample("set")
 	
-	self:setStateValue(kStateKeys.isSet, true)
+	self.config.isSet = true
+	
 	self:updateImage()
 end
 
 function Checkpoint:loadConfig(config)
-	self:setStateValue(kStateKeys.isSet, config.isSet)
+	self.config = table.shallowcopy(config)
+	
 	self:updateImage()
 end
 
-function Checkpoint:updateConfig(config)
-	config.isSet = self:getStateValue(kStateKeys.isSet)
+function Checkpoint:getConfig()
+	return table.shallowcopy(self.config)
 end
 
 function Checkpoint:reset()
-	local state = {}
-	state[kStateKeys.isSet] = false
-	self:setInitialState(state)
+	self.config {
+		isSet = false
+	}
 	
 	self:updateImage()
 end
 
-
--- These Methods can be moved into "sprite" once state management is well thought-out.
-
-function Checkpoint:setInitialState(state)
-	self._stateInitial = state
-	self._state = {}
-	
-	for k, v in pairs(state) do
-		self._state[k] = v
-	end
-end
-
-function Checkpoint:setStateValue(key, value)
-	self._state[key] = value
-end
-
-function Checkpoint:getStateValue(key)
-	return self._state[key]
-end
-
 function Checkpoint:updateImage()
-	local imagePath = getImageForState(kAssetsImages.checkpoint, self._state)
-	local image = playdate.graphics.image.new(imagePath)
-	self:setImage(image)
+	local imagePath
+	
+	if self.config.isSet == true then
+		imagePath = kAssetsImages.checkpointSet
+	else
+		imagePath = kAssetsImages.checkpoint
+	end
+	
+	self:setImage(playdate.graphics.image.new(imagePath))
 end
-
---
