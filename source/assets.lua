@@ -43,7 +43,8 @@ kAssetsSounds = {
 	rev = dirSounds.."rev",
 	menuAccept = dirSounds.."menu-accept",
 	levelCompleteBlink = dirSounds.."levelCompleteBlink",
-	levelCompleteCard = dirSounds.."levelCompleteCard"
+	levelCompleteCard = dirSounds.."levelCompleteCard",
+	tick = dirSounds.."tick"
 }
 
 kAssetsTracks = {

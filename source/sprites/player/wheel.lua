@@ -44,6 +44,7 @@ function Wheel:init()
 	-- Samples
 	
 	self:initializeSamples()
+	sampleplayer:addSample(kAssetsSounds.tick, kAssetsSounds.tick, 0.2)
 	
 	-- Create Properties
 	
@@ -111,6 +112,9 @@ function Wheel:setAwaitingInput()
 	self.isAwaitingInput = true
 end
 
+local previousTicks = 0
+local currentTicks = 0
+
 -- Movement
 
 function Wheel:update()
@@ -141,6 +145,14 @@ function Wheel:update()
 		end
 		
 		crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
+		
+		local ticks = crankTicks / 12
+		currentTicks += ticks
+		
+		if math.abs(previousTicks - currentTicks) >= 1 then
+			sampleplayer:playSample(kAssetsSounds.tick)
+			previousTicks = currentTicks
+		end
 	else
 		crankTicks = 0
 	end
