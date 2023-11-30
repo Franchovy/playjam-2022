@@ -163,10 +163,6 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.ready and (stateTo == self.kStates.playing) then
 		self.wheel.ignoresPlayerInput = false
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.unloaded) then
-		
-		self.spriteCycler:discardConfigForIndexes({self.loadIndex})
-		self.loadIndex -= 1
-		
 		self.spriteCycler:unloadAll()
 
 		self.periodicBlinker:stop()
@@ -183,8 +179,6 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		
 		self.spriteCycler:loadInitialSprites(initialChunk, 1, self.loadIndex)
-		
-		self.loadIndex += 1
 		
 		self:updateDrawOffset()
 	end

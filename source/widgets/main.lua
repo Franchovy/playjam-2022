@@ -30,6 +30,14 @@ function WidgetMain:_load()
 				self.children.play = Widget.new(WidgetPlay, levelConfig)
 				self.children.play:load()
 				
+				self.children.play.signals.writeLevelPlaythrough = function(data)
+					
+				end
+				
+				self.children.play.signals.returnToMenu = function()
+					
+				end
+				
 				self.children.loading:setVisible(false)
 			end
 		end)

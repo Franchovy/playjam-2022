@@ -35,6 +35,8 @@ function FilePlayer:stop()
 	else
 		self.loop:stop()
 	end
+	
+	self.isPlayingIntro = true
 end
 
 function FilePlayer:onIntroFinished() 

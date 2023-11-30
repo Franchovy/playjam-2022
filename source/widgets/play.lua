@@ -18,11 +18,13 @@ function WidgetPlay:init(config)
 		start = 1,
 		playing = 2,
 		gameOver = 3,
-		levelComplete = 4
+		checkpoint = 4,
+		levelComplete = 5
 	}, 1)
 	
 	self.timers = {}
 	self.data = {}
+	self.signals = {}
 	
 	--
 	
@@ -64,17 +66,17 @@ function WidgetPlay:_load()
 	self.children.gameOver:setVisible(false)
 	
 	self.children.gameOver.signals.restartCheckpoint = function() 
-		self:setState(self.kStates.start)
+		self:setState(self.kStates.checkpoint)
  	end
 	
 	function self.restartLevel() 
-		self.children.level.previousLoadPoint = nil
-		
 		self:setState(self.kStates.start)
  	end
 	
 	function self.returnToMenu() 
 		self.children.level:setState(self.children.level.kStates.unloaded)
+		
+		self.signals.returnToMenu()
 	end
 	 
 	self.children.gameOver.signals.restartLevel = self.restartLevel
@@ -132,20 +134,23 @@ function WidgetPlay:_update()
 end
 
 function WidgetPlay:changeState(stateFrom, stateTo)
-	if stateFrom == self.kStates.start and (stateTo == self.kStates.playing) then
+	if stateTo == self.kStates.playing then
 		self.children.level:setState(self.children.level.kStates.playing)
 		self.timers.levelTimer:start()
 		self.children.hud:setState(self.children.hud.kStates.onScreen)
-	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.start) then
+	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.checkpoint) then
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.inside)
 		
 		playdate.timer.performAfterDelay(400, function()
+			
 			self.children.gameOver:setVisible(false)
 			self.children.transition:setState(self.children.transition.kStates.outside)
+			
 			self.children.level:setState(self.children.level.kStates.ready)
+			self.children.level.loadIndex += 1
 			self.filePlayer:play()
-					
+			
 			playdate.timer.performAfterDelay(400, function()
 				self:setState(self.kStates.playing)
 			end)
@@ -159,6 +164,9 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			self.children.transition:setState(self.children.transition.kStates.inside)
 			
 			playdate.timer.performAfterDelay(500, function()
+				self.children.level.spriteCycler:discardConfigForIndexes({self.children.level.loadIndex})
+				self.children.level.loadIndex -= 1
+				
 				self.children.level:setState(self.children.level.kStates.unloaded)
 				
 				self.children.transition:setState(self.children.transition.kStates.outside)
@@ -170,8 +178,6 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		end)
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.levelComplete) then
 		self.timers.levelTimer:pause()
-		
-		--self.children.level:setState(self.children.level.freeze)
 		
 		-- Calculate objectives reached
 		local stars = 1
@@ -227,25 +233,45 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		playdate.timer.performAfterDelay(5000, function()
 			self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
 		end)
-	elseif stateFrom == self.kStates.levelComplete and (stateTo == self.kStates.start) then
+	elseif stateTo == self.kStates.start then
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.inside)
 		
+		self.filePlayer:stop()
+		
 		playdate.timer.performAfterDelay(500, function()
-			self.children.levelComplete:unload()
-			self.children.levelComplete = nil
+			if self.children.levelComplete ~= nil and (self.children.levelComplete:isVisible() == true) then
+				self.children.levelComplete:setVisible(false)
+			end
+			
+			if self.children.gameOver ~= nil and (self.children.gameOver:isVisible() == true) then
+				self.children.gameOver:setVisible(false)
+			end
 			
 			self.children.level:setState(self.children.level.kStates.unloaded)
+			
+			local loadedIndexes = {}
+			for i=1, self.children.level.loadIndex do
+				table.insert(loadedIndexes, i)
+			end
+			self.children.level.spriteCycler:discardConfigForIndexes(loadedIndexes)
+			self.children.level.loadIndex = 1
 			self.children.level.previousLoadPoint = nil
 			
-			self.children.level:setState(self.children.level.kStates.ready)
+			self.data.coins = 0
+			self.data.time = 0
+			self.timers.levelTimer:reset()
 			
 			self.children.transition:setState(self.children.transition.kStates.outside)
 			
+			self.children.level:setState(self.children.level.kStates.ready)
+			
 			playdate.timer.performAfterDelay(500, function()
 				self.children.transition:setVisible(false)
+				
 				self.children.hud:setState(self.children.hud.kStates.onScreen)
-				self.children.level:setState(self.children.level.kStates.playing)
+				
+				self.filePlayer:play()
 			end)
 		end)
 	end
