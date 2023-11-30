@@ -63,16 +63,16 @@ end
 
 -- Lifecycle
 
-function SpriteCycler:loadInitialSprites(initialChunkX, initialChunkY)
+function SpriteCycler:loadInitialSprites(initialChunkX, initialChunkY, loadIndex)
 	local chunksToLoad = chunksToGenerate(initialChunkX, generationConfig)
 	
 	-- load Sprites In Chunk If Needed
 	
-	local _, _ = loadSpritesInChunksIfNeeded(self, chunksToLoad)
+	local _, _ = loadSpritesInChunksIfNeeded(self, chunksToLoad, loadIndex)
 	self.chunksLoaded = chunksToLoad
 end
 
-function SpriteCycler:update(drawOffsetX, drawOffsetY)
+function SpriteCycler:update(drawOffsetX, drawOffsetY, loadIndex)
 	-- Convert to grid coordinates
 	local drawOffsetX, drawOffsetY = (-drawOffsetX / kGame.gridSize), (drawOffsetY / kGame.gridSize)
 	
@@ -100,13 +100,13 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY)
 	if (#chunksToLoad > 0) or (#chunksToUnload > 0) then
 		-- Load and Unload
 		
-		local _ = unloadSpritesInChunksIfNeeded(self, chunksToUnload)
-		local _, _ = loadSpritesInChunksIfNeeded(self, chunksToLoad)
+		local _ = unloadSpritesInChunksIfNeeded(self, chunksToUnload, loadIndex)
+		local _, _ = loadSpritesInChunksIfNeeded(self, chunksToLoad, loadIndex)
 	end
 end
 
 function SpriteCycler:unloadAll()
-	local count = unloadSpritesInChunksIfNeeded(self, self.chunksLoaded)
+	local count = unloadSpritesInChunksIfNeeded(self, self.chunksLoaded, loadIndex)
 	print("Unloaded ".. count.. " sprites from level.")
 	self.chunksLoaded = {}
 	

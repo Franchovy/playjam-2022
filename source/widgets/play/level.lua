@@ -117,7 +117,7 @@ function WidgetLevel:_load()
 	-- Initialize sprite cycling using initial wheel position
 	
 	local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
-	self.spriteCycler:loadInitialSprites(initialChunk, 1)
+	self.spriteCycler:loadInitialSprites(initialChunk, 1, 0)
 	
 	--
 	
@@ -131,18 +131,17 @@ end
 function WidgetLevel:_update()
 	
 	if self.state == self.kStates.ready then
-		self.spriteCycler:update(playdate.graphics.getDrawOffset())
 		self:updateDrawOffset()
 		
 		if playdate.buttonIsPressed(playdate.kButtonA) or (math.abs(playdate.getCrankChange()) > 5) then
 			self.signals.startPlaying()
 		end
-		
-		return
 	end
 	
 	self.periodicBlinker:update()
-	self.spriteCycler:update(playdate.graphics.getDrawOffset())
+	
+	local drawOffsetX, drawOffsetY = playdate.graphics.getDrawOffset()
+	self.spriteCycler:update(drawOffsetX, drawOffsetY, 0)
 	
 	if self.state == self.kStates.playing then
 		local updatedCoinCount = self.wheel:getCoinCountUpdate()
@@ -172,7 +171,7 @@ function WidgetLevel:changeState(stateFrom, stateTo)
 		self.spriteCycler:load(self.config.objects)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
-		self.spriteCycler:loadInitialSprites(initialChunk, 1)
+		self.spriteCycler:loadInitialSprites(initialChunk, 1, 0)
 		
 		self:updateDrawOffset()
 	end

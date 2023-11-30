@@ -45,14 +45,6 @@ function Checkpoint:set()
 end
 
 function Checkpoint:loadConfig(config)
-	Checkpoint.super.loadConfig(self, config)
-		
-	if config.isSet == nil then
-		config.isSet = false
-		
-		print("WARNING: [Checkpoint:loadConfig] - no config value for 'isSet'! Setting default value...")
-	end
-	
 	self:setStateValue(kStateKeys.isSet, config.isSet)
 	self:updateImage()
 end
