@@ -16,6 +16,6 @@ function convertToTimeString(timeValueMs, decimalsCount)
 		local seconds = math.floor(timeInSeconds) % 60
 		local minutes = math.floor(timeInSeconds / 60)
 		
-		return string.format("%02d:%02d", minutes, seconds)
+		return string.format("%01d:%02d", minutes, seconds)
 	end
 end
