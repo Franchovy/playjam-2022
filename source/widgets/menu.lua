@@ -6,6 +6,8 @@ import "menu/title"
 class("WidgetMenu").extends(Widget)
 
 function WidgetMenu:init(config)	
+	self.config = config
+	
 	self:supply(Widget.kDeps.children)
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.samples)
@@ -25,22 +27,22 @@ function WidgetMenu:_load()
 	self:loadSample(kAssetsSounds.menuAccept)
 	self:loadSample(kAssetsSounds.intro)
 	
-	local menuSelectCallback = function(args)
+	self.painters.background = PainterBackground()
+	
+	self.children.title = Widget.new(WidgetTitle)
+	self.children.title:load()
+	
+	self.children.levelSelect = Widget.new(WidgetLevelSelect, { levels = self.config.levels })
+	self.children.levelSelect:load()
+	self.children.levelSelect:setVisible(false)
+	
+	self.children.levelSelect.signals.select = function(args)
 		if args.type == WidgetLevelSelect.kMenuActionType.play and (args.path ~= nil) then
 			self:playSample(kAssetsSounds.menuAccept)
 			
 			self.signals.play(args.path)
 		end
 	end
-	
-	self.painters.background = PainterBackground()
-	
-	self.children.title = Widget.new(WidgetTitle)
-	self.children.title:load()
-	
-	self.children.levelSelect = Widget.new(WidgetLevelSelect, { menuSelectCallback = menuSelectCallback })
-	self.children.levelSelect:load()
-	self.children.levelSelect:setVisible(false)
 	
 	self.children.title:animate(WidgetLevelSelect.kAnimations.animateIn)
 	

@@ -1,4 +1,5 @@
 import "common/loading"
+import "constant"
 import "engine"
 import "menu"
 import "play"
@@ -19,12 +20,13 @@ function WidgetMain:init()
 end
 
 function WidgetMain:_load()
-	self.children.menu = Widget.new(WidgetMenu)
+	self.children.menu = Widget.new(WidgetMenu, { levels = kLevels })
 	self.children.menu:load()
 	
 	self.onPlaythroughComplete = function(data)
 		-- TODO: if stats enabled, write (append) playthrough data into an existing or new file
-		-- write data into high-scores file
+		
+		-- Write data into high-scores file
 	end
 	
 	self.onReturnToMenu = function()
@@ -34,6 +36,22 @@ function WidgetMain:_load()
 	self.onMenuPressedPlay = function(filePathLevel)
 		self.filePathLevel = filePathLevel
 		self:setState(self.kStates.play)
+	end
+	
+	self.getNextLevelConfig = function()
+		local filePathNextLevel
+		
+		for _, v in pairs(kLevels) do
+			if v.levelFileName == self.filePathLevel then
+				self.filePathLevel = nil
+			elseif self.filePathLevel == nil then
+				self.filePathLevel = v.levelFileName
+			end
+		end
+		
+		if self.filePathLevel ~= nil then
+			return loadLevelFromFile(self.filePathLevel)
+		end
 	end
 	
 	self.children.menu.signals.play = self.onMenuPressedPlay
@@ -82,6 +100,7 @@ function WidgetMain:changeState(stateFrom, stateTo)
 				
 				self.children.play.signals.writeLevelPlaythrough = self.onPlaythroughComplete
 				self.children.play.signals.returnToMenu = self.onReturnToMenu
+				self.children.play.signals.getNextLevelConfig = self.getNextLevelConfig
 				
 				self.children.loading:setVisible(false)
 			end

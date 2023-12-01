@@ -78,27 +78,31 @@ function WidgetPlay:_load()
 		
 		self.signals.returnToMenu()
 	end
-	 
+	
 	self.children.gameOver.signals.restartLevel = self.restartLevel
 	self.children.gameOver.signals.returnToMenu = self.returnToMenu
 	
 	-- Level Theme
 	
-	if self.config.theme ~= nil then
-		self.theme = kThemes[self.config.theme]
-	end
-	
-	if AppConfig.enableBackgroundMusic and self.theme ~= nil then
-		local musicFilePath = getMusicFilepathForTheme(self.theme)
-		self.filePlayer = FilePlayer(musicFilePath)
+	self.loadTheme = function()
+		if self.config.theme ~= nil then
+			self.theme = kThemes[self.config.theme]
+		end
 		
-		self.filePlayer:play()
+		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
+			local musicFilePath = getMusicFilepathForTheme(self.theme)
+			self.filePlayer = FilePlayer(musicFilePath)
+			
+			self.filePlayer:play()
+		end
+		
+		if AppConfig.enableParalaxBackground and (self.config.theme ~= nil) then
+			self.children.background = Widget.new(WidgetBackground, { theme = self.config.theme })
+			self.children.background:load()
+		end
 	end
 	
-	if AppConfig.enableParalaxBackground and (self.config.theme ~= nil) then
-		self.children.background = Widget.new(WidgetBackground, { theme = self.config.theme })
-		self.children.background:load()
-	end
+	self.loadTheme()
 	
 	-- Level Timer
 	
@@ -108,6 +112,10 @@ function WidgetPlay:_load()
 	self.timers.levelTimer.updateCallback = function(timer)
 		self.data.time = timer.currentTime
 	end
+	
+	playdate.timer.performAfterDelay(4000, function()
+		self:setState(self.kStates.levelComplete)
+	end)
 end
 
 function WidgetPlay:_draw(rect)
@@ -219,8 +227,14 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		self.children.levelComplete:load()
 		
 		self.children.levelComplete.signals.nextLevel = function()
-			print("Start next level")
-			self.children.level:setState(self.children.level.kStates.unloaded)
+			self.config = self.signals.getNextLevelConfig()
+			
+			self.loadTheme()
+			
+			self.children.level.config.objects = self.config.objects
+			self.children.level.config.objectives = self.config.objectives
+			
+			self:setState(self.kStates.start)
 		end
 		
 		self.children.levelComplete.signals.restartLevel = self.restartLevel

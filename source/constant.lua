@@ -1,6 +1,7 @@
 import "constant/kCollisionGroups"
 import "constant/kFilePath"
+import "constant/kLevels"
+import "constant/kGame"
 import "constant/kSpriteTypes"
 import "constant/kThemes"
-import "constant/kGame"
 import "constant/kZIndex"

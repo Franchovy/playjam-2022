@@ -9,6 +9,8 @@ WidgetLevelSelect.kMenuActionType = {
 }
 
 function WidgetLevelSelect:init(config)
+	self.config = config
+	
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.children)
 	
@@ -19,27 +21,7 @@ function WidgetLevelSelect:init(config)
 	
 	self.samples = {}
 	
-	self.selectCallback = config.menuSelectCallback
-	
-	-- TODO: Feed these from higher up. Same with settings
-	self.kLevels = {
-		{
-			title = "MOUNTAIN",
-			menuImagePath = kAssetsImages.menuMountain,
-			levelFileName = kAssetsLevels.mountain
-		},
-		{
-			title = "SPACE",
-			menuImagePath = kAssetsImages.menuSpace,
-			levelFileName = kAssetsLevels.space
-		},
-		{
-			title = "CITY",
-			menuImagePath = kAssetsImages.menuCity,
-			levelFileName = kAssetsLevels.city
-		}
-	}
-
+	self.signals = {}
 end
 
 function WidgetLevelSelect:_load()
@@ -49,7 +31,7 @@ function WidgetLevelSelect:_load()
 	self.entries = {}
 	self.previews = {}
 	
-	for i, v in ipairs(self.kLevels) do
+	for i, v in ipairs(self.config.levels) do
 		local entry = Widget.new(LevelSelectEntry, { text = v.title })
 		table.insert(self.entries, entry)
 		self.children["entry"..i] = entry
@@ -140,12 +122,12 @@ function WidgetLevelSelect:_update()
 		local selectButtonPressed = playdate.buttonJustPressed(playdate.kButtonA)
 		if selectButtonPressed then
 			local index = self.state
-			if index <= #self.kLevels then
+			if index <= #self.config.levels then
 				-- Load level
-				self.selectCallback({ type = WidgetLevelSelect.kMenuActionType.play, path = self.kLevels[index].levelFileName })
+				self.signals.select({ type = WidgetLevelSelect.kMenuActionType.play, path = self.config.levels[index].levelFileName })
 			elseif index == 4 then
 				-- Settings
-				self.selectCallback({ type = WidgetLevelSelect.kMenuActionType.menu, name = "settings" })
+				self.signals.select({ type = WidgetLevelSelect.kMenuActionType.menu, name = "settings" })
 			end
 		end
 	end
