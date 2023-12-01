@@ -100,6 +100,12 @@ end
 
 function Widget.setVisible(self, isVisible)
 	self._state.isVisible = isVisible
+	
+	if self.children ~= nil then
+		for _, child in pairs(self.children) do
+			child:setVisible(isVisible)
+		end
+	end	
 end
 
 function Widget.isVisible(self)
@@ -107,11 +113,11 @@ function Widget.isVisible(self)
 end
 
 function Widget.unload(self)
-	self._state.isLoaded = false
-	
-	if self._state.isLoaded == false or (self._state.isVisible == false) then
+	if self._state.isLoaded == false then
 		return
 	end
+	
+	self._state.isLoaded = false
 	
 	if self._unload ~= nil then
 		self:_unload()

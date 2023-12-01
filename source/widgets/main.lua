@@ -19,34 +19,24 @@ function WidgetMain:init()
 end
 
 function WidgetMain:_load()
-	self.playCallback = function(levelPath)
-		self.children.menu:setVisible(false)
-		self.children.loading:setVisible(true)
-		
-		playdate.timer.performAfterDelay(10, function()
-			local levelConfig = loadLevelFromFile(levelPath)
-			
-			if self.children.play == nil then
-				self.children.menu:unload()
-				
-				self.children.play = Widget.new(WidgetPlay, levelConfig)
-				self.children.play:load()
-				
-				self.children.play.signals.writeLevelPlaythrough = function(data)
-					
-				end
-				
-				self.children.play.signals.returnToMenu = function()
-					
-				end
-				
-				self.children.loading:setVisible(false)
-			end
-		end)
+	self.children.menu = Widget.new(WidgetMenu)
+	self.children.menu:load()
+	
+	self.onPlaythroughComplete = function(data)
+		-- TODO: if stats enabled, write (append) playthrough data into an existing or new file
+		-- write data into high-scores file
 	end
 	
-	self.children.menu = Widget.new(WidgetMenu, { playCallback = self.playCallback })
-	self.children.menu:load()
+	self.onReturnToMenu = function()
+		self:setState(self.kStates.menu)
+	end
+	
+	self.onMenuPressedPlay = function(filePathLevel)
+		self.filePathLevel = filePathLevel
+		self:setState(self.kStates.play)
+	end
+	
+	self.children.menu.signals.play = self.onMenuPressedPlay
 	
 	self.children.loading = Widget.new(WidgetLoading)
 	self.children.loading:load()
@@ -54,23 +44,11 @@ function WidgetMain:_load()
 end
 
 function WidgetMain:_draw(rect)
-	if self:isLoaded() == false then 
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.fillRect(0, 0, 400, 240)
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		
-		local loadingText = playdate.graphics.imageWithText("LOADING...", 120, 20):scaledImage(2):invertedImage()
-		local loadingTextRect = Rect.size(loadingText:getSize())
-		local displayRect = Rect.size(playdate.display.getSize())
-		local centerRect = Rect.center(loadingTextRect, displayRect)
-		loadingText:draw(centerRect.x, centerRect.y)
-	end
-	
-	if (self:isLoaded() == true) and (self.state == self.kStates.menu) then
+	if self.state == self.kStates.menu and (self.children.menu ~= nil) then
 		self.children.menu:draw(rect)
 	end
 	
-	if self.children.play ~= nil then
+	if self.state == self.kStates.play and (self.children.play ~= nil) then
 		self.children.play:draw(rect)
 	end
 	
@@ -83,4 +61,47 @@ end
 
 function WidgetMain:_input()
 	
+end
+
+function WidgetMain:changeState(stateFrom, stateTo)
+	if stateFrom == self.kStates.menu and (stateTo == self.kStates.play) then
+		self.children.menu:setVisible(false)
+		self.children.loading:setVisible(true)
+		
+		playdate.timer.performAfterDelay(10, function()
+			local levelConfig = loadLevelFromFile(self.filePathLevel)
+			
+			if self.children.play == nil then
+				self.children.menu:unload()
+				self.children.menu = nil
+				
+				collectgarbage("collect")
+				
+				self.children.play = Widget.new(WidgetPlay, levelConfig)
+				self.children.play:load()
+				
+				self.children.play.signals.writeLevelPlaythrough = self.onPlaythroughComplete
+				self.children.play.signals.returnToMenu = self.onReturnToMenu
+				
+				self.children.loading:setVisible(false)
+			end
+		end)
+	elseif stateFrom == self.kStates.play and (stateTo == self.kStates.menu) then
+		self.children.loading:setVisible(true)
+		self.children.play:setVisible(false)
+		
+		playdate.timer.performAfterDelay(10, function()
+			self.children.play:unload()
+			self.children.play = nil 
+			
+			collectgarbage("collect")
+			
+			self.children.menu = Widget.new(WidgetMenu)
+			self.children.menu:load()
+			
+			self.children.menu.signals.play = self.onMenuPressedPlay
+			
+			self.children.loading:setVisible(false)
+		end)
+	end
 end

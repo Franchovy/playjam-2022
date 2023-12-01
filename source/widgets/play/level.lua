@@ -50,7 +50,7 @@ function WidgetLevel:_load()
 	-- Sprite Cycler
 	
 	local chunkLength = AppConfig["chunkLength"]
-	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint"}
+	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint", "levelEnd"}
 	
 	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, config, spriteToRecycle)
 		local sprite = spriteToRecycle;
@@ -194,3 +194,10 @@ function WidgetLevel:updateDrawOffset()
 	end
 end
 
+function WidgetLevel:_unload()
+	self.spriteCycler:unloadAll()
+	
+	self.periodicBlinker:stop()
+	
+	self.wheel:remove()
+end

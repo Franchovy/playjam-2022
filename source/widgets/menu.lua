@@ -5,14 +5,13 @@ import "menu/title"
 
 class("WidgetMenu").extends(Widget)
 
-function WidgetMenu:init(config)
-	self.playCallback = config.playCallback
-	
+function WidgetMenu:init(config)	
 	self:supply(Widget.kDeps.children)
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.samples)
 	
 	self.painters = {}
+	self.signals = {}
 	
 	self:setStateInitial({default = 1, menu = 2}, 1)
 	
@@ -30,7 +29,7 @@ function WidgetMenu:_load()
 		if args.type == WidgetLevelSelect.kMenuActionType.play and (args.path ~= nil) then
 			self:playSample(kAssetsSounds.menuAccept)
 			
-			self.playCallback(args.path)
+			self.signals.play(args.path)
 		end
 	end
 	
@@ -110,6 +109,4 @@ function WidgetMenu:_unload()
 	self.children.title = nil
 	self.children.levelSelect = nil
 	self.children.title = nil
-	
-	collectgarbage("collect")
 end
