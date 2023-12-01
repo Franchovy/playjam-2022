@@ -27,6 +27,8 @@ function WidgetMain:_load()
 			local levelConfig = loadLevelFromFile(levelPath)
 			
 			if self.children.play == nil then
+				self.children.menu:unload()
+				
 				self.children.play = Widget.new(WidgetPlay, levelConfig)
 				self.children.play:load()
 				

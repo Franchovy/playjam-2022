@@ -16,6 +16,8 @@ function initialize()
 	playdate.timer.performAfterDelay(1, function()
 		topLevelWidget:load()
 	end)
+	
+	playdate.setCollectsGarbage(false)
 end
 
 function playdate.update()

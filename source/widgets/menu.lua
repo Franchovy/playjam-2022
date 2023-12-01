@@ -103,3 +103,13 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 		self.children.title:animate(WidgetLevelSelect.kAnimations.animateBackIn)
 	end
 end
+
+function WidgetMenu:_unload()
+	self.samples = {}
+	self.painters.background = nil
+	self.children.title = nil
+	self.children.levelSelect = nil
+	self.children.title = nil
+	
+	collectgarbage("collect")
+end
