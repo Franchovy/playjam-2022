@@ -6,7 +6,6 @@ class("SpriteCycler").extends()
 local generationConfig = { left = 1, right = 2}
 
 function SpriteCycler:init(chunkLength, recycledSpriteIds, createSpriteCallback)
-	self.data = {}
 	self.chunksLoaded = {}
 	self.spritesToRecycle = {}
 	self.chunkLength = chunkLength
@@ -89,7 +88,6 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY, loadIndex)
 			table.insert(chunksToLoad, chunk)
 		end
 	end
-	
 	local chunksToUnload = {}
 	for _, chunk in pairs(self.chunksLoaded) do
 		if chunkExists(self, chunk, 1) and not table.contains(chunksShouldLoad, chunk) then
@@ -100,8 +98,20 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY, loadIndex)
 	if (#chunksToLoad > 0) or (#chunksToUnload > 0) then
 		-- Load and Unload
 		
-		local _ = unloadSpritesInChunksIfNeeded(self, chunksToUnload, loadIndex)
-		local _, _ = loadSpritesInChunksIfNeeded(self, chunksToLoad, loadIndex)
+		print("Loading chunks: ")
+		printTable(chunksToLoad)
+		
+		print("Unloading chunks: ")
+		printTable(chunksToUnload)
+		
+		local spritesUnloadedCount = unloadSpritesInChunksIfNeeded(self, chunksToUnload, loadIndex)
+		local spritesLoadedCount, spritesRecycledCount = loadSpritesInChunksIfNeeded(self, chunksToLoad, loadIndex)
+		
+		print(spritesUnloadedCount.." sprites were unloaded.")
+		print(spritesLoadedCount.." sprites were loaded, ".. spritesRecycledCount.. " of which were recycled.")
+		
+		--print("Data objects: ".. #self.data.objects)
+		--print("Available recycled sprites: ".. #self.spritesToRecycle)
 	end
 end
 
