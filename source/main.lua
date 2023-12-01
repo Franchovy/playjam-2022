@@ -17,7 +17,6 @@ function initialize()
 		topLevelWidget:load()
 	end)
 	
-	playdate.setCollectsGarbage(false)
 end
 
 function playdate.update()
