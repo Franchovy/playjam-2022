@@ -134,6 +134,9 @@ function WidgetLevel:_draw(rect)
 end
 
 function WidgetLevel:_update()
+	if self.state == self.kStates.unloaded then
+		return
+	end
 	
 	if self.state == self.kStates.ready then
 		self:updateDrawOffset()

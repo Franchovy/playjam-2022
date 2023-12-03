@@ -73,7 +73,8 @@ function WidgetPlay:_load()
 		self:setState(self.kStates.start)
  	end
 	
-	function self.returnToMenu() 
+	function self.returnToMenu()
+		self.filePlayer:stop()
 		self.children.level:setState(self.children.level.kStates.unloaded)
 		
 		self.signals.returnToMenu()
@@ -117,10 +118,6 @@ function WidgetPlay:_load()
 	self.timers.levelTimer.updateCallback = function(timer)
 		self.data.time = timer.currentTime
 	end
-	
-	playdate.timer.performAfterDelay(4000, function()
-		self:setState(self.kStates.levelComplete)
-	end)
 end
 
 function WidgetPlay:_draw(rect)
@@ -232,8 +229,14 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		self.children.levelComplete:load()
 		
 		self.children.levelComplete.signals.nextLevel = function()
-			self.config = self.signals.getNextLevelConfig()
+			local configNextLevel = self.signals.getNextLevelConfig()
 			
+			if configNextLevel == nil then
+				self.signals.returnToMenu()
+				return
+			end
+			
+			self.config = configNextLevel
 			self.loadTheme()
 			
 			self.children.level.config.objects = self.config.objects

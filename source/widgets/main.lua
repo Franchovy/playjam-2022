@@ -115,7 +115,7 @@ function WidgetMain:changeState(stateFrom, stateTo)
 			
 			collectgarbage("collect")
 			
-			self.children.menu = Widget.new(WidgetMenu)
+			self.children.menu = Widget.new(WidgetMenu, { levels = kLevels })
 			self.children.menu:load()
 			
 			self.children.menu.signals.play = self.onMenuPressedPlay
