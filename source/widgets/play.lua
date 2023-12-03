@@ -91,6 +91,11 @@ function WidgetPlay:_load()
 		
 		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
 			local musicFilePath = getMusicFilepathForTheme(self.theme)
+			
+			if self.filePlayer ~= nil then
+				self.filePlayer:stop()
+			end
+			
 			self.filePlayer = FilePlayer(musicFilePath)
 			
 			self.filePlayer:play()
