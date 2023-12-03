@@ -4,13 +4,7 @@ import "utils/drawMode"
 class("LevelComplete").extends(Widget)
 
 function LevelComplete:init(config)
-	
-	self.titleColor = config.titleColor
-	self.numStars = config.objectives.stars
-	self.coins = config.objectives.coinCount
-	self.coinsObjective = config.objectives.coinCountObjective
-	self.time = config.objectives.timeString
-	self.timeObjective = config.objectives.timeStringObjective
+	self.config = config
 	
 	self:supply(Widget.kDeps.samples)
 	self:supply(Widget.kDeps.state)
@@ -37,7 +31,7 @@ function LevelComplete:_load()
 	self:loadSample(kAssetsSounds.levelCompleteBlink, 0.7)
 	self:loadSample(kAssetsSounds.levelCompleteCard, 0.7)
 	
-	local drawMode = getColorDrawModeFill(self.titleColor)
+	local drawMode = getColorDrawModeFill(self.config.titleColor)
 	playdate.graphics.setImageDrawMode(drawMode)
 	self.images.titleInGame = playdate.graphics.imageWithText("LEVEL COMPLETE", 200, 70):scaledImage(3)
 	
@@ -50,8 +44,8 @@ function LevelComplete:_load()
 	self.images.textLabelCoins = playdate.graphics.imageWithText("COINS", 60, 100):scaledImage(1.5)
 	self.images.textLabelTime = playdate.graphics.imageWithText("TIME", 60, 100):scaledImage(1.5)
 	
-	local coinsText = self.coins .. "/".. self.coinsObjective
-	local timeText = self.time .. "/".. self.timeObjective
+	local coinsText = self.config.objectives.coinCount .. "/".. self.config.objectives.coinCountObjective
+	local timeText = self.config.objectives.timeString .. "/".. self.config.objectives.timeStringObjective
 	self.images.textCoins = playdate.graphics.imageWithText(coinsText, 100, 40):scaledImage(2)
 	self.images.textTime = playdate.graphics.imageWithText(timeText, 100, 40):scaledImage(2)
 	
@@ -104,7 +98,7 @@ function LevelComplete:_load()
 	end)
 	
 	self.stars = {}
-	for i=1, self.numStars do
+	for i=1, self.config.objectives.stars do
 		local star = Widget.new(WidgetStar, { initialDelay = 100 + i * 700 })
 		star:load()
 		table.insert(self.stars, star)
@@ -166,10 +160,10 @@ function LevelComplete:_draw(rect)
 			return (starImageWidth * numStars) + starMargin * (numStars - 1)
 		end
 		
-		if self.numStars <= 3 then 
+		if self.config.objectives.stars <= 3 then 
 			starMargin = 20
 			starContainerWidth = starsContentWidth(3)
-		elseif self.numStars == 4 then
+		elseif self.config.objectives.stars == 4 then
 			starMargin = 5
 			starContainerWidth = starsContentWidth(4)
 		end
