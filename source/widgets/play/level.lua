@@ -1,3 +1,5 @@
+import "utils/screenShake"
+
 class("WidgetLevel").extends(Widget)
 
 function WidgetLevel:init(config)
@@ -39,6 +41,8 @@ function WidgetLevel:_load()
 		end
 		
 		wheel.signals.onDeath = function()
+			screenShake(400, 13)
+			
 			self.signals.gameOver()
 		end
 		
