@@ -106,6 +106,9 @@ function WidgetPlay:_load()
 			self.children.background = Widget.new(WidgetBackground, { theme = self.config.theme })
 			self.children.background:load()
 		end
+		
+		local backgroundColor = getBackgroundColorForTheme(self.theme)
+		playdate.graphics.setBackgroundColor(backgroundColor)
 	end
 	
 	self.loadTheme()
@@ -118,6 +121,10 @@ function WidgetPlay:_load()
 	self.timers.levelTimer.updateCallback = function(timer)
 		self.data.time = timer.currentTime
 	end
+	
+	playdate.timer.performAfterDelay(3000, function()
+		self:setState(self.kStates.levelComplete)
+	end)
 end
 
 function WidgetPlay:_draw(rect)
@@ -224,7 +231,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		
 		self.children.levelComplete = Widget.new(LevelComplete, {
 			objectives = objectives,
-			darkMode = self.config.theme ~= 1
+			titleColor = getForegroundColorForTheme(self.theme)
 		})
 		self.children.levelComplete:load()
 		

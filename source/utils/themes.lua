@@ -23,3 +23,19 @@ end
 function getMusicFilepathForTheme(theme)
 	return theme[2]
 end
+
+function getForegroundColorForTheme(theme)
+	if theme[5] == true then
+		return playdate.graphics.kColorBlack
+	else
+		return playdate.graphics.kColorWhite
+	end
+end
+
+function getBackgroundColorForTheme(theme)
+	if theme[5] == true then
+		return playdate.graphics.kColorWhite
+	else
+		return playdate.graphics.kColorBlack
+	end
+end

@@ -26,6 +26,8 @@ function playdate.update()
 	playdate.timer.updateTimers()
 	playdate.frameTimer.updateTimers()
 	playdate.graphics.animation.blinker.updateAll()
+	
+	playdate.drawFPS(10, 10)
 end
 
 -- Start game

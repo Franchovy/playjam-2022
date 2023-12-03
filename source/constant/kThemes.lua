@@ -2,19 +2,22 @@ kThemes = {
 	{
 		"MOUNTAIN",
 		"assets/tracks/mountain",
-		"assets/images/backgrounds/mountain", 
-		5
+		"assets/images/backgrounds/mountain",
+		5,
+		true
 	},
 	{
 		"SPACE",
 		"assets/tracks/space",
 		"assets/images/backgrounds/space", 
-		5
+		5,
+		false
 	},
 	{
 		"CITY",
 		"assets/tracks/city",
 		"assets/images/backgrounds/city", 
-		4
+		4,
+		false
 	}
 }

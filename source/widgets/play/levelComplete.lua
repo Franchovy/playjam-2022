@@ -1,10 +1,11 @@
 import "levelComplete/star"
+import "utils/drawMode"
 
 class("LevelComplete").extends(Widget)
 
 function LevelComplete:init(config)
 	
-	self.levelDarkMode = config.darkMode
+	self.titleColor = config.titleColor
 	self.numStars = config.objectives.stars
 	self.coins = config.objectives.coinCount
 	self.coinsObjective = config.objectives.coinCountObjective
@@ -36,8 +37,11 @@ function LevelComplete:_load()
 	self:loadSample(kAssetsSounds.levelCompleteBlink, 0.7)
 	self:loadSample(kAssetsSounds.levelCompleteCard, 0.7)
 	
+	local drawMode = getColorDrawModeFill(self.titleColor)
+	playdate.graphics.setImageDrawMode(drawMode)
 	self.images.titleInGame = playdate.graphics.imageWithText("LEVEL COMPLETE", 200, 70):scaledImage(3)
-	self.images.titleInGame:setInverted(self.levelDarkMode) 
+	
+	playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
 
 	self.images.title = playdate.graphics.imageWithText("LEVEL COMPLETE!", 200, 70):scaledImage(2)
 	
