@@ -121,10 +121,6 @@ function WidgetPlay:_load()
 	self.timers.levelTimer.updateCallback = function(timer)
 		self.data.time = timer.currentTime
 	end
-	
-	playdate.timer.performAfterDelay(3000, function()
-		self:setState(self.kStates.levelComplete)
-	end)
 end
 
 function WidgetPlay:_draw(rect)
