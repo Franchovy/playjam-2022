@@ -38,6 +38,8 @@ function WidgetLevel:_load()
 			self.spriteCycler:saveConfigWithIndex(self.loadIndex)
 			
 			self.loadIndex += 1
+			
+			self.signals.onCheckpoint()
 		end
 		
 		wheel.signals.onDeath = function()

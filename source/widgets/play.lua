@@ -25,10 +25,6 @@ function WidgetPlay:init(config)
 	self.timers = {}
 	self.data = {}
 	self.signals = {}
-	
-	--
-	
-	self.data.coins = 0
 end
 
 function WidgetPlay:_load()
@@ -50,7 +46,27 @@ function WidgetPlay:_load()
 		self:setState(self.kStates.levelComplete)
 	end
 	
+	self.children.level.signals.onCheckpoint = function()
+		table.insert(self.data.checkpoints, {
+			time = self.data.time + self.timers.levelTimer.currentTime,
+			coins = self.data.coins
+		})
+	end
+	
 	self.children.level:load()
+	
+	self.resetData = function()
+		self.data.coins = 0
+		self.data.time = 0
+		self.data.checkpoints = {
+			{
+				time = 0,
+				coins = 0
+			}
+		}
+	end
+	
+	self:resetData()
 	
 	self.children.hud = Widget.new(WidgetHUD)
 	self.children.hud:load()
@@ -70,6 +86,8 @@ function WidgetPlay:_load()
  	end
 	
 	function self.restartLevel() 
+		self.resetData()
+		
 		self:setState(self.kStates.start)
  	end
 	
@@ -118,9 +136,9 @@ function WidgetPlay:_load()
 	self.timers.levelTimer = playdate.timer.new(999000)
 	self.timers.levelTimer:pause()
 	
-	self.timers.levelTimer.updateCallback = function(timer)
-		self.data.time = timer.currentTime
-	end
+	--self.timers.levelTimer.updateCallback = function(timer)
+--		self.data.time = timer.currentTime
+--	end
 end
 
 function WidgetPlay:_draw(rect)
@@ -141,7 +159,7 @@ end
 
 function WidgetPlay:_update()
 	if self.children.hud:isVisible() and (self.data.time ~= nil) and (self.data.coins ~= nil) then
-		self.children.hud.data.time = self.data.time
+		self.children.hud.data.time = self.data.time + self.timers.levelTimer.currentTime
 		self.children.hud.data.coins = self.data.coins
 	end
 end
@@ -177,6 +195,11 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			self.children.transition:setState(self.children.transition.kStates.inside)
 			
 			playdate.timer.performAfterDelay(500, function()
+				local checkpointData = table.last(self.data.checkpoints)
+				self.data.coins = checkpointData.coins
+				self.data.time = checkpointData.time
+				self.timers.levelTimer:reset()
+				
 				self.children.level.spriteCycler:discardConfigForIndexes({self.children.level.loadIndex})
 				self.children.level.loadIndex -= 1
 				
@@ -214,7 +237,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			end
 		end
 		
-		local timeString = convertToTimeString(self.timers.levelTimer.currentTime, 1)
+		local timeString = convertToTimeString(self.data.time + self.timers.levelTimer.currentTime, 1)
 		local timeStringObjective = convertToTimeString(timeObjective * 1000, 1)
 		
 		local objectives = {
@@ -241,6 +264,8 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			
 			self.config = configNextLevel
 			self.loadTheme()
+			
+			self.resetData()
 			
 			self.children.level.config.objects = self.config.objects
 			self.children.level.config.objectives = self.config.objectives

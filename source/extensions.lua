@@ -1,6 +1,10 @@
 
 -- Extensions on "table"
 
+function table.last(t)
+	return t[#t]
+end
+
 function table.values(inputTable)
 	local values = {}
 	
