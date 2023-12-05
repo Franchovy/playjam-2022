@@ -124,7 +124,7 @@ function WidgetLevelSelect:_update()
 			local index = self.state
 			if index <= #self.config.levels then
 				-- Load level
-				self.signals.select({ type = WidgetLevelSelect.kMenuActionType.play, path = self.config.levels[index].levelFileName })
+				self.signals.select({ type = WidgetLevelSelect.kMenuActionType.play, level = self.config.levels[index] })
 			elseif index == 4 then
 				-- Settings
 				self.signals.select({ type = WidgetLevelSelect.kMenuActionType.menu, name = "settings" })

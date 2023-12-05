@@ -37,10 +37,10 @@ function WidgetMenu:_load()
 	self.children.levelSelect:setVisible(false)
 	
 	self.children.levelSelect.signals.select = function(args)
-		if args.type == WidgetLevelSelect.kMenuActionType.play and (args.path ~= nil) then
+		if args.type == WidgetLevelSelect.kMenuActionType.play and (args.level ~= nil) then
 			self:playSample(kAssetsSounds.menuAccept)
 			
-			self.signals.play(args.path)
+			self.signals.play(args.level)
 		end
 	end
 	

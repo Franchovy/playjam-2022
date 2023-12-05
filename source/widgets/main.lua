@@ -27,30 +27,65 @@ function WidgetMain:_load()
 		-- TODO: if stats enabled, write (append) playthrough data into an existing or new file
 		
 		-- Write data into high-scores file
+		
+		if not playdate.file.exists(kFilePath.saves) then
+			playdate.file.mkdir(kFilePath.saves)
+		end
+		
+		local filePath = kFilePath.saves.. "/".. self.level.title
+		
+		local saveFileRead = playdate.file.open(filePath, playdate.file.kFileRead)
+		
+		local shouldWriteToFile
+		local existingContents
+		
+		if saveFileRead ~= nil then
+			existingContents = json.decodeFile(saveFileRead)
+		end
+		
+		if saveFileRead == nil or (existingContents == nil) then	
+			shouldWriteToFile = true
+		else
+			function scoreCalculation(coinCount, time, timeObjective)
+				return coinCount + (timeObjective - time) * 50
+			end
+			local previousScore = scoreCalculation(existingContents.coinCount, tonumber(existingContents.timeString), tonumber(existingContents.timeStringObjective))
+			local currentScore = scoreCalculation(data.coinCount, tonumber(data.timeString), tonumber(data.timeStringObjective))
+			
+			shouldWriteToFile = previousScore < currentScore
+		end
+		
+		if saveFileRead ~= nil then
+			saveFileRead:close()
+		end
+		
+		if shouldWriteToFile then
+			local saveFileWrite = playdate.file.open(filePath, playdate.file.kFileWrite)
+			json.encodeToFile(saveFileWrite, true, data)
+			saveFileWrite:close()
+		end
 	end
 	
 	self.onReturnToMenu = function()
 		self:setState(self.kStates.menu)
 	end
 	
-	self.onMenuPressedPlay = function(filePathLevel)
-		self.filePathLevel = filePathLevel
+	self.onMenuPressedPlay = function(level)
+		self.level = level
 		self:setState(self.kStates.play)
 	end
 	
 	self.getNextLevelConfig = function()
-		local filePathNextLevel
-		
 		for _, v in pairs(kLevels) do
-			if v.levelFileName == self.filePathLevel then
-				self.filePathLevel = nil
-			elseif self.filePathLevel == nil then
-				self.filePathLevel = v.levelFileName
+			if v.levelFileName == self.level.path then
+				self.level = nil
+			elseif self.level == nil then
+				self.level = v
 			end
 		end
 		
-		if self.filePathLevel ~= nil then
-			return loadLevelFromFile(self.filePathLevel)
+		if self.level ~= nil then
+			return loadLevelFromFile(self.level.path)
 		end
 	end
 	
@@ -87,7 +122,7 @@ function WidgetMain:changeState(stateFrom, stateTo)
 		self.children.loading:setVisible(true)
 		
 		playdate.timer.performAfterDelay(10, function()
-			local levelConfig = loadLevelFromFile(self.filePathLevel)
+			local levelConfig = loadLevelFromFile(self.level.path)
 			
 			if self.children.play == nil then
 				self.children.menu:unload()
@@ -98,7 +133,7 @@ function WidgetMain:changeState(stateFrom, stateTo)
 				self.children.play = Widget.new(WidgetPlay, levelConfig)
 				self.children.play:load()
 				
-				self.children.play.signals.writeLevelPlaythrough = self.onPlaythroughComplete
+				self.children.play.signals.saveLevelScore = self.onPlaythroughComplete
 				self.children.play.signals.returnToMenu = self.onReturnToMenu
 				self.children.play.signals.getNextLevelConfig = self.getNextLevelConfig
 				

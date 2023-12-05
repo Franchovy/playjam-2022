@@ -248,6 +248,8 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			coinCountObjective = coinCountObjective
 		}
 		
+		self.signals.saveLevelScore(objectives)
+		
 		self.children.levelComplete = Widget.new(LevelComplete, {
 			objectives = objectives,
 			titleColor = getForegroundColorForTheme(self.theme)
