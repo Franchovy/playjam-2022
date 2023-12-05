@@ -17,6 +17,10 @@ function WidgetMain:init()
 	self:createSprite()
 	self.sprite:setZIndex(1)
 	self.sprite:add()
+	
+	self.data = {}
+	
+	self.data.highscores = {}
 end
 
 function WidgetMain:_load()
@@ -88,6 +92,27 @@ function WidgetMain:_load()
 			return loadLevelFromFile(self.level.path)
 		end
 	end
+	
+	-- High Scores
+	
+	if not playdate.file.exists(kFilePath.saves) then
+		playdate.file.mkdir(kFilePath.saves)
+	end
+	
+	local saveFiles = playdate.file.listFiles(kFilePath.saves)
+	for _, fileName in pairs(saveFiles) do
+		local path = kFilePath.saves.. "/".. fileName
+		local saveFile = playdate.file.open(path, playdate.file.kFileRead)
+		
+		if saveFile ~= nil then
+			self.data.highscores[fileName] = json.decodeFile(saveFile)
+		end
+	end
+	
+	print("Save files:")
+	printTable(self.data.highscores)
+	
+	--
 	
 	self.children.menu.signals.play = self.onMenuPressedPlay
 	
