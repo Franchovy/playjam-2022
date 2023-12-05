@@ -68,6 +68,8 @@ function WidgetMain:_load()
 			json.encodeToFile(saveFileWrite, true, data)
 			saveFileWrite:close()
 		end
+		
+		self.loadHighscores()
 	end
 	
 	self.onReturnToMenu = function()
@@ -95,22 +97,23 @@ function WidgetMain:_load()
 	
 	-- High Scores
 	
-	if not playdate.file.exists(kFilePath.saves) then
-		playdate.file.mkdir(kFilePath.saves)
-	end
-	
-	local saveFiles = playdate.file.listFiles(kFilePath.saves)
-	for _, fileName in pairs(saveFiles) do
-		local path = kFilePath.saves.. "/".. fileName
-		local saveFile = playdate.file.open(path, playdate.file.kFileRead)
+	self.loadHighscores = function()
+		if not playdate.file.exists(kFilePath.saves) then
+			playdate.file.mkdir(kFilePath.saves)
+		end
 		
-		if saveFile ~= nil then
-			self.data.highscores[fileName] = json.decodeFile(saveFile)
+		local saveFiles = playdate.file.listFiles(kFilePath.saves)
+		for _, fileName in pairs(saveFiles) do
+			local path = kFilePath.saves.. "/".. fileName
+			local saveFile = playdate.file.open(path, playdate.file.kFileRead)
+			
+			if saveFile ~= nil then
+				self.data.highscores[fileName] = json.decodeFile(saveFile)
+			end
 		end
 	end
 	
-	print("Save files:")
-	printTable(self.data.highscores)
+	self.loadHighscores()
 	
 	--
 	
