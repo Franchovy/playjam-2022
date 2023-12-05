@@ -66,7 +66,11 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload, loadIndex)
 					
 					-- Save the active config to the active load index. Else, discard the active config.
 					if loadIndex ~= nil then
-						object.config[loadIndex] = sprite:getConfig()
+						if object.config[loadIndex] == nil then
+							object.config[loadIndex] = {}
+						end
+						
+						sprite:writeConfig(object.config[loadIndex])
 					end
 					
 					sprite:remove()

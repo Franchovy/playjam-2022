@@ -128,7 +128,11 @@ function SpriteCycler:saveConfigWithIndex(loadIndex)
 				if object.sprite ~= nil then
 					local sprite = object.sprite
 
-					object.config[loadIndex] = sprite:getConfig()
+					if object.config[loadIndex] == nil then
+						object.config[loadIndex] = {}
+					end
+
+					sprite:writeConfig(object.config[loadIndex])
 										
 					count += 1
 				end

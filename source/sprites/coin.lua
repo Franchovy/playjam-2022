@@ -22,13 +22,13 @@ function Coin:init()
 end
 
 function Coin:loadConfig(config)
-	self.config = table.shallowcopy(config)
+	self.config.isPicked = config.isPicked
 	
 	self:setVisible(not self.config.isPicked)
 end
 
-function Coin:getConfig()
-	return table.shallowcopy(self.config)
+function Coin:writeConfig(config)
+	config.isPicked = self.config.isPicked
 end
 
 function Coin:reset()

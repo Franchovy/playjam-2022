@@ -46,13 +46,13 @@ function Checkpoint:set()
 end
 
 function Checkpoint:loadConfig(config)
-	self.config = table.shallowcopy(config)
+	self.config.isSet = config.isSet
 	
 	self:updateImage()
 end
 
-function Checkpoint:getConfig()
-	return table.shallowcopy(self.config)
+function Checkpoint:writeConfig(config)
+	config.isSet = self.config.isSet
 end
 
 function Checkpoint:reset()
