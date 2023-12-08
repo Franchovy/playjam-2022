@@ -162,6 +162,10 @@ function WidgetPlay:_update()
 		self.children.hud.data.time = self.data.time + self.timers.levelTimer.currentTime
 		self.children.hud.data.coins = self.data.coins
 	end
+	
+	if playdate.isCrankDocked() and (self.state == self.kStates.playing or (self.state == self.kStates.start)) then
+		g.showCrankIndicator = true
+	end
 end
 
 function WidgetPlay:changeState(stateFrom, stateTo)

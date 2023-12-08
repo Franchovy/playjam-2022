@@ -5,6 +5,10 @@ import "CoreLibs/object"
 
 import "playdate/extensions/buttons"
 
+-- UI
+
+import "CoreLibs/ui"
+
 -- File
 
 import "playdate/extensions/file"
