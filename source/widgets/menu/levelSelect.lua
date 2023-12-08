@@ -31,15 +31,16 @@ function WidgetLevelSelect:_load()
 	self.entries = {}
 	self.previews = {}
 	
-	for i, v in ipairs(self.config.levels) do
-		local entry = Widget.new(LevelSelectEntry, { text = v.title })
+	for i, level in ipairs(self.config.levels) do
+		local entry = Widget.new(LevelSelectEntry, { text = level.title })
 		table.insert(self.entries, entry)
 		self.children["entry"..i] = entry
 		
+		local score = self.config.scores[level.title]
 		local preview = Widget.new(LevelSelectPreview, {
-			name = v.title,
-			image = playdate.graphics.image.new(v.menuImagePath),
-			highscore = nil
+			title = level.title,
+			imagePath = level.menuImagePath,
+			score = score
 		})
 		table.insert(self.previews, preview)
 		self.children["preview"..i] = preview

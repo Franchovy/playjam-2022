@@ -32,7 +32,7 @@ function WidgetMenu:_load()
 	self.children.title = Widget.new(WidgetTitle)
 	self.children.title:load()
 	
-	self.children.levelSelect = Widget.new(WidgetLevelSelect, { levels = self.config.levels })
+	self.children.levelSelect = Widget.new(WidgetLevelSelect, { levels = self.config.levels, scores = self.config.scores })
 	self.children.levelSelect:load()
 	self.children.levelSelect:setVisible(false)
 	

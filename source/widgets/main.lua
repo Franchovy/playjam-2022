@@ -24,9 +24,6 @@ function WidgetMain:init()
 end
 
 function WidgetMain:_load()
-	self.children.menu = Widget.new(WidgetMenu, { levels = kLevels })
-	self.children.menu:load()
-	
 	self.onPlaythroughComplete = function(data)
 		-- TODO: if stats enabled, write (append) playthrough data into an existing or new file
 		
@@ -102,20 +99,26 @@ function WidgetMain:_load()
 			playdate.file.mkdir(kFilePath.saves)
 		end
 		
+		local data = {}
 		local saveFiles = playdate.file.listFiles(kFilePath.saves)
 		for _, fileName in pairs(saveFiles) do
 			local path = kFilePath.saves.. "/".. fileName
 			local saveFile = playdate.file.open(path, playdate.file.kFileRead)
 			
 			if saveFile ~= nil then
-				self.data.highscores[fileName] = json.decodeFile(saveFile)
+				data[fileName] = json.decodeFile(saveFile)
 			end
 		end
+		
+		return data
 	end
 	
-	self.loadHighscores()
+	self.data.highscores = self.loadHighscores()
 	
 	--
+	
+	self.children.menu = Widget.new(WidgetMenu, { levels = kLevels, scores = self.data.highscores })
+	self.children.menu:load()
 	
 	self.children.menu.signals.play = self.onMenuPressedPlay
 	
