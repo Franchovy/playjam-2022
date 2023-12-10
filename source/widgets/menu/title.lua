@@ -4,14 +4,15 @@ import "common/painters/background"
 
 class("WidgetTitle").extends(Widget)
 
-WidgetLevelSelect.kAnimations = {
-	animateIn = 1,
-	animateOut = 2,
-	animateBackIn = 3
-}
-
 function WidgetTitle:init()
-	self.animators = {}
+	self:supply(Widget.kDeps.update)
+	self:supply(Widget.kDeps.animators)
+	
+	self:setAnimations({
+		onFirstOpen = 1,
+		toLevelSelect = 2,
+		fromLevelSelect = 3
+	})
 	
 	self.images = {}
 	self.imagetables = {}
@@ -158,7 +159,7 @@ function WidgetTitle:animate(animation, finishedCallback)
 	
 	self._previousAnimation = previousAnimation
 	
-	function finishedCallbackAfterDelay(delay)
+	function queueFinishedCallback(delay)
 		if finishedCallback ~= nil then
 			playdate.timer.performAfterDelay(delay, function() 
 				local animationChanged = (previousAnimation.animation ~= self._previousAnimation.animation) 
@@ -169,11 +170,11 @@ function WidgetTitle:animate(animation, finishedCallback)
 		end
 	end
 	
-	self:_animate(animation, finishedCallbackAfterDelay)
+	self:_animate(animation, queueFinishedCallback)
 end
 
-function WidgetTitle:_animate(animation, finishedCallbackAfterDelay)
-	if animation == WidgetLevelSelect.kAnimations.animateIn then
+function WidgetTitle:_animate(animation, queueFinishedCallback)
+	if animation == self.kAnimations.onFirstOpen then
 		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
 		self.animators.animator2 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outExpo, 500)
 		self.animators.animator3 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outCirc, 1000)
@@ -189,8 +190,8 @@ function WidgetTitle:_animate(animation, finishedCallbackAfterDelay)
 		self.animators.animatorOut = playdate.graphics.animator.new(0, 0, 0, playdate.easingFunctions.outCirc, 0)
 		self.animators.animatorOutWheel = playdate.graphics.animator.new(0, playdate.geometry.point.new(0, 0), playdate.geometry.point.new(0, 0), playdate.easingFunctions.outCirc, 0)
 		
-		finishedCallbackAfterDelay(1800)
-	elseif animation == WidgetLevelSelect.kAnimations.animateBackIn then
+		queueFinishedCallback(1800)
+	elseif animation == self.kAnimations.fromLevelSelect then
 		self.animators.animatorOut = playdate.graphics.animator.new(
 			800, 
 			math.min(240, self.animators.animatorOut:currentValue()), 
@@ -201,8 +202,8 @@ function WidgetTitle:_animate(animation, finishedCallbackAfterDelay)
 		self.animators.animatorOutWheel = playdate.graphics.animator.new(0, playdate.geometry.point.new(0, 0), playdate.geometry.point.new(0, 0), playdate.easingFunctions.outCirc, 0)
 		self.animators.animatorWheel:reset()
 		
-		finishedCallbackAfterDelay(1000)
-	elseif animation == WidgetLevelSelect.kAnimations.animateOut then
+		queueFinishedCallback(1000)
+	elseif animation == self.kAnimations.toLevelSelect then
 		self.animators.animatorOut = playdate.graphics.animator.new(
 			800, 
 			math.max(0, self.animators.animatorOut:currentValue()), 
@@ -217,7 +218,7 @@ function WidgetTitle:_animate(animation, finishedCallbackAfterDelay)
 			500
 		)
 		
-		finishedCallbackAfterDelay(1300)
+		queueFinishedCallback(1300)
 	end
 end
 
@@ -242,5 +243,9 @@ function WidgetTitle:_update()
 	
 	if self.index % 40 > 32 then
 		self.tick = self.tick == 0 and 1 or 0
+	end
+	
+	if not self:animatorsEnded() then
+		self:markDirty(Rect.make(0, 0, 400, 240))
 	end
 end

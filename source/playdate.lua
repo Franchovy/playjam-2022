@@ -31,6 +31,8 @@ import "playdate/constant/kCollisionResponse"
 
 import "CoreLibs/animation"
 
+import "playdate/extensions/animator"
+
 -- Timers
 
 import "CoreLibs/timer"

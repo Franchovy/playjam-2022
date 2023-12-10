@@ -44,7 +44,7 @@ function WidgetMenu:_load()
 		end
 	end
 	
-	self.children.title:animate(WidgetLevelSelect.kAnimations.animateIn)
+	self.children.title:animate(self.children.title.kAnimations.onFirstOpen)
 	
 	playdate.timer.performAfterDelay(600, function()
 		self:playSample(kAssetsSounds.intro)
@@ -87,7 +87,7 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 			self.children.levelSelect:load()
 		end
 		
-		self.children.title:animate(WidgetLevelSelect.kAnimations.animateOut, function(animationChanged)
+		self.children.title:animate(self.children.title.kAnimations.toLevelSelect, function(animationChanged)
 			if not animationChanged then
 				self.children.title:setVisible(false)
 				self.children.levelSelect:setVisible(true)
@@ -101,7 +101,7 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 		self.children.title:setVisible(true)
 		self.children.levelSelect:setVisible(false)
 		
-		self.children.title:animate(WidgetLevelSelect.kAnimations.animateBackIn)
+		self.children.title:animate(self.children.title.kAnimations.fromLevelSelect)
 	end
 end
 

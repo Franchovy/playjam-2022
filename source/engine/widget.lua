@@ -5,7 +5,9 @@ Widget.drawList = {}
 Widget.kDeps = {
 	children = 1,
 	state = 2,
-	samples = 3
+	samples = 3,
+	animators = 4,
+	update = 5
 }
 
 function Widget:createSprite(zIndex)
@@ -23,7 +25,6 @@ function Widget:createSprite(zIndex)
 		
 		sprite:setIgnoresDrawOffset(true)
 		sprite:setUpdatesEnabled(false)
-		sprite.setAlwaysRedraw(true)
 		sprite.draw = function(s, x, y, w, h)
 			self:draw(Rect.make(x, y, w, h), self.state)
 		end
@@ -31,6 +32,10 @@ function Widget:createSprite(zIndex)
 		sprite:add()
 		self.sprite = sprite
 	end
+end
+
+function Widget:markDirty(rect)
+	playdate.graphics.sprite.addDirtyRect(rect.x, rect.y, rect.w, rect.h)
 end
 
 function Widget.new(class, ...)
@@ -51,6 +56,10 @@ function Widget.supply(widget, dep)
 		widget:_supplyDepState()
 	elseif dep == Widget.kDeps.samples then
 		widget:_supplyDepSamples()
+	elseif dep == Widget.kDeps.animators then
+		widget:_supplyDepAnimators()
+	elseif dep == Widget.kDeps.update then
+		widget:_supplyDepUpdate()
 	end
 end
 
@@ -72,6 +81,10 @@ function Widget._supplyDepState(self)
 	end
 end
 
+function Widget._supplyDepUpdate(self)
+	self._updateCallbacks = {}
+end
+
 function Widget._supplyDepSamples(self)
 	self.samples = {}
 	function self:loadSample(path, key, volume)
@@ -90,6 +103,28 @@ function Widget._supplyDepSamples(self)
 	function self:unloadSample(key)
 		self.samples[key] = nil
 	end
+end
+
+function Widget._supplyDepAnimators(self)
+	self.animators = {}
+	
+	function self:setAnimations(animations) 
+		self.kAnimations = animations
+	end
+	function self:animatorsEnded()
+		for _, animator in pairs(self.animators) do
+			if animator.didend ~= true then
+				return false
+			end
+		end
+		
+		return true
+	end
+	table.insert(self._updateCallbacks, function()
+		for _, animator in pairs(self.animators) do
+			animator:update()
+		end
+	end)
 end
 
 function Widget.load(self)
@@ -138,6 +173,12 @@ function Widget:update()
 	if self.children ~= nil then
 		for _, child in pairs(self.children) do
 			child:update()
+		end
+	end
+	
+	if self._updateCallbacks ~= nil then
+		for _, callback in pairs(self._updateCallbacks) do
+			callback()
 		end
 	end
 end
