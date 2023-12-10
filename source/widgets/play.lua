@@ -135,10 +135,6 @@ function WidgetPlay:_load()
 	
 	self.timers.levelTimer = playdate.timer.new(999000)
 	self.timers.levelTimer:pause()
-	
-	--self.timers.levelTimer.updateCallback = function(timer)
---		self.data.time = timer.currentTime
---	end
 end
 
 function WidgetPlay:_draw(rect)
@@ -364,6 +360,7 @@ function WidgetPlay:_unload()
 	end
 	
 	if self.children.background ~= nil then
+		self.children.background.sprite:remove()
 		self.children.background = nil
 	end
 		
