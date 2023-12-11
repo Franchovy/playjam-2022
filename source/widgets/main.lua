@@ -127,16 +127,16 @@ function WidgetMain:_load()
 	self.children.loading:setVisible(false)
 end
 
-function WidgetMain:_draw(rect)
+function WidgetMain:_draw(frame, rect)
 	if self.state == self.kStates.menu and (self.children.menu ~= nil) then
-		self.children.menu:draw(rect)
+		self.children.menu:draw(frame, rect)
 	end
 	
 	if self.state == self.kStates.play and (self.children.play ~= nil) then
-		self.children.play:draw(rect)
+		self.children.play:draw(frame, rect)
 	end
 	
-	self.children.loading:draw(rect)
+	self.children.loading:draw(frame, rect)
 end
 
 function WidgetMain:_update()

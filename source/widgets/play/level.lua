@@ -135,10 +135,6 @@ function WidgetLevel:_load()
 	self:updateDrawOffset()
 end
 
-function WidgetLevel:_draw(rect)
-	
-end
-
 function WidgetLevel:_update()
 	if self.state == self.kStates.unloaded then
 		return

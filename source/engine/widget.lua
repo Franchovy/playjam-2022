@@ -26,16 +26,14 @@ function Widget:createSprite(zIndex)
 		sprite:setIgnoresDrawOffset(true)
 		sprite:setUpdatesEnabled(false)
 		sprite.draw = function(s, x, y, w, h)
-			self:draw(Rect.make(x, y, w, h), self.state)
+			local frame = Rect.make(s.x, s.y, s.width, s.height)
+			local drawRect = Rect.make(x, y, w, h)
+			self:draw(frame, self.state, drawRect)
 		end
 		
 		sprite:add()
 		self.sprite = sprite
 	end
-end
-
-function Widget:markDirty(rect)
-	playdate.graphics.sprite.addDirtyRect(rect.x, rect.y, rect.w, rect.h)
 end
 
 function Widget.new(class, ...)
@@ -183,10 +181,10 @@ function Widget:update()
 	end
 end
 
-function Widget:draw(rect)
+function Widget:draw(frame, rect)
 	if self._state.isLoaded == false or (self._state.isVisible == false) then
 		return
 	end
 
-	self:_draw(rect)
+	self:_draw(frame, rect)
 end

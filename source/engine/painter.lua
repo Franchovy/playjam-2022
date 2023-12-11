@@ -1,8 +1,10 @@
 
 class("Painter").extends()
 
-function Painter:init(drawFunction)
+function Painter:init(drawFunction, config)
 	self.drawFunction = drawFunction
+	self.config = config or {}
+	
 	self.stateImages = {}
 	self.state = nil
 end
@@ -21,6 +23,14 @@ function Painter:draw(rect, state)
 	end
 	
 	image:draw(rect.x, rect.y)
+	
+	self.rect = rect
+end
+
+function Painter:update()
+	if self.config.alwaysRedraw == true then
+		playdate.graphics.sprite.addDirtyRect(self.rect.x, self.rect.y, self.rect.w, self.rect.h)
+	end
 end
 
 function Painter:_getImage(state)
