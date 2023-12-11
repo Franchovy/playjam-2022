@@ -4,14 +4,15 @@ import "utils/textPainter"
 class("WidgetHUD").extends(Widget)
 
 function WidgetHUD:init()
+	self:supply(Widget.kDeps.update)
 	self:supply(Widget.kDeps.state)
+	self:supply(Widget.kDeps.animators)
 	self:setStateInitial({onScreen = 1, offScreen = 2})
 	
 	self.images = {}
 	self.painters = {}
 	
 	self.data = {}
-	self.animators = {}
 	
 	self.textPainter = textPainter({
 		charsPreloaded = "1234567890.:", 
@@ -41,8 +42,8 @@ function WidgetHUD:_load()
 	self.animators.hideAnimator = playdate.graphics.animator.new(0, 0, 0)
 end
 
-function WidgetHUD:_draw(rect)
-	local offsetRect = Rect.offset(rect, 0, self.animators.hideAnimator:currentValue())
+function WidgetHUD:_draw(frame)
+	local offsetRect = Rect.offset(frame, 0, self.animators.hideAnimator:currentValue())
 	self.painters.frame:draw(offsetRect)
 	
 	self.textPainter:drawText(self.data.timeLabelText, offsetRect.x + 10, offsetRect.y + 7)
@@ -51,11 +52,20 @@ function WidgetHUD:_draw(rect)
 	self.textPainter:drawTextAlignedRight(self.data.coinsLabelText, offsetRect.x + offsetRect.w - 10 - coinImageSize, offsetRect.y + 7)
 	
 	self.images.coin:draw(offsetRect.x + offsetRect.w - 10 - coinImageSize, offsetRect.y + 3)
+	
+	self.frame = frame
 end
 
 function WidgetHUD:_update()
+	local timeLabelTextPrevious = self.data.timeLabelText
 	self.data.timeLabelText = convertToTimeString(self.data.time, 2)
+	
+	local coinsLabelTextPrevious = self.data.coinsLabelText
 	self.data.coinsLabelText = ""..self.data.coins
+	
+	if self:isAnimating() == false and (self.frame ~= nil) then
+		playdate.graphics.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+	end
 end
 
 function WidgetHUD:changeState(stateFrom, stateTo)

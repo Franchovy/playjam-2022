@@ -138,16 +138,12 @@ function WidgetPlay:_load()
 end
 
 function WidgetPlay:_draw(rect)
-	if self.children.level ~= nil then
-		--self.children.level:draw(rect)
-	end
-	
 	if self.children.levelComplete ~= nil then
 		local insetRect = Rect.inset(rect, 30, 20)
-		--self.children.levelComplete:draw(insetRect)
+		self.children.levelComplete:draw(insetRect)
 	end
 
-	--self.children.gameOver:draw(rect)
+	self.children.gameOver:draw(rect)
 	
 	local topAlignedRect = Rect.with(Rect.inset(rect, 7), { h = 29 })
 	self.children.hud:draw(topAlignedRect)

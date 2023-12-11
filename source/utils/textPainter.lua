@@ -49,6 +49,24 @@ function textPainter(config)
 		end
 	end
 	
+	function textPainter:getSize(text)
+		local textSizeW = 0
+		local textSizeH = 0
+		for i = 1, #text do
+			local char = text:sub(i, i)
+			
+			if textPainter.images[char] == nil then
+				self:loadCharsFromString(char)
+			end
+			
+			local width, height = textPainter.images[char]:getSize()
+			textSizeH = height
+			textSizeW += width + textPainter.config.spacing
+		end
+		
+		return textSizeW, textSizeH
+	end
+	
 	if textPainter.config.charsPreloaded ~= nil then
 		textPainter:loadCharsFromString(textPainter.config.charsPreloaded)
 	end
