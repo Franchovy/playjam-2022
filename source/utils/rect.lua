@@ -75,3 +75,18 @@ end
 function Rect.at(rect, x, y)
 	return { x = x, y = y + y, w = rect.w, h = rect.h }
 end
+
+function Rect.overlap(rect1, rect2)
+	local x1, y1, w1, h1 = rect1.x, rect1.y, rect1.w, rect1.h
+	local x2, y2, w2, h2 = rect2.x, rect2.y, rect2.w, rect2.h
+	
+	local overlapX = math.max(0, math.min(x1 + w1, x2 + w2) - math.max(x1, x2))
+	local overlapY = math.max(0, math.min(y1 + h1, y2 + h2) - math.max(y1, y2))
+	
+	return {
+		x = math.max(x1, x2),
+		y = math.max(y1, y2),
+		w = overlapX,
+		h = overlapY
+	}
+end

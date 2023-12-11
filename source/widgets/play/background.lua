@@ -36,13 +36,27 @@ function WidgetBackground:_draw(frame, rect)
 	
 	for i, image in ipairs(self.images) do
 		local imageOffset = math.floor(self.imageOffsets[i])
-		local imageWidth = image:getSize()
+		local imageWidth, imageHeight = image:getSize()
 		
-		-- TODO: Handle drawRect / image source rects overlap
+		-- TODO: Handle drawRect / image visible rects overlap
+		local imageRightRect = Rect.make(imageOffset, 0, imageWidth, imageHeight)
+		local imageLeftRect = Rect.make(imageOffset - 400, 0, imageWidth, imageHeight)
+		local screenRect = Rect.make(0, 0, 400, 240)
 		
 		-- Draw 2 copies of the image, one before and one after
-		image:draw(frame.x, frame.y, playdate.graphics.kImageUnflipped, -imageOffset, 0, imageWidth - math.abs(imageOffset), 240)
-		image:draw(frame.x + imageOffset + imageWidth, frame.y, playdate.graphics.kImageUnflipped, 0, 0, -imageOffset, 240)
+		local imageRightSourceRect = Rect.offset(Rect.overlap(imageRightRect, screenRect), -imageOffset, 0)
+		assert(imageRightSourceRect.x == 0)
+		assert(imageRightSourceRect.y == 0)
+		assert(imageRightSourceRect.w == imageWidth - math.abs(imageOffset))
+		assert(imageRightSourceRect.h == 240)
+		image:draw(frame.x + imageOffset, frame.y, playdate.graphics.kImageUnflipped, imageRightSourceRect.x, imageRightSourceRect.y, imageRightSourceRect.w, imageRightSourceRect.h)
+		
+		local imageLeftSourceRect = Rect.offset(Rect.overlap(imageLeftRect, screenRect), imageWidth - imageOffset, 0)
+		assert(imageLeftSourceRect.x == imageWidth - imageOffset)
+		assert(imageLeftSourceRect.y == 0)
+		assert(imageLeftSourceRect.w == imageOffset)
+		assert(imageLeftSourceRect.h == 240)
+		image:draw(frame.x + imageOffset - imageOffset, frame.y, playdate.graphics.kImageUnflipped, imageLeftSourceRect.x, imageLeftSourceRect.y, imageLeftSourceRect.w, imageLeftSourceRect.h)
 	end
 end
 
@@ -52,7 +66,7 @@ function WidgetBackground:_update()
 	
 	for i, image in pairs(self.images) do
 		local originalOffset = self.drawOffset * self.paralaxRatios[i]
-		self.imageOffsets[i] = originalOffset % 400 - 400
+		self.imageOffsets[i] = originalOffset % 400
 	end
 	
 	if self.drawOffset ~= previousOffset then
