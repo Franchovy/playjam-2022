@@ -14,7 +14,6 @@ end
 function WidgetTransition:_load()
 	self.painters.screen = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		--playdate.graphics.setDitherPattern(0.7, playdate.graphics.image.kDitherTypeBayer8x8)
 		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
 	end)
 	
