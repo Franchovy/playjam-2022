@@ -118,6 +118,40 @@ function Widget._supplyDepAnimators(self)
 		
 		return true
 	end
+	function self:animate(animation, finishedCallback)
+		local previousAnimation = {
+			animation = animation,
+			timestamp = playdate.getCurrentTimeMilliseconds()
+		}
+		
+		self._previousAnimation = previousAnimation
+		
+		function queueFinishedCallback(delay)
+			if finishedCallback ~= nil then
+				playdate.timer.performAfterDelay(delay, function() 
+					local animationChanged = (previousAnimation.animation ~= self._previousAnimation.animation) 
+						or (previousAnimation.timestamp ~= self._previousAnimation.timestamp)
+					
+					finishedCallback(animationChanged)
+					
+					if animationChanged == false then
+						self._previousAnimation.isended = true
+					end
+				end)
+			end
+		end
+		
+		self:_animate(animation, queueFinishedCallback)
+	end
+	function self:isAnimating()
+		if self._previousAnimation == nil then
+			return false
+		elseif self._previousAnimation.isended == nil then
+			return false
+		else
+			return self._previousAnimation.isended
+		end
+	end
 	table.insert(self._updateCallbacks, function()
 		for _, animator in pairs(self.animators) do
 			animator:update()

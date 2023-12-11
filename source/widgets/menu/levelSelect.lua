@@ -11,8 +11,15 @@ WidgetLevelSelect.kMenuActionType = {
 function WidgetLevelSelect:init(config)
 	self.config = config
 	
+	self:supply(Widget.kDeps.update)
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.children)
+	self:supply(Widget.kDeps.animators)
+	
+	self:setAnimations({
+		open = 1,
+		menuSelectError = 2
+	})
 	
 	self:setStateInitial({1, 2, 3, 4}, 1)
 	
@@ -114,11 +121,6 @@ function WidgetLevelSelect:_draw(rect)
 end
 
 function WidgetLevelSelect:_update()
-	if self.animators == nil then
-		self.animators = {}
-		self.animators.card = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo)
-	end
-	
 	if self.animators.card:currentValue() < 100 then
 		local selectButtonPressed = playdate.buttonJustPressed(playdate.kButtonA)
 		if selectButtonPressed then
@@ -143,8 +145,8 @@ function WidgetLevelSelect:_update()
 			self.samples.select:play()
 		else
 			self.samples.selectFail:play()
-			self.animators.card = playdate.graphics.animator.new(50, 0, 16, playdate.easingFunctions.outInBack)
-			self.animators.card.reverses = true
+			
+			self:animate(self.kAnimations.menuSelectError)
 		end
 	end
 	
@@ -155,8 +157,8 @@ function WidgetLevelSelect:_update()
 			self.samples.select:play()
 		else
 			self.samples.selectFail:play()
-			self.animators.card = playdate.graphics.animator.new(50, 0, 16, playdate.easingFunctions.outInBack)
-			self.animators.card.reverses = true
+			
+			self:animate(self.kAnimations.menuSelectError)
 		end
 	end
 	
@@ -166,6 +168,23 @@ function WidgetLevelSelect:_update()
 		elseif entry.state.selected == true then
 			entry:setState({ selected = false })
 		end
+	end
+	
+	playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+end
+
+function WidgetLevelSelect:_animate(animation, queueFinishedCallback)
+	if animation == self.kAnimations.open then
+		self.animators.card = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo)
+		
+		queueFinishedCallback(800)
+	elseif animation == self.kAnimations.menuSelectError then
+		if self:isAnimating() == false then
+			self.animators.card = playdate.graphics.animator.new(50, 0, 16, playdate.easingFunctions.outInBack)
+			self.animators.card.reverses = true
+		end
+		
+		queueFinishedCallback(50)
 	end
 end
 

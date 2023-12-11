@@ -156,28 +156,6 @@ function WidgetTitle:_load()
 	end, { alwaysRedraw = true })
 end
 
-function WidgetTitle:animate(animation, finishedCallback)
-	local previousAnimation = {
-		animation = animation,
-		timestamp = playdate.getCurrentTimeMilliseconds()
-	}
-	
-	self._previousAnimation = previousAnimation
-	
-	function queueFinishedCallback(delay)
-		if finishedCallback ~= nil then
-			playdate.timer.performAfterDelay(delay, function() 
-				local animationChanged = (previousAnimation.animation ~= self._previousAnimation.animation) 
-					or (previousAnimation.timestamp ~= self._previousAnimation.timestamp)
-				
-				finishedCallback(animationChanged) 
-			end)
-		end
-	end
-	
-	self:_animate(animation, queueFinishedCallback)
-end
-
 function WidgetTitle:_animate(animation, queueFinishedCallback)
 	if animation == self.kAnimations.onFirstOpen then
 		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)

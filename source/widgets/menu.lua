@@ -91,6 +91,8 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 			if not animationChanged then
 				self.children.title:setVisible(false)
 				self.children.levelSelect:setVisible(true)
+				
+				self.children.levelSelect:animate(self.children.levelSelect.kAnimations.open)
 			end
 		end)
 	end
