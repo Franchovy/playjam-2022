@@ -1,4 +1,5 @@
 import "utils/time"
+import "utils/textPainter"
 
 class("WidgetHUD").extends(Widget)
 
@@ -10,8 +11,13 @@ function WidgetHUD:init()
 	self.painters = {}
 	
 	self.data = {}
-	
 	self.animators = {}
+	
+	self.textPainter = textPainter({
+		charsPreloaded = "1234567890.:", 
+		scale = 2,
+		spacing = 4
+	})
 end
 
 function WidgetHUD:_load()
@@ -37,23 +43,19 @@ end
 
 function WidgetHUD:_draw(rect)
 	local offsetRect = Rect.offset(rect, 0, self.animators.hideAnimator:currentValue())
-	
 	self.painters.frame:draw(offsetRect)
 	
-	self.images.timeLabel = playdate.graphics.imageWithText(self.data.timeLabelText, 100, 15):scaledImage(2)
-	self.images.timeLabel:draw(offsetRect.x + 10, offsetRect.y + 7)
+	self.textPainter:drawText(self.data.timeLabelText, offsetRect.x + 10, offsetRect.y + 7)
 	
-	self.images.coinsLabel = playdate.graphics.imageWithText(""..self.data.coins, 100, 15):scaledImage(2)
+	local coinImageSize = self.images.coin:getSize()
+	self.textPainter:drawTextAlignedRight(self.data.coinsLabelText, offsetRect.x + offsetRect.w - 10 - coinImageSize, offsetRect.y + 7)
 	
-	local imageLabelCoinWidth = self.images.coinsLabel:getSize()
-	local imageCoinSize = self.images.coin:getSize()
-	
-	self.images.coinsLabel:draw(offsetRect.x + offsetRect.w - (10 * 2) - imageCoinSize - imageLabelCoinWidth, offsetRect.y + 7)
-	self.images.coin:draw(offsetRect.x + offsetRect.w - 10 - imageCoinSize, offsetRect.y + 3)
+	self.images.coin:draw(offsetRect.x + offsetRect.w - 10 - coinImageSize, offsetRect.y + 3)
 end
 
 function WidgetHUD:_update()
 	self.data.timeLabelText = convertToTimeString(self.data.time, 2)
+	self.data.coinsLabelText = ""..self.data.coins
 end
 
 function WidgetHUD:changeState(stateFrom, stateTo)
