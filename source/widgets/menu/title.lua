@@ -230,9 +230,19 @@ end
 function WidgetTitle:_update()
 	self.index += 2
 	
+	local tickPrevious = self.tick
 	if self.index % 40 > 32 then
 		self.tick = self.tick == 0 and 1 or 0
 	end
 	
-	playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+	if self.tick ~= tickPrevious then
+		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+	end
+	
+	self.painters.painterWheel:update()
+	self.painters.painterButton:update()
+	
+	if self:isAnimating() == true then
+		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+	end
 end

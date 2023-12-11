@@ -27,8 +27,8 @@ function Painter:draw(rect, state)
 	self.rect = rect
 end
 
-function Painter:update()
-	if self.config.alwaysRedraw == true then
+function Painter:update( )
+	if self.config.alwaysRedraw == true and (self.rect ~= nil) then
 		playdate.graphics.sprite.addDirtyRect(self.rect.x, self.rect.y, self.rect.w, self.rect.h)
 	end
 end
