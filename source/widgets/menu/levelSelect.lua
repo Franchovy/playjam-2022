@@ -170,7 +170,10 @@ function WidgetLevelSelect:_update()
 		end
 	end
 	
-	playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+	if self.wasAnimating == true then
+		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+	end
+	self.wasAnimating = self:isAnimating()
 end
 
 function WidgetLevelSelect:_animate(animation, queueFinishedCallback)
@@ -179,15 +182,13 @@ function WidgetLevelSelect:_animate(animation, queueFinishedCallback)
 		
 		queueFinishedCallback(800)
 	elseif animation == self.kAnimations.menuSelectError then
-		if self:isAnimating() == false then
-			self.animators.card = playdate.graphics.animator.new(50, 0, 16, playdate.easingFunctions.outInBack)
-			self.animators.card.reverses = true
-		end
+		self.animators.card = playdate.graphics.animator.new(50, 0, 16, playdate.easingFunctions.outInBack)
+		self.animators.card.reverses = true
 		
 		queueFinishedCallback(50)
 	end
 end
 
-function WidgetLevelSelect:changeState(_, stateTo)
-	
+function WidgetLevelSelect:changeState(_, _)
+	playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 end
