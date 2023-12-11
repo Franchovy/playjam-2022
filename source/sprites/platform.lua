@@ -13,4 +13,6 @@ function Platform:init()
 	
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)
+	
+	self:setOpaque(true)
 end

@@ -40,8 +40,7 @@ function WidgetHUD:_draw(rect)
 	
 	self.painters.frame:draw(offsetRect)
 	
-	local timeLabelText = convertToTimeString(self.data.time, 2)
-	self.images.timeLabel = playdate.graphics.imageWithText(timeLabelText, 100, 15):scaledImage(2)
+	self.images.timeLabel = playdate.graphics.imageWithText(self.data.timeLabelText, 100, 15):scaledImage(2)
 	self.images.timeLabel:draw(offsetRect.x + 10, offsetRect.y + 7)
 	
 	self.images.coinsLabel = playdate.graphics.imageWithText(""..self.data.coins, 100, 15):scaledImage(2)
@@ -54,7 +53,7 @@ function WidgetHUD:_draw(rect)
 end
 
 function WidgetHUD:_update()
-	
+	self.data.timeLabelText = convertToTimeString(self.data.time, 2)
 end
 
 function WidgetHUD:changeState(stateFrom, stateTo)
