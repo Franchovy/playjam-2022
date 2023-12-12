@@ -96,10 +96,10 @@ function Widget._supplyDepSamples(self)
 		if key == nil then
 			key = path
 		end
-		self.samples[path] = playdate.sound.sampleplayer.new(path)
+		self.samples[key] = playdate.sound.sampleplayer.new(path)
 		
 		if volume ~= nil then
-			self.samples[path]:setVolume(volume)
+			self.samples[key]:setVolume(volume)
 		end
 	end
 	function self:playSample(key, finishedCallback)
