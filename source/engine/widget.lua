@@ -92,7 +92,7 @@ end
 
 function Widget._supplyDepSamples(self)
 	self.samples = {}
-	function self:loadSample(path, key, volume)
+	function self:loadSample(path, volume, key)
 		if key == nil then
 			key = path
 		end

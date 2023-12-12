@@ -20,9 +20,9 @@ function WidgetTransition:_load()
 		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
 	end)
 	
-	self:loadSample(kAssetsSounds.transitionSwoosh, "swoosh", 0.8)
-	self:loadSample(kAssetsSounds.transitionSlam, "slam", 0.8)
-	self:loadSample(kAssetsSounds.transitionOut, "out", 0.8)
+	self:loadSample(kAssetsSounds.transitionSwoosh, 0.8, "swoosh")
+	self:loadSample(kAssetsSounds.transitionSlam, 0.8, "slam")
+	self:loadSample(kAssetsSounds.transitionOut, 0.8, "out")
 end
 
 function WidgetTransition:_draw(frame)
