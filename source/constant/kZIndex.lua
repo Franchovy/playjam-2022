@@ -1,6 +1,7 @@
 kZIndex = {
 	background = -1,
-	main = 0,
-	overlay = 1,
-	transition = 2
+	level = 0,
+	main = 1,
+	overlay = 2,
+	transition = 3
 }

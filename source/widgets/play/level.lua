@@ -90,6 +90,8 @@ function WidgetLevel:_load()
 			else 
 				print("Unrecognized ID: ".. id)
 			end
+			
+			sprite:setZIndex(kZIndex.level)
 		end
 		
 		if config ~= nil then
