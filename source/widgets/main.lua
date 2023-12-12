@@ -1,4 +1,3 @@
-import "common/loading"
 import "constant"
 import "engine"
 import "menu"
@@ -184,7 +183,7 @@ function WidgetMain:changeState(stateFrom, stateTo)
 			end
 		end
 	elseif stateFrom == self.kStates.play and (stateTo == self.kStates.menu) then
-		self.children.loading:setVisible(true)
+		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.closed)
 		
 		self.children.play:setVisible(false)
