@@ -167,12 +167,12 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		self.children.hud:setState(self.children.hud.kStates.onScreen)
 	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.checkpoint) then
 		self.children.transition:setVisible(true)
-		self.children.transition:setState(self.children.transition.kStates.inside)
+		self.children.transition:setState(self.children.transition.kStates.closed)
 		
 		playdate.timer.performAfterDelay(400, function()
 			
 			self.children.gameOver:setVisible(false)
-			self.children.transition:setState(self.children.transition.kStates.outside)
+			self.children.transition:setState(self.children.transition.kStates.open)
 			
 			self.children.level:setState(self.children.level.kStates.ready)
 			self.children.level.loadIndex += 1
@@ -188,7 +188,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		
 		playdate.timer.performAfterDelay(1200, function()
 			self.children.transition:setVisible(true)
-			self.children.transition:setState(self.children.transition.kStates.inside)
+			self.children.transition:setState(self.children.transition.kStates.closed)
 			
 			playdate.timer.performAfterDelay(500, function()
 				local checkpointData = table.last(self.data.checkpoints)
@@ -201,7 +201,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 				
 				self.children.level:setState(self.children.level.kStates.unloaded)
 				
-				self.children.transition:setState(self.children.transition.kStates.outside)
+				self.children.transition:setState(self.children.transition.kStates.open)
 				
 				self.children.gameOver:setVisible(true)
 				
@@ -283,7 +283,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		end)
 	elseif stateTo == self.kStates.start then
 		self.children.transition:setVisible(true)
-		self.children.transition:setState(self.children.transition.kStates.inside)
+		self.children.transition:setState(self.children.transition.kStates.closed)
 		
 		self.filePlayer:stop()
 		
@@ -310,7 +310,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			self.data.time = 0
 			self.timers.levelTimer:reset()
 			
-			self.children.transition:setState(self.children.transition.kStates.outside)
+			self.children.transition:setState(self.children.transition.kStates.open)
 			
 			self.children.level:setState(self.children.level.kStates.ready)
 			

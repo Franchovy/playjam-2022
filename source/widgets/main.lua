@@ -14,9 +14,7 @@ function WidgetMain:init()
 	self.kStates = { menu = 1, play = 2 }
 	self.state = self.kStates.menu
 	
-	self:createSprite()
-	self.sprite:setZIndex(1)
-	self.sprite:add()
+	self:createSprite(kZIndex.main)
 	
 	self.data = {}
 	
@@ -122,9 +120,9 @@ function WidgetMain:_load()
 	
 	self.children.menu.signals.play = self.onMenuPressedPlay
 	
-	self.children.loading = Widget.new(WidgetLoading)
-	self.children.loading:load()
-	self.children.loading:setVisible(false)
+	self.children.transition = Widget.new(WidgetTransition)
+	self.children.transition:load()
+	self.children.transition:setVisible(false)
 end
 
 function WidgetMain:_draw(frame, rect)
@@ -136,7 +134,7 @@ function WidgetMain:_draw(frame, rect)
 		self.children.play:draw(frame, rect)
 	end
 	
-	self.children.loading:draw(frame, rect)
+	self.frame = frame
 end
 
 function WidgetMain:_update()
@@ -149,10 +147,10 @@ end
 
 function WidgetMain:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.menu and (stateTo == self.kStates.play) then
-		self.children.menu:setVisible(false)
-		self.children.loading:setVisible(true)
-		
-		playdate.timer.performAfterDelay(10, function()
+		self.children.transition:setVisible(true)
+		self.children.transition:setState(self.children.transition.kStates.closed)
+		self.children.transition.signals.animationFinished = function()
+			self.children.menu:setVisible(false)
 			local levelConfig = loadLevelFromFile(self.level.path)
 			
 			if self.children.play == nil then
@@ -168,14 +166,19 @@ function WidgetMain:changeState(stateFrom, stateTo)
 				self.children.play.signals.returnToMenu = self.onReturnToMenu
 				self.children.play.signals.getNextLevelConfig = self.getNextLevelConfig
 				
-				self.children.loading:setVisible(false)
+				self.children.transition:setState(self.children.transition.kStates.open)
+				self.children.transition.signals.animationFinished = function()
+					self.children.transition:setVisible(false)
+				end
 			end
-		end)
+		end
 	elseif stateFrom == self.kStates.play and (stateTo == self.kStates.menu) then
 		self.children.loading:setVisible(true)
+		self.children.transition:setState(self.children.transition.kStates.closed)
+		
 		self.children.play:setVisible(false)
 		
-		playdate.timer.performAfterDelay(10, function()
+		self.children.transition.signals.animationFinished = function()
 			self.children.play:unload()
 			self.children.play = nil 
 			
@@ -186,7 +189,10 @@ function WidgetMain:changeState(stateFrom, stateTo)
 			
 			self.children.menu.signals.play = self.onMenuPressedPlay
 			
-			self.children.loading:setVisible(false)
-		end)
+			self.children.transition:setState(self.children.transition.kStates.open)
+			self.children.transition.signals.animationFinished = function()
+				self.children.transition:setVisible(false)
+			end
+		end
 	end
 end
