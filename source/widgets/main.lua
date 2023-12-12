@@ -130,7 +130,7 @@ function WidgetMain:_load()
 	
 	self.children.menu.signals.play = self.onMenuPressedPlay
 	
-	self.children.transition = Widget.new(WidgetTransition)
+	self.children.transition = Widget.new(WidgetTransition, { showLoading = true })
 	self.children.transition:load()
 	self.children.transition:setVisible(false)
 end
