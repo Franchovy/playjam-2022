@@ -39,6 +39,7 @@ function WidgetMenu:_load()
 	
 	self.children.levelSelect.signals.select = function(args)
 		if args.type == WidgetLevelSelect.kMenuActionType.play and (args.level ~= nil) then
+			self.fileplayer.menu:stop(0)
 			self:playSample(kAssetsSounds.menuAccept)
 			
 			self.signals.play(args.level)
@@ -115,8 +116,6 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 end
 
 function WidgetMenu:_unload()
-	self.fileplayer.menu:stop(0)
-	
 	self.samples = {}
 	self.painters.background = nil
 	self.children.title = nil

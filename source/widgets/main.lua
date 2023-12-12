@@ -126,11 +126,11 @@ function WidgetMain:_load()
 end
 
 function WidgetMain:_draw(frame, rect)
-	if self.state == self.kStates.menu and (self.children.menu ~= nil) then
+	if self.children.menu ~= nil then
 		self.children.menu:draw(frame, rect)
 	end
-	
-	if self.state == self.kStates.play and (self.children.play ~= nil) then
+		
+	if self.children.play ~= nil then
 		self.children.play:draw(frame, rect)
 	end
 	
@@ -149,6 +149,7 @@ function WidgetMain:changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.menu and (stateTo == self.kStates.play) then
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.closed)
+		
 		self.children.transition.signals.animationFinished = function()
 			self.children.menu:setVisible(false)
 			local levelConfig = loadLevelFromFile(self.level.path)

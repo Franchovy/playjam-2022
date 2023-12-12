@@ -23,13 +23,12 @@ end
 function WidgetTransition:_draw(frame)
 	local animatorValue = self:getAnimatorValue(self.animators.animator)
 	self.painters.screen:draw(Rect.offset(frame, animatorValue, 0))
-	
-	self.frame = frame
 end
 
 function WidgetTransition:_update()
-	if self:isAnimating() and (self.frame ~= nil) then
-		playdate.graphics.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+	if self:isAnimating() then
+		print("animating")
+		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 	end
 end
 
