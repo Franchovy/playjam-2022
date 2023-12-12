@@ -46,10 +46,20 @@ function WidgetMain:_load()
 			shouldWriteToFile = true
 		else
 			function scoreCalculation(coinCount, time, timeObjective)
-				return coinCount + (timeObjective - time) * 50
+			    function timeStringToNumber(timeString)
+					if timeString:find(":")  then
+						local minutes, seconds = timeString:match("(%d+):(%d+)")
+						return tonumber(minutes) * 60 + tonumber(seconds)
+					else
+						return tonumber(timeString)
+					end
+				end
+				
+				return coinCount + (timeStringToNumber(timeObjective) - timeStringToNumber(time)) * 50
 			end
-			local previousScore = scoreCalculation(existingContents.coinCount, tonumber(existingContents.timeString), tonumber(existingContents.timeStringObjective))
-			local currentScore = scoreCalculation(data.coinCount, tonumber(data.timeString), tonumber(data.timeStringObjective))
+			
+			local previousScore = scoreCalculation(existingContents.coinCount, existingContents.timeString, existingContents.timeStringObjective)
+			local currentScore = scoreCalculation(data.coinCount, data.timeString, data.timeStringObjective)
 			
 			shouldWriteToFile = previousScore < currentScore
 		end
