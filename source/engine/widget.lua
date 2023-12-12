@@ -74,6 +74,10 @@ function Widget._supplyDepState(self)
 		self.state = state
 	end
 	function self:setState(targetState)
+		if self.state == targetState then
+			return
+		end
+		
 		if self.changeState ~= nil then
 			self:changeState(self.state, targetState)
 		end
