@@ -7,7 +7,7 @@ function WidgetHUD:init()
 	self:supply(Widget.kDeps.update)
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.animators)
-	self:setStateInitial({onScreen = 1, offScreen = 2})
+	self:setStateInitial({onScreen = 1, offScreen = 2}, 1)
 	
 	self.images = {}
 	self.painters = {}
@@ -38,12 +38,13 @@ function WidgetHUD:_load()
 	
 	self.data.time = 0
 	self.data.coins = 0
-	
-	self.animators.hideAnimator = playdate.graphics.animator.new(0, 0, 0)
+	self.data.timeLabelText = ""
+	self.data.coinsLabelText = ""
 end
 
 function WidgetHUD:_draw(frame)
-	local offsetRect = Rect.offset(frame, 0, self.animators.hideAnimator:currentValue())
+	local animatorValue = self:getAnimatorValue(self.animators.hideAnimator)
+	local offsetRect = Rect.offset(frame, 0, animatorValue)
 	self.painters.frame:draw(offsetRect)
 	
 	self.textPainter:drawText(self.data.timeLabelText, offsetRect.x + 10, offsetRect.y + 7)
@@ -63,8 +64,20 @@ function WidgetHUD:_update()
 	local coinsLabelTextPrevious = self.data.coinsLabelText
 	self.data.coinsLabelText = ""..self.data.coins
 	
-	if self:isAnimating() == false and (self.frame ~= nil) then
-		playdate.graphics.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+	if self.frame ~= nil then
+		if self:isAnimating() == true then
+			playdate.graphics.sprite.addDirtyRect(0, 0, self.frame.x + self.frame.w, self.frame.y + self.frame.h)
+		else	
+			local labelWidth = 150
+			
+			if self.data.coinsLabelText ~= coinsLabelTextPrevious then
+				playdate.graphics.sprite.addDirtyRect(self.frame.x + self.frame.w - labelWidth - 10, self.frame.y, labelWidth, self.frame.h)
+			end
+			
+			if self.data.timeLabelText ~= timeLabelTextPrevious then
+				playdate.graphics.sprite.addDirtyRect(self.frame.x + 10, self.frame.y, labelWidth, self.frame.h)
+			end
+		end
 	end
 end
 
