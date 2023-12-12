@@ -240,7 +240,6 @@ function WidgetTitle:_update()
 	self.painters.painterWheel:markDirty()
 	self.painters.painterButton:markDirty()
 	
-	print(self:isAnimating())
 	if self:isAnimating() == true then
 		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 	end
