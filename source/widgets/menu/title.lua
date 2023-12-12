@@ -5,8 +5,7 @@ import "common/painters/background"
 class("WidgetTitle").extends(Widget)
 
 function WidgetTitle:init()
-	self:supply(Widget.kDeps.update)
-	self:supply(Widget.kDeps.animators)
+	self:supply(Widget.kDeps.animations)
 	
 	self:setAnimations({
 		onFirstOpen = 1,
@@ -80,7 +79,7 @@ function WidgetTitle:_load()
 		local imageSizePressStartW, imageSizePressStartH = self.images.pressStart:getSize()
 		local rectButtonText = Rect.with(Rect.offset(rect, 15, 5), { w = imageSizePressStartW, h = imageSizePressStartH })
 		painterButtonPressStart:draw(rectButtonText, state)
-	end, { alwaysRedraw = true })
+	end)
 	
 	-- Painter Background
 	
@@ -153,7 +152,7 @@ function WidgetTitle:_load()
 		self.imagetables.particles:getImage((state.index % 36) + 1):scaledImage(2):draw(10, -70)
 		
 		self.imagetables.wheel:getImage((-state.index % 12) + 1):draw(140, 0)
-	end, { alwaysRedraw = true })
+	end)
 end
 
 function WidgetTitle:_animate(animation, queueFinishedCallback)
@@ -169,10 +168,6 @@ function WidgetTitle:_animate(animation, queueFinishedCallback)
 			800
 		)
 		
-		-- Placeholder animator for use on transition out
-		self.animators.animatorOut = playdate.graphics.animator.new(0, 0, 0, playdate.easingFunctions.outCirc, 0)
-		self.animators.animatorOutWheel = playdate.graphics.animator.new(0, playdate.geometry.point.new(0, 0), playdate.geometry.point.new(0, 0), playdate.easingFunctions.outCirc, 0)
-		
 		queueFinishedCallback(1800)
 	elseif animation == self.kAnimations.fromLevelSelect then
 		self.animators.animatorOut = playdate.graphics.animator.new(
@@ -187,9 +182,10 @@ function WidgetTitle:_animate(animation, queueFinishedCallback)
 		
 		queueFinishedCallback(1000)
 	elseif animation == self.kAnimations.toLevelSelect then
+		local animatorValue = self:getAnimatorValue(self.animators.animatorOut)
 		self.animators.animatorOut = playdate.graphics.animator.new(
 			800, 
-			math.max(0, self.animators.animatorOut:currentValue()), 
+			math.max(0, animatorValue), 
 			240, 
 			playdate.easingFunctions.inExpo, 200
 		)
@@ -206,24 +202,26 @@ function WidgetTitle:_animate(animation, queueFinishedCallback)
 end
 
 function WidgetTitle:_draw(frame, rect)	
-	local animationValue = self.animators.animator1:currentValue() + self.animators.animatorOut:currentValue()
+	local animatorValueBackground = self:getAnimatorValue(self.animators.animator1, self.animators.animatorOut)
 	
-	local rectOffsetTop = Rect.offset(frame, 0, -20 - animationValue)
-	local rectOffsetLeft = Rect.offset(frame, -animationValue, -20)
-	local rectOffsetRight = Rect.offset(frame, animationValue, -20)
+	local rectOffsetTop = Rect.offset(frame, 0, -20 - animatorValueBackground)
+	local rectOffsetLeft = Rect.offset(frame, -animatorValueBackground, -20)
+	local rectOffsetRight = Rect.offset(frame, animatorValueBackground, -20)
 	self.painterBackground1:draw(rectOffsetTop)
 	self.painterBackground2:draw(rectOffsetRight)
 	self.painterBackground3:draw(rectOffsetTop, { tick = self.tick })
 	self.painterBackground4:draw(rectOffsetLeft)
 	self.painterBackgroundAssets:draw(rectOffsetRight)
 	
-	local animationWheelValue = self.animators.animatorWheel:currentValue():offsetBy(self.animators.animatorOutWheel:currentValue().x, self.animators.animatorOutWheel:currentValue().y)
-	self.painters.painterWheel:draw({x = animationWheelValue.x - 60, y = 30 + animationWheelValue.y, w = 280, h = 120}, { index = self.index % 36 })
+	local animatorValueWheel = self:getAnimatorValue(self.animators.animatorWheel, self.animators.animatorOutWheel)
+	self.painters.painterWheel:draw({x = animatorValueWheel.x - 60, y = 30 + animatorValueWheel.y, w = 280, h = 120}, { index = self.index % 36 })
 	
-	local titleRect = Rect.with(Rect.offset(frame, 0, 130 + self.animators.animator2:currentValue() + self.animators.animatorOut:currentValue()), { h = 57 })
+	local animatorValueTitle =  self:getAnimatorValue(self.animators.animator2, self.animators.animatorOut)
+	local titleRect = Rect.with(Rect.offset(frame, 0, 130 + animatorValueTitle), { h = 57 })
 	self.painters.painterTitle:draw(titleRect)
 	
-	local buttonRect = Rect.offset(Rect.with(Rect.center(Rect.size(160, 27), frame), { y = 200 }), 0, self.animators.animator3:currentValue() + self.animators.animatorOut:currentValue())
+	local animatorValueButton =  self:getAnimatorValue(self.animators.animator2, self.animators.animatorOut)
+	local buttonRect = Rect.offset(Rect.with(Rect.center(Rect.size(160, 27), frame), { y = 200 }), 0, animatorValueButton)
 	self.painters.painterButton:draw(buttonRect, { tick = self.tick })
 end
 
@@ -239,9 +237,10 @@ function WidgetTitle:_update()
 		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 	end
 	
-	self.painters.painterWheel:update()
-	self.painters.painterButton:update()
+	self.painters.painterWheel:markDirty()
+	self.painters.painterButton:markDirty()
 	
+	print(self:isAnimating())
 	if self:isAnimating() == true then
 		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 	end

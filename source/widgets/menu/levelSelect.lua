@@ -11,10 +11,9 @@ WidgetLevelSelect.kMenuActionType = {
 function WidgetLevelSelect:init(config)
 	self.config = config
 	
-	self:supply(Widget.kDeps.update)
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.children)
-	self:supply(Widget.kDeps.animators)
+	self:supply(Widget.kDeps.animations)
 	
 	self:setAnimations({
 		open = 1,

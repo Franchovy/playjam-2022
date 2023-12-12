@@ -7,7 +7,8 @@ Widget.kDeps = {
 	state = 2,
 	samples = 3,
 	animators = 4,
-	update = 5
+	update = 5,
+	animations = 6
 }
 
 function Widget:createSprite(zIndex)
@@ -58,6 +59,8 @@ function Widget.supply(widget, dep)
 		widget:_supplyDepAnimators()
 	elseif dep == Widget.kDeps.update then
 		widget:_supplyDepUpdate()
+	elseif dep == Widget.kDeps.animations then
+		widget:_supplyDepAnimations()
 	end
 end
 
@@ -108,10 +111,38 @@ function Widget._supplyDepSamples(self)
 end
 
 function Widget._supplyDepAnimators(self)
+	self:supply(Widget.kDeps.update)
+	
 	self.animators = {}
 	
-	function self:setAnimations(animations) 
-		self.kAnimations = animations
+	function self:getAnimatorValue(...)
+		local animators = {...}
+		local type
+		local value
+		for _, animator in pairs(animators) do
+			if value == nil then
+				if getmetatable(animator:currentValue()) == nil then
+					value = 0
+					type = "number"
+				elseif getmetatable(animator:currentValue()).__name == "playdate.geometry.point" then
+					value = playdate.geometry.point.new(0, 0)
+					type = "playdate.geometry.point"
+				end
+			end
+			
+			if type == "number" then
+				value += animator:currentValue()
+			elseif type == "playdate.geometry.point" then
+				assert(getmetatable(animator:currentValue()).__name == "playdate.geometry.point", "Error: Attempted to add animators with different value types.")
+				value:offset(animator:currentValue().x, animator:currentValue().y)
+			end
+		end
+		
+		if value ~= nil then
+			return value
+		else
+			return 0
+		end
 	end
 	function self:animatorsEnded()
 		for _, animator in pairs(self.animators) do
@@ -121,6 +152,28 @@ function Widget._supplyDepAnimators(self)
 		end
 		
 		return true
+	end
+	function self:isAnimating()
+		for _, animator in pairs(self.animators) do
+			if (animator.previousUpdateTime == nil) or (animator.didend ~= true) then
+				return true
+			end
+		end
+			
+		return false
+	end
+	table.insert(self._updateCallbacks, function()
+		for _, animator in pairs(self.animators) do
+			animator:update()
+		end
+	end)
+end
+
+function Widget._supplyDepAnimations(self)
+	self:supply(Widget.kDeps.animators)
+	
+	function self:setAnimations(animations) 
+		self.kAnimations = animations
 	end
 	function self:animate(animation, finishedCallback)
 		local previousAnimation = {
@@ -149,20 +202,6 @@ function Widget._supplyDepAnimators(self)
 		
 		self:_animate(animation, queueFinishedCallback)
 	end
-	function self:isAnimating()
-		if self._previousAnimation == nil then
-			return false
-		elseif self._previousAnimation.isended == nil then
-			return true
-		else
-			return self._previousAnimation.isended == false
-		end
-	end
-	table.insert(self._updateCallbacks, function()
-		for _, animator in pairs(self.animators) do
-			animator:update()
-		end
-	end)
 end
 
 function Widget.load(self)
