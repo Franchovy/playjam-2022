@@ -1,35 +1,34 @@
 
 class("Painter").extends()
 
-function Painter:init(drawFunction, config)
+function Painter:init(drawFunction)
 	self.drawFunction = drawFunction
-	self.config = config or {}
 	
 	self.stateImages = {}
 	self.state = nil
 end
 
-function Painter:draw(rect, state)
+function Painter:draw(frame, state)
 	local image = self:_getImage(state)
 	
 	if image == nil then
-		image = playdate.graphics.image.new(rect.w, rect.h)
+		image = playdate.graphics.image.new(frame.w, frame.h)
 		
 		playdate.graphics.pushContext(image)
-		self.drawFunction({x = 0, y = 0, w = rect.w, h = rect.h }, state)
+		self.drawFunction({x = 0, y = 0, w = frame.w, h = frame.h }, state)
 		playdate.graphics.popContext()
 		
 		self:_setImage(image, state)
 	end
 	
-	image:draw(rect.x, rect.y)
+	image:draw(frame.x, frame.y)
 	
-	self.rect = rect
+	self.frame = frame
 end
 
-function Painter:update( )
-	if self.config.alwaysRedraw == true and (self.rect ~= nil) then
-		playdate.graphics.sprite.addDirtyRect(self.rect.x, self.rect.y, self.rect.w, self.rect.h)
+function Painter:markDirty( )
+	if self.frame ~= nil then
+		playdate.graphics.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
 	end
 end
 
