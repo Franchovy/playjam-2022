@@ -5,7 +5,6 @@ local dirTracks = "assets/tracks/"
 local dirLevels = "assets/levels/"
 
 kAssetsImages = {
-	menuWheel = dirImages.."menu/wheel",
 	checkpoint = dirImages.."sprites/checkpoint/checkpoint",
 	checkpointSet = dirImages.."sprites/checkpoint/checkpoint_isSet",
 	coin = dirImages.."sprites/coin",
