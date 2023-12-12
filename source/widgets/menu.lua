@@ -14,6 +14,7 @@ function WidgetMenu:init(config)
 	
 	self.painters = {}
 	self.signals = {}
+	self.fileplayer = {}
 	
 	self:setStateInitial({default = 1, menu = 2}, 1)
 	
@@ -45,9 +46,15 @@ function WidgetMenu:_load()
 	end
 	
 	self.children.title:animate(self.children.title.kAnimations.onFirstOpen)
-	
-	playdate.timer.performAfterDelay(600, function()
+
+	self.fileplayer.menu = playdate.sound.fileplayer.new(kAssetsTracks.menu)
+
+	playdate.timer.performAfterDelay(10, function()
 		self:playSample(kAssetsSounds.intro)
+		
+		playdate.timer.performAfterDelay(300, function()
+			self.fileplayer.menu:play(0)
+		end)
 	end)
 end
 
@@ -108,6 +115,8 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 end
 
 function WidgetMenu:_unload()
+	self.fileplayer.menu:stop(0)
+	
 	self.samples = {}
 	self.painters.background = nil
 	self.children.title = nil

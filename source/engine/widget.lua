@@ -95,8 +95,12 @@ function Widget._supplyDepSamples(self)
 			self.samples[path]:setVolume(volume)
 		end
 	end
-	function self:playSample(key, ...)
-		self.samples[key]:play(...)
+	function self:playSample(key, finishedCallback)
+		self.samples[key]:play()
+		
+		if finishedCallback ~= nil then
+			self.samples[key]:setFinishCallback(finishedCallback)
+		end
 	end
 	function self:unloadSample(key)
 		self.samples[key] = nil

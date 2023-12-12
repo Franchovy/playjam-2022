@@ -48,7 +48,7 @@ kAssetsSounds = {
 }
 
 kAssetsTracks = {
-	
+	menu = dirTracks.."menu"
 }
 
 kAssetsFonts = {
