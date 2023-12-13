@@ -33,6 +33,10 @@ function WidgetStar:_load()
 	
 	self.timers.timer = playdate.timer.new(self.timerDuration)
 	self.timers.timer:pause()
+	
+	function self:isAnimating()
+		return self.timers.timer ~= nil and (self.timers.timer.paused == false) and (self.timers.timer.timeLeft > 0)
+	end
 end
 
 function WidgetStar:_draw(rect)

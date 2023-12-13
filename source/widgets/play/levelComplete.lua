@@ -9,6 +9,7 @@ function LevelComplete:init(config)
 	self:supply(Widget.kDeps.samples)
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.children)
+	self:supply(Widget.kDeps.animators)
 	
 	self:setStateInitial({
 		text = 1,
@@ -22,7 +23,6 @@ function LevelComplete:init(config)
 	
 	self.previousBlink = false
 	
-	self.animators = {}
 	self.signals = {}
 end
 
@@ -133,14 +133,7 @@ end
 function LevelComplete:_draw(rect)
 	if self.state == self.kStates.text then
 		if self.blinkers.blinkerTitle.on then
-			if self.previousBlink == false then
-				self:playSample(kAssetsSounds.levelCompleteBlink)
-				self.previousBlink = true
-			end
-			
 			self.images.titleInGame:drawCentered(rect.x + rect.w / 2, rect.y + 100)
-		else 
-			self.previousBlink = false
 		end
 	end
 	
@@ -160,7 +153,7 @@ function LevelComplete:_draw(rect)
 			return (starImageWidth * numStars) + starMargin * (numStars - 1)
 		end
 		
-		if self.config.objectives.stars <= 3 then 
+		if self.config.objectives.stars <= 3 then
 			starMargin = 20
 			starContainerWidth = starsContentWidth(3)
 		elseif self.config.objectives.stars == 4 then
@@ -210,6 +203,54 @@ function LevelComplete:_draw(rect)
 end
 
 function LevelComplete:_update()
+	if self.state == self.kStates.text then
+		if self.blinkers.blinkerTitle ~= self.previousBlinkTitle then
+			playdate.graphics.sprite.addDirtyRect(10, 100, 380, 40)
+		end
+		
+		if self.blinkers.blinkerTitle.on then
+			if self.previousBlinkTitle == false then
+				self:playSample(kAssetsSounds.levelCompleteBlink)
+				self.previousBlinkTitle = true
+			end
+		else 
+			self.previousBlinkTitle = false
+		end
+	end
+	
+	if self.state == self.kStates.overlay or (self.state == self.kStates.menu) then
+		if self:isAnimating() then
+			playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+		end
+		
+		for _, star in pairs(self.stars) do
+			if self.wasAnimating == true then
+				playdate.graphics.sprite.addDirtyRect(50, 60, 290, 70)
+			end
+			self.wasAnimating = star:isAnimating()
+		end
+	end
+	
+	if self.state == self.kStates.overlay then
+		local blinker1 = self.blinkers.blinkerPressAButton1.on
+		local blinker2 = self.blinkers.blinkerPressAButton2.on
+		
+		local blink = (not blinker1 and blinker2) or (not blinker2 and blinker1) 
+		if self.previousBlinkButton ~= blink then
+			playdate.graphics.sprite.addDirtyRect(110, 185, 180, 28)
+		end
+		self.previousBlinkButton = blink
+	end
+	
+	if self.state == self.kStates.menu then
+		
+		local menuIsVisible = self.children.menu:isVisible()
+		if menuIsVisible ~= self.previousVisibleMenu then
+			playdate.graphics.sprite.addDirtyRect(37, 130, 326, 85)
+		end
+		self.previousVisibleMenu = menuIsVisible
+	end
+	
 	if playdate.buttonJustPressed(playdate.kButtonA) then
 		if self.state == self.kStates.overlay then
 			self:setState(self.kStates.menu)
