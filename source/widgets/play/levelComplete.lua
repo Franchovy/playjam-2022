@@ -196,8 +196,8 @@ function LevelComplete:_draw(rect)
 				inverted = (not blinker1 and blinker2) or (not blinker2 and blinker1) 
 			})
 		elseif self.state == self.kStates.menu then
-			local offsetContentRect = Rect.offset(contentRect, 75, -8)
-			self.children.menu:draw(offsetContentRect)
+			local rectMenu = Rect.with(Rect.offset(contentRect, 75, -8), { w = 90, h = 80 })
+			self.children.menu:draw(rectMenu)
 		end
 	end
 end

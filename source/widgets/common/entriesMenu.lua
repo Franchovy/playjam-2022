@@ -27,13 +27,15 @@ function WidgetEntriesMenu:_load()
 	end
 end
 
-function WidgetEntriesMenu:_draw(rect)
-	local entryHeight = rect.h / #self.entries
+function WidgetEntriesMenu:_draw(frame)
+	local entryHeight = frame.h / #self.entries
 	
 	for i, entry in pairs(self.entries) do
-		local entryRect = Rect.with(rect, { h = entryHeight, y = rect.y + 10 + (entryHeight * (i - 1)) })
+		local entryRect = Rect.with(frame, { h = entryHeight, y = frame.y + 10 + (entryHeight * (i - 1)) })
 		entry:draw(entryRect)
 	end
+	
+	self.frame = frame
 end
 
 function WidgetEntriesMenu:_update()
@@ -44,12 +46,20 @@ function WidgetEntriesMenu:_update()
 	if playdate.buttonJustPressed(playdate.kButtonDown) then
 		if self.state < #self.entries then
 			self:setState(self.state + 1)
+			
+			if self.frame ~= nil then
+				playdate.graphics.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+			end
 		end
 	end
 	
 	if playdate.buttonJustPressed(playdate.kButtonUp) then
 		if self.state > 1 then
 			self:setState(self.state - 1)
+			
+			if self.frame ~= nil then
+				playdate.graphics.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+			end
 		end
 	end
 end

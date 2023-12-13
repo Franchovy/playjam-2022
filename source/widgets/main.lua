@@ -186,9 +186,9 @@ function WidgetMain:changeState(stateFrom, stateTo)
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.closed)
 		
-		self.children.play:setVisible(false)
-		
 		self.children.transition.signals.animationFinished = function()
+			self.children.play:setVisible(false)
+			
 			self.children.play:unload()
 			self.children.play = nil 
 			
@@ -199,10 +199,12 @@ function WidgetMain:changeState(stateFrom, stateTo)
 			
 			self.children.menu.signals.play = self.onMenuPressedPlay
 			
-			self.children.transition:setState(self.children.transition.kStates.open)
-			self.children.transition.signals.animationFinished = function()
-				self.children.transition:setVisible(false)
-			end
+			playdate.timer.performAfterDelay(100, function()
+				self.children.transition:setState(self.children.transition.kStates.open)
+				self.children.transition.signals.animationFinished = function()
+					self.children.transition:setVisible(false)
+				end
+			end)
 		end
 	end
 end
