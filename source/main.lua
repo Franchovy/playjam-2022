@@ -21,6 +21,8 @@ function initialize()
 	end)
 	
 	g.showCrankIndicator = false
+	
+	playdate.setMinimumGCTime(2)
 end
 
 function playdate.update()
