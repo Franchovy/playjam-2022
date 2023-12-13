@@ -15,4 +15,7 @@ function Platform:init()
 	self:setCenter(0, 0)
 	
 	self:setOpaque(true)
+	
+	self:setUpdatesEnabled(false)
+	self:setGroupMask(kCollisionGroups.static)
 end

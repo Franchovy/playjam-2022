@@ -30,6 +30,8 @@ function Wheel:init()
 	self.type = kSpriteTypes.player
 	
 	self:setCollideRect(self:getBounds())
+	self:setGroupMask(kCollisionGroups.player)
+	self:setCollidesWithGroupsMask(kCollisionGroups.static)
 	
 	self.collisionResponse = function(self, other)
 		if other.type == kSpriteTypes.platform then

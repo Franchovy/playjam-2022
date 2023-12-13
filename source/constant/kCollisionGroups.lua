@@ -1,4 +1,4 @@
 kCollisionGroups = {
-	moving = 1,
+	player = 1,
 	static = 2
 }

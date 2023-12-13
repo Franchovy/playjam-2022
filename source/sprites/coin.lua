@@ -19,6 +19,9 @@ function Coin:init()
 	self.config = {
 		isPicked = false
 	}
+	
+	self:setUpdatesEnabled(false)
+	self:setGroupMask(kCollisionGroups.static)
 end
 
 function Coin:loadConfig(config)

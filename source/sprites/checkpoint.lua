@@ -27,10 +27,13 @@ function Checkpoint:init()
 	
 	self:updateImage()
 	self:setCollideRect(0, -240, 24, 480)
+	self:setGroupMask(kCollisionGroups.static)
 	
 	-- Sound effects
 	
 	sampleplayer:addSample("set", kAssetsSounds.checkpointSet)
+	
+	self:setUpdatesEnabled(false)
 end
 
 function Checkpoint:isSet()

@@ -15,4 +15,7 @@ function LevelEnd:init()
 	self:setImage(image)
 	self:setCenter(0, 0)
 	self:setCollideRect(self:getBounds())
+	
+	self:setUpdatesEnabled(false)
+	self:setGroupMask(kCollisionGroups.static)
 end

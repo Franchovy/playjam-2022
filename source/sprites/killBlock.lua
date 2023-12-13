@@ -19,6 +19,7 @@ function KillBlock:init(periodicBlinker)
 	self:setCenter(0, 0)
 	
 	self.periodicBlinker = periodicBlinker
+	self:setGroupMask(kCollisionGroups.static)
 end
 
 function KillBlock:update()

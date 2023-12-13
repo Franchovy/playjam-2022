@@ -40,6 +40,8 @@ function playdate.update()
 		
 		g.showCrankIndicator = false
 	end
+	
+	playdate.drawFPS(10, 10)
 end
 
 -- Start game
