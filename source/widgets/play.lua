@@ -169,19 +169,21 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.closed)
 		
-		playdate.timer.performAfterDelay(400, function()
-			
+		self.children.transition.signals.animationFinished = function()
 			self.children.gameOver:setVisible(false)
-			self.children.transition:setState(self.children.transition.kStates.open)
 			
 			self.children.level:setState(self.children.level.kStates.ready)
 			self.children.level.loadIndex += 1
 			self.filePlayer:play()
 			
-			playdate.timer.performAfterDelay(400, function()
-				self:setState(self.kStates.playing)
+			playdate.timer.performAfterDelay(10, function()
+				self.children.transition:setState(self.children.transition.kStates.open)
+				
+				self.children.transition.signals.animationFinished = function()
+					self:setState(self.kStates.playing)
+				end
 			end)
-		end)
+		end
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.gameOver) then
 		self.filePlayer:stop()
 		self.timers.levelTimer:pause()
@@ -190,7 +192,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			self.children.transition:setVisible(true)
 			self.children.transition:setState(self.children.transition.kStates.closed)
 			
-			playdate.timer.performAfterDelay(500, function()
+			self.children.transition.signals.animationFinished = function()
 				local checkpointData = table.last(self.data.checkpoints)
 				self.data.coins = checkpointData.coins
 				self.data.time = checkpointData.time
@@ -201,12 +203,14 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 				
 				self.children.level:setState(self.children.level.kStates.unloaded)
 				
-				self.children.transition:setState(self.children.transition.kStates.open)
-				
 				self.children.gameOver:setVisible(true)
-				
 				self.children.hud:setState(self.children.hud.kStates.offScreen)
-			end)
+				
+				self.children.transition:setState(self.children.transition.kStates.open)
+				self.children.transition.signals.animationFinished = function()
+					self.children.transition:setVisible(false)
+				end
+			end
 		end)
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.levelComplete) then
 		self.timers.levelTimer:pause()
@@ -309,18 +313,19 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			self.data.coins = 0
 			self.data.time = 0
 			self.timers.levelTimer:reset()
-			
-			self.children.transition:setState(self.children.transition.kStates.open)
-			
 			self.children.level:setState(self.children.level.kStates.ready)
 			
-			self.children.transition.signals.animationFinished = function()
-				self.children.transition:setVisible(false)
+			playdate.timer.performAfterDelay(10, function()
+				self.children.transition:setState(self.children.transition.kStates.open)
 				
-				self.children.hud:setState(self.children.hud.kStates.onScreen)
-				
-				self.filePlayer:play()
-			end
+				self.children.transition.signals.animationFinished = function()
+					self.children.transition:setVisible(false)
+					
+					self.children.hud:setState(self.children.hud.kStates.onScreen)
+					
+					self.filePlayer:play()
+				end
+			end)
 		end
 	end
 end
