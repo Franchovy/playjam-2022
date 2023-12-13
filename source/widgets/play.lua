@@ -174,9 +174,12 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			
 			self.children.level:setState(self.children.level.kStates.ready)
 			self.children.level.loadIndex += 1
-			self.filePlayer:play()
+
+			collectgarbage("collect")
 			
 			playdate.timer.performAfterDelay(10, function()
+				self.filePlayer:play()
+
 				self.children.transition:setState(self.children.transition.kStates.open)
 				
 				self.children.transition.signals.animationFinished = function()
@@ -205,6 +208,8 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 				
 				self.children.gameOver:setVisible(true)
 				self.children.hud:setState(self.children.hud.kStates.offScreen)
+				
+				collectgarbage("collect")
 				
 				self.children.transition:setState(self.children.transition.kStates.open)
 				self.children.transition.signals.animationFinished = function()
@@ -314,6 +319,8 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			self.data.time = 0
 			self.timers.levelTimer:reset()
 			self.children.level:setState(self.children.level.kStates.ready)
+			
+			collectgarbage("collect")
 			
 			playdate.timer.performAfterDelay(10, function()
 				self.children.transition:setState(self.children.transition.kStates.open)
