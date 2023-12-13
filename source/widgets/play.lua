@@ -287,7 +287,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		
 		self.filePlayer:stop()
 		
-		playdate.timer.performAfterDelay(500, function()
+		self.children.transition.signals.animationFinished = function()
 			if self.children.levelComplete ~= nil and (self.children.levelComplete:isVisible() == true) then
 				self.children.levelComplete:setVisible(false)
 			end
@@ -314,14 +314,14 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			
 			self.children.level:setState(self.children.level.kStates.ready)
 			
-			playdate.timer.performAfterDelay(500, function()
+			self.children.transition.signals.animationFinished = function()
 				self.children.transition:setVisible(false)
 				
 				self.children.hud:setState(self.children.hud.kStates.onScreen)
 				
 				self.filePlayer:play()
-			end)
-		end)
+			end
+		end
 	end
 end
 
