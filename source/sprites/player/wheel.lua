@@ -84,7 +84,7 @@ function Wheel:setIsDead()
 		return
 	end
 	
-	local random = math.random(2)
+	local random = math.random(3)
 	sampleplayer:playSample("death"..random)
 	
 	-- Freeze all wheel behaviour, no movement or accepted input
