@@ -274,11 +274,11 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		self.children.levelComplete.signals.restartLevel = self.restartLevel
 		self.children.levelComplete.signals.returnToMenu = self.returnToMenu
 		
-		playdate.timer.performAfterDelay(4500, function()
+		playdate.timer.performAfterDelay(2500, function()
 			self.children.hud:setState(self.children.hud.kStates.offScreen)
 		end)
 		
-		playdate.timer.performAfterDelay(5000, function()
+		playdate.timer.performAfterDelay(3000, function()
 			self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
 		end)
 	elseif stateTo == self.kStates.start then
