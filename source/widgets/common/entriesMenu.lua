@@ -7,6 +7,7 @@ function WidgetEntriesMenu:init(config)
 	
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.children)
+	self:supply(Widget.kDeps.samples)
 	
 	self:setStateInitial(self.config, 1)
 	
@@ -25,6 +26,10 @@ function WidgetEntriesMenu:_load()
 		self.children["entry"..i] = entry
 		self.entries[i] = entry
 	end
+	
+	self:loadSample(kAssetsSounds.menuSelect)
+	self:loadSample(kAssetsSounds.menuSelectFail)
+	self:loadSample(kAssetsSounds.menuAccept)
 end
 
 function WidgetEntriesMenu:_draw(frame)
@@ -40,26 +45,34 @@ end
 
 function WidgetEntriesMenu:_update()
 	if playdate.buttonJustPressed(playdate.kButtonA) then
+		self:playSample(kAssetsSounds.menuAccept)
+				
 		self.signals.entrySelected(self.state)
 	end
 	
 	if playdate.buttonJustPressed(playdate.kButtonDown) then
 		if self.state < #self.entries then
+			self:playSample(kAssetsSounds.menuSelect)
 			self:setState(self.state + 1)
 			
 			if self.frame ~= nil then
 				playdate.graphics.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
 			end
+		else
+			self:playSample(kAssetsSounds.menuSelectFail)
 		end
 	end
 	
 	if playdate.buttonJustPressed(playdate.kButtonUp) then
 		if self.state > 1 then
+			self:playSample(kAssetsSounds.menuSelect)
 			self:setState(self.state - 1)
 			
 			if self.frame ~= nil then
 				playdate.graphics.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
 			end
+		else
+			self:playSample(kAssetsSounds.menuSelectFail)
 		end
 	end
 end

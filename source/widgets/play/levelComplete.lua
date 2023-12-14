@@ -30,6 +30,7 @@ function LevelComplete:_load()
 	
 	self:loadSample(kAssetsSounds.levelCompleteBlink, 0.7)
 	self:loadSample(kAssetsSounds.levelCompleteCard, 0.7)
+	self:loadSample(kAssetsSounds.menuAccept)
 	
 	local drawMode = getColorDrawModeFill(self.config.titleColor)
 	playdate.graphics.setImageDrawMode(drawMode)
@@ -253,6 +254,8 @@ function LevelComplete:_update()
 	
 	if playdate.buttonJustPressed(playdate.kButtonA) then
 		if self.state == self.kStates.overlay then
+			self:playSample(kAssetsSounds.menuAccept)
+			
 			self:setState(self.kStates.menu)
 		end
 	end
