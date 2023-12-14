@@ -113,17 +113,24 @@ function WidgetPlay:_load()
 			
 			if self.filePlayer ~= nil then
 				self.filePlayer:stop()
+				self.filePlayer = nil
 			end
 			
 			self.filePlayer = FilePlayer(musicFilePath)
-			
 			self.filePlayer:play()
 		end
 		
 		if AppConfig.enableParalaxBackground and (self.config.theme ~= nil) then
+			if self.children.background ~= nil then
+				self.children.background.sprite:remove()
+				self.children.background = nil
+			end
+			
 			self.children.background = Widget.new(WidgetBackground, { theme = self.config.theme })
 			self.children.background:load()
 		end
+		
+		collectgarbage("collect")
 		
 		local backgroundColor = getBackgroundColorForTheme(self.theme)
 		playdate.graphics.setBackgroundColor(backgroundColor)
