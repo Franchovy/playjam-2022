@@ -87,10 +87,11 @@ function WidgetMain:_load()
 	
 	self.getNextLevelConfig = function()
 		for _, v in pairs(kLevels) do
-			if v.levelFileName == self.level.path then
-				self.level = nil
-			elseif self.level == nil then
+			if self.level == nil then
 				self.level = v
+				break
+			elseif v.path == self.level.path then
+				self.level = nil
 			end
 		end
 		
