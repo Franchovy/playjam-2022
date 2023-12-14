@@ -5,7 +5,6 @@ function WidgetBackground:init(config)
 	self.theme = config.theme
 	
 	self:createSprite(kZIndex.background)
-	self.sprite:add()
 end
 
 function WidgetBackground:_load()

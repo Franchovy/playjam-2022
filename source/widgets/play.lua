@@ -39,7 +39,9 @@ function WidgetPlay:_load()
 	end
 	
 	self.children.level.signals.gameOver = function()
-		self:setState(self.kStates.gameOver)
+		if self.state == self.kStates.playing then
+			self:setState(self.kStates.gameOver)
+		end
 	end
 	
 	self.children.level.signals.levelComplete = function()
@@ -142,6 +144,10 @@ function WidgetPlay:_load()
 	
 	self.timers.levelTimer = playdate.timer.new(999000)
 	self.timers.levelTimer:pause()
+	
+	playdate.timer.performAfterDelay(4000, function()
+		self:setState(self.kStates.levelComplete)
+	end)
 end
 
 function WidgetPlay:_draw(rect)
@@ -277,9 +283,6 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			end
 			
 			self.config = configNextLevel
-			self.loadTheme()
-			
-			self.resetData()
 			
 			self.children.level.config.objects = self.config.objects
 			self.children.level.config.objectives = self.config.objectives
@@ -310,6 +313,11 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			
 			if self.children.gameOver ~= nil and (self.children.gameOver:isVisible() == true) then
 				self.children.gameOver:setVisible(false)
+			end
+			
+			if stateFrom == self.kStates.levelComplete then
+				self.loadTheme()
+				self.resetData()
 			end
 			
 			self.children.level:setState(self.children.level.kStates.unloaded)
@@ -363,6 +371,7 @@ function WidgetPlay:_unload()
 	end
 		
 	if self.children.gameOver ~= nil then
+		self.children.gameOver.sprite:remove()
 		self.children.gameOver = nil
 	end
 		
