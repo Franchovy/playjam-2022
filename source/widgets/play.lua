@@ -144,10 +144,6 @@ function WidgetPlay:_load()
 	
 	self.timers.levelTimer = playdate.timer.new(999000)
 	self.timers.levelTimer:pause()
-	
-	playdate.timer.performAfterDelay(4000, function()
-		self:setState(self.kStates.levelComplete)
-	end)
 end
 
 function WidgetPlay:_draw(rect)
