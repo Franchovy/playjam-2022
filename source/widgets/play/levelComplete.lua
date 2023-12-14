@@ -252,7 +252,7 @@ function LevelComplete:_update()
 		self.previousVisibleMenu = menuIsVisible
 	end
 	
-	if playdate.buttonJustPressed(playdate.kButtonA) then
+	if playdate.buttonJustPressed(playdate.kButtonA) or (playdate.buttonJustPressed(playdate.kButtonB)) then
 		if self.state == self.kStates.overlay then
 			self:playSample(kAssetsSounds.menuAccept)
 			

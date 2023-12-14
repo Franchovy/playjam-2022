@@ -44,7 +44,7 @@ function WidgetEntriesMenu:_draw(frame)
 end
 
 function WidgetEntriesMenu:_update()
-	if playdate.buttonJustPressed(playdate.kButtonA) then
+	if playdate.buttonJustPressed(playdate.kButtonA) or (playdate.buttonJustPressed(playdate.kButtonB)) then
 		self:playSample(kAssetsSounds.menuAccept)
 				
 		self.signals.entrySelected(self.state)
