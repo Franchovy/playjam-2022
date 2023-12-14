@@ -1,6 +1,5 @@
 import "utils/rect"
 import "utils/position"
-import "common/painters/background"
 
 class("WidgetTitle").extends(Widget)
 

@@ -28,7 +28,14 @@ function WidgetMenu:_load()
 	self:loadSample(kAssetsSounds.menuAccept)
 	self:loadSample(kAssetsSounds.intro)
 	
-	self.painters.background = PainterBackground()
+	self.painters.background = Painter(function(rect)
+		playdate.graphics.setColor(playdate.graphics.kColorWhite)
+		playdate.graphics.fillRect(0, 0, rect.w, rect.h)
+		
+		playdate.graphics.setColor(playdate.graphics.kColorBlack)
+		playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeBayer4x4)
+		playdate.graphics.fillRect(0, 0, rect.w, rect.h)
+	end)
 	
 	self.children.title = Widget.new(WidgetTitle)
 	self.children.title:load()
