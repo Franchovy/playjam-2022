@@ -278,7 +278,7 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			local configNextLevel = self.signals.getNextLevelConfig()
 			
 			if configNextLevel == nil then
-				self.signals.returnToMenu()
+				self.returnToMenu()
 				return
 			end
 			
