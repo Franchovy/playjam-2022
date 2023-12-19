@@ -113,11 +113,12 @@ end
 
 function WidgetLevelSelect:_draw(rect)
 	local cardWidth = 220
+	local xOffset = self:getAnimatorValue(self.animators.card)
 	
-	self.painters.card:draw(Rect.offset(Rect.with(rect, { w = cardWidth }), -self.animators.card:currentValue(), 0))
+	self.painters.card:draw(Rect.offset(Rect.with(rect, { w = cardWidth }), xOffset, 0))
 	
 	for i, entry in ipairs(self.entries) do
- 		entry:draw(Rect.make(rect.x - 5 - self.animators.card:currentValue(), rect.y + i * 45 - 25, cardWidth, 40))
+ 		entry:draw(Rect.make(rect.x - 5 + xOffset, rect.y + i * 45 - 25, cardWidth, 40))
 	end
 	
 	local previewX = self:getAnimatorValue(self.animators.preview) + cardWidth
@@ -128,17 +129,15 @@ function WidgetLevelSelect:_draw(rect)
 end
 
 function WidgetLevelSelect:_update()
-	if self.animators.card:currentValue() < 100 then
-		local selectButtonPressed = playdate.buttonJustPressed(playdate.kButtonA)
-		if selectButtonPressed then
-			local index = self.state
-			if index <= #self.config.levels then
-				-- Load level
-				self.signals.select({ type = WidgetLevelSelect.kMenuActionType.play, level = self.config.levels[index] })
-			elseif index == 4 then
-				-- Settings
-				self.signals.select({ type = WidgetLevelSelect.kMenuActionType.menu, name = "settings" })
-			end
+	local selectButtonPressed = playdate.buttonJustPressed(playdate.kButtonA)
+	if selectButtonPressed then
+		local index = self.state
+		if index <= #self.config.levels then
+			-- Load level
+			self.signals.select({ type = WidgetLevelSelect.kMenuActionType.play, level = self.config.levels[index] })
+		elseif index == 4 then
+			-- Settings
+			self.signals.select({ type = WidgetLevelSelect.kMenuActionType.menu, name = "settings" })
 		end
 	end
 	
@@ -185,16 +184,16 @@ end
 
 function WidgetLevelSelect:_animate(animation, queueFinishedCallback)
 	if animation == self.kAnimations.intro then
-		self.animators.card = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo)
+		self.animators.card = playdate.graphics.animator.new(800, -240, 0, playdate.easingFunctions.outExpo)
 		
 		queueFinishedCallback(800)
 	elseif animation == self.kAnimations.error then
-		self.animators.card = playdate.graphics.animator.new(50, 0, 16, playdate.easingFunctions.outInBack)
+		self.animators.card = playdate.graphics.animator.new(50, 0, -16, playdate.easingFunctions.outInBack)
 		self.animators.card.reverses = true
 		
 		queueFinishedCallback(50)
 	elseif animation == self.kAnimations.outro then
-		self.animators.card = playdate.graphics.animator.new(800, 0, 240, playdate.easingFunctions.outExpo)
+		self.animators.card = playdate.graphics.animator.new(800, 0, -240, playdate.easingFunctions.outExpo)
 		self.animators.preview = playdate.graphics.animator.new(600, 0, 240, playdate.easingFunctions.inCubic)
 
 		queueFinishedCallback(800)
