@@ -94,7 +94,10 @@ function WidgetPlay:_load()
  	end
 	
 	function self.returnToMenu()
-		self.filePlayer:stop()
+		if AppConfig.enableBackgroundMusic == true then
+			self.filePlayer:stop()
+		end
+		
 		self.children.level:setState(self.children.level.kStates.unloaded)
 		
 		self.signals.returnToMenu()
@@ -187,7 +190,9 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			collectgarbage("collect")
 			
 			playdate.timer.performAfterDelay(10, function()
-				self.filePlayer:play()
+				if AppConfig.enableBackgroundMusic == true then
+					self.filePlayer:play()
+				end
 
 				self.children.transition:setState(self.children.transition.kStates.open)
 				
@@ -197,7 +202,10 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 			end)
 		end
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.gameOver) then
-		self.filePlayer:stop()
+		if AppConfig.enableBackgroundMusic == true then
+			self.filePlayer:stop()
+		end
+		
 		self.timers.levelTimer:pause()
 		
 		playdate.timer.performAfterDelay(1200, function()
@@ -300,7 +308,9 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.closed)
 		
-		self.filePlayer:stop()
+		if AppConfig.enableBackgroundMusic == true then
+			self.filePlayer:stop()
+		end
 		
 		self.children.transition.signals.animationFinished = function()
 			if self.children.levelComplete ~= nil and (self.children.levelComplete:isVisible() == true) then
@@ -341,7 +351,9 @@ function WidgetPlay:changeState(stateFrom, stateTo)
 					
 					self.children.hud:setState(self.children.hud.kStates.onScreen)
 					
-					self.filePlayer:play()
+					if AppConfig.enableBackgroundMusic == true then
+						self.filePlayer:play()
+					end
 				end
 			end)
 		end
