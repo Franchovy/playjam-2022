@@ -1,5 +1,6 @@
 import "levelSelect/entry"
 import "levelSelect/preview"
+import "levelSelect/previewImage"
 
 class("WidgetLevelSelect").extends(Widget)
 
@@ -55,6 +56,10 @@ function WidgetLevelSelect:_load()
 	local entrySettings = Widget.new(LevelSelectEntry, { text = "SETTINGS", showOutline = false })
 	table.insert(self.entries, entrySettings)
 	self.children.entrySettings = entrySettings
+	
+	local previewSettings = Widget.new(LevelSelectPreviewImage, { path = kAssetsImages.menuSettings })
+	table.insert(self.previews, previewSettings)
+	self.children["preview"..4] = previewSettings
 	
 	self.images.screw1 = playdate.graphics.image.new(kAssetsImages.screw)
 	self.images.screw2 = playdate.graphics.image.new(kAssetsImages.screw):rotatedImage(45)

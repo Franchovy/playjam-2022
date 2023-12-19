@@ -24,7 +24,8 @@ kAssetsImages = {
 	menuCity = dirImages.."backgrounds/menu-city",
 	screw = dirImages.."menu/screw",
 	transitionBackground = dirImages.."transition/background",
-	transitionForeground = dirImages.."transition/foreground"
+	transitionForeground = dirImages.."transition/foreground",
+	menuSettings = dirImages.."menu/settings"
 }
 
 kAssetsSounds = {
