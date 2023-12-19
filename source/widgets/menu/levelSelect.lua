@@ -17,9 +17,9 @@ function WidgetLevelSelect:init(config)
 	self:supply(Widget.kDeps.animations)
 	
 	self:setAnimations({
-		open = 1,
-		menuSelectError = 2,
-		hide = 3
+		intro = 1,
+		error = 2,
+		outro = 3
 	})
 	
 	self:setStateInitial({1, 2, 3, 4}, 1)
@@ -153,7 +153,7 @@ function WidgetLevelSelect:_update()
 		else
 			self.samples.selectFail:play()
 			
-			self:animate(self.kAnimations.menuSelectError)
+			self:animate(self.kAnimations.error)
 		end
 	end
 	
@@ -165,7 +165,7 @@ function WidgetLevelSelect:_update()
 		else
 			self.samples.selectFail:play()
 			
-			self:animate(self.kAnimations.menuSelectError)
+			self:animate(self.kAnimations.error)
 		end
 	end
 	
@@ -184,16 +184,16 @@ function WidgetLevelSelect:_update()
 end
 
 function WidgetLevelSelect:_animate(animation, queueFinishedCallback)
-	if animation == self.kAnimations.open then
+	if animation == self.kAnimations.intro then
 		self.animators.card = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo)
 		
 		queueFinishedCallback(800)
-	elseif animation == self.kAnimations.menuSelectError then
+	elseif animation == self.kAnimations.error then
 		self.animators.card = playdate.graphics.animator.new(50, 0, 16, playdate.easingFunctions.outInBack)
 		self.animators.card.reverses = true
 		
 		queueFinishedCallback(50)
-	elseif animation == self.kAnimations.hide then
+	elseif animation == self.kAnimations.outro then
 		self.animators.card = playdate.graphics.animator.new(800, 0, 240, playdate.easingFunctions.outExpo)
 		self.animators.preview = playdate.graphics.animator.new(600, 0, 240, playdate.easingFunctions.inCubic)
 
