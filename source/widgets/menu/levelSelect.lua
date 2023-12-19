@@ -66,11 +66,6 @@ function WidgetLevelSelect:_load()
 	self.images.screw2 = playdate.graphics.image.new(kAssetsImages.screw):rotatedImage(45)
 	self.images.screw3 = playdate.graphics.image.new(kAssetsImages.screw):rotatedImage(90)
 	
-	self.painters.background = Painter(function(rect)
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
-	end)
-	
 	local painterCardOutline = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
 		playdate.graphics.setDitherPattern(0.7, playdate.graphics.image.kDitherTypeDiagonalLine)
