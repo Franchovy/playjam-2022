@@ -2,6 +2,7 @@ import "utils/rect"
 import "utils/position"
 import "menu/levelSelect"
 import "menu/title"
+import "menu/settings"
 
 class("WidgetMenu").extends(Widget)
 
@@ -54,8 +55,31 @@ function WidgetMenu:_load()
 			self:playSample(kAssetsSounds.menuAccept)
 			
 			self.signals.play(args.level)
+		elseif args.type == WidgetLevelSelect.kMenuActionType.menu then
+			self.children.menuSettings:setVisible(true)
 		end
 	end
+	
+	local valuesMenuEntriesTypeOptions = {"off",1,2,3,4,5,6,7,8,9,10}
+	local dataSettingsMenuEntries = {
+		{
+			title = "SFX VOLUME",
+			type = "options",
+			values = valuesMenuEntriesTypeOptions,
+		},
+		{
+			title = "MUSIC VOLUME",
+			type = "options",
+			values = valuesMenuEntriesTypeOptions,
+		},
+		{
+			title = "BACK",
+			type = "button"
+		}
+	}
+	self.children.menuSettings = Widget.new(WidgetMenuSettings, { entries = dataSettingsMenuEntries })
+	self.children.menuSettings:load()
+	self.children.menuSettings:setVisible(false)
 	
 	self.children.title:animate(self.children.title.kAnimations.onFirstOpen)
 
@@ -81,6 +105,8 @@ function WidgetMenu:_draw(rect)
 	
 	self.children.title:draw(rect)
 	self.children.levelSelect:draw(rect)
+	
+	self.children.menuSettings:draw(rect)
 end
 
 function WidgetMenu:_update()
