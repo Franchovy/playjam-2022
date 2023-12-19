@@ -18,7 +18,8 @@ function WidgetLevelSelect:init(config)
 	
 	self:setAnimations({
 		open = 1,
-		menuSelectError = 2
+		menuSelectError = 2,
+		hide = 3
 	})
 	
 	self:setStateInitial({1, 2, 3, 4}, 1)
@@ -111,16 +112,18 @@ function WidgetLevelSelect:_load()
 end
 
 function WidgetLevelSelect:_draw(rect)
-	local width = 220
+	local cardWidth = 220
 	
-	self.painters.card:draw(Rect.offset(Rect.with(rect, { w = width }), -self.animators.card:currentValue(), 0))
+	self.painters.card:draw(Rect.offset(Rect.with(rect, { w = cardWidth }), -self.animators.card:currentValue(), 0))
 	
 	for i, entry in ipairs(self.entries) do
- 		entry:draw(Rect.make(rect.x - 5 - self.animators.card:currentValue(), rect.y + i * 45 - 25, width, 40))
+ 		entry:draw(Rect.make(rect.x - 5 - self.animators.card:currentValue(), rect.y + i * 45 - 25, cardWidth, 40))
 	end
 	
+	local previewX = self:getAnimatorValue(self.animators.preview) + cardWidth
+	
 	if self.previews[self.state] ~= nil then
-		self.previews[self.state]:draw(Rect.with(rect, { x = width, w = rect.w - width }))
+		self.previews[self.state]:draw(Rect.with(rect, { x = previewX, w = rect.w - cardWidth }))
 	end
 end
 
@@ -190,6 +193,11 @@ function WidgetLevelSelect:_animate(animation, queueFinishedCallback)
 		self.animators.card.reverses = true
 		
 		queueFinishedCallback(50)
+	elseif animation == self.kAnimations.hide then
+		self.animators.card = playdate.graphics.animator.new(800, 0, 240, playdate.easingFunctions.outExpo)
+		self.animators.preview = playdate.graphics.animator.new(600, 0, 240, playdate.easingFunctions.inCubic)
+
+		queueFinishedCallback(800)
 	end
 end
 
