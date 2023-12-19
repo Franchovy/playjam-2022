@@ -116,12 +116,22 @@ function WidgetMenu:_update()
 		self.tick = self.tick == 0 and 1 or 0
 	end
 	
-	if playdate.buttonJustPressed(playdate.kButtonA) then
+	local current, pressed, released = playdate.getButtonState()
+	
+	if self.state == self.kStates.subMenu then
+		self.children.menuSettings:_handleInput({ current = current, pressed = pressed, released = released })
+	else
+		self:_handleInput({ current = current, pressed = pressed, released = released })
+	end
+end
+
+function WidgetMenu:_handleInput(input)
+	if input.pressed & playdate.kButtonA ~= 0 then
 		self.tick = 0
 		self:setState(self.kStates.menuMain)
 	end
 	
-	if playdate.buttonJustPressed(playdate.kButtonB) then
+	if input.pressed & playdate.kButtonB ~= 0 then
 		self.tick = 0
 		self:setState(self.kStates.default)
 	end
@@ -155,12 +165,24 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 		self.children.title:animate(self.children.title.kAnimations.fromLevelSelect)
 	end
 	
-	if stateFrom == self.kStates.menuMain and stateTo == self.kStates.subMenu then
+	if stateFrom == self.kStates.menuMain and (stateTo == self.kStates.subMenu) then
 		self:playSample(kAssetsSounds.menuAccept)
 		
-		self.children.levelSelect:animate(self.children.levelSelect.kAnimations.outro)
+		self.children.levelSelect:animate(self.children.levelSelect.kAnimations.outro, function()
+			self.children.levelSelect:setVisible(false)
+			self.children.menuSettings:setVisible(true)
+			
+			playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+		end)
+	end
+	
+	if stateFrom == self.kStates.subMenu and (stateTo == self.kStates.menuMain) then
+		self:playSample(kAssetsSounds.menuAccept)
 		
-		self.children.menuSettings:setVisible(true)
+		self.children.levelSelect:animate(self.children.levelSelect.kAnimations.intro, function ()
+			self.children.levelSelect:setVisible(true)
+			self.children.menuSettings:setVisible(false)
+		end)
 	end
 end
 

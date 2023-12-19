@@ -1,9 +1,17 @@
+import "settings/entry"
+
 class("WidgetMenuSettings").extends(Widget)
 
 function WidgetMenuSettings:init(config)
 	self.config = config
 	
+	self:supply(Widget.kDeps.state)
+	self.state = 1
+	
+	self:supply(Widget.kDeps.children)
+	
 	self.painters = {}
+	self.entries = {}
 end
 
 function WidgetMenuSettings:_load()
@@ -52,15 +60,32 @@ function WidgetMenuSettings:_load()
 		
 		painterCardOutline:draw(rect)
 	end)
+	
+	for i, entryConfig in ipairs(self.config.entries) do
+		local entry = Widget.new(WidgetMenuSettingsEntry, { title = entryConfig.title })
+		entry:load()
+		
+		table.insert(self.entries, entry)
+		self.children["entry"..i] = entry
+	end
 end
 
 function WidgetMenuSettings:_draw(frame, rect)
-	
 	local insetRect = Rect.inset(frame, 12, 6)
-	
 	self.painters.card:draw(insetRect)
+	
+	local entryHeight = 27
+	local margin = 4
+	for i, entry in ipairs(self.entries) do
+		local entryRect = Rect.with(Rect.offset(Rect.inset(insetRect, 18, 26), 0, (entryHeight + margin) * (i - 1)), { h = entryHeight })
+		entry:draw(entryRect)
+	end
 end
 
 function WidgetMenuSettings:_update()
+	
+end
+
+function WidgetMenuSettings:_handleInput(input)
 	
 end
