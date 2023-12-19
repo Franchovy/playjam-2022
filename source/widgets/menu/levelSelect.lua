@@ -57,7 +57,7 @@ function WidgetLevelSelect:_load()
 	table.insert(self.entries, entrySettings)
 	self.children.entrySettings = entrySettings
 	
-	local previewSettings = Widget.new(LevelSelectPreviewImage, { path = kAssetsImages.menuSettings })
+	local previewSettings = Widget.new(LevelSelectPreviewImage, { path = kAssetsImages.menuSettings, title = "SETTINGS" })
 	table.insert(self.previews, previewSettings)
 	self.children["preview"..4] = previewSettings
 	
