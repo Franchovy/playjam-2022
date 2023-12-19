@@ -160,7 +160,7 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 		
 		self.children.levelSelect:animate(self.children.levelSelect.kAnimations.outro)
 		
-		--self.children.menuSettings:setVisible(true)
+		self.children.menuSettings:setVisible(true)
 	end
 end
 
