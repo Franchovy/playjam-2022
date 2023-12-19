@@ -62,7 +62,7 @@ function WidgetMenuSettings:_load()
 	end)
 	
 	for i, entryConfig in ipairs(self.config.entries) do
-		local entry = Widget.new(WidgetMenuSettingsEntry, { title = entryConfig.title })
+		local entry = Widget.new(WidgetMenuSettingsEntry, { title = entryConfig.title, isSelected = i == 1 and true or false })
 		entry:load()
 		
 		table.insert(self.entries, entry)
@@ -87,5 +87,22 @@ function WidgetMenuSettings:_update()
 end
 
 function WidgetMenuSettings:_handleInput(input)
+	if input.pressed & playdate.kButtonUp ~= 0 then
+		if self.state > 1 then
+			self:setState(self.state - 1)
+		end
+	end
 	
+	if input.pressed & playdate.kButtonDown ~= 0 then
+		if self.state < #self.entries then
+			self:setState(self.state + 1)
+		end
+	end
+end
+
+function WidgetMenuSettings:changeState(stateFrom, stateTo)
+	self.entries[stateFrom]:setState(self.entries[stateFrom].kStates.unselected)
+	self.entries[stateTo]:setState(self.entries[stateTo].kStates.selected)
+	
+	playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 end
