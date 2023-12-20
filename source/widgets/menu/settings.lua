@@ -9,6 +9,7 @@ function WidgetMenuSettings:init(config)
 	self.state = 1
 	
 	self:supply(Widget.kDeps.children)
+	self:supply(Widget.kDeps.input)
 	
 	self.painters = {}
 	self.entries = {}
@@ -83,7 +84,9 @@ function WidgetMenuSettings:_draw(frame, rect)
 end
 
 function WidgetMenuSettings:_update()
-	
+	self:passInput(self.entries[self.state])
+		
+	self:handleInput()
 end
 
 function WidgetMenuSettings:_handleInput(input)

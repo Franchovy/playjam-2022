@@ -6,6 +6,7 @@ function WidgetMenuSettingsEntry:init(config)
 	self.config = config
 	
 	self:supply(Widget.kDeps.keyValueState)
+	self:supply(Widget.kDeps.input)
 	
 	local isSelected = config.isSelected == true and 1 or 2
 	local value = config.value ~= nil and config.value or (config.options ~= nil) and config.options[1] or nil
@@ -60,5 +61,21 @@ function WidgetMenuSettingsEntry:_draw(frame, rect)
 end
 
 function WidgetMenuSettingsEntry:_update()
+	self:handleInput()
+end
+
+function WidgetMenuSettingsEntry:_handleInput(input)
+	if self.config.type == kDataTypeSettingsEntry.button then
+		if input.pressed & playdate.kButtonA ~= 0 then
+			print("Pressed ".. self.config.title)
+		end
+	end
 	
+	if self.config.type == kDataTypeSettingsEntry.options then
+		if input.pressed & playdate.kButtonLeft ~= 0 then
+			print("Pressed Left ".. self.config.title)
+		elseif input.pressed & playdate.kButtonRight ~= 0 then
+			print("Pressed Right ".. self.config.title)
+		end
+	end
 end

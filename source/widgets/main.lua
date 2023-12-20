@@ -9,6 +9,7 @@ class("WidgetMain").extends(Widget)
 function WidgetMain:init()	
 	self:supply(Widget.kDeps.children)
 	self:supply(Widget.kDeps.state)
+	self:supply(Widget.kDeps.input)
 	
 	self.kStates = { menu = 1, play = 2 }
 	self.state = self.kStates.menu
@@ -148,7 +149,11 @@ function WidgetMain:_draw(frame, rect)
 end
 
 function WidgetMain:_update()
+	self:registerDeviceInput()
 	
+	if self.state == self.kStates.menu then
+		self:passInput(self.children.menu)
+	end
 end
 
 function WidgetMain:_input()

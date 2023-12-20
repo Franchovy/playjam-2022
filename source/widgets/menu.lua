@@ -13,6 +13,7 @@ function WidgetMenu:init(config)
 	self:supply(Widget.kDeps.children)
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.samples)
+	self:supply(Widget.kDeps.input)
 	
 	self.painters = {}
 	self.signals = {}
@@ -117,12 +118,10 @@ function WidgetMenu:_update()
 		self.tick = self.tick == 0 and 1 or 0
 	end
 	
-	local current, pressed, released = playdate.getButtonState()
-	
 	if self.state == self.kStates.subMenu then
-		self.children.menuSettings:_handleInput({ current = current, pressed = pressed, released = released })
+		self:passInput(self.children.menuSettings)
 	else
-		self:_handleInput({ current = current, pressed = pressed, released = released })
+		self:handleInput()
 	end
 end
 
