@@ -73,9 +73,17 @@ function WidgetMenuSettingsEntry:_handleInput(input)
 	
 	if self.config.type == kDataTypeSettingsEntry.options then
 		if input.pressed & playdate.kButtonLeft ~= 0 then
-			print("Pressed Left ".. self.config.title)
+			local index = table.indexOfElement(self.config.options, self.state.value)
+			if index > 1 then
+				self:setState(self.kStateKeys.value, self.kStates.value[index - 1])
+				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+			end
 		elseif input.pressed & playdate.kButtonRight ~= 0 then
-			print("Pressed Right ".. self.config.title)
+			local index = table.indexOfElement(self.config.options, self.state.value)
+			if index < #self.config.options then
+				self:setState(self.kStateKeys.value, self.kStates.value[index + 1])
+				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+			end
 		end
 	end
 end
