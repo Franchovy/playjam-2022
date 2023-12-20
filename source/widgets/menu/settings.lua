@@ -74,7 +74,7 @@ function WidgetMenuSettings:_draw(frame, rect)
 	local insetRect = Rect.inset(frame, 12, 6)
 	self.painters.card:draw(insetRect)
 	
-	local entryHeight = 27
+	local entryHeight = 32
 	local margin = 4
 	for i, entry in ipairs(self.entries) do
 		local entryRect = Rect.with(Rect.offset(Rect.inset(insetRect, 18, 26), 0, (entryHeight + margin) * (i - 1)), { h = entryHeight })
