@@ -1,3 +1,4 @@
+import "extensions"
 
 class("Painter").extends()
 
@@ -54,23 +55,13 @@ function Painter:_setImage(image, state)
 end
 
 function Painter:_contains(set, t)
-	for table, image in pairs(set) do
-		if self:_shallowEqual(t, table) then
-			return table, image
+	for t2, image in pairs(set) do
+		if table.shallowEqual(t, t2) then
+			return t2, image
 		end
 	end
 	
 	return nil
-end
-
-function Painter:_shallowEqual(table1, table2)
-	for k, v in pairs(table1) do
-		if table2[k] == nil or table1[k] ~= table2[k] then
-			return false
-		end
-	end
-	
-	return true
 end
 
 function Painter:unload()

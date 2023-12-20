@@ -8,7 +8,8 @@ Widget.kDeps = {
 	samples = 3,
 	animators = 4,
 	update = 5,
-	animations = 6
+	animations = 6,
+	keyValueState = 7
 }
 
 function Widget:createSprite(zIndex)
@@ -61,6 +62,8 @@ function Widget.supply(widget, dep)
 		widget:_supplyDepUpdate()
 	elseif dep == Widget.kDeps.animations then
 		widget:_supplyDepAnimations()
+	elseif dep == Widget.kDeps.keyValueState then
+		widget:_supplyDepKeyValueState()
 	end
 end
 
@@ -83,6 +86,32 @@ function Widget._supplyDepState(self)
 		end
 		
 		self.state = targetState
+	end
+end
+
+function Widget._supplyDepKeyValueState(self)
+	function self:setStateInitial(stateTable, state)
+		self.state = state
+		self.kStates = stateTable
+		
+		self.kStateKeys = {}
+		for k, _ in pairs(stateTable) do
+			self.kStateKeys[k] = k
+		end
+	end
+	function self:setState(key, value)
+		if self.state[key] == value then
+			return
+		end
+		
+		local updatedState = table.shallowcopy(self.state)
+		updatedState[key] = value
+		
+		if self.changeState ~= nil then
+			self:changeState(self.state, updatedState)
+		end
+		
+		self.state = updatedState
 	end
 end
 

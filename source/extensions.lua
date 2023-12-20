@@ -127,6 +127,16 @@ function table.deepcopy(orig)
 	return copy
 end
 
+function table.shallowEqual(table1, table2)
+	for k, v in pairs(table1) do
+		if table2[k] == nil or table1[k] ~= table2[k] then
+			return false
+		end
+	end
+	
+	return true
+end
+
 -- Extensions on "math"
 
 function math.approach( value, target, step)
