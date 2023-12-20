@@ -77,7 +77,7 @@ function WidgetMenuSettingsEntry:_handleInput(input)
 			local index = table.indexOfElement(self.config.options, self.state.value)
 			if index > 1 then
 				self:setState(self.kStateKeys.value, self.kStates.value[index - 1])
-				self.signals.onChanged()
+				self.signals.onChanged(self.kStates.value[index - 1])
 				
 				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 			end
@@ -85,7 +85,7 @@ function WidgetMenuSettingsEntry:_handleInput(input)
 			local index = table.indexOfElement(self.config.options, self.state.value)
 			if index < #self.config.options then
 				self:setState(self.kStateKeys.value, self.kStates.value[index + 1])
-				self.signals.onChanged()
+				self.signals.onChanged(self.kStates.value[index + 1])
 				
 				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 			end

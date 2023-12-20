@@ -63,10 +63,10 @@ function WidgetMenuSettings:_load()
 		painterCardOutline:draw(rect)
 	end)
 	
-	local entryCallback = function(entry)
+	local entryCallback = function(entry, key, value)
 		if entry.config.type == kDataTypeSettingsEntry.options then
 			-- Option changed
-			
+			Settings:setValue(key, value)
 		elseif entry.config.type == kDataTypeSettingsEntry.button then 
 			-- Button pressed
 			self.signals.close()
@@ -74,10 +74,17 @@ function WidgetMenuSettings:_load()
 	end
 	
 	for i, entryConfig in ipairs(self.config.entries) do
-		local entry = Widget.new(WidgetMenuSettingsEntry, { title = entryConfig.title, isSelected = i == 1 and true or false, type = entryConfig.type, options = entryConfig.values })
+		local entry = Widget.new(WidgetMenuSettingsEntry, { 
+			title = entryConfig.title, 
+			isSelected = i == 1 and true or false, 
+			type = entryConfig.type, 
+			options = entryConfig.values, 
+			value = Settings:getValue(entryConfig.key)
+		})
+		
 		entry:load()
-		entry.signals.onChanged = function()
-			entryCallback(entry)
+		entry.signals.onChanged = function(value)
+			entryCallback(entry, entryConfig.key, value)
 		end
 		
 		table.insert(self.entries, entry)

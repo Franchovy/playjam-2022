@@ -1,5 +1,6 @@
-import "utils/rect"
 import "utils/position"
+import "utils/rect"
+import "utils/settings"
 import "menu/levelSelect"
 import "menu/title"
 import "menu/settings"
@@ -62,17 +63,23 @@ function WidgetMenu:_load()
 		end
 	end
 	
+	-- TODO: Load settings from file
+	Settings:setValue(kSettingsKeys.sfxVolume, 10)
+	Settings:setValue(kSettingsKeys.musicVolume, 10)
+	
 	local valuesMenuEntriesTypeOptions = {"OFF",1,2,3,4,5,6,7,8,9,10}
 	local dataSettingsMenuEntries = {
 		{
 			title = "SFX VOLUME",
 			type = kDataTypeSettingsEntry.options,
 			values = valuesMenuEntriesTypeOptions,
+			key = kSettingsKeys.sfxVolume
 		},
 		{
 			title = "MUSIC VOLUME",
 			type = kDataTypeSettingsEntry.options,
 			values = valuesMenuEntriesTypeOptions,
+			key = kSettingsKeys.musicVolume
 		},
 		{
 			title = "BACK",
@@ -82,6 +89,7 @@ function WidgetMenu:_load()
 	self.children.menuSettings = Widget.new(WidgetMenuSettings, { entries = dataSettingsMenuEntries })
 	self.children.menuSettings:load()
 	self.children.menuSettings:setVisible(false)
+	
 	self.children.menuSettings.signals.close = function()
 		self:setState(self.kStates.menu)
 	end
