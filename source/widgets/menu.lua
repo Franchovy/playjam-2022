@@ -19,7 +19,7 @@ function WidgetMenu:init(config)
 	self.signals = {}
 	self.fileplayer = {}
 	
-	self:setStateInitial({default = 1, menuMain = 2, subMenu = 3}, 1)
+	self:setStateInitial({default = 1, menu = 2, subMenu = 3}, 1)
 	
 	self.index = 0
 	self.tick = 0
@@ -82,6 +82,9 @@ function WidgetMenu:_load()
 	self.children.menuSettings = Widget.new(WidgetMenuSettings, { entries = dataSettingsMenuEntries })
 	self.children.menuSettings:load()
 	self.children.menuSettings:setVisible(false)
+	self.children.menuSettings.signals.close = function()
+		self:setState(self.kStates.menu)
+	end
 	
 	self.children.title:animate(self.children.title.kAnimations.onFirstOpen)
 
@@ -128,7 +131,7 @@ end
 function WidgetMenu:_handleInput(input)
 	if input.pressed & playdate.kButtonA ~= 0 then
 		self.tick = 0
-		self:setState(self.kStates.menuMain)
+		self:setState(self.kStates.menu)
 	end
 	
 	if input.pressed & playdate.kButtonB ~= 0 then
@@ -138,7 +141,7 @@ function WidgetMenu:_handleInput(input)
 end
 
 function WidgetMenu:changeState(stateFrom, stateTo)
-	if stateFrom == self.kStates.default and stateTo == self.kStates.menuMain then
+	if stateFrom == self.kStates.default and stateTo == self.kStates.menu then
 		self:playSample(kAssetsSounds.menuAccept)
 		
 		if self.children.levelSelect == nil then
@@ -156,7 +159,7 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 		end)
 	end
 	
-	if stateFrom == self.kStates.menuMain and stateTo == self.kStates.default then
+	if stateFrom == self.kStates.menu and stateTo == self.kStates.default then
 		self:playSample(kAssetsSounds.menuAccept)
 		
 		self.children.title:setVisible(true)
@@ -165,7 +168,7 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 		self.children.title:animate(self.children.title.kAnimations.fromLevelSelect)
 	end
 	
-	if stateFrom == self.kStates.menuMain and (stateTo == self.kStates.subMenu) then
+	if stateFrom == self.kStates.menu and (stateTo == self.kStates.subMenu) then
 		self:playSample(kAssetsSounds.menuAccept)
 		
 		self.children.levelSelect:animate(self.children.levelSelect.kAnimations.outro, function()
@@ -176,13 +179,12 @@ function WidgetMenu:changeState(stateFrom, stateTo)
 		end)
 	end
 	
-	if stateFrom == self.kStates.subMenu and (stateTo == self.kStates.menuMain) then
+	if stateFrom == self.kStates.subMenu and (stateTo == self.kStates.menu) then
 		self:playSample(kAssetsSounds.menuAccept)
+		self.children.menuSettings:setVisible(false)
+		self.children.levelSelect:setVisible(true)
 		
-		self.children.levelSelect:animate(self.children.levelSelect.kAnimations.intro, function ()
-			self.children.levelSelect:setVisible(true)
-			self.children.menuSettings:setVisible(false)
-		end)
+		self.children.levelSelect:animate(self.children.levelSelect.kAnimations.intro)
 	end
 end
 

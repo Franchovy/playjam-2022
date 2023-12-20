@@ -180,6 +180,7 @@ end
 function WidgetLevelSelect:_animate(animation, queueFinishedCallback)
 	if animation == self.kAnimations.intro then
 		self.animators.card = playdate.graphics.animator.new(800, -240, 0, playdate.easingFunctions.outExpo)
+		self.animators.preview = playdate.graphics.animator.new(600, 240, 0, playdate.easingFunctions.inCubic)
 		
 		queueFinishedCallback(800)
 	elseif animation == self.kAnimations.error then

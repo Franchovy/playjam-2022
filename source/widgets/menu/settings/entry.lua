@@ -23,6 +23,7 @@ function WidgetMenuSettingsEntry:init(config)
 	)
 	
 	self.painters = {}
+	self.signals = {}
 end
 
 function WidgetMenuSettingsEntry:_load()
@@ -67,7 +68,7 @@ end
 function WidgetMenuSettingsEntry:_handleInput(input)
 	if self.config.type == kDataTypeSettingsEntry.button then
 		if input.pressed & playdate.kButtonA ~= 0 then
-			print("Pressed ".. self.config.title)
+			self.signals.onChanged()
 		end
 	end
 	
@@ -76,12 +77,16 @@ function WidgetMenuSettingsEntry:_handleInput(input)
 			local index = table.indexOfElement(self.config.options, self.state.value)
 			if index > 1 then
 				self:setState(self.kStateKeys.value, self.kStates.value[index - 1])
+				self.signals.onChanged()
+				
 				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 			end
 		elseif input.pressed & playdate.kButtonRight ~= 0 then
 			local index = table.indexOfElement(self.config.options, self.state.value)
 			if index < #self.config.options then
 				self:setState(self.kStateKeys.value, self.kStates.value[index + 1])
+				self.signals.onChanged()
+				
 				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 			end
 		end
