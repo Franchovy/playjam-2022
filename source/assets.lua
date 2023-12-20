@@ -58,8 +58,10 @@ kAssetsTracks = {
 }
 
 kAssetsFonts = {
-	twinbee = dirFonts.."Twinbee (1)",
-	marbleMadness = dirFonts.."Marble Madness [unused 1] (1)"
+	twinbee = dirFonts.."Twinbee",
+	twinbee2x = dirFonts.."Twinbee_2x",
+	twinbee15x = dirFonts.."Twinbee_1.5x",
+	marbleMadness = dirFonts.."Marble Madness"
 }
 
 kAssetsLevels = {
