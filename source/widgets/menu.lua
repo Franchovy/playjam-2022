@@ -3,6 +3,7 @@ import "utils/position"
 import "menu/levelSelect"
 import "menu/title"
 import "menu/settings"
+import "menu/settings/kDataTypeSettingsEntry"
 
 class("WidgetMenu").extends(Widget)
 
@@ -60,21 +61,21 @@ function WidgetMenu:_load()
 		end
 	end
 	
-	local valuesMenuEntriesTypeOptions = {"off",1,2,3,4,5,6,7,8,9,10}
+	local valuesMenuEntriesTypeOptions = {"OFF",1,2,3,4,5,6,7,8,9,10}
 	local dataSettingsMenuEntries = {
 		{
 			title = "SFX VOLUME",
-			type = "options",
+			type = kDataTypeSettingsEntry.options,
 			values = valuesMenuEntriesTypeOptions,
 		},
 		{
 			title = "MUSIC VOLUME",
-			type = "options",
+			type = kDataTypeSettingsEntry.options,
 			values = valuesMenuEntriesTypeOptions,
 		},
 		{
 			title = "BACK",
-			type = "button"
+			type = kDataTypeSettingsEntry.button
 		}
 	}
 	self.children.menuSettings = Widget.new(WidgetMenuSettings, { entries = dataSettingsMenuEntries })

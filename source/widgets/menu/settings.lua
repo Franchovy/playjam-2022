@@ -62,7 +62,7 @@ function WidgetMenuSettings:_load()
 	end)
 	
 	for i, entryConfig in ipairs(self.config.entries) do
-		local entry = Widget.new(WidgetMenuSettingsEntry, { title = entryConfig.title, isSelected = i == 1 and true or false })
+		local entry = Widget.new(WidgetMenuSettingsEntry, { title = entryConfig.title, isSelected = i == 1 and true or false, type = entryConfig.type, options = entryConfig.values })
 		entry:load()
 		
 		table.insert(self.entries, entry)
@@ -101,8 +101,8 @@ function WidgetMenuSettings:_handleInput(input)
 end
 
 function WidgetMenuSettings:changeState(stateFrom, stateTo)
-	self.entries[stateFrom]:setState(self.entries[stateFrom].kStates.unselected)
-	self.entries[stateTo]:setState(self.entries[stateTo].kStates.selected)
+	self.entries[stateFrom]:setState(self.entries[stateFrom].kStateKeys.isSelected, self.entries[stateFrom].kStates.isSelected.unselected)
+	self.entries[stateTo]:setState(self.entries[stateTo].kStateKeys.isSelected, self.entries[stateTo].kStates.isSelected.selected)
 	
 	playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 end
