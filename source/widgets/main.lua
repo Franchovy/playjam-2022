@@ -169,7 +169,7 @@ function WidgetMain:_input()
 	
 end
 
-function WidgetMain:changeState(stateFrom, stateTo)
+function WidgetMain:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.menu and (stateTo == self.kStates.play) then
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.closed)

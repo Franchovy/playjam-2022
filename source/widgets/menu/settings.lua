@@ -148,7 +148,7 @@ function WidgetMenuSettings:_handleInput(input)
 	end
 end
 
-function WidgetMenuSettings:changeState(stateFrom, stateTo)
+function WidgetMenuSettings:_changeState(stateFrom, stateTo)
 	self.entries[stateFrom]:setState(self.entries[stateFrom].kStateKeys.isSelected, self.entries[stateFrom].kStates.isSelected.unselected)
 	self.entries[stateTo]:setState(self.entries[stateTo].kStateKeys.isSelected, self.entries[stateTo].kStates.isSelected.selected)
 	

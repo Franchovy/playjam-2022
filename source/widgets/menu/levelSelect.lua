@@ -194,6 +194,6 @@ function WidgetLevelSelect:_animate(animation, queueFinishedCallback)
 	end
 end
 
-function WidgetLevelSelect:changeState(_, _)
+function WidgetLevelSelect:_changeState(_, _)
 	playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 end

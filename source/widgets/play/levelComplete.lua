@@ -260,7 +260,7 @@ function LevelComplete:_update()
 	end
 end
 
-function LevelComplete:changeState(stateFrom, stateTo)
+function LevelComplete:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.text and (stateTo == self.kStates.overlay) then
 		self:playSample(kAssetsSounds.levelCompleteCard)
 		

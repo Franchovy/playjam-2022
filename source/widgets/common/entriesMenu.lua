@@ -76,7 +76,7 @@ function WidgetEntriesMenu:_update()
 	end
 end
 
-function WidgetEntriesMenu:changeState(_, stateTo)
+function WidgetEntriesMenu:_changeState(_, stateTo)
 	for i, entry in ipairs(self.entries) do
 		entry:setState(stateTo == i and entry.kStates.selected or entry.kStates.unselected)
 	end

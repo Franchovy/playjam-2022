@@ -80,7 +80,7 @@ function WidgetHUD:_update()
 	end
 end
 
-function WidgetHUD:changeState(stateFrom, stateTo)
+function WidgetHUD:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.offScreen and (stateTo == self.kStates.onScreen) then
 		self.animators.hideAnimator = playdate.graphics.animator.new(400, -200, 0, playdate.easingFunctions.outQuint)
 	elseif stateFrom == self.kStates.onScreen and (stateTo == self.kStates.offScreen) then

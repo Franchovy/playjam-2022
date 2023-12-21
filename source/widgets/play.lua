@@ -171,7 +171,7 @@ function WidgetPlay:_update()
 	end
 end
 
-function WidgetPlay:changeState(stateFrom, stateTo)
+function WidgetPlay:_changeState(stateFrom, stateTo)
 	if stateTo == self.kStates.playing then
 		self.children.level:setState(self.children.level.kStates.playing)
 		self.timers.levelTimer:start()

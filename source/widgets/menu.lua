@@ -141,7 +141,7 @@ function WidgetMenu:_handleInput(input)
 	end
 end
 
-function WidgetMenu:changeState(stateFrom, stateTo)
+function WidgetMenu:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.default and stateTo == self.kStates.menu then
 		self:playSample(kAssetsSounds.menuAccept)
 		

@@ -76,7 +76,7 @@ function WidgetTransition:_update()
 	end
 end
 
-function WidgetTransition:changeState(stateFrom, stateTo)
+function WidgetTransition:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.open and stateTo == self.kStates.closed then
 		self.animators.animator = playdate.graphics.animator.new(400, -400, 0, playdate.easingFunctions.inQuad, 100)
 		self:playSample("swoosh")

@@ -44,13 +44,13 @@ end
 function WidgetEntriesMenuEntry:setState(state)
 	for k, v in pairs(state) do
 		if self.state[k] ~= v then
-			self:changeState(self.state, state)
+			self:_changeState(self.state, state)
 			
 			self.state[k] = v
 		end
 	end
 end
 
-function WidgetEntriesMenuEntry:changeState(stateFrom, stateTo)
+function WidgetEntriesMenuEntry:_changeState(stateFrom, stateTo)
 	
 end

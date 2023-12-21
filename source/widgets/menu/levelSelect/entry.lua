@@ -56,13 +56,13 @@ end
 function LevelSelectEntry:setState(state)
 	for k, v in pairs(state) do
 		if self.state[k] ~= v then
-			self:changeState(self.state, state)
+			self:_changeState(self.state, state)
 			
 			self.state[k] = v
 		end
 	end
 end
 
-function LevelSelectEntry:changeState(stateFrom, stateTo)
+function LevelSelectEntry:_changeState(stateFrom, stateTo)
 	
 end

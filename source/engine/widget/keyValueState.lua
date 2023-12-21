@@ -19,8 +19,8 @@ function keyValueState(widget)
 		local updatedState = table.shallowcopy(self.state)
 		updatedState[key] = value
 		
-		if self.changeState ~= nil then
-			self:changeState(self.state, updatedState)
+		if self._changeState ~= nil then
+			self:_changeState(self.state, updatedState)
 		end
 		
 		self.state = updatedState

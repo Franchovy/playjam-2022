@@ -10,8 +10,8 @@ local function state(widget)
 			return
 		end
 		
-		if self.changeState ~= nil then
-			self:changeState(self.state, targetState)
+		if self._changeState ~= nil then
+			self:_changeState(self.state, targetState)
 		end
 		
 		self.state = targetState

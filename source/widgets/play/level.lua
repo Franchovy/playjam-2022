@@ -166,7 +166,7 @@ function WidgetLevel:_update()
 	end
 end
 
-function WidgetLevel:changeState(stateFrom, stateTo)
+function WidgetLevel:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.ready and (stateTo == self.kStates.playing) then
 		self.wheel.ignoresPlayerInput = false
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.unloaded) then
