@@ -1,5 +1,6 @@
-import "sampleplayer"
 import "fileplayer"
-import "spritecycler/spritecycler"
 import "painter"
+import "sampleplayer"
+import "spritecycler/spritecycler"
+import "synth"
 import "widget"

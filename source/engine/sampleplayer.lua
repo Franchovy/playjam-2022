@@ -14,11 +14,11 @@ sampleplayer = {
 	}
 }
 
-function sampleplayer:addSample(name, filePath, volume)
+function sampleplayer:addSample(key, filePath, volume)
 	local player = sound.sampleplayer.new(filePath)
 	volume = volume or 1
 	
-	self.sampleplayers[name] = {
+	self.sampleplayers[key] = {
 		player = player,
 		volume = volume
 	}
@@ -26,18 +26,22 @@ function sampleplayer:addSample(name, filePath, volume)
 	player:setVolume(volume * self.config.volume)
 end
 
-function sampleplayer:playSample(name, callback)
+function sampleplayer:playSample(key, callback)
 	if AppConfig.sfx.disabled then
 		return 
 	end
 	
-	local player = self.sampleplayers[name].player
+	local player = self.sampleplayers[key].player
 	
 	if callback then
 		player:setFinishCallback(callback)
 	end
 	
 	player:play()
+end
+
+function sampleplayer:getSample(key)
+	return self.sampleplayers[key].player:getSample()
 end
 
 function sampleplayer:setGlobalVolume(volume)

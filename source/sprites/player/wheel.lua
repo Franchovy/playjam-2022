@@ -6,7 +6,6 @@ import "playdate"
 class("Wheel").extends(playdate.graphics.sprite)
 
 import "speed"
-import "sounds"
 import "jump"
 
 local maxFallSpeed = 14
@@ -45,8 +44,31 @@ function Wheel:init()
 	
 	-- Samples
 	
-	self:initializeSamples()
+	-- Load sound assets
+	
+	sampleplayer:addSample("coin", kAssetsSounds.coin, 0.5)
+	sampleplayer:addSample("bump", kAssetsSounds.bump, 0.3)
+	sampleplayer:addSample("land", kAssetsSounds.land, 0.2)
+	sampleplayer:addSample("jump", kAssetsSounds.jump, 0.2)
+		
+	sampleplayer:addSample("death"..1, kAssetsSounds.death1, 0.6)
+	sampleplayer:addSample("death"..2, kAssetsSounds.death2, 0.6)
+	sampleplayer:addSample("death"..3, kAssetsSounds.death3, 0.6)
 	sampleplayer:addSample(kAssetsSounds.tick, kAssetsSounds.tick, 0.2)
+	sampleplayer:addSample(kAssetsSounds.rev, kAssetsSounds.rev, 1)
+	
+	-- Synth
+	
+	local sampleSynth = sampleplayer:getSample(kAssetsSounds.rev)
+	local synthConfig = {
+		sample = sampleSynth,
+		attack = 0.5,
+		decay = 1.2,
+		volume = 0.35,
+		frequency = 440
+	}
+	
+	synth:create(kAssetsSounds.rev, synthConfig)		
 	
 	-- Create Properties
 	
@@ -253,7 +275,13 @@ function Wheel:update()
 		end
 		
 		-- Play sounds based on movement
-		self:playMovementSound()
+		local maxVelocityX = 11 -- this has been copied from speed.lua
+		local velocityFactor = math.abs(self.velocityX) / maxVelocityX
+		
+		local frequencyFactor = (velocityFactor + 1) * 2.5
+		local volumeFactor = (velocityFactor + 1)
+		
+		synth:play(kAssetsSounds.rev, frequencyFactor, volumeFactor)
 	end
 	
 	-- Update graphics

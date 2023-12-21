@@ -49,8 +49,3 @@ function Wheel:calculateSpeed(crankTicks, speedPreviousActual)
 		return math.min(speedActual, maxVelocityX)
 	end
 end
-
-function Wheel:playMovementSound()
-	local normalizedVelocityFactor = math.abs(self.velocityX) / maxVelocityX
-	self:playMovementBasedSounds(normalizedVelocityFactor)	
-end
