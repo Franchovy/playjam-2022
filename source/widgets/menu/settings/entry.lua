@@ -42,7 +42,7 @@ function WidgetMenuSettingsEntry:_load()
 		playdate.graphics.setFont(playdate.graphics.font.new(kAssetsFonts.twinbee))
 	end)
 	
-	if self.config.type == kDataTypeSettingsEntry.options then
+	if self.config.type == WidgetMenuSettings.type.options then
 		self.painters.value = Painter(function(frame, state)
 			local font = playdate.graphics.font.new(kAssetsFonts.twinbee2x)
 			local fontHeight = font:getHeight()
@@ -56,7 +56,7 @@ end
 function WidgetMenuSettingsEntry:_draw(frame, rect)
 	self.painters.title:draw(frame, { isSelected = self.state.isSelected == self.kStates.isSelected.selected })
 	
-	if self.config.type == kDataTypeSettingsEntry.options then
+	if self.config.type == WidgetMenuSettings.type.options then
 		self.painters.value:draw(frame, { value = self.state.value })
 	end
 end
@@ -66,13 +66,13 @@ function WidgetMenuSettingsEntry:_update()
 end
 
 function WidgetMenuSettingsEntry:_handleInput(input)
-	if self.config.type == kDataTypeSettingsEntry.button then
+	if self.config.type == WidgetMenuSettings.type.button then
 		if input.pressed & playdate.kButtonA ~= 0 then
 			self.signals.onChanged()
 		end
 	end
 	
-	if self.config.type == kDataTypeSettingsEntry.options then
+	if self.config.type == WidgetMenuSettings.type.options then
 		if input.pressed & playdate.kButtonLeft ~= 0 then
 			local index = table.indexOfElement(self.config.options, self.state.value)
 			if index > 1 then

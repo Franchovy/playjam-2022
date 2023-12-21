@@ -2,6 +2,11 @@ import "settings/entry"
 
 class("WidgetMenuSettings").extends(Widget)
 
+WidgetMenuSettings.type = {
+	options = 1,
+	button = 2
+}
+
 function WidgetMenuSettings:init(config)
 	self.config = config
 	
@@ -64,7 +69,7 @@ function WidgetMenuSettings:_load()
 	end)
 	
 	local function entryCallback(entry, key, value)
-		if entry.config.type == kDataTypeSettingsEntry.options then
+		if entry.config.type == WidgetMenuSettings.type.options then
 			if value == "OFF" then
 				value = 0
 			end
@@ -73,7 +78,7 @@ function WidgetMenuSettings:_load()
 			
 			-- Option changed
 			Settings:setValue(key, settingsValue)
-		elseif entry.config.type == kDataTypeSettingsEntry.button then 
+		elseif entry.config.type == WidgetMenuSettings.type.button then 
 			-- Button pressed
 			Settings:writeToFile()
 			
@@ -82,7 +87,7 @@ function WidgetMenuSettings:_load()
 	end
 	
 	local function getEntryValue(type, key)
-		if type == kDataTypeSettingsEntry.options then
+		if type == WidgetMenuSettings.type.options then
 			local settingsValue = Settings:getValue(key)
 			if settingsValue == 0 then
 				return "OFF"
