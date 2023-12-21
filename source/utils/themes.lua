@@ -20,8 +20,8 @@ function getParalaxImagesForTheme(theme)
 	}
 end
 
-function getMusicFilepathForTheme(theme)
-	return theme[2]
+function getMusicFilepathsForTheme(theme)
+	return theme[2].."/intro", theme[2].."/loop"
 end
 
 function getForegroundColorForTheme(theme)

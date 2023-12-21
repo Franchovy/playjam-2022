@@ -1,24 +1,28 @@
-import "CoreLibs/object"
-
-local sound <const> = playdate.sound
+import "settings"
 
 class("FilePlayer").extends()
 
-function FilePlayer:init(pathName)
-	self.intro = sound.fileplayer.new(pathName.."/intro")
-	self.intro:setFinishCallback(function() self:onIntroFinished() end)
+FilePlayer._fileplayers = table.weakValuesTable()
+
+function FilePlayer:init(loopPath, introPath)
+	if introPath ~= nil then
+		self.intro = playdate.sound.fileplayer.new(introPath)
+		self.intro:setFinishCallback(function() self:onIntroFinished() end)
+		
+		-- Load File
+		self.intro:play(0)
+		self.intro:pause()
+	end
 	
-	-- Load File
-	self.intro:play(0)
-	self.intro:pause()
-	
-	self.loop = sound.fileplayer.new(pathName.. "/loop")
+	self.loop = playdate.sound.fileplayer.new(loopPath)
 	
 	-- Load File
 	self.loop:play(0)
 	self.loop:pause()
 	
-	self.isPlayingIntro = true
+	self.isPlayingIntro = self.intro ~= nil
+	
+	table.insert(FilePlayer._fileplayers, self)
 end
 
 function FilePlayer:play()
@@ -36,7 +40,7 @@ function FilePlayer:stop()
 		self.loop:stop()
 	end
 	
-	self.isPlayingIntro = true
+	self.isPlayingIntro = self.intro ~= nil
 end
 
 function FilePlayer:onIntroFinished() 
@@ -46,3 +50,15 @@ function FilePlayer:onIntroFinished()
 		self.loop:play(0)
 	end
 end
+
+Settings:addCallback(kSettingsKeys.musicVolume, function(value)
+	for _, player in pairs(FilePlayer._fileplayers) do
+		if player.intro ~= nil then
+			player.intro:setVolume(value)
+		end
+		
+		if player.loop ~= nil then
+			player.loop:setVolume(value)
+		end
+	end
+end)
