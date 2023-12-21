@@ -1,15 +1,27 @@
+local config = {
+	volume = 1,
+	sampleplayers = {} -- Warning: Memory leak here! Using a weak table (using table.weakValuesTable) for some reason loses all data inside. Investigate
+}
+
 function samples(widget)
 	function widget:loadSample(path, volume, key)
 		if key == nil then
 			key = path
 		end
-		self.samples[key] = playdate.sound.sampleplayer.new(path)
+		local player = playdate.sound.sampleplayer.new(path)
 		
 		if volume == nil then
 			volume = 1
 		end
 		
-		self.samples[key]:setVolume(volume)
+		player:setVolume(volume * config.volume)
+		
+		self.samples[key] = player
+		
+		table.insert(config.sampleplayers, {
+			player = self.samples[key],
+			volume = volume * config.volume
+		})
 	end
 	
 	function widget:playSample(key, finishedCallback)
@@ -21,11 +33,23 @@ function samples(widget)
 	end
 	
 	function widget:unloadSample(key)
+		local player = self.samples[key]
+		
 		self.samples[key] = nil
+		
+		table.removevalue(config.sampleplayers, player)
 	end
 	
 	widget.samples = {}
 end
 
-Widget.register("samples", samples)
+Settings:addCallback(kSettingsKeys.sfxVolume, function(value)
+	config.volume = value
+	
+	for _, configSampleplayer in pairs(config.sampleplayers) do
+		configSampleplayer.player:setVolume(configSampleplayer.volume * value)
+	end
+end)
+
+Widget.register("samples", samples, config)
 	

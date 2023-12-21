@@ -129,23 +129,12 @@ function table.shallowEqual(table1, table2)
 	return true
 end
 
-function table.weakValuesTable(t)
-	local mt
-	if t == nil then
-		t = {}
-	else 
-		mt = getmetatable(t)
-	end
-	
-	if mt == nil then
-		mt = {
-			__mode = "v"
-		}
-		setmetatable(t, b)
-	else
-		mt.__mode = "v"
-	end
-	
+function table.weakValuesTable()
+	local t = {}
+	local mt = {
+		__mode = "v"
+	}
+	setmetatable(t, mt)
 	return t
 end
 
