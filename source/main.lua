@@ -1,4 +1,5 @@
-import "engine.lua"
+import "constant"
+import "engine"
 import "assets"
 import "sprites/lib"
 import "notify"

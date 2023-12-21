@@ -1,5 +1,10 @@
+import "settings"
+
 synth = {
-	_synthData = {}
+	_synthData = {},
+	config = {
+		volume = 1
+	}
 }
 
 function synth:create(key, config)
@@ -17,6 +22,10 @@ end
 function synth:play(key, frequencyFactor, volumeFactor)
 	local synthData = self._synthData[key]
 	
-	synthData.player:setVolume(synthData.volume * volumeFactor)
+	synthData.player:setVolume(synthData.volume * volumeFactor * self.config.volume)
 	synthData.player:playNote(synthData.frequency * frequencyFactor)
 end
+
+Settings:addCallback(kSettingsKeys.sfxVolume, function(value)
+	self.config.volume = volume
+end)

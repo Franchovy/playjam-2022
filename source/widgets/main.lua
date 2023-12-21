@@ -22,14 +22,6 @@ function WidgetMain:init()
 end
 
 function WidgetMain:_load()
-	Settings:setCallback(kSettingsKeys.sfxVolume, function(value)
-		if value == "OFF" then
-			value = 0
-		end
-		
-		sampleplayer:setGlobalVolume(value / 10)
-	end)
-	
 	if Settings:existsSettingsFile() then
 		Settings:readFromFile()
 	else 

@@ -1,5 +1,5 @@
 import "CoreLibs/object"
-
+import "settings"
 
 -- Libraries
 
@@ -44,10 +44,10 @@ function sampleplayer:getSample(key)
 	return self.sampleplayers[key].player:getSample()
 end
 
-function sampleplayer:setGlobalVolume(volume)
+Settings:addCallback(kSettingsKeys.sfxVolume, function(value)
 	self.config.volume = volume
 	
 	for _, sampleplayer in pairs(sampleplayer.sampleplayers) do
 		sampleplayer.player:setVolume(player._volume * volume)
 	end
-end
+end)
