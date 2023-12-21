@@ -15,6 +15,7 @@ function WidgetLevelSelect:init(config)
 	self:supply(Widget.kDeps.state)
 	self:supply(Widget.kDeps.children)
 	self:supply(Widget.kDeps.animations)
+	self:supply(Widget.kDeps.samples)
 	
 	self:setAnimations({
 		intro = 1,
@@ -27,14 +28,12 @@ function WidgetLevelSelect:init(config)
 	self.painters = {}
 	self.images = {}
 	
-	self.samples = {}
-	
 	self.signals = {}
 end
 
 function WidgetLevelSelect:_load()
-	self.samples.select = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelect)
-	self.samples.selectFail = playdate.sound.sampleplayer.new(kAssetsSounds.menuSelectFail)
+	self:loadSample(kAssetsSounds.menuSelect)
+	self:loadSample(kAssetsSounds.menuSelectFail)
 	
 	self.entries = {}
 	self.previews = {}
@@ -141,11 +140,11 @@ function WidgetLevelSelect:_update()
 	
 	if scrollUp then
 		if self.state > 1 then
-			self:setState(self.state - 1)
+			self:playSample(kAssetsSounds.menuSelect)
 			
-			self.samples.select:play()
+			self:setState(self.state - 1)
 		else
-			self.samples.selectFail:play()
+			self:playSample(kAssetsSounds.menuSelectFail)
 			
 			self:animate(self.kAnimations.error)
 		end
@@ -153,11 +152,11 @@ function WidgetLevelSelect:_update()
 	
 	if scrollDown then
 		if self.state < #self.entries then
-			self:setState(self.state + 1)
+			self:playSample(kAssetsSounds.menuSelect)
 			
-			self.samples.select:play()
+			self:setState(self.state + 1)
 		else
-			self.samples.selectFail:play()
+			self:playSample(kAssetsSounds.menuSelectFail)
 			
 			self:animate(self.kAnimations.error)
 		end

@@ -2,7 +2,6 @@
 function Wheel:initializeSamples()
 	-- Load sound assets
 	
-	--sampleplayer:addSample("hurt", kAssetsSounds.death1)
 	sampleplayer:addSample("coin", kAssetsSounds.coin, 0.5)
 	sampleplayer:addSample("bump", kAssetsSounds.bump, 0.3)
 	sampleplayer:addSample("land", kAssetsSounds.land, 0.2)

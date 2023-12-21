@@ -26,7 +26,9 @@ end
 function Settings:readFromFile()
 	local data = json.decodeFile(kFilePath.settings)
 	
-	table.shallowcopy(data, self._data)
+	for k, v in pairs(data) do
+		self:setValue(k, v)
+	end
 end
 
 function Settings:writeToFile()
@@ -34,7 +36,9 @@ function Settings:writeToFile()
 end
 
 function Settings:setDefaultValues(data)
-	table.shallowcopy(data, self._data)
+	for k, v in pairs(data) do
+		self:setValue(k, v)
+	end
 	
 	self:writeToFile()
 end

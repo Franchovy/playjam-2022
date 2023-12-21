@@ -8,7 +8,9 @@ import "widgets"
 local topLevelWidget
 
 -- Globals table -- Use sparingly!
-g = {}
+g = {
+	showCrankIndicator = false
+}
 
 function initialize()
 	playdate.graphics.setFont(playdate.graphics.font.new(kAssetsFonts.twinbee))
@@ -19,8 +21,6 @@ function initialize()
 	playdate.timer.performAfterDelay(1, function()
 		topLevelWidget:load()
 	end)
-	
-	g.showCrankIndicator = false
 	
 	playdate.setMinimumGCTime(2)
 end

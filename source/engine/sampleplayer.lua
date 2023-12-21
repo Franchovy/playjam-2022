@@ -7,14 +7,23 @@ local sound <const> = playdate.sound
 
 --
 
-sampleplayer = {}
+sampleplayer = {
+	sampleplayers = {},
+	config = {
+		volume = 0
+	}
+}
 
 function sampleplayer:addSample(name, filePath, volume)
-	self[name] = sound.sampleplayer.new(filePath)
+	local player = sound.sampleplayer.new(filePath)
+	volume = volume or 1
 	
-	if volume ~= nil then
-		self[name]:setVolume(volume)
-	end
+	self.sampleplayers[name] = {
+		player = player,
+		volume = volume
+	}
+	
+	player:setVolume(volume * self.config.volume)
 end
 
 function sampleplayer:playSample(name, callback)
@@ -22,9 +31,19 @@ function sampleplayer:playSample(name, callback)
 		return 
 	end
 	
+	local player = self.sampleplayers[name].player
+	
 	if callback then
-		self[name]:setFinishCallback(callback)
+		player:setFinishCallback(callback)
 	end
 	
-	self[name]:play()
+	player:play()
+end
+
+function sampleplayer:setGlobalVolume(volume)
+	self.config.volume = volume
+	
+	for _, sampleplayer in pairs(sampleplayer.sampleplayers) do
+		sampleplayer.player:setVolume(player._volume * volume)
+	end
 end
