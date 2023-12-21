@@ -15,6 +15,7 @@ import "widget/animators"
 import "widget/animations"
 import "widget/keyValueState"
 import "widget/samples"
+import "widget/fileplayer"
 
 function Widget.new(class, ...)
 	local widget = class(...)

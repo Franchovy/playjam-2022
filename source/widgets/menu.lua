@@ -12,10 +12,10 @@ function WidgetMenu:init(config)
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.input)
+	self:supply(Widget.deps.fileplayer)
 	
 	self.painters = {}
 	self.signals = {}
-	self.fileplayer = {}
 	
 	self:setStateInitial({default = 1, menu = 2, subMenu = 3}, 1)
 	
@@ -49,7 +49,7 @@ function WidgetMenu:_load()
 		if args.type == WidgetLevelSelect.kMenuActionType.play and (args.level ~= nil) then
 			
 			if AppConfig.enableBackgroundMusic == true then
-				self.fileplayer.menu:stop(0)
+				self:stopFilePlayer()
 			end
 			
 			self:playSample(kAssetsSounds.menuAccept)
@@ -89,17 +89,13 @@ function WidgetMenu:_load()
 	
 	self.children.title:animate(self.children.title.kAnimations.onFirstOpen)
 
-	if AppConfig.enableBackgroundMusic == true then
-		self.fileplayer.menu = playdate.sound.fileplayer.new(kAssetsTracks.menu)
-	end
+	self:loadFilePlayer(kAssetsTracks.menu)
 	
 	playdate.timer.performAfterDelay(10, function()
 		self:playSample(kAssetsSounds.intro)
 		
 		playdate.timer.performAfterDelay(300, function()
-			if AppConfig.enableBackgroundMusic == true then
-				self.fileplayer.menu:play(0)
-			end
+			self:playFilePlayer()
 		end)
 	end)
 end
