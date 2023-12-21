@@ -5,7 +5,7 @@ class("WidgetLevel").extends(Widget)
 function WidgetLevel:init(config)
 	self.config = config
 	
-	self:supply(Widget.kDeps.state)
+	self:supply(Widget.deps.state)
 	
 	self:setStateInitial({
 		ready = 1,

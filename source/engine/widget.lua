@@ -1,17 +1,47 @@
 class("Widget").extends()
 
-Widget.drawList = {}
+Widget.deps = {}
 
-Widget.kDeps = {
-	children = 1,
-	state = 2,
-	samples = 3,
-	animators = 4,
-	update = 5,
-	animations = 6,
-	keyValueState = 7,
-	input = 8
-}
+function Widget.register(name, dep, config)
+	Widget.deps[name] = {
+		_supply = dep,
+		_config = config
+	}
+end
+
+import "widget/input"
+import "widget/state"
+import "widget/animators"
+import "widget/animations"
+import "widget/keyValueState"
+import "widget/samples"
+
+function Widget.new(class, ...)
+	local widget = class(...)
+	
+	widget._state = {
+		isLoaded = false,
+		isVisible = true
+	}
+	
+	widget.children = {}
+	
+	return widget
+end
+
+function Widget:supply(dep)
+	if dep._config ~= nil then
+		if dep._config.dependsOn ~= nil then
+			for _, dep in pairs(dep._config.dependsOn) do
+				assert(Widget.deps[dep] ~= nil, "Missing dependency: ".. dep)
+				
+				Widget:supply(Widget.deps[dep])
+			end
+		end
+	end
+	
+	dep._supply(self)
+end
 
 function Widget:createSprite(zIndex)
 	if self.sprite == nil then
@@ -36,231 +66,6 @@ function Widget:createSprite(zIndex)
 		
 		sprite:add()
 		self.sprite = sprite
-	end
-end
-
-function Widget.new(class, ...)
-	local widget = class(...)
-	
-	widget._state = {
-		isLoaded = false,
-		isVisible = true
-	}
-	
-	return widget
-end
-
-function Widget.supply(widget, dep)
-	if dep == Widget.kDeps.children then
-		widget:_supplyDepChildren()
-	elseif dep == Widget.kDeps.state then
-		widget:_supplyDepState()
-	elseif dep == Widget.kDeps.samples then
-		widget:_supplyDepSamples()
-	elseif dep == Widget.kDeps.animators then
-		widget:_supplyDepAnimators()
-	elseif dep == Widget.kDeps.update then
-		widget:_supplyDepUpdate()
-	elseif dep == Widget.kDeps.animations then
-		widget:_supplyDepAnimations()
-	elseif dep == Widget.kDeps.keyValueState then
-		widget:_supplyDepKeyValueState()
-	elseif dep == Widget.kDeps.input then
-		widget:_supplyDepInput()
-	end
-end
-
-function Widget._supplyDepChildren(self)
-	self.children = {}
-end
-
-function Widget._supplyDepState(self)
-	function self:setStateInitial(states, state)
-		self.kStates = states
-		self.state = state
-	end
-	function self:setState(targetState)
-		if self.state == targetState then
-			return
-		end
-		
-		if self.changeState ~= nil then
-			self:changeState(self.state, targetState)
-		end
-		
-		self.state = targetState
-	end
-end
-
-function Widget._supplyDepInput(self)
-	self:supply(Widget.kDeps.update)
-	
-	local emptyInput = { pressed = 0, released = 0, current = 0 }
-	self._input = emptyInput
-	function self:registerDeviceInput()
-		local current, pressed, released = playdate.getButtonState()
-		self._input = { current = current, pressed = pressed, released = released }
-	end
-	function self:passInput(child, input)
-		child._input = input or self._input
-	end
-	function self:handleInput()
-		if self._handleInput ~= nil then
-			self:_handleInput(self._input)
-		end
-	end
-	table.insert(self._updateCallbacks, function()
-		self._input = emptyInput
-	end)
-end
-
-function Widget._supplyDepKeyValueState(self)
-	function self:setStateInitial(stateTable, state)
-		self.state = state
-		self.kStates = stateTable
-		
-		self.kStateKeys = {}
-		for k, _ in pairs(stateTable) do
-			self.kStateKeys[k] = k
-		end
-	end
-	function self:setState(key, value)
-		if self.state[key] == value then
-			return
-		end
-		
-		local updatedState = table.shallowcopy(self.state)
-		updatedState[key] = value
-		
-		if self.changeState ~= nil then
-			self:changeState(self.state, updatedState)
-		end
-		
-		self.state = updatedState
-	end
-end
-
-function Widget._supplyDepUpdate(self)
-	self._updateCallbacks = {}
-end
-
-function Widget._supplyDepSamples(self)
-	self.samples = {}
-	function self:loadSample(path, volume, key)
-		if key == nil then
-			key = path
-		end
-		self.samples[key] = playdate.sound.sampleplayer.new(path)
-		
-		if volume == nil then
-			volume = 1
-		end
-		
-		self.samples[key]:setVolume(volume)
-	end
-	function self:playSample(key, finishedCallback)
-		self.samples[key]:play()
-		
-		if finishedCallback ~= nil then
-			self.samples[key]:setFinishCallback(finishedCallback)
-		end
-	end
-	function self:unloadSample(key)
-		self.samples[key] = nil
-	end
-end
-
-function Widget._supplyDepAnimators(self)
-	self:supply(Widget.kDeps.update)
-	
-	self.animators = {}
-	
-	function self:getAnimatorValue(...)
-		local animators = {...}
-		local type
-		local value
-		for _, animator in pairs(animators) do
-			if value == nil then
-				if getmetatable(animator:currentValue()) == nil then
-					value = 0
-					type = "number"
-				elseif getmetatable(animator:currentValue()).__name == "playdate.geometry.point" then
-					value = playdate.geometry.point.new(0, 0)
-					type = "playdate.geometry.point"
-				end
-			end
-			
-			if type == "number" then
-				value += animator:currentValue()
-			elseif type == "playdate.geometry.point" then
-				assert(getmetatable(animator:currentValue()).__name == "playdate.geometry.point", "Error: Attempted to add animators with different value types.")
-				value:offset(animator:currentValue().x, animator:currentValue().y)
-			end
-		end
-		
-		if value ~= nil then
-			return value
-		else
-			return 0
-		end
-	end
-	function self:animatorsEnded()
-		for _, animator in pairs(self.animators) do
-			if animator.didend ~= true then
-				return false
-			end
-		end
-		
-		return true
-	end
-	function self:isAnimating()
-		for _, animator in pairs(self.animators) do
-			if (animator.previousUpdateTime == nil) or (animator.didend ~= true) then
-				return true
-			end
-		end
-			
-		return false
-	end
-	table.insert(self._updateCallbacks, function()
-		for _, animator in pairs(self.animators) do
-			animator:update()
-		end
-	end)
-end
-
-function Widget._supplyDepAnimations(self)
-	self:supply(Widget.kDeps.animators)
-	
-	function self:setAnimations(animations) 
-		self.kAnimations = animations
-	end
-	function self:animate(animation, finishedCallback)
-		local previousAnimation = {
-			animation = animation,
-			timestamp = playdate.getCurrentTimeMilliseconds()
-		}
-		
-		self._previousAnimation = previousAnimation
-		
-		function queueFinishedCallback(delay)
-			if delay ~= nil then
-				playdate.timer.performAfterDelay(delay, function() 
-					local animationChanged = (previousAnimation.animation ~= self._previousAnimation.animation) 
-						or (previousAnimation.timestamp ~= self._previousAnimation.timestamp)
-					
-					if finishedCallback ~= nil then
-						finishedCallback(animationChanged)
-					end
-					
-					if animationChanged == false then
-						self._previousAnimation.isended = true
-					end
-				end)
-			end
-		end
-		
-		self:_animate(animation, queueFinishedCallback)
 	end
 end
 
@@ -318,6 +123,14 @@ function Widget:update()
 			callback()
 		end
 	end
+end
+
+function Widget:_addUpdateCallback(callback)
+	if self._updateCallbacks == nil then
+		self._updateCallbacks = {}
+	end
+	
+	table.insert(self._updateCallbacks, callback)
 end
 
 function Widget:draw(frame, rect)

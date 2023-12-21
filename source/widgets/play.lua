@@ -11,8 +11,7 @@ class("WidgetPlay").extends(Widget)
 function WidgetPlay:init(config)
 	self.config = config
 	
-	self:supply(Widget.kDeps.children)
-	self:supply(Widget.kDeps.state)
+	self:supply(Widget.deps.state)
 	
 	self:setStateInitial({
 		start = 1,

@@ -10,11 +10,10 @@ WidgetMenuSettings.type = {
 function WidgetMenuSettings:init(config)
 	self.config = config
 	
-	self:supply(Widget.kDeps.state)
-	self.state = 1
+	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.input)
 	
-	self:supply(Widget.kDeps.children)
-	self:supply(Widget.kDeps.input)
+	self.state = 1
 	
 	self.painters = {}
 	self.entries = {}

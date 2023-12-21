@@ -4,9 +4,8 @@ import "utils/textPainter"
 class("WidgetHUD").extends(Widget)
 
 function WidgetHUD:init()
-	self:supply(Widget.kDeps.update)
-	self:supply(Widget.kDeps.state)
-	self:supply(Widget.kDeps.animators)
+	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.animators)
 	self:setStateInitial({onScreen = 1, offScreen = 2}, 1)
 	
 	self.images = {}

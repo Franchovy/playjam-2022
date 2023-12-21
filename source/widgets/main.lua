@@ -6,10 +6,9 @@ import "utils/level"
 
 class("WidgetMain").extends(Widget)
 
-function WidgetMain:init()	
-	self:supply(Widget.kDeps.children)
-	self:supply(Widget.kDeps.state)
-	self:supply(Widget.kDeps.input)
+function WidgetMain:init()
+	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.input)
 	
 	self.kStates = { menu = 1, play = 2 }
 	self.state = self.kStates.menu

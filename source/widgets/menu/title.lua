@@ -4,7 +4,7 @@ import "utils/position"
 class("WidgetTitle").extends(Widget)
 
 function WidgetTitle:init()
-	self:supply(Widget.kDeps.animations)
+	self:supply(Widget.deps.animations)
 	
 	self:setAnimations({
 		onFirstOpen = 1,

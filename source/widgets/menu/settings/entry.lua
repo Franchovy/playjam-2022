@@ -5,8 +5,8 @@ class("WidgetMenuSettingsEntry").extends(Widget)
 function WidgetMenuSettingsEntry:init(config)
 	self.config = config
 	
-	self:supply(Widget.kDeps.keyValueState)
-	self:supply(Widget.kDeps.input)
+	self:supply(Widget.deps.keyValueState)
+	self:supply(Widget.deps.input)
 	
 	local isSelected = config.isSelected == true and 1 or 2
 	local value = config.value ~= nil and config.value or (config.options ~= nil) and config.options[1] or nil

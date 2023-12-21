@@ -5,9 +5,8 @@ class("WidgetEntriesMenu").extends(Widget)
 function WidgetEntriesMenu:init(config)
 	self.config = config
 	
-	self:supply(Widget.kDeps.state)
-	self:supply(Widget.kDeps.children)
-	self:supply(Widget.kDeps.samples)
+	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.samples)
 	
 	self:setStateInitial(self.config, 1)
 	

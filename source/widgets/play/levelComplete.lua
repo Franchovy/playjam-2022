@@ -6,10 +6,9 @@ class("LevelComplete").extends(Widget)
 function LevelComplete:init(config)
 	self.config = config
 	
-	self:supply(Widget.kDeps.samples)
-	self:supply(Widget.kDeps.state)
-	self:supply(Widget.kDeps.children)
-	self:supply(Widget.kDeps.animators)
+	self:supply(Widget.deps.samples)
+	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.animators)
 	
 	self:setStateInitial({
 		text = 1,

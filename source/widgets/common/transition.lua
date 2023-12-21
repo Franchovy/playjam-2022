@@ -3,9 +3,9 @@ class("WidgetTransition").extends(Widget)
 function WidgetTransition:init(config)
 	self.config = config or {}
 	
-	self:supply(Widget.kDeps.state)
-	self:supply(Widget.kDeps.animators)
-	self:supply(Widget.kDeps.samples)
+	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.animators)
+	self:supply(Widget.deps.samples)
 	
 	self:createSprite(kZIndex.transition)
 	

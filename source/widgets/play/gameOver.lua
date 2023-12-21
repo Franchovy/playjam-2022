@@ -8,8 +8,6 @@ function WidgetGameOver:init(config)
 	self.painters = {}
 	self.images = {}
 	
-	self:supply(Widget.kDeps.children)
-	
 	self:createSprite(kZIndex.overlay)
 	
 	self.signals = {}
