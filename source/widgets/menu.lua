@@ -62,7 +62,7 @@ function WidgetMenu:_load()
 		end
 	end
 	
-	local valuesMenuEntriesTypeOptions = {"OFF",1,2,3,4,5,6,7,8,9,10}
+	local valuesMenuEntriesTypeOptions = {"OFF","1","2","3","4","5","6","7","8","9","10"}
 	local dataSettingsMenuEntries = {
 		{
 			title = "SFX VOLUME",

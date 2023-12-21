@@ -63,10 +63,16 @@ function WidgetMenuSettings:_load()
 		painterCardOutline:draw(rect)
 	end)
 	
-	local entryCallback = function(entry, key, value)
+	local function entryCallback(entry, key, value)
 		if entry.config.type == kDataTypeSettingsEntry.options then
+			if value == "OFF" then
+				value = 0
+			end
+			
+			local settingsValue = tonumber(value) / 10
+			
 			-- Option changed
-			Settings:setValue(key, value)
+			Settings:setValue(key, settingsValue)
 		elseif entry.config.type == kDataTypeSettingsEntry.button then 
 			-- Button pressed
 			Settings:writeToFile()
@@ -75,13 +81,25 @@ function WidgetMenuSettings:_load()
 		end
 	end
 	
+	local function getEntryValue(type, key)
+		if type == kDataTypeSettingsEntry.options then
+			local settingsValue = Settings:getValue(key)
+			if settingsValue == 0 then
+				return "OFF"
+			else 
+				return string.format("%d", settingsValue * 10)
+			end
+		end
+	end
+	
 	for i, entryConfig in ipairs(self.config.entries) do
+		
 		local entry = Widget.new(WidgetMenuSettingsEntry, { 
 			title = entryConfig.title, 
 			isSelected = i == 1 and true or false, 
 			type = entryConfig.type, 
 			options = entryConfig.values, 
-			value = Settings:getValue(entryConfig.key)
+			value = getEntryValue(entryConfig.type, entryConfig.key)
 		})
 		
 		entry:load()

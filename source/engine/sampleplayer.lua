@@ -45,9 +45,9 @@ function sampleplayer:getSample(key)
 end
 
 Settings:addCallback(kSettingsKeys.sfxVolume, function(value)
-	sampleplayer.config.volume = volume
+	sampleplayer.config.volume = value
 	
 	for _, sampleplayer in pairs(sampleplayer.sampleplayers) do
-		sampleplayer.player:setVolume(player._volume * volume)
+		sampleplayer.player:setVolume(sampleplayer.volume * value)
 	end
 end)

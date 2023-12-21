@@ -161,7 +161,7 @@ end
 function WidgetMain:_update()
 	self:registerDeviceInput()
 	
-	if self.state == self.kStates.menu then
+	if self.state == self.kStates.menu and (self.children.menu ~= nil) then
 		self:passInput(self.children.menu)
 	end
 end
