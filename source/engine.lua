@@ -8,5 +8,12 @@ import "CoreLibs/object"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 
-import "engine/lib"
 import "extensions"
+
+import "engine/fileplayer"
+import "engine/painter"
+import "engine/sampleplayer"
+import "engine/settings"
+import "engine/spritecycler/spritecycler"
+import "engine/synth"
+import "engine/widget"

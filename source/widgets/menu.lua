@@ -1,6 +1,5 @@
 import "utils/position"
 import "utils/rect"
-import "utils/settings"
 import "menu/levelSelect"
 import "menu/title"
 import "menu/settings"
