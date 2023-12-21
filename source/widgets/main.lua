@@ -26,8 +26,8 @@ function WidgetMain:_load()
 		Settings:readFromFile()
 	else 
 		local settings = {}
-		settings[kSettingsKeys.sfxVolume] = 10
-		settings[kSettingsKeys.musicVolume] = 10
+		settings[kSettingsKeys.sfxVolume] = 1
+		settings[kSettingsKeys.musicVolume] = 1
 		
 		Settings:setDefaultValues(settings)
 	end

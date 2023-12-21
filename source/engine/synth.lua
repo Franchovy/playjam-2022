@@ -27,5 +27,5 @@ function synth:play(key, frequencyFactor, volumeFactor)
 end
 
 Settings:addCallback(kSettingsKeys.sfxVolume, function(value)
-	self.config.volume = volume
+	synth.config.volume = volume
 end)

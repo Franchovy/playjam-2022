@@ -1,6 +1,6 @@
+import "assets"
 import "constant"
 import "engine"
-import "assets"
 import "sprites/lib"
 import "notify"
 import "config"

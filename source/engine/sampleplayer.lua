@@ -10,7 +10,7 @@ local sound <const> = playdate.sound
 sampleplayer = {
 	sampleplayers = {},
 	config = {
-		volume = 0
+		volume = 1
 	}
 }
 
@@ -45,7 +45,7 @@ function sampleplayer:getSample(key)
 end
 
 Settings:addCallback(kSettingsKeys.sfxVolume, function(value)
-	self.config.volume = volume
+	sampleplayer.config.volume = volume
 	
 	for _, sampleplayer in pairs(sampleplayer.sampleplayers) do
 		sampleplayer.player:setVolume(player._volume * volume)

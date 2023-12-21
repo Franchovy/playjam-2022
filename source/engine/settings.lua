@@ -10,13 +10,21 @@ end
 function Settings:setValue(key, value)
 	self._data[key] = value
 	
-	if self._callbackFunctions[key] ~= nil then
-		self._callbackFunctions[key](value)
+	if self._callbackFunctions[key] == nil then
+		self._callbackFunctions[key] = {}
+	end
+	
+	for _, callback in pairs(self._callbackFunctions[key]) do
+		callback(value)
 	end
 end
 
-function Settings:setCallback(key, callbackFunction)
-	self._callbackFunctions[key] = callbackFunction
+function Settings:addCallback(key, callbackFunction)
+	if self._callbackFunctions[key] == nil then
+		self._callbackFunctions[key] = {}
+	end
+	
+	table.insert(self._callbackFunctions[key], callbackFunction)
 end
 
 function Settings:existsSettingsFile()
