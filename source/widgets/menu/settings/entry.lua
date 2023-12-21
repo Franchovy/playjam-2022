@@ -7,6 +7,7 @@ function WidgetMenuSettingsEntry:init(config)
 	
 	self:supply(Widget.deps.keyValueState)
 	self:supply(Widget.deps.input)
+	self:supply(Widget.deps.samples)
 	
 	local isSelected = config.isSelected == true and 1 or 2
 	local value = config.value ~= nil and config.value or (config.options ~= nil) and config.options[1] or nil
@@ -51,6 +52,10 @@ function WidgetMenuSettingsEntry:_load()
 			playdate.graphics.setFont(playdate.graphics.font.new(kAssetsFonts.twinbee))
 		end)
 	end
+	
+	self:loadSample(kAssetsSounds.menuSelect)
+	self:loadSample(kAssetsSounds.menuSelectFail)
+	self:loadSample(kAssetsSounds.menuAccept)
 end
 
 function WidgetMenuSettingsEntry:_draw(frame, rect)
@@ -80,6 +85,10 @@ function WidgetMenuSettingsEntry:_handleInput(input)
 				self.signals.onChanged(self.kStates.value[index - 1])
 				
 				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+				
+				self:playSample(kAssetsSounds.menuSelect)
+			else
+				self:playSample(kAssetsSounds.menuSelectFail)
 			end
 		elseif input.pressed & playdate.kButtonRight ~= 0 then
 			local index = table.indexOfElement(self.config.options, self.state.value)
@@ -88,6 +97,10 @@ function WidgetMenuSettingsEntry:_handleInput(input)
 				self.signals.onChanged(self.kStates.value[index + 1])
 				
 				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+				
+				self:playSample(kAssetsSounds.menuSelect)
+			else
+				self:playSample(kAssetsSounds.menuSelectFail)
 			end
 		end
 	end

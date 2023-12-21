@@ -12,6 +12,7 @@ function WidgetMenuSettings:init(config)
 	
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.input)
+	self:supply(Widget.deps.samples)
 	
 	self.state = 1
 	
@@ -81,6 +82,8 @@ function WidgetMenuSettings:_load()
 			-- Button pressed
 			Settings:writeToFile()
 			
+			self:playSample(kAssetsSounds.menuAccept)
+			
 			self.signals.close()
 		end
 	end
@@ -95,6 +98,10 @@ function WidgetMenuSettings:_load()
 			end
 		end
 	end
+	
+	self:loadSample(kAssetsSounds.menuSelect)
+	self:loadSample(kAssetsSounds.menuSelectFail)
+	self:loadSample(kAssetsSounds.menuAccept)
 	
 	for i, entryConfig in ipairs(self.config.entries) do
 		
@@ -136,12 +143,20 @@ function WidgetMenuSettings:_handleInput(input)
 	if input.pressed & playdate.kButtonUp ~= 0 then
 		if self.state > 1 then
 			self:setState(self.state - 1)
+			
+			self:playSample(kAssetsSounds.menuSelect)
+		else
+			self:playSample(kAssetsSounds.menuSelectFail)
 		end
 	end
 	
 	if input.pressed & playdate.kButtonDown ~= 0 then
 		if self.state < #self.entries then
 			self:setState(self.state + 1)
+			
+			self:playSample(kAssetsSounds.menuSelect)
+		else
+			self:playSample(kAssetsSounds.menuSelectFail)
 		end
 	end
 end
