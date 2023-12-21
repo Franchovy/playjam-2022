@@ -124,8 +124,10 @@ function WidgetMenu:_update()
 	
 	if self.state == self.kStates.subMenu then
 		self:passInput(self.children.menuSettings)
-	else
-		self:handleInput()
+	elseif self.state == self.kStates.default then
+		self:filterInput(playdate.kButtonA)
+	elseif self.state == self.kStates.menu then
+		self:filterInput(playdate.kButtonsNone)
 	end
 end
 
@@ -142,7 +144,7 @@ function WidgetMenu:_handleInput(input)
 end
 
 function WidgetMenu:_changeState(stateFrom, stateTo)
-	if stateFrom == self.kStates.default and stateTo == self.kStates.menu then
+	if stateFrom == self.kStates.default and (stateTo == self.kStates.menu) then
 		self:playSample(kAssetsSounds.menuAccept)
 		
 		if self.children.levelSelect == nil then
@@ -160,7 +162,7 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		end)
 	end
 	
-	if stateFrom == self.kStates.menu and stateTo == self.kStates.default then
+	if stateFrom == self.kStates.menu and (stateTo == self.kStates.default) then
 		self:playSample(kAssetsSounds.menuAccept)
 		
 		self.children.title:setVisible(true)

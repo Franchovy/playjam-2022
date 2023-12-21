@@ -62,7 +62,7 @@ function WidgetMenuSettingsEntry:_draw(frame, rect)
 end
 
 function WidgetMenuSettingsEntry:_update()
-	self:handleInput()
+	
 end
 
 function WidgetMenuSettingsEntry:_handleInput(input)

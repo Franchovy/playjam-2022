@@ -129,9 +129,7 @@ function WidgetMenuSettings:_draw(frame, rect)
 end
 
 function WidgetMenuSettings:_update()
-	self:passInput(self.entries[self.state])
-		
-	self:handleInput()
+	self:passInput(self.entries[self.state], playdate.kButtonA | playdate.kButtonsLeftRight)
 end
 
 function WidgetMenuSettings:_handleInput(input)
