@@ -27,6 +27,8 @@ function fileplayer(widget)
 end
 
 Settings:addCallback(kSettingsKeys.musicVolume, function(value)
+	config.volume = value
+	
 	for _, player in pairs(config.fileplayers) do
 		if player ~= nil then
 			player:setVolume(value)
