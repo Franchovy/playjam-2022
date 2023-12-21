@@ -22,6 +22,17 @@ function WidgetMain:init()
 end
 
 function WidgetMain:_load()
+	
+	if Settings:existsSettingsFile() then
+		Settings:readFromFile()
+	else 
+		local settings = {}
+		settings[kSettingsKeys.sfxVolume] = 10
+		settings[kSettingsKeys.musicVolume] = 10
+		
+		Settings:setDefaultValues(settings)
+	end
+	
 	self.onPlaythroughComplete = function(data)
 		-- TODO: if stats enabled, write (append) playthrough data into an existing or new file
 		

@@ -69,6 +69,8 @@ function WidgetMenuSettings:_load()
 			Settings:setValue(key, value)
 		elseif entry.config.type == kDataTypeSettingsEntry.button then 
 			-- Button pressed
+			Settings:writeToFile()
+			
 			self.signals.close()
 		end
 	end

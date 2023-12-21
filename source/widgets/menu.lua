@@ -63,10 +63,6 @@ function WidgetMenu:_load()
 		end
 	end
 	
-	-- TODO: Load settings from file
-	Settings:setValue(kSettingsKeys.sfxVolume, 10)
-	Settings:setValue(kSettingsKeys.musicVolume, 10)
-	
 	local valuesMenuEntriesTypeOptions = {"OFF",1,2,3,4,5,6,7,8,9,10}
 	local dataSettingsMenuEntries = {
 		{

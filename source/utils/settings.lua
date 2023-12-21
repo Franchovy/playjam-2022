@@ -19,5 +19,23 @@ function Settings:setCallback(key, callbackFunction)
 	self._callbackFunctions[key] = callbackFunction
 end
 
--- function Settings:writeToDisk
--- function Settings:readFromDisk
+function Settings:existsSettingsFile()
+	return playdate.file.exists(kFilePath.settings)
+end
+
+function Settings:readFromFile()
+	local data = json.decodeFile(kFilePath.settings)
+	
+	table.shallowcopy(data, self._data)
+end
+
+function Settings:writeToFile()
+	json.encodeToFile(kFilePath.settings, true, self._data)
+end
+
+function Settings:setDefaultValues(data)
+	table.shallowcopy(data, self._data)
+	
+	self:writeToFile()
+end
+	
