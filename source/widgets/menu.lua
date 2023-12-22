@@ -123,7 +123,7 @@ function WidgetMenu:_update()
 	elseif self.state == self.kStates.default then
 		self:filterInput(playdate.kButtonA)
 	elseif self.state == self.kStates.menu then
-		self:filterInput(playdate.kButtonsNone)
+		self:passInput(self.children.levelSelect)
 	end
 end
 

@@ -15,6 +15,7 @@ function WidgetLevelSelect:init(config)
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animations)
 	self:supply(Widget.deps.samples)
+	self:supply(Widget.deps.input)
 	
 	self:setAnimations({
 		intro = 1,
@@ -38,7 +39,7 @@ function WidgetLevelSelect:_load()
 	self.previews = {}
 	
 	for i, level in ipairs(self.config.levels) do
-		local entry = Widget.new(LevelSelectEntry, { text = level.title })
+		local entry = Widget.new(LevelSelectEntry, { text = level.title, isSelected = i == 1, showOutline = true })
 		table.insert(self.entries, entry)
 		self.children["entry"..i] = entry
 		
@@ -122,8 +123,15 @@ function WidgetLevelSelect:_draw(rect)
 end
 
 function WidgetLevelSelect:_update()
-	local selectButtonPressed = playdate.buttonJustPressed(playdate.kButtonA)
-	if selectButtonPressed then
+	if self.wasAnimating == true then
+		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+	end
+	
+	self.wasAnimating = self:isAnimating()
+end
+
+function WidgetLevelSelect:_handleInput(input)
+	if input.pressed & playdate.kButtonA ~= 0 then
 		local index = self.state
 		if index <= #self.config.levels then
 			-- Load level
@@ -134,10 +142,7 @@ function WidgetLevelSelect:_update()
 		end
 	end
 	
-	local scrollUp = playdate.buttonJustPressed(playdate.kButtonUp)
-	local scrollDown = playdate.buttonJustPressed(playdate.kButtonDown)
-	
-	if scrollUp then
+	if input.pressed & playdate.kButtonUp ~= 0 then
 		if self.state > 1 then
 			self:playSample(kAssetsSounds.menuSelect)
 			
@@ -149,7 +154,7 @@ function WidgetLevelSelect:_update()
 		end
 	end
 	
-	if scrollDown then
+	if input.pressed & playdate.kButtonDown ~= 0 then
 		if self.state < #self.entries then
 			self:playSample(kAssetsSounds.menuSelect)
 			
@@ -160,19 +165,6 @@ function WidgetLevelSelect:_update()
 			self:animate(self.kAnimations.error)
 		end
 	end
-	
-	for i, entry in ipairs(self.entries) do
-		if i == self.state then
-			entry:setState({ selected = true })
-		elseif entry.state.selected == true then
-			entry:setState({ selected = false })
-		end
-	end
-	
-	if self.wasAnimating == true then
-		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
-	end
-	self.wasAnimating = self:isAnimating()
 end
 
 function WidgetLevelSelect:_animate(animation, queueFinishedCallback)
@@ -194,6 +186,14 @@ function WidgetLevelSelect:_animate(animation, queueFinishedCallback)
 	end
 end
 
-function WidgetLevelSelect:_changeState(_, _)
+function WidgetLevelSelect:_changeState(_, stateTo)
+	for i, entry in ipairs(self.entries) do
+		if i == stateTo then
+			entry:setState(entry.kStates.selected)
+		elseif entry.state == entry.kStates.selected then
+			entry:setState(entry.kStates.unselected)
+		end
+	end
+	
 	playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 end

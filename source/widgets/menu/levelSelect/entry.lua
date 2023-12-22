@@ -3,15 +3,15 @@ import "utils/value"
 class("LevelSelectEntry").extends(Widget)
 
 function LevelSelectEntry:init(config)
-	self.state = {}
-	self.state.selected = false
+	self.config = config
+	
+	self:supply(Widget.deps.state)
+	
+	local isSelected = config.isSelected == true
+	self:setStateInitial({ selected = 1, unselected = 2}, isSelected and 1 or 2)
 	
 	self.images = {}
 	self.painters = {}
-	
-	self.config = {}
-	self.config.text = config.text
-	self.config.showOutline = value.default(config.showOutline, true)
 end
 
 function LevelSelectEntry:_load()
@@ -40,7 +40,7 @@ function LevelSelectEntry:_draw(rect)
 	
 	self.images.title:draw(outlineRect.x + 10, outlineRect.y + 12)
 	
-	if not self.state.selected then
+	if self.state == self.kStates.unselected then
 		if self.config.showOutline then	
 			self.painters.outline:draw(outlineRect)
 		end
@@ -51,16 +51,6 @@ end
 
 function LevelSelectEntry:_update()
 	
-end
-
-function LevelSelectEntry:setState(state)
-	for k, v in pairs(state) do
-		if self.state[k] ~= v then
-			self:_changeState(self.state, state)
-			
-			self.state[k] = v
-		end
-	end
 end
 
 function LevelSelectEntry:_changeState(stateFrom, stateTo)

@@ -165,10 +165,6 @@ function WidgetMain:_update()
 	end
 end
 
-function WidgetMain:_input()
-	
-end
-
 function WidgetMain:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.menu and (stateTo == self.kStates.play) then
 		self.children.transition:setVisible(true)
@@ -180,7 +176,7 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 			
 			if self.children.play == nil then
 				self.children.menu:unload()
-				self.children.menu = nil
+				--self.children.menu = nil
 				
 				collectgarbage("collect")
 				
