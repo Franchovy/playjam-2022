@@ -7,12 +7,19 @@ function Coin.new()
 	return Coin()
 end
 
+local coinImage
+local coinEmptyImage
+
 function Coin:init()
 	Coin.super.init(self)
 	self.type = kSpriteTypes.coin
 	
-	local image = playdate.graphics.image.new(kAssetsImages.coin)
-	self:setImage(image)
+	if coinImage == nil then
+		coinImage = playdate.graphics.image.new(kAssetsImages.coin)
+		coinEmptyImage = coinImage:copy()
+		coinEmptyImage:clear(playdate.graphics.kColorClear)
+	end
+	self:setImage(coinImage)
 	self:setCenter(0, 0)
 	self:setCollideRect(self:getBounds())
 	
@@ -28,6 +35,7 @@ function Coin:loadConfig(config)
 	self.config.isPicked = config.isPicked
 	
 	self:setVisible(not self.config.isPicked)
+	self:markDirty()
 end
 
 function Coin:writeConfig(config)
@@ -38,10 +46,21 @@ function Coin:reset()
 	self.config.isPicked = false
 	
 	self:setVisible(not self.config.isPicked)
+	self:markDirty()
 end
 
 function Coin:isGrabbed()
 	self.config.isPicked = true
 	
-	self:setVisible(not self.config.isPicked)
+	self:updateImage()
+end
+
+function Coin:updateImage()
+	if self.config.isPicked == true then
+		self:setImage(coinEmptyImage)
+	elseif self.config.isPicked == false then
+		self:setImage(coinImage)
+	end
+	
+	self:markDirty()
 end
