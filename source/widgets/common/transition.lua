@@ -86,7 +86,6 @@ function WidgetTransition:_changeState(stateFrom, stateTo)
 			
 			if self.signals.animationFinished ~= nil then
 				self.signals.animationFinished()
-				--self.signals.animationFinished = nil
 			end
 		end
 	end
