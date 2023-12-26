@@ -83,7 +83,7 @@ function WidgetMain:_load()
 			saveFileWrite:close()
 		end
 		
-		self.loadHighscores()
+		self:loadHighscores()
 	end
 	
 	self.onReturnToMenu = function()
@@ -112,7 +112,7 @@ function WidgetMain:_load()
 	
 	-- High Scores
 	
-	self.loadHighscores = function()
+	function self:loadHighscores()
 		if not playdate.file.exists(kFilePath.saves) then
 			playdate.file.mkdir(kFilePath.saves)
 		end
@@ -128,10 +128,10 @@ function WidgetMain:_load()
 			end
 		end
 		
-		return data
+		self.data.highscores = data
 	end
 	
-	self.data.highscores = self.loadHighscores()
+	self:loadHighscores()
 	
 	--
 	
