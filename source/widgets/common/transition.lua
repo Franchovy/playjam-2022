@@ -86,6 +86,8 @@ function WidgetTransition:_changeState(stateFrom, stateTo)
 			
 			if self.signals.animationFinished ~= nil then
 				self.signals.animationFinished()
+				
+				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 			end
 		end
 	end
@@ -97,6 +99,8 @@ function WidgetTransition:_changeState(stateFrom, stateTo)
 		self.animators.animator.finishedCallback = function()
 			if self.signals.animationFinished ~= nil then
 				self.signals.animationFinished()
+				
+				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 			end
 		end
 	end
