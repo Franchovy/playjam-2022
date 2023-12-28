@@ -181,6 +181,8 @@ function Wheel:update()
 		crankTicks = 0
 	end
 	
+	local previousBounds = { self:getBounds() }
+	
 	if self.isFrozen == false then
 		self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
 		self.velocityX = self:calculateSpeed(crankTicks, self.velocityX)
@@ -298,4 +300,14 @@ function Wheel:update()
 	local imageIndex = math.floor(self.angle)
 
 	self:setImage(self.imagetable[imageIndex])
+	
+	local currentBounds = { self:getBounds() }
+	if (previousBounds[1] ~= currentBounds[1]) or 
+		(previousBounds[2] ~= currentBounds[2]) or 
+		(previousBounds[3] ~= currentBounds[3]) or 
+		(previousBounds[4] ~= currentBounds[4]) then
+		local drawOffsetX, _ = playdate.graphics.getDrawOffset()
+		playdate.graphics.sprite.addDirtyRect(previousBounds[1] + drawOffsetX, previousBounds[2], previousBounds[3], previousBounds[4])
+		playdate.graphics.sprite.addDirtyRect(currentBounds[1] + drawOffsetX, currentBounds[2], currentBounds[3], currentBounds[4])
+	end
 end
