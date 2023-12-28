@@ -241,6 +241,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		
 		local coinCountObjective = self.config.objectives[1].coins
 		local timeObjective = self.config.objectives[2].time
+		local timeValue = self.data.time + self.timers.levelTimer.currentTime
 		
 		for _, objective in pairs(self.config.objectives) do
 			local objectiveReached = true
@@ -250,7 +251,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			end
 			
 			if objective.time ~= nil then
-				objectiveReached = objectiveReached and self.timers.levelTimer.currentTime <= (objective.time * 1000)
+				objectiveReached = objectiveReached and timeValue <= (objective.time * 1000)
 			end
 			
 			if objectiveReached == true then
@@ -258,7 +259,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			end
 		end
 		
-		local timeString = convertToTimeString(self.data.time + self.timers.levelTimer.currentTime, 1)
+		local timeString = convertToTimeString(timeValue, 1)
 		local timeStringObjective = convertToTimeString(timeObjective * 1000, 1)
 		
 		local objectives = {
