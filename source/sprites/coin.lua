@@ -34,8 +34,7 @@ end
 function Coin:loadConfig(config)
 	self.config.isPicked = config.isPicked
 	
-	self:setVisible(not self.config.isPicked)
-	self:markDirty()
+	self:updateImage()
 end
 
 function Coin:writeConfig(config)
@@ -45,8 +44,7 @@ end
 function Coin:reset()
 	self.config.isPicked = false
 	
-	self:setVisible(not self.config.isPicked)
-	self:markDirty()
+	self:updateImage()
 end
 
 function Coin:isGrabbed()
