@@ -27,12 +27,12 @@ function WidgetEntriesMenuEntry:_load()
 end
 
 function WidgetEntriesMenuEntry:_draw(rect)
-	local insetRect = Rect.inset(rect, 28, 8, 5)
+	local insetRect = Rect.inset(rect, 32, 8, 5)
 	
 	self.images.title:draw(insetRect.x, insetRect.y)
 	
 	if self.state == self.kStates.selected then
-		local insetRect = Rect.inset(rect, 5, 5)
+		local insetRect = Rect.inset(rect, 7, 5)
 		self.painters.circle:draw(Rect.with(insetRect, { w = 15 }))
 	end
 end

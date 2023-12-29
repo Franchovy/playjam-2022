@@ -11,6 +11,7 @@ function WidgetEntriesMenu:init(config)
 	self:setStateInitial(self.config, 1)
 	
 	self.signals = {}
+	self.painters = {}
 	
 	--
 	
@@ -19,11 +20,18 @@ end
 
 function WidgetEntriesMenu:_load()
 	for i=1,#self.config.entries do
-		local entry = Widget.new(WidgetEntriesMenuEntry, { text = self.config.entries[i], selected = i == 1, scale = self.config.scaleFactor })
+		local entry = Widget.new(WidgetEntriesMenuEntry, { text = self.config.entries[i], selected = i == 1, scale = self.config.scale })
 		entry:load()
 		
 		self.children["entry"..i] = entry
 		self.entries[i] = entry
+	end
+	
+	if self.config.backgroundColor ~= nil then
+		self.painters.background = Painter(function(rect)
+			playdate.graphics.setColor(self.config.backgroundColor)
+			playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		end)
 	end
 	
 	self:loadSample(kAssetsSounds.menuSelect)
@@ -33,6 +41,10 @@ end
 
 function WidgetEntriesMenu:_draw(frame)
 	local entryHeight = frame.h / #self.entries
+	
+	if self.painters.background ~= nil then
+		self.painters.background:draw(frame)
+	end
 	
 	for i, entry in pairs(self.entries) do
 		local entryRect = Rect.with(frame, { h = entryHeight, y = frame.y + 10 + (entryHeight * (i - 1)) })

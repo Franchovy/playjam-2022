@@ -45,7 +45,7 @@ function WidgetGameOver:_load()
 			"RESTART LEVEL",
 			"LEVEL SELECT"
 		},
-		scaleFactor = 2
+		scale = 2
 	})
 	self.children.entriesMenu:load()
 	

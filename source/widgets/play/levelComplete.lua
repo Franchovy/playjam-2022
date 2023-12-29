@@ -113,7 +113,8 @@ function LevelComplete:_load()
 			"RESTART",
 			"MAIN MENU"
 		},
-		scaleFactor = 1.5
+		scale = 1.5,
+		backgroundColor = playdate.graphics.kColorWhite
 	})
 	
 	self.children.menu:load()
@@ -196,7 +197,7 @@ function LevelComplete:_draw(rect)
 				inverted = (not blinker1 and blinker2) or (not blinker2 and blinker1) 
 			})
 		elseif self.state == self.kStates.menu then
-			local rectMenu = Rect.with(Rect.offset(contentRect, 75, -8), { w = 90, h = 80 })
+			local rectMenu = Rect.with(Rect.offset(contentRect, 65, -8), { w = 180, h = 80 })
 			self.children.menu:draw(rectMenu)
 		end
 	end
