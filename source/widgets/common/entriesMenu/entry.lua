@@ -13,7 +13,18 @@ function WidgetEntriesMenuEntry:init(config)
 end
 
 function WidgetEntriesMenuEntry:_load()
-	self.images.title = playdate.graphics.imageWithText(self.config.text, 200, 70):scaledImage(self.config.scale)
+	if self.config.scale == 1 then
+		setCurrentFont(kAssetsFonts.twinbee)
+	elseif self.config.scale == 1.5 then
+		setCurrentFont(kAssetsFonts.twinbee15x)
+	elseif self.config.scale == 2 then
+		setCurrentFont(kAssetsFonts.twinbee2x)
+	end
+	
+	self.images.title = playdate.graphics.imageWithText(self.config.text, 400, 70)
+	
+	setCurrentFontDefault()
+	
 	self.painters.circle = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
 		playdate.graphics.fillCircleInRect(rect.x, rect.y, rect.w, rect.h)

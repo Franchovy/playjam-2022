@@ -5,6 +5,7 @@ import "sprites/lib"
 import "notify"
 import "config"
 import "widgets"
+import "utils/fonts"
 
 local topLevelWidget
 
@@ -14,7 +15,7 @@ g = {
 }
 
 function initialize()
-	playdate.graphics.setFont(playdate.graphics.font.new(kAssetsFonts.twinbee))
+	setCurrentFontDefault(kAssetsFonts.twinbee)
 	playdate.graphics.setFontTracking(1)
 	
 	topLevelWidget = Widget.new(WidgetMain)
