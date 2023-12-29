@@ -38,13 +38,17 @@ function WidgetEntriesMenuEntry:_load()
 end
 
 function WidgetEntriesMenuEntry:_draw(rect)
-	local insetRect = Rect.inset(rect, 32, 8, 5)
+	local _, titleH = self.images.title:getSize()
+	local marginLeft = titleH * 2
+	local marginVert = (rect.h - titleH) / 2
+	local insetRect = Rect.inset(rect, marginLeft, marginVert, 5)
 	
 	self.images.title:draw(insetRect.x, insetRect.y)
 	
 	if self.state == self.kStates.selected then
-		local insetRect = Rect.inset(rect, 7, 5)
-		self.painters.circle:draw(Rect.with(insetRect, { w = 15 }))
+		local circleSize = math.ceil(titleH * 0.9)
+		local circleRect = Rect.with(Rect.size(circleSize, circleSize), { x = math.ceil(rect.x + (marginLeft - circleSize) / 2), y = math.ceil(rect.y + marginVert) })
+		self.painters.circle:draw(circleRect)
 	end
 end
 

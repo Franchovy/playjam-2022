@@ -40,14 +40,14 @@ function WidgetEntriesMenu:_load()
 end
 
 function WidgetEntriesMenu:_draw(frame)
-	local entryHeight = frame.h / #self.entries
+	local entryHeight = (frame.h - 10) / #self.entries
 	
 	if self.painters.background ~= nil then
 		self.painters.background:draw(frame)
 	end
 	
 	for i, entry in pairs(self.entries) do
-		local entryRect = Rect.with(frame, { h = entryHeight, y = frame.y + 10 + (entryHeight * (i - 1)) })
+		local entryRect = Rect.with(frame, { h = entryHeight, y = frame.y + 5 + (entryHeight * (i - 1)) })
 		entry:draw(entryRect)
 	end
 	
