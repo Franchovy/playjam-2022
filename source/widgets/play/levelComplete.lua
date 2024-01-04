@@ -37,9 +37,9 @@ function LevelComplete:_load()
 	
 	playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
 
-	self.images.title = playdate.graphics.imageWithText("LEVEL COMPLETE!", 200, 70):scaledImage(2)
-	
 	self.images.coin = playdate.graphics.image.new(kAssetsImages.coin)
+	
+	self.images.background = playdate.graphics.image.new(400, 240, playdate.graphics.kColorBlack):fadedImage(0.6, playdate.graphics.image.kDitherTypeHorizontalLine)
 	
 	self.images.textLabelCoins = playdate.graphics.imageWithText("COINS", 60, 100):scaledImage(1.5)
 	self.images.textLabelTime = playdate.graphics.imageWithText("TIME", 60, 100):scaledImage(1.5)
@@ -57,7 +57,7 @@ function LevelComplete:_load()
 	self.blinkers.blinkerPressAButton1 = playdate.graphics.animation.blinker.new(800, 100)
 	self.blinkers.blinkerPressAButton2 = playdate.graphics.animation.blinker.new(700, 200)
 	
-	self.painters.background = Painter(function(rect)
+	self.painters.frame = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
 		playdate.graphics.setLineWidth(6)
 		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 16)
@@ -68,11 +68,10 @@ function LevelComplete:_load()
 		playdate.graphics.drawRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 4)
 		
 		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.5, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
 		
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.setDitherPattern(0.7, playdate.graphics.image.kDitherTypeDiagonalLine)
+		playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
 	end)
 	
@@ -99,6 +98,11 @@ function LevelComplete:_load()
 		playdate.graphics.setImageDrawMode(drawMode)
 		self.images.textPressAButton:invertedImage():draw(rect.x + 12, rect.y + 4)
 		playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
+	end)
+	
+	self.painters.title = Painter(function(rect)
+		setCurrentFont(kAssetsFonts.twinbee2x)
+		playdate.graphics.drawTextAligned("LEVEL COMPLETE!", rect.x + rect.w / 2, rect.y + rect.h / 2, kTextAlignment.center)
 	end)
 	
 	self.stars = {}
@@ -145,10 +149,12 @@ function LevelComplete:_draw(rect)
 	if self.state == self.kStates.overlay or (self.state == self.kStates.menu) then
 		local offsetRect = Rect.offset(rect, 0, self.animators.card:currentValue())
 		
-		self.painters.background:draw(offsetRect)
+		self.images.background:drawFaded(0, 0, self.animators.card:progress(), playdate.graphics.image.kDitherTypeDiagonalLine)
 		
-		local titleImageY = offsetRect.y + 8
-		self.images.title:drawCentered(offsetRect.x + offsetRect.w / 2, offsetRect.y + titleImageY)
+		self.painters.frame:draw(offsetRect)
+		
+		local titleRect = Rect.with(Rect.offset(offsetRect, 0, 2), { h = 32 })
+		self.painters.title:draw(titleRect)
 		
 		local starImageWidth, starImageHeight = self.stars[1].imagetables.star:getImage(1):getSize()
 		local starMargin
@@ -166,7 +172,7 @@ function LevelComplete:_draw(rect)
 			starContainerWidth = starsContentWidth(4)
 		end
 		
-		local starImageY = offsetRect.y + titleImageY + 12
+		local starImageY = offsetRect.y * 2 + 8 + 12
 		
 		for i, star in ipairs(self.stars) do
 			local contentRect = Rect.size(starContainerWidth, starImageHeight)
@@ -190,6 +196,8 @@ function LevelComplete:_draw(rect)
 			
 			self.images.textCoins:draw(contentRect.x, contentRect.y + labelCoinsHeight + 12)
 			self.images.textTime:draw(contentRect.x + contentRect.w - textTimeWidth, contentRect.y + labelTimeHeight + 12)
+			
+			--self.painters.objectives:draw(contentRect)
 			
 			local buttonTextWidth, buttonTextHeight = self.images.textPressAButton:getSize()
 			local buttonRect = Rect.inset(Rect.size(buttonTextWidth, buttonTextHeight), -12, -4)
@@ -310,7 +318,7 @@ function LevelComplete:_unload()
 	self.blinkers.blinkerPressAButton1 = nil
 	self.blinkers.blinkerPressAButton2 = nil
 	
-	self.painters.background = nil
+	self.painters.frame = nil
 	
 	self.painters.pressAButton:unload()
 	self.painters.pressAButton = nil
