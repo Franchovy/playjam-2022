@@ -41,14 +41,6 @@ function LevelComplete:_load()
 	
 	self.images.background = playdate.graphics.image.new(400, 240, playdate.graphics.kColorBlack):fadedImage(0.6, playdate.graphics.image.kDitherTypeHorizontalLine)
 	
-	self.images.textLabelCoins = playdate.graphics.imageWithText("COINS", 60, 100):scaledImage(1.5)
-	self.images.textLabelTime = playdate.graphics.imageWithText("TIME", 60, 100):scaledImage(1.5)
-	
-	local coinsText = self.config.objectives.coinCount .. "/".. self.config.objectives.coinCountObjective
-	local timeText = self.config.objectives.timeString .. "/".. self.config.objectives.timeStringObjective
-	self.images.textCoins = playdate.graphics.imageWithText(coinsText, 100, 40):scaledImage(2)
-	self.images.textTime = playdate.graphics.imageWithText(timeText, 100, 40):scaledImage(2)
-	
 	self.images.textPressAButton = playdate.graphics.imageWithText("PRESS A", 80, 40):scaledImage(2)
 
 	self.blinkers.blinkerTitle = playdate.graphics.animation.blinker.new(300, 100)
@@ -103,6 +95,26 @@ function LevelComplete:_load()
 	self.painters.title = Painter(function(rect)
 		setCurrentFont(kAssetsFonts.twinbee2x)
 		playdate.graphics.drawTextAligned("LEVEL COMPLETE!", rect.x + rect.w / 2, rect.y + rect.h / 2, kTextAlignment.center)
+	end)
+	
+	self.painters.objectives = Painter(function(rect)
+		local textHeight15 = getFont(kAssetsFonts.twinbee15x):getHeight()
+		local topTextRect = Rect.with(rect, { h = textHeight15 })
+		local rectLeft, rectRight = Rect.splitHorizontal(topTextRect, 2)
+		
+		setCurrentFont(kAssetsFonts.twinbee15x)
+		playdate.graphics.drawTextAligned("COINS:", rectLeft.x + rectLeft.w / 2, topTextRect.y + topTextRect.h / 2, kTextAlignment.center)
+		playdate.graphics.drawTextAligned("TIME:", rectRight.x + rectRight.w / 2, topTextRect.y + topTextRect.h / 2, kTextAlignment.center)
+		
+		local textHeight2 = getFont(kAssetsFonts.twinbee2x):getHeight()
+		local topTextRect = Rect.with(rect, { y = topTextRect.y + textHeight15 + 3, h = textHeight2 })
+		
+		local coinsLabelText = self.config.objectives.coinCount .. "/".. self.config.objectives.coinCountObjective
+		local timeLabelText = self.config.objectives.timeString .. "/".. self.config.objectives.timeStringObjective
+		
+		setCurrentFont(kAssetsFonts.twinbee2x)
+		playdate.graphics.drawTextAligned(coinsLabelText, rectLeft.x + rectLeft.w / 2, topTextRect.y + topTextRect.h / 2, kTextAlignment.center)
+		playdate.graphics.drawTextAligned(timeLabelText, rectRight.x + rectRight.w / 2, topTextRect.y + topTextRect.h / 2, kTextAlignment.center)
 	end)
 	
 	self.stars = {}
@@ -184,20 +196,7 @@ function LevelComplete:_draw(rect)
 		local contentRect = Rect.inset(offsetRect, 8, starImageY + starImageHeight - 16, 8, 8)
 		
 		if self.state == self.kStates.overlay then
-			local labelCoinsWidth, labelCoinsHeight = self.images.textLabelCoins:getSize()
-			local labelTimeWidth, labelTimeHeight = self.images.textLabelTime:getSize()
-			local textCoinsWidth, textHeight = self.images.textCoins:getSize()
-			local textTimeWidth, _ = self.images.textTime:getSize()
-			local coinImageWidth, coinImageHeight = self.images.coin:getSize()
-			
-			self.images.textLabelCoins:draw(contentRect.x + coinImageWidth + 5 + (textCoinsWidth - labelCoinsWidth - coinImageHeight) / 2, contentRect.y)
-			self.images.coin:draw(contentRect.x + (textCoinsWidth - labelCoinsWidth - coinImageHeight) / 2, contentRect.y + (labelCoinsHeight - coinImageHeight) / 2)
-			self.images.textLabelTime:draw(contentRect.x + contentRect.w - (textTimeWidth + labelTimeWidth) / 2, contentRect.y)
-			
-			self.images.textCoins:draw(contentRect.x, contentRect.y + labelCoinsHeight + 12)
-			self.images.textTime:draw(contentRect.x + contentRect.w - textTimeWidth, contentRect.y + labelTimeHeight + 12)
-			
-			--self.painters.objectives:draw(contentRect)
+			self.painters.objectives:draw(contentRect)
 			
 			local buttonTextWidth, buttonTextHeight = self.images.textPressAButton:getSize()
 			local buttonRect = Rect.inset(Rect.size(buttonTextWidth, buttonTextHeight), -12, -4)

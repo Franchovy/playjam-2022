@@ -15,3 +15,11 @@ function setCurrentFontDefault(pathDefaultFont)
 	
 	playdate.graphics.setFont(fonts["default"])
 end
+
+function getFont(path)
+	if fonts[path] == nil then
+		fonts[path] = playdate.graphics.font.new(path)
+	end
+	
+	return fonts[path]
+end
