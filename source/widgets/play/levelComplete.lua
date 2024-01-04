@@ -67,8 +67,12 @@ function LevelComplete:_load()
 		playdate.graphics.setLineWidth(4)
 		playdate.graphics.drawRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 4)
 		
+		playdate.graphics.setColor(playdate.graphics.kColorBlack)
+		playdate.graphics.setDitherPattern(0.5, playdate.graphics.image.kDitherTypeDiagonalLine)
+		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
+		
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeDiagonalLine)
+		playdate.graphics.setDitherPattern(0.7, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
 	end)
 	
