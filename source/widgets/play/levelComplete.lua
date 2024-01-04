@@ -49,6 +49,24 @@ function LevelComplete:_load()
 	self.blinkers.blinkerPressAButton1 = playdate.graphics.animation.blinker.new(800, 100)
 	self.blinkers.blinkerPressAButton2 = playdate.graphics.animation.blinker.new(700, 200)
 	
+	self.painters.containerBackgroundStars = Painter(function(rect)
+		playdate.graphics.setColor(playdate.graphics.kColorWhite)
+		playdate.graphics.setLineWidth(6)
+		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 16)
+		
+		local insetRect = Rect.inset(rect, 4, 4)
+		playdate.graphics.setColor(playdate.graphics.kColorBlack)
+		playdate.graphics.setLineWidth(4)
+		playdate.graphics.drawRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 4)
+		
+		playdate.graphics.setColor(playdate.graphics.kColorWhite)
+		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
+		
+		playdate.graphics.setColor(playdate.graphics.kColorBlack)
+		playdate.graphics.setDitherPattern(0.4, playdate.graphics.image.kDitherTypeDiagonalLine)
+		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
+	end)
+	
 	self.painters.frame = Painter(function(rect)
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
 		playdate.graphics.setLineWidth(6)
@@ -59,11 +77,7 @@ function LevelComplete:_load()
 		playdate.graphics.setLineWidth(4)
 		playdate.graphics.drawRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 4)
 		
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
-		
 		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
 		playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
 	end)
 	
@@ -94,7 +108,8 @@ function LevelComplete:_load()
 	
 	self.painters.title = Painter(function(rect)
 		setCurrentFont(kAssetsFonts.twinbee2x)
-		playdate.graphics.drawTextAligned("LEVEL COMPLETE!", rect.x + rect.w / 2, rect.y + rect.h / 2, kTextAlignment.center)
+		local textHeight = getFont(kAssetsFonts.twinbee2x):getHeight()
+		playdate.graphics.drawTextAligned("LEVEL COMPLETE!", rect.x + rect.w / 2, rect.y + textHeight / 2, kTextAlignment.center)
 	end)
 	
 	self.painters.objectives = Painter(function(rect)
@@ -165,42 +180,31 @@ function LevelComplete:_draw(rect)
 		
 		self.painters.frame:draw(offsetRect)
 		
-		local titleRect = Rect.with(Rect.offset(offsetRect, 0, 2), { h = 32 })
+		local titleRect = Rect.with(Rect.offset(offsetRect, 0, 2), { h = 25 })
 		self.painters.title:draw(titleRect)
 		
 		local starImageWidth, starImageHeight = self.stars[1].imagetables.star:getImage(1):getSize()
-		local starMargin
-		local starContainerWidth
 		
-		function starsContentWidth(numStars)
-			return (starImageWidth * numStars) + starMargin * (numStars - 1)
-		end
+		local frameStarCount = math.max(self.config.objectives.stars, 3)
+		local margin = frameStarCount == 3 and 20 or 5
+		local rectStarContainer = Rect.with(Rect.inset(offsetRect, 7, 0), { y = Rect.bottom(titleRect) + 5, h = starImageHeight + 10 })
+		local rectStarContent = Rect.center(Rect.size((starImageWidth + margin) * frameStarCount - margin, starImageHeight), rectStarContainer)
+		local starRects = { Rect.splitHorizontal(rectStarContent, frameStarCount) }
 		
-		if self.config.objectives.stars <= 3 then
-			starMargin = 20
-			starContainerWidth = starsContentWidth(3)
-		elseif self.config.objectives.stars == 4 then
-			starMargin = 5
-			starContainerWidth = starsContentWidth(4)
-		end
-		
-		local starImageY = offsetRect.y * 2 + 8 + 12
+		self.painters.containerBackgroundStars:draw(rectStarContainer)
 		
 		for i, star in ipairs(self.stars) do
-			local contentRect = Rect.size(starContainerWidth, starImageHeight)
-			local centeredRect = Rect.center(contentRect, offsetRect)
-			
-			self.stars[i]:draw(Rect.make(centeredRect.x + (starImageWidth + starMargin) * (i - 1), starImageY, starImageWidth, starImageHeight))
+			self.stars[i]:draw(starRects[i])
 		end
 		
-		local contentRect = Rect.inset(offsetRect, 8, starImageY + starImageHeight - 16, 8, 8)
+		local rectContentBottom = Rect.inset(offsetRect, 8, rectStarContainer.y + rectStarContainer.h - 16, 8, 8)
 		
 		if self.state == self.kStates.overlay then
-			self.painters.objectives:draw(contentRect)
+			self.painters.objectives:draw(rectContentBottom)
 			
 			local buttonTextWidth, buttonTextHeight = self.images.textPressAButton:getSize()
 			local buttonRect = Rect.inset(Rect.size(buttonTextWidth, buttonTextHeight), -12, -4)
-			local buttonRectPositioned = Rect.with(buttonRect, { x = contentRect.x + (contentRect.w - buttonRect.w) / 2, y = contentRect.y + contentRect.h - buttonRect.h })
+			local buttonRectPositioned = Rect.with(buttonRect, { x = rectContentBottom.x + (rectContentBottom.w - buttonRect.w) / 2, y = rectContentBottom.y + rectContentBottom.h - buttonRect.h })
 			
 			local blinker1 = self.blinkers.blinkerPressAButton1.on
 			local blinker2 = self.blinkers.blinkerPressAButton2.on
@@ -208,7 +212,7 @@ function LevelComplete:_draw(rect)
 				inverted = (not blinker1 and blinker2) or (not blinker2 and blinker1) 
 			})
 		elseif self.state == self.kStates.menu then
-			local rectMenu = Rect.with(Rect.offset(contentRect, 70, 8), { w = 180, h = 70 })
+			local rectMenu = Rect.with(Rect.offset(rectContentBottom, 70, 8), { w = 180, h = 70 })
 			self.children.menu:draw(rectMenu)
 		end
 	end
