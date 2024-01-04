@@ -27,10 +27,18 @@ function WidgetEntriesMenu:_load()
 		self.entries[i] = entry
 	end
 	
-	if self.config.backgroundColor ~= nil then
+	if self.config.shouldDrawFrame == true then
 		self.painters.background = Painter(function(rect)
-			playdate.graphics.setColor(self.config.backgroundColor)
-			playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+			local edgeWidth = 4
+			playdate.graphics.setColor(playdate.graphics.kColorBlack)
+			playdate.graphics.setLineWidth(edgeWidth)
+			playdate.graphics.setDitherPattern(0.5)
+			
+			local insetRect = Rect.inset(rect, edgeWidth, edgeWidth)
+			playdate.graphics.drawRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
+			
+			playdate.graphics.setColor(playdate.graphics.kColorWhite)
+			playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
 		end)
 	end
 	
