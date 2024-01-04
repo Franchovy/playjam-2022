@@ -90,3 +90,13 @@ function Rect.overlap(rect1, rect2)
 		h = overlapY
 	}
 end
+
+function Rect.splitHorizontal(rect, count)
+	local rects = {}
+	local width = rect.w / count
+	for i=1,count do
+		table.insert(rects, Rect.make(rect.x + (i - 1) * width, rect.y, width, rect.h))
+	end
+	
+	return table.unpack(rects)
+end
