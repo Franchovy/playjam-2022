@@ -235,15 +235,14 @@ function LevelComplete:_update()
 	end
 	
 	if self.state == self.kStates.overlay or (self.state == self.kStates.menu) then
-		if self:isAnimating() then
+		if self:wasAnimating() == true then
 			playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 		end
 		
 		for _, star in pairs(self.stars) do
-			if self.wasAnimating == true then
+			if star:wasAnimating() == true then
 				playdate.graphics.sprite.addDirtyRect(50, 60, 290, 70)
 			end
-			self.wasAnimating = star:isAnimating()
 		end
 	end
 	

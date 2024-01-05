@@ -20,3 +20,7 @@ function playdate.graphics.animator:update()
 		self.hasCalledFinishedCallback = true
 	end
 end
+
+function playdate.graphics.animator:isAnimating()
+	return (self.previousUpdateTime == nil) or (self.didend ~= true)
+end

@@ -35,7 +35,10 @@ function WidgetStar:_load()
 	self.timers.timer:pause()
 	
 	function self:isAnimating()
-		return self.timers.timer ~= nil and (self.timers.timer.paused == false) and (self.timers.timer.timeLeft > 0)
+		return self._state.isAnimating
+	end
+	function self:wasAnimating()
+		return self._state.wasAnimating
 	end
 end
 
@@ -47,4 +50,7 @@ function WidgetStar:_update()
 	if not self.timers.timer.paused then
 		self.tickFunction(self.timers.timer)
 	end
+	
+	self._state.wasAnimating = self._state.isAnimating ~= nil and self._state.isAnimating or false
+	self._state.isAnimating = self.timers.timer ~= nil and (self.timers.timer.paused == false) and (self.timers.timer.timeLeft > 0)
 end

@@ -71,7 +71,7 @@ end
 function WidgetTransition:_update()
 	-- TODO: Update wheel rotation (%12) on every tick, use painter state
 	
-	if self:isAnimating() == true then
+	if self:wasAnimating() == true then
 		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
 	end
 end
