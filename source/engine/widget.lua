@@ -36,7 +36,7 @@ function Widget:supply(dep)
 			for _, dep in pairs(dep._config.dependsOn) do
 				assert(Widget.deps[dep] ~= nil, "Missing dependency: ".. dep)
 				
-				Widget:supply(Widget.deps[dep])
+				self:supply(Widget.deps[dep])
 			end
 		end
 	end
@@ -121,7 +121,7 @@ function Widget:update()
 	
 	if self._updateCallbacks ~= nil then
 		for _, callback in pairs(self._updateCallbacks) do
-			callback()
+			callback(self)
 		end
 	end
 end

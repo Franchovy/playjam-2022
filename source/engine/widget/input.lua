@@ -28,17 +28,17 @@ local function input(widget)
 		self._filter = filter
 	end
 	
-	widget:_addUpdateCallback(function()
-		local input = widget._input
+	widget:_addUpdateCallback(function(self)
+		local input = self._input
 		
-		if ((input.pressed | input.released | input.current) & widget._filter) ~= 0 then
-			if widget._handleInput ~= nil then
-				widget:_handleInput(input)
+		if ((input.pressed | input.released | input.current) & self._filter) ~= 0 then
+			if self._handleInput ~= nil then
+				self:_handleInput(input)
 			end
 		end
 		
-		widget._input = emptyInput
-		widget._filter = playdate.kButtonsAny
+		self._input = emptyInput
+		self._filter = playdate.kButtonsAny
 	end)
 	
 	widget._input = emptyInput

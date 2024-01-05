@@ -40,19 +40,22 @@ function animators(widget)
 		return true
 	end
 	
-	function widget:isAnimating()
-		for _, animator in pairs(self.animators) do
-			if (animator.previousUpdateTime == nil) or (animator.didend ~= true) then
-				return true
-			end
-		end
-			
-		return false
+	function widget:wasAnimating()
+		return self._state.wasAnimating == true
 	end
 	
-	widget:_addUpdateCallback(function()
-		for _, animator in pairs(widget.animators) do
+	function widget:isAnimating()
+		return self._state.isAnimating == true
+	end
+	
+	widget:_addUpdateCallback(function(self)
+		self._state.wasAnimating = self._state.isAnimating ~= nil and self._state.isAnimating or false
+		self._state.isAnimating = false
+		
+		for _, animator in pairs(self.animators) do
 			animator:update()
+			
+			self._state.isAnimating = self._state.isAnimating or animator:isAnimating()
 		end
 	end)
 	
