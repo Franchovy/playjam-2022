@@ -9,6 +9,7 @@ function samples(widget)
 			key = path
 		end
 		local player = playdate.sound.sampleplayer.new(path)
+		assert(player ~= nil and (err == nil), err)
 		
 		if volume == nil then
 			volume = 1

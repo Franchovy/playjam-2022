@@ -15,7 +15,10 @@ sampleplayer = {
 }
 
 function sampleplayer:addSample(key, filePath, volume)
-	local player = sound.sampleplayer.new(filePath)
+	local player, err = sound.sampleplayer.new(filePath)
+	
+	assert(player ~= nil and (err == nil), err)
+	
 	volume = volume or 1
 	
 	self.sampleplayers[key] = {
