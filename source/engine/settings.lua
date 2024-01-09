@@ -4,6 +4,11 @@ Settings = {}
 Settings._data = {}
 Settings._callbackFunctions = {}
 
+local defaultValues = {
+    [kSettingsKeys.sfxVolume] = 1,
+    [kSettingsKeys.musicVolume] = 1
+}
+
 function Settings:getValue(key)
 	return self._data[key]
 end
@@ -44,8 +49,8 @@ function Settings:writeToFile()
 	json.encodeToFile(kFilePath.settings, true, self._data)
 end
 
-function Settings:setDefaultValues(data)
-	for k, v in pairs(data) do
+function Settings:setDefaultValues()
+	for k, v in pairs(defaultValues) do
 		self:setValue(k, v)
 	end
 	

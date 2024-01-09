@@ -27,11 +27,7 @@ function WidgetMain:_load()
 	if Settings:existsSettingsFile() then
 		Settings:readFromFile()
 	else 
-		local settings = {}
-		settings[kSettingsKeys.sfxVolume] = 1
-		settings[kSettingsKeys.musicVolume] = 1
-		
-		Settings:setDefaultValues(settings)
+		Settings:setDefaultValues()
 	end
 	
 	self.onPlaythroughComplete = function(data)
