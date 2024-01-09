@@ -50,13 +50,15 @@ function animators(widget)
 	end
 	
 	widget:_addUpdateCallback(function(self)
-		self._state.wasAnimating = self._state.isAnimating ~= nil and self._state.isAnimating or false
-		self._state.isAnimating = false
+		local state = self._state
+		state.wasAnimating = self._state.isAnimating ~= nil and self._state.isAnimating or false
+		state.isAnimating = false
 		
+		local state = self._state
 		for _, animator in pairs(self.animators) do
 			animator:update()
 			
-			self._state.isAnimating = self._state.isAnimating or animator:isAnimating()
+			state.isAnimating = state.isAnimating or animator:isAnimating()
 		end
 	end)
 	

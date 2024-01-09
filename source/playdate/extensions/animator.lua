@@ -1,16 +1,17 @@
 function playdate.graphics.animator:update()
-	if self.duration == 0 then
+	if self.hasCalledFinishedCallback == true or (self.duration == 0) then
 		-- Ignore placeholder animators
 		return
 	end
 	
-	if self.previousUpdateTime ~= nil and (self.previousUpdateTime < playdate.getCurrentTimeMilliseconds()) then
+	local currentTime = playdate.getCurrentTimeMilliseconds()
+	if self.previousUpdateTime ~= nil and (self.previousUpdateTime < currentTime) then
 		if self.updateCallback ~= nil then
 			self.updateCallback()
 		end
 	end
 	
-	self.previousUpdateTime = playdate.getCurrentTimeMilliseconds()
+	self.previousUpdateTime = currentTime
 	
 	if self:ended() and (self.hasCalledFinishedCallback ~= true) then
 		if self.finishedCallback ~= nil then
