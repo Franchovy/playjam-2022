@@ -1,3 +1,4 @@
+local geo <const> = playdate.geometry
 function animators(widget)
 	
 	function widget:getAnimatorValue(...)
@@ -10,7 +11,7 @@ function animators(widget)
 					value = 0
 					type = "number"
 				elseif getmetatable(animator:currentValue()).__name == "playdate.geometry.point" then
-					value = playdate.geometry.point.new(0, 0)
+					value = geo.point.new(0, 0)
 					type = "playdate.geometry.point"
 				end
 			end

@@ -1,3 +1,4 @@
+local file <const> = playdate.file
 
 Settings = {}
 Settings._data = {}
@@ -28,7 +29,7 @@ function Settings:addCallback(key, callbackFunction)
 end
 
 function Settings:existsSettingsFile()
-	return playdate.file.exists(kFilePath.settings)
+	return file.exists(kFilePath.settings)
 end
 
 function Settings:readFromFile()

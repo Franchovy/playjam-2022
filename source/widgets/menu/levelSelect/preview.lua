@@ -1,5 +1,7 @@
 import "assets"
 
+local gfx <const> = playdate.graphics
+
 class("LevelSelectPreview").extends(Widget)
 
 function LevelSelectPreview:init(config)
@@ -14,8 +16,8 @@ function LevelSelectPreview:init(config)
 end
 
 function LevelSelectPreview:_load()
-	self.images.level = playdate.graphics.image.new(self.config.imagePath)
-	self.images.star = playdate.graphics.image.new(kAssetsImages.starMenu):scaledImage(0.5)
+	self.images.level = gfx.image.new(self.config.imagePath)
+	self.images.star = gfx.image.new(kAssetsImages.starMenu):scaledImage(0.5)
 	
 	local scoreCoins
 	if self.config.score ~= nil then
@@ -31,10 +33,10 @@ function LevelSelectPreview:_load()
 		scoreTime = "-"
 	end
 	
-	self.images.labelCoins = playdate.graphics.imageWithText(scoreCoins, 100, 20)
-	self.images.labelTime = playdate.graphics.imageWithText(scoreTime, 100, 20)
-	self.images.labelTitle = playdate.graphics.imageWithText(self.config.title, 100, 20):scaledImage(1.5)
-	self.images.labelMissing = playdate.graphics.imageWithText("NO HIGHSCORE", 200, 20)
+	self.images.labelCoins = gfx.imageWithText(scoreCoins, 100, 20)
+	self.images.labelTime = gfx.imageWithText(scoreTime, 100, 20)
+	self.images.labelTitle = gfx.imageWithText(self.config.title, 100, 20):scaledImage(1.5)
+	self.images.labelMissing = gfx.imageWithText("NO HIGHSCORE", 200, 20)
 	
 	local scoreStars
 	if self.config.score ~= nil then
@@ -45,22 +47,22 @@ function LevelSelectPreview:_load()
 	self.data.starsCount = scoreStars
 	
 	self.painters.star = Painter(function(rect)
-		playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeFillBlack)
+		gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
 		self.images.star:draw(rect.x, rect.y)
 		
-		playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
-		self.images.star:drawFaded(rect.x, rect.y, 0.9, playdate.graphics.image.kDitherTypeDiagonalLine)
+		gfx.setImageDrawMode(gfx.kDrawModeCopy)
+		self.images.star:drawFaded(rect.x, rect.y, 0.9, gfx.image.kDitherTypeDiagonalLine)
 	end)
 	
 	self.painters.background = Painter(function(rect)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeScreen)
-		playdate.graphics.setLineWidth(2)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0.3, gfx.image.kDitherTypeScreen)
+		gfx.setLineWidth(2)
+		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
+		gfx.setColor(gfx.kColorWhite)
 		local fillRect = Rect.inset(rect, 2, 2)
-		playdate.graphics.fillRoundRect(fillRect.x, fillRect.y - 1, fillRect.w, fillRect.h, 6)
+		gfx.fillRoundRect(fillRect.x, fillRect.y - 1, fillRect.w, fillRect.h, 6)
 	end)
 	
 	local noHighScore = Painter(function(rect)

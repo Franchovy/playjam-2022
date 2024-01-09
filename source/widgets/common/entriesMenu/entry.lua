@@ -1,5 +1,7 @@
 import "utils/value"
 
+local gfx <const> = playdate.graphics
+
 class("WidgetEntriesMenuEntry").extends(Widget)
 
 function WidgetEntriesMenuEntry:init(config)
@@ -21,19 +23,19 @@ function WidgetEntriesMenuEntry:_load()
 		setCurrentFont(kAssetsFonts.twinbee2x)
 	end
 	
-	self.images.title = playdate.graphics.imageWithText(self.config.text, 400, 70)
+	self.images.title = gfx.imageWithText(self.config.text, 400, 70)
 	
 	setCurrentFontDefault()
 	
 	self.painters.circle = Painter(function(rect)
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillCircleInRect(rect.x, rect.y, rect.w, rect.h)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillCircleInRect(rect.x, rect.y, rect.w, rect.h)
 		
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.drawCircleInRect(rect.x, rect.y, rect.w, rect.h)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.drawCircleInRect(rect.x, rect.y, rect.w, rect.h)
 		
-		playdate.graphics.setDitherPattern(0.5, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillCircleInRect(rect.x, rect.y, rect.w, rect.h)
+		gfx.setDitherPattern(0.5, gfx.image.kDitherTypeDiagonalLine)
+		gfx.fillCircleInRect(rect.x, rect.y, rect.w, rect.h)
 	end)
 end
 

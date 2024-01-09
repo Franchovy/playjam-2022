@@ -1,3 +1,4 @@
+local timer <const> = playdate.timer
 function animations(widget)
 	function widget:setAnimations(animations) 
 		self.kAnimations = animations
@@ -12,7 +13,7 @@ function animations(widget)
 		
 		function queueFinishedCallback(delay)
 			if delay ~= nil then
-				playdate.timer.performAfterDelay(delay, function() 
+				timer.performAfterDelay(delay, function() 
 					local animationChanged = (previousAnimation.animation ~= self._previousAnimation.animation) 
 						or (previousAnimation.timestamp ~= self._previousAnimation.timestamp)
 					

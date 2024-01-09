@@ -4,6 +4,9 @@ import "menu/levelSelect"
 import "menu/title"
 import "menu/settings"
 
+local gfx <const> = playdate.graphics
+local timer <const> = playdate.timer
+
 class("WidgetMenu").extends(Widget)
 
 function WidgetMenu:init(config)	
@@ -30,12 +33,12 @@ function WidgetMenu:_load()
 	self:loadSample(kAssetsSounds.intro)
 	
 	self.painters.background = Painter(function(rect)
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillRect(0, 0, rect.w, rect.h)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillRect(0, 0, rect.w, rect.h)
 		
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeBayer4x4)
-		playdate.graphics.fillRect(0, 0, rect.w, rect.h)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0.1, gfx.image.kDitherTypeBayer4x4)
+		gfx.fillRect(0, 0, rect.w, rect.h)
 	end)
 	
 	self.children.title = Widget.new(WidgetTitle)
@@ -91,10 +94,10 @@ function WidgetMenu:_load()
 
 	self:loadFilePlayer(kAssetsTracks.menu)
 	
-	playdate.timer.performAfterDelay(10, function()
+	timer.performAfterDelay(10, function()
 		self:playSample(kAssetsSounds.intro)
 		
-		playdate.timer.performAfterDelay(300, function()
+		timer.performAfterDelay(300, function()
 			self:playFilePlayer()
 		end)
 	end)
@@ -174,7 +177,7 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 			self.children.levelSelect:setVisible(false)
 			self.children.menuSettings:setVisible(true)
 			
-			playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+			gfx.sprite.addDirtyRect(0, 0, 400, 240)
 		end)
 	end
 	

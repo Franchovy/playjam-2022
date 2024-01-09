@@ -1,5 +1,7 @@
 import "entriesMenu/entry"
 
+local gfx <const> = playdate.graphics
+
 class("WidgetEntriesMenu").extends(Widget)
 
 function WidgetEntriesMenu:init(config)
@@ -30,15 +32,15 @@ function WidgetEntriesMenu:_load()
 	if self.config.shouldDrawFrame == true then
 		self.painters.background = Painter(function(rect)
 			local edgeWidth = 4
-			playdate.graphics.setColor(playdate.graphics.kColorBlack)
-			playdate.graphics.setLineWidth(edgeWidth)
-			playdate.graphics.setDitherPattern(0.5)
+			gfx.setColor(gfx.kColorBlack)
+			gfx.setLineWidth(edgeWidth)
+			gfx.setDitherPattern(0.5)
 			
 			local insetRect = Rect.inset(rect, edgeWidth, edgeWidth)
-			playdate.graphics.drawRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
+			gfx.drawRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
 			
-			playdate.graphics.setColor(playdate.graphics.kColorWhite)
-			playdate.graphics.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
+			gfx.setColor(gfx.kColorWhite)
+			gfx.fillRoundRect(insetRect.x, insetRect.y, insetRect.w, insetRect.h, 8)
 		end)
 	end
 	
@@ -75,7 +77,7 @@ function WidgetEntriesMenu:_update()
 			self:setState(self.state + 1)
 			
 			if self.frame ~= nil then
-				playdate.graphics.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+				gfx.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
 			end
 		else
 			self:playSample(kAssetsSounds.menuSelectFail)
@@ -88,7 +90,7 @@ function WidgetEntriesMenu:_update()
 			self:setState(self.state - 1)
 			
 			if self.frame ~= nil then
-				playdate.graphics.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+				gfx.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
 			end
 		else
 			self:playSample(kAssetsSounds.menuSelectFail)

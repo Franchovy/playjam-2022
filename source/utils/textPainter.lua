@@ -1,3 +1,4 @@
+local gfx <const> = playdate.graphics
 function textPainter(config)
 	local textPainter = {}
 	textPainter.config = config
@@ -16,8 +17,8 @@ function textPainter(config)
 		for i = 1, #chars do
 			local char = chars:sub(i, i)
 			
-			local textSizeW, textSizeH = playdate.graphics.getTextSize(char)
-			textPainter.images[char] = playdate.graphics.imageWithText(char, textSizeW, textSizeH):scaledImage(textPainter.config.scale)
+			local textSizeW, textSizeH = gfx.getTextSize(char)
+			textPainter.images[char] = gfx.imageWithText(char, textSizeW, textSizeH):scaledImage(textPainter.config.scale)
 		end
 	end
 	

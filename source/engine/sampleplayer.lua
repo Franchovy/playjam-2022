@@ -1,9 +1,11 @@
 import "CoreLibs/object"
 import "settings"
 
+local sound <const> = playdate.sound
+
 -- Libraries
 
-local sound <const> = playdate.sound
+local sound <const> = sound
 
 --
 

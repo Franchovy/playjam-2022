@@ -3,8 +3,10 @@ import "CoreLibs/graphics"
 import "engine"
 import "extensions"
 
+local gfx <const> = playdate.graphics
 
-local graphics <const> = playdate.graphics
+
+local graphics <const> = gfx
 
 function getImageTable(path, count)
 	

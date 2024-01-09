@@ -1,3 +1,4 @@
+local gfx <const> = playdate.graphics
 
 class("WidgetBackground").extends(Widget)
 
@@ -30,7 +31,7 @@ function WidgetBackground:_draw(frame, rect)
 	if rect == nil then 
 		self.backgroundImage:draw(frame.x, frame.y)
 	else
-		self.backgroundImage:draw(frame.x, frame.y, playdate.graphics.kImageUnflipped, rect.x, rect.y, rect.w, rect.h)
+		self.backgroundImage:draw(frame.x, frame.y, gfx.kImageUnflipped, rect.x, rect.y, rect.w, rect.h)
 	end
 	
 	for i, image in ipairs(self.images) do
@@ -49,7 +50,7 @@ function WidgetBackground:_draw(frame, rect)
 			imageRightOverlapRect = Rect.overlap(Rect.overlap(imageRightRect, screenRect), rect)
 		end
 		local imageRightSourceRect = Rect.offset(imageRightOverlapRect, -imageOffset, 0)
-		image:draw(frame.x + imageOffset, frame.y, playdate.graphics.kImageUnflipped, imageRightSourceRect.x, imageRightSourceRect.y, imageRightSourceRect.w, imageRightSourceRect.h)
+		image:draw(frame.x + imageOffset, frame.y, gfx.kImageUnflipped, imageRightSourceRect.x, imageRightSourceRect.y, imageRightSourceRect.w, imageRightSourceRect.h)
 		
 		local imageLeftOverlapRect
 		if rect == nil then
@@ -58,13 +59,13 @@ function WidgetBackground:_draw(frame, rect)
 			imageLeftOverlapRect = Rect.overlap(Rect.overlap(imageLeftRect, screenRect), rect)
 		end
 		local imageLeftSourceRect = Rect.offset(imageLeftOverlapRect, imageWidth - imageOffset, 0)
-		image:draw(frame.x + imageOffset - imageOffset, frame.y, playdate.graphics.kImageUnflipped, imageLeftSourceRect.x, imageLeftSourceRect.y, imageLeftSourceRect.w, imageLeftSourceRect.h)
+		image:draw(frame.x + imageOffset - imageOffset, frame.y, gfx.kImageUnflipped, imageLeftSourceRect.x, imageLeftSourceRect.y, imageLeftSourceRect.w, imageLeftSourceRect.h)
 	end
 end
 
 function WidgetBackground:_update()
 	local previousOffset <const> = self.drawOffset
-	self.drawOffset = playdate.graphics.getDrawOffset()
+	self.drawOffset = gfx.getDrawOffset()
 	
 	for i, image in pairs(self.images) do
 		local originalOffset = self.drawOffset * self.paralaxRatios[i]

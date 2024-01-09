@@ -17,6 +17,9 @@ import "widget/keyValueState"
 import "widget/samples"
 import "widget/fileplayer"
 
+local disp <const> = playdate.display
+local gfx <const> = playdate.graphics
+
 function Widget.new(class, ...)
 	local widget = class(...)
 	
@@ -46,8 +49,8 @@ end
 
 function Widget:createSprite(zIndex)
 	if self.sprite == nil then
-		local sprite = playdate.graphics.sprite.new()
-		sprite:setSize(playdate.display.getSize())
+		local sprite = gfx.sprite.new()
+		sprite:setSize(disp.getSize())
 		sprite:setCenter(0, 0)
 		sprite:moveTo(0, 0)
 		

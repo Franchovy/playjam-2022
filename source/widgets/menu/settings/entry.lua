@@ -1,3 +1,4 @@
+local gfx <const> = playdate.graphics
 class("WidgetMenuSettingsEntry").extends(Widget)
 
 -- Special chars: ◁ ◀ ▶ ▷
@@ -31,25 +32,25 @@ function WidgetMenuSettingsEntry:_load()
 	self.painters.title = Painter(function(frame, state)
 		if state.isSelected == true then
 			local rectInset = Rect.inset(frame, 1, 1)
-			playdate.graphics.setColor(playdate.graphics.kColorBlack)
-			playdate.graphics.setLineWidth(2)
-			playdate.graphics.drawRoundRect(rectInset.x, rectInset.y, rectInset.w, rectInset.h, 6)
+			gfx.setColor(gfx.kColorBlack)
+			gfx.setLineWidth(2)
+			gfx.drawRoundRect(rectInset.x, rectInset.y, rectInset.w, rectInset.h, 6)
 		end
 		
-		local font = playdate.graphics.font.new(kAssetsFonts.twinbee2x)
+		local font = gfx.font.new(kAssetsFonts.twinbee2x)
 		local fontHeight = font:getHeight()
-		playdate.graphics.setFont(font)
-		playdate.graphics.drawText(self.config.title, frame.x + 8, frame.y + (frame.h - fontHeight) / 2)
-		playdate.graphics.setFont(playdate.graphics.font.new(kAssetsFonts.twinbee))
+		gfx.setFont(font)
+		gfx.drawText(self.config.title, frame.x + 8, frame.y + (frame.h - fontHeight) / 2)
+		gfx.setFont(gfx.font.new(kAssetsFonts.twinbee))
 	end)
 	
 	if self.config.type == WidgetMenuSettings.type.options then
 		self.painters.value = Painter(function(frame, state)
-			local font = playdate.graphics.font.new(kAssetsFonts.twinbee2x)
+			local font = gfx.font.new(kAssetsFonts.twinbee2x)
 			local fontHeight = font:getHeight()
-			playdate.graphics.setFont(font)
-			playdate.graphics.drawTextAligned("◁ "..state.value.." ▷", frame.x + frame.w - 8, frame.y + (frame.h - fontHeight) / 2, kTextAlignment.right)
-			playdate.graphics.setFont(playdate.graphics.font.new(kAssetsFonts.twinbee))
+			gfx.setFont(font)
+			gfx.drawTextAligned("◁ "..state.value.." ▷", frame.x + frame.w - 8, frame.y + (frame.h - fontHeight) / 2, kTextAlignment.right)
+			gfx.setFont(gfx.font.new(kAssetsFonts.twinbee))
 		end)
 	end
 	
@@ -84,7 +85,7 @@ function WidgetMenuSettingsEntry:_handleInput(input)
 				self:setState(self.kStateKeys.value, self.kStates.value[index - 1])
 				self.signals.onChanged(self.kStates.value[index - 1])
 				
-				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+				gfx.sprite.addDirtyRect(0, 0, 400, 240)
 				
 				self:playSample(kAssetsSounds.menuSelect)
 			else
@@ -96,7 +97,7 @@ function WidgetMenuSettingsEntry:_handleInput(input)
 				self:setState(self.kStateKeys.value, self.kStates.value[index + 1])
 				self.signals.onChanged(self.kStates.value[index + 1])
 				
-				playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+				gfx.sprite.addDirtyRect(0, 0, 400, 240)
 				
 				self:playSample(kAssetsSounds.menuSelect)
 			else

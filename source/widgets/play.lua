@@ -6,6 +6,9 @@ import "play/background"
 import "play/hud"
 import "utils/themes"
 
+local gfx <const> = playdate.graphics
+local timer <const> = playdate.timer
+
 class("WidgetPlay").extends(Widget)
 
 function WidgetPlay:init(config)
@@ -137,14 +140,14 @@ function WidgetPlay:_load()
 		collectgarbage("collect")
 		
 		local backgroundColor = getBackgroundColorForTheme(self.theme)
-		playdate.graphics.setBackgroundColor(backgroundColor)
+		gfx.setBackgroundColor(backgroundColor)
 	end
 	
 	self.loadTheme()
 	
 	-- Level Timer
 	
-	self.timers.levelTimer = playdate.timer.new(999000)
+	self.timers.levelTimer = timer.new(999000)
 	self.timers.levelTimer:pause()
 end
 
@@ -188,7 +191,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 
 			collectgarbage("collect")
 			
-			playdate.timer.performAfterDelay(10, function()
+			timer.performAfterDelay(10, function()
 				if AppConfig.enableBackgroundMusic == true then
 					self.filePlayer:play()
 				end
@@ -207,7 +210,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		
 		self.timers.levelTimer:pause()
 		
-		playdate.timer.performAfterDelay(1200, function()
+		timer.performAfterDelay(1200, function()
 			self.children.transition:setVisible(true)
 			self.children.transition:setState(self.children.transition.kStates.closed)
 			
@@ -297,11 +300,11 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		self.children.levelComplete.signals.restartLevel = self.restartLevel
 		self.children.levelComplete.signals.returnToMenu = self.returnToMenu
 		
-		playdate.timer.performAfterDelay(2500, function()
+		timer.performAfterDelay(2500, function()
 			self.children.hud:setState(self.children.hud.kStates.offScreen)
 		end)
 		
-		playdate.timer.performAfterDelay(3000, function()
+		timer.performAfterDelay(3000, function()
 			self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
 		end)
 	elseif stateTo == self.kStates.start then
@@ -343,7 +346,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			
 			collectgarbage("collect")
 			
-			playdate.timer.performAfterDelay(10, function()
+			timer.performAfterDelay(10, function()
 				self.children.transition:setState(self.children.transition.kStates.open)
 				
 				self.children.transition.signals.animationFinished = function()

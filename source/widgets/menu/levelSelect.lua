@@ -2,6 +2,9 @@ import "levelSelect/entry"
 import "levelSelect/preview"
 import "levelSelect/previewImage"
 
+local easing <const> = playdate.easingFunctions
+local gfx <const> = playdate.graphics
+
 class("WidgetLevelSelect").extends(Widget)
 
 WidgetLevelSelect.kMenuActionType = {
@@ -61,24 +64,24 @@ function WidgetLevelSelect:_load()
 	table.insert(self.previews, previewSettings)
 	self.children["preview"..4] = previewSettings
 	
-	self.images.screw1 = playdate.graphics.image.new(kAssetsImages.screw)
-	self.images.screw2 = playdate.graphics.image.new(kAssetsImages.screw):rotatedImage(45)
-	self.images.screw3 = playdate.graphics.image.new(kAssetsImages.screw):rotatedImage(90)
+	self.images.screw1 = gfx.image.new(kAssetsImages.screw)
+	self.images.screw2 = gfx.image.new(kAssetsImages.screw):rotatedImage(45)
+	self.images.screw3 = gfx.image.new(kAssetsImages.screw):rotatedImage(90)
 	
 	local painterCardOutline = Painter(function(rect)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.7, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0.7, gfx.image.kDitherTypeDiagonalLine)
+		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
 		local rectInset = Rect.inset(rect, 10, 14)
 		
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.setLineWidth(3)
-		playdate.graphics.drawRoundRect(rectInset.x - 4, rectInset.y - 1, rectInset.w, rectInset.h, 6)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0.3, gfx.image.kDitherTypeDiagonalLine)
+		gfx.setLineWidth(3)
+		gfx.drawRoundRect(rectInset.x - 4, rectInset.y - 1, rectInset.w, rectInset.h, 6)
 		
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillRoundRect(rectInset.x - 3, rectInset.y, rectInset.w, rectInset.h, 6)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillRoundRect(rectInset.x - 3, rectInset.y, rectInset.w, rectInset.h, 6)
 		
 		local size = self.images.screw1:getSize()
 		self.images.screw2:draw(rect.x + 4, rect.y + 4)
@@ -90,12 +93,12 @@ function WidgetLevelSelect:_load()
 	self.painters.card = Painter(function(rect)
 		-- Painter background
 		
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.1, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0.1, gfx.image.kDitherTypeDiagonalLine)
+		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
 		painterCardOutline:draw(rect)
 	end)
@@ -124,7 +127,7 @@ end
 
 function WidgetLevelSelect:_update()
 	if self.wasAnimating == true then
-		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+		gfx.sprite.addDirtyRect(0, 0, 400, 240)
 	end
 	
 	self.wasAnimating = self:isAnimating()
@@ -169,18 +172,18 @@ end
 
 function WidgetLevelSelect:_animate(animation, queueFinishedCallback)
 	if animation == self.kAnimations.intro then
-		self.animators.card = playdate.graphics.animator.new(800, -240, 0, playdate.easingFunctions.outExpo)
-		self.animators.preview = playdate.graphics.animator.new(600, 240, 0, playdate.easingFunctions.inCubic)
+		self.animators.card = gfx.animator.new(800, -240, 0, easing.outExpo)
+		self.animators.preview = gfx.animator.new(600, 240, 0, easing.inCubic)
 		
 		queueFinishedCallback(800)
 	elseif animation == self.kAnimations.error then
-		self.animators.card = playdate.graphics.animator.new(50, 0, -16, playdate.easingFunctions.outInBack)
+		self.animators.card = gfx.animator.new(50, 0, -16, easing.outInBack)
 		self.animators.card.reverses = true
 		
 		queueFinishedCallback(50)
 	elseif animation == self.kAnimations.outro then
-		self.animators.card = playdate.graphics.animator.new(800, 0, -240, playdate.easingFunctions.outExpo)
-		self.animators.preview = playdate.graphics.animator.new(600, 0, 240, playdate.easingFunctions.inCubic)
+		self.animators.card = gfx.animator.new(800, 0, -240, easing.outExpo)
+		self.animators.preview = gfx.animator.new(600, 0, 240, easing.inCubic)
 
 		queueFinishedCallback(800)
 	end
@@ -195,5 +198,5 @@ function WidgetLevelSelect:_changeState(_, stateTo)
 		end
 	end
 	
-	playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+	gfx.sprite.addDirtyRect(0, 0, 400, 240)
 end

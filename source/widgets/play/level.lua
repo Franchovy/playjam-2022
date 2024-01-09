@@ -1,5 +1,7 @@
 import "utils/screenShake"
 
+local gfx <const> = playdate.graphics
+
 class("WidgetLevel").extends(Widget)
 
 function WidgetLevel:init(config)
@@ -152,7 +154,7 @@ function WidgetLevel:_update()
 	
 	self.periodicBlinker:update()
 	
-	local drawOffsetX, drawOffsetY = playdate.graphics.getDrawOffset()
+	local drawOffsetX, drawOffsetY = gfx.getDrawOffset()
 	self.spriteCycler:update(drawOffsetX, drawOffsetY, self.loadIndex)
 	
 	if self.state == self.kStates.playing then
@@ -192,12 +194,12 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 end
 
 function WidgetLevel:updateDrawOffset()
-	local drawOffset = playdate.graphics.getDrawOffset()
+	local drawOffset = gfx.getDrawOffset()
 	local relativeX = self.wheel.x + drawOffset
 	if relativeX > 150 then
-		playdate.graphics.setDrawOffset(-self.wheel.x + 150, 0)
+		gfx.setDrawOffset(-self.wheel.x + 150, 0)
 	elseif relativeX < 80 then
-		playdate.graphics.setDrawOffset(-self.wheel.x + 80, 0)
+		gfx.setDrawOffset(-self.wheel.x + 80, 0)
 	end
 end
 

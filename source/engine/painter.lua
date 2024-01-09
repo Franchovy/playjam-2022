@@ -1,5 +1,7 @@
 import "extensions"
 
+local gfx <const> = playdate.graphics
+
 class("Painter").extends()
 
 function Painter:init(drawFunction)
@@ -13,11 +15,11 @@ function Painter:draw(frame, state)
 	local image = self:_getImage(state)
 	
 	if image == nil then
-		image = playdate.graphics.image.new(frame.w, frame.h)
+		image = gfx.image.new(frame.w, frame.h)
 		
-		playdate.graphics.pushContext(image)
+		gfx.pushContext(image)
 		self.drawFunction({x = 0, y = 0, w = frame.w, h = frame.h }, state)
-		playdate.graphics.popContext()
+		gfx.popContext()
 		
 		self:_setImage(image, state)
 	end
@@ -29,7 +31,7 @@ end
 
 function Painter:markDirty( )
 	if self.frame ~= nil then
-		playdate.graphics.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+		gfx.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
 	end
 end
 

@@ -1,3 +1,4 @@
+local sound <const> = playdate.sound
 local config = {
 	volume = 1,
 	sampleplayers = {} -- Warning: Memory leak here! Using a weak table (using table.weakValuesTable) for some reason loses all data inside. Investigate
@@ -8,7 +9,7 @@ function samples(widget)
 		if key == nil then
 			key = path
 		end
-		local player = playdate.sound.sampleplayer.new(path)
+		local player = sound.sampleplayer.new(path)
 		assert(player ~= nil and (err == nil), err)
 		
 		if volume == nil then

@@ -1,16 +1,18 @@
 import "engine"
 import "utils/images"
 
+local gfx <const> = playdate.graphics
+
 class("Theme").extends()
 
 function getParalaxImagesForTheme(theme)
 	local filePath = theme[3]
-	local backgroundImage = playdate.graphics.image.new(filePath.. "/".. 0)
+	local backgroundImage = gfx.image.new(filePath.. "/".. 0)
 	
 	local imageCount = theme[4]
 	local images = {}
 	for i=1,(imageCount-1) do
-		local image = playdate.graphics.image.new(filePath.. "/".. i)
+		local image = gfx.image.new(filePath.. "/".. i)
 		table.insert(images, image)
 	end
 	
@@ -26,16 +28,16 @@ end
 
 function getForegroundColorForTheme(theme)
 	if theme[5] == true then
-		return playdate.graphics.kColorBlack
+		return gfx.kColorBlack
 	else
-		return playdate.graphics.kColorWhite
+		return gfx.kColorWhite
 	end
 end
 
 function getBackgroundColorForTheme(theme)
 	if theme[5] == true then
-		return playdate.graphics.kColorWhite
+		return gfx.kColorWhite
 	else
-		return playdate.graphics.kColorBlack
+		return gfx.kColorBlack
 	end
 end

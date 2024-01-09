@@ -1,7 +1,9 @@
 import "engine"
 import "constant"
 
-class('Coin').extends(playdate.graphics.sprite)
+local gfx <const> = playdate.graphics
+
+class('Coin').extends(gfx.sprite)
 
 function Coin.new() 
 	return Coin()
@@ -15,9 +17,9 @@ function Coin:init()
 	self.type = kSpriteTypes.coin
 	
 	if coinImage == nil then
-		coinImage = playdate.graphics.image.new(kAssetsImages.coin)
+		coinImage = gfx.image.new(kAssetsImages.coin)
 		coinEmptyImage = coinImage:copy()
-		coinEmptyImage:clear(playdate.graphics.kColorClear)
+		coinEmptyImage:clear(gfx.kColorClear)
 	end
 	self:setImage(coinImage)
 	self:setCenter(0, 0)

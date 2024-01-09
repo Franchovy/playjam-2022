@@ -3,10 +3,12 @@ import "constant"
 import "utils/images"
 import "playdate"
 
-class("Wheel").extends(playdate.graphics.sprite)
+local gfx <const> = playdate.graphics
+class("Wheel").extends(gfx.sprite)
 
 import "speed"
 import "jump"
+
 
 local maxFallSpeed = 14
 local gravity = 1.4
@@ -21,7 +23,7 @@ end
 function Wheel:init()
 	Wheel.super.init(self)
 	
-	self.imagetable = playdate.graphics.imagetable.new(kAssetsImages.wheel)
+	self.imagetable = gfx.imagetable.new(kAssetsImages.wheel)
 	
 	self:setImage(self.imagetable[1])
 	self:setCenter(0, 0)
@@ -306,8 +308,8 @@ function Wheel:update()
 		(previousBounds[2] ~= currentBounds[2]) or 
 		(previousBounds[3] ~= currentBounds[3]) or 
 		(previousBounds[4] ~= currentBounds[4]) then
-		local drawOffsetX, _ = playdate.graphics.getDrawOffset()
-		playdate.graphics.sprite.addDirtyRect(previousBounds[1] + drawOffsetX, previousBounds[2], previousBounds[3], previousBounds[4])
-		playdate.graphics.sprite.addDirtyRect(currentBounds[1] + drawOffsetX, currentBounds[2], currentBounds[3], currentBounds[4])
+		local drawOffsetX, _ = gfx.getDrawOffset()
+		gfx.sprite.addDirtyRect(previousBounds[1] + drawOffsetX, previousBounds[2], previousBounds[3], previousBounds[4])
+		gfx.sprite.addDirtyRect(currentBounds[1] + drawOffsetX, currentBounds[2], currentBounds[3], currentBounds[4])
 	end
 end

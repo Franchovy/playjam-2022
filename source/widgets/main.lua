@@ -4,6 +4,9 @@ import "menu"
 import "play"
 import "utils/level"
 
+local timer <const> = playdate.timer
+local file <const> = playdate.file
+
 class("WidgetMain").extends(Widget)
 
 function WidgetMain:init()
@@ -36,13 +39,13 @@ function WidgetMain:_load()
 		
 		-- Write data into high-scores file
 		
-		if not playdate.file.exists(kFilePath.saves) then
-			playdate.file.mkdir(kFilePath.saves)
+		if not file.exists(kFilePath.saves) then
+			file.mkdir(kFilePath.saves)
 		end
 		
 		local filePath = kFilePath.saves.. "/".. self.level.title
 		
-		local saveFileRead = playdate.file.open(filePath, playdate.file.kFileRead)
+		local saveFileRead = file.open(filePath, file.kFileRead)
 		
 		local shouldWriteToFile
 		local existingContents
@@ -78,7 +81,7 @@ function WidgetMain:_load()
 		end
 		
 		if shouldWriteToFile then
-			local saveFileWrite = playdate.file.open(filePath, playdate.file.kFileWrite)
+			local saveFileWrite = file.open(filePath, file.kFileWrite)
 			json.encodeToFile(saveFileWrite, true, data)
 			saveFileWrite:close()
 		end
@@ -113,15 +116,15 @@ function WidgetMain:_load()
 	-- High Scores
 	
 	function self:loadHighscores()
-		if not playdate.file.exists(kFilePath.saves) then
-			playdate.file.mkdir(kFilePath.saves)
+		if not file.exists(kFilePath.saves) then
+			file.mkdir(kFilePath.saves)
 		end
 		
 		local data = {}
-		local saveFiles = playdate.file.listFiles(kFilePath.saves)
+		local saveFiles = file.listFiles(kFilePath.saves)
 		for _, fileName in pairs(saveFiles) do
 			local path = kFilePath.saves.. "/".. fileName
-			local saveFile = playdate.file.open(path, playdate.file.kFileRead)
+			local saveFile = file.open(path, file.kFileRead)
 			
 			if saveFile ~= nil then
 				data[fileName] = json.decodeFile(saveFile)
@@ -187,7 +190,7 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 				self.children.play.signals.returnToMenu = self.onReturnToMenu
 				self.children.play.signals.getNextLevelConfig = self.getNextLevelConfig
 				
-				playdate.timer.performAfterDelay(100, function()
+				timer.performAfterDelay(100, function()
 					self.children.transition:setState(self.children.transition.kStates.open)
 					self.children.transition.signals.animationFinished = function()
 						self.children.transition:setVisible(false)
@@ -212,7 +215,7 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 			
 			self.children.menu.signals.play = self.onMenuPressedPlay
 			
-			playdate.timer.performAfterDelay(100, function()
+			timer.performAfterDelay(100, function()
 				self.children.transition:setState(self.children.transition.kStates.open)
 				self.children.transition.signals.animationFinished = function()
 					self.children.transition:setVisible(false)

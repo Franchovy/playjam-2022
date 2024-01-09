@@ -1,5 +1,7 @@
 import "utils/value"
 
+local gfx <const> = playdate.graphics
+
 class("LevelSelectEntry").extends(Widget)
 
 function LevelSelectEntry:init(config)
@@ -15,23 +17,23 @@ function LevelSelectEntry:init(config)
 end
 
 function LevelSelectEntry:_load()
-	self.images.title = playdate.graphics.imageWithText(self.config.text, 200, 70):scaledImage(2)
+	self.images.title = gfx.imageWithText(self.config.text, 200, 70):scaledImage(2)
 	
 	self.painters.outline = Painter(function(rect, state)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.setLineWidth(1)
-		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
+		gfx.setLineWidth(1)
+		gfx.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
-		playdate.graphics.setDitherPattern(0.8, playdate.graphics.image.kDitherTypeScreen)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
+		gfx.setDitherPattern(0.8, gfx.image.kDitherTypeScreen)
+		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
 	end)
 	
 	self.painters.outlineSelected = Painter(function(rect, state)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setLineWidth(3)
-		playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setLineWidth(3)
+		gfx.setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
+		gfx.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
 	end)
 end
 

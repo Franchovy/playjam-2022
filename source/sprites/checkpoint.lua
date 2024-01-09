@@ -3,7 +3,9 @@ import "constant"
 import "utils/images"
 import "playdate"
 
-class("Checkpoint").extends(playdate.graphics.sprite)
+local gfx <const> = playdate.graphics
+
+class("Checkpoint").extends(gfx.sprite)
 
 local kStateKeys = { isSet = "isSet" }
 
@@ -75,5 +77,5 @@ function Checkpoint:updateImage()
 		imagePath = kAssetsImages.checkpoint
 	end
 	
-	self:setImage(playdate.graphics.image.new(imagePath))
+	self:setImage(gfx.image.new(imagePath))
 end

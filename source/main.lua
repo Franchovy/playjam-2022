@@ -6,6 +6,9 @@ import "config"
 import "widgets"
 import "utils/fonts"
 
+local gfx <const> = playdate.graphics
+local timer <const> = playdate.timer
+
 local topLevelWidget
 
 -- Globals table -- Use sparingly!
@@ -15,11 +18,11 @@ g = {
 
 function initialize()
 	setCurrentFontDefault(kAssetsFonts.twinbee)
-	playdate.graphics.setFontTracking(1)
+	gfx.setFontTracking(1)
 	
 	topLevelWidget = Widget.new(WidgetMain)
 	
-	playdate.timer.performAfterDelay(1, function()
+	timer.performAfterDelay(1, function()
 		topLevelWidget:load()
 	end)
 	
@@ -29,10 +32,10 @@ end
 function playdate.update()
 	math.randomseed(playdate.getSecondsSinceEpoch())
 	topLevelWidget:update()
-	playdate.graphics.sprite.update()
-	playdate.timer.updateTimers()
+	gfx.sprite.update()
+	timer.updateTimers()
 	playdate.frameTimer.updateTimers()
-	playdate.graphics.animation.blinker.updateAll()
+	gfx.animation.blinker.updateAll()
 	
 	if g.showCrankIndicator ~= false then
 		if playdate.ui.crankIndicator.bubbleX == nil then

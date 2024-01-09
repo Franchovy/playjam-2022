@@ -3,7 +3,9 @@ import "constant"
 import "playdate"
 import "utils/periodicBlinker"
 
-class('KillBlock').extends(playdate.graphics.sprite)
+local gfx <const> = playdate.graphics
+
+class('KillBlock').extends(gfx.sprite)
 
 local image
 local imageInverted
@@ -17,11 +19,11 @@ function KillBlock:init(periodicBlinker)
 	self.type = kSpriteTypes.killBlock
 	
 	if image == nil then
-		image = playdate.graphics.image.new(kAssetsImages.killBlock)
+		image = gfx.image.new(kAssetsImages.killBlock)
 	end
 	
 	if imageInverted == nil then
-		imageInverted = playdate.graphics.image.new(kAssetsImages.killBlock):invertedImage()
+		imageInverted = gfx.image.new(kAssetsImages.killBlock):invertedImage()
 	end
 	
 	self:setImage(image)

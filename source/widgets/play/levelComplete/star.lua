@@ -1,3 +1,5 @@
+local gfx <const> = playdate.graphics
+local timer <const> = playdate.timer
 class("WidgetStar").extends(Widget)
 
 function WidgetStar:init(config)
@@ -29,9 +31,9 @@ function WidgetStar:init(config)
 end
 
 function WidgetStar:_load()
-	self.imagetables.star = playdate.graphics.imagetable.new(kAssetsImages.star)
+	self.imagetables.star = gfx.imagetable.new(kAssetsImages.star)
 	
-	self.timers.timer = playdate.timer.new(self.timerDuration)
+	self.timers.timer = timer.new(self.timerDuration)
 	self.timers.timer:pause()
 	
 	function self:isAnimating()

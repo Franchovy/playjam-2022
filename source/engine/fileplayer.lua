@@ -1,12 +1,14 @@
 import "settings"
 
+local sound <const> = playdate.sound
+
 class("FilePlayer").extends()
 
 FilePlayer._fileplayers = table.weakValuesTable()
 
 function FilePlayer:init(loopPath, introPath)
 	if introPath ~= nil then
-		self.intro = playdate.sound.fileplayer.new(introPath)
+		self.intro = sound.fileplayer.new(introPath)
 		self.intro:setFinishCallback(function() self:onIntroFinished() end)
 		
 		-- Load File
@@ -14,7 +16,7 @@ function FilePlayer:init(loopPath, introPath)
 		self.intro:pause()
 	end
 	
-	self.loop = playdate.sound.fileplayer.new(loopPath)
+	self.loop = sound.fileplayer.new(loopPath)
 	
 	-- Load File
 	self.loop:play(0)

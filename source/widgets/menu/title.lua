@@ -1,6 +1,10 @@
 import "utils/rect"
 import "utils/position"
 
+local gfx <const> = playdate.graphics
+local easing <const> = playdate.easingFunctions
+local geo <const> = playdate.geometry
+
 class("WidgetTitle").extends(Widget)
 
 function WidgetTitle:init()
@@ -21,50 +25,50 @@ function WidgetTitle:init()
 end
 
 function WidgetTitle:_load()
-	self.imagetables.particles = playdate.graphics.imagetable.new(kAssetsImages.particles)
-	self.imagetables.wheel = playdate.graphics.imagetable.new(kAssetsImages.wheel):scaled(2)
-	self.images.backgroundImage = playdate.graphics.image.new(kAssetsImages.background)
-	self.images.backgroundImage2 = playdate.graphics.image.new(kAssetsImages.background2)
-	self.images.backgroundImage3 = playdate.graphics.image.new(kAssetsImages.background3)
-	self.images.backgroundImage4 = playdate.graphics.image.new(kAssetsImages.background4)
-	self.images.textImage = playdate.graphics.imageWithText("WHEEL RUNNER", 400, 100):scaledImage(3)
-	self.images.pressStart = playdate.graphics.imageWithText("PRESS A", 200, 60):scaledImage(2)
+	self.imagetables.particles = gfx.imagetable.new(kAssetsImages.particles)
+	self.imagetables.wheel = gfx.imagetable.new(kAssetsImages.wheel):scaled(2)
+	self.images.backgroundImage = gfx.image.new(kAssetsImages.background)
+	self.images.backgroundImage2 = gfx.image.new(kAssetsImages.background2)
+	self.images.backgroundImage3 = gfx.image.new(kAssetsImages.background3)
+	self.images.backgroundImage4 = gfx.image.new(kAssetsImages.background4)
+	self.images.textImage = gfx.imageWithText("WHEEL RUNNER", 400, 100):scaledImage(3)
+	self.images.pressStart = gfx.imageWithText("PRESS A", 200, 60):scaledImage(2)
 	
 	-- Painter Button
 	
 	local painterButtonFill = Painter(function(rect, state)
 		if state.tick == 0 then
 			-- press a button fill
-			playdate.graphics.setColor(playdate.graphics.kColorWhite)
-			playdate.graphics.setDitherPattern(0.8, playdate.graphics.image.kDitherTypeDiagonalLine)
-			playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
+			gfx.setColor(gfx.kColorWhite)
+			gfx.setDitherPattern(0.8, gfx.image.kDitherTypeDiagonalLine)
+			gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
 		else
 			-- press a button fill
-			playdate.graphics.setColor(playdate.graphics.kColorWhite)
-			playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
-			playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
+			gfx.setColor(gfx.kColorWhite)
+			gfx.setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
+			gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
 		end
 	end)
 	
 	local painterButtonOutline = Painter(function(rect, state)
 		if state.tick == 0 then
 			-- press a button outline
-			playdate.graphics.setColor(playdate.graphics.kColorBlack)
-			playdate.graphics.setDitherPattern(0.2, playdate.graphics.image.kDitherTypeDiagonalLine)
-			playdate.graphics.setLineWidth(3)
-			playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
+			gfx.setColor(gfx.kColorBlack)
+			gfx.setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
+			gfx.setLineWidth(3)
+			gfx.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
 		else
 			-- press a button outline
-			playdate.graphics.setColor(playdate.graphics.kColorBlack)
-			playdate.graphics.setLineWidth(3)
-			playdate.graphics.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
+			gfx.setColor(gfx.kColorBlack)
+			gfx.setLineWidth(3)
+			gfx.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 6)
 		end
 	end)
 	
 	local painterButtonPressStart = Painter(function(rect, state)
 		if state.tick == 0 then
 			-- press a text
-			self.images.pressStart:drawFaded(rect.x, rect.y, 0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
+			self.images.pressStart:drawFaded(rect.x, rect.y, 0.3, gfx.image.kDitherTypeDiagonalLine)
 		else
 			-- press a text
 			self.images.pressStart:draw(rect.x, rect.y)
@@ -83,33 +87,33 @@ function WidgetTitle:_load()
 	-- Painter Background
 	
 	self.painterBackground1 = Painter(function(rect, state)
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.4, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillRect(rect.x, rect.y, rect.w, rect.h)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0.4, gfx.image.kDitherTypeDiagonalLine)
+		gfx.fillRect(rect.x, rect.y, rect.w, rect.h)
 	end)
 	
 	self.painterBackground2 = Painter(function(rect, state)
 		-- background - right hill
 		local offsetRect = Rect.offset(rect, 0, -10)
-		self.images.backgroundImage3:drawFaded(offsetRect.x, offsetRect.y, 0.4, playdate.graphics.image.kDitherTypeBayer8x8)
+		self.images.backgroundImage3:drawFaded(offsetRect.x, offsetRect.y, 0.4, gfx.image.kDitherTypeBayer8x8)
 	end)
 	
 	self.painterBackground3 = Painter(function(rect, state)
 		local offsetRect = Rect.offset(rect, 5, 0)
 		-- background - flashing lights
 		if state.tick == 0 then
-			self.images.backgroundImage2:drawFaded(offsetRect.x, offsetRect.y, 0.6, playdate.graphics.image.kDitherTypeDiagonalLine)
+			self.images.backgroundImage2:drawFaded(offsetRect.x, offsetRect.y, 0.6, gfx.image.kDitherTypeDiagonalLine)
 		else
-			self.images.backgroundImage2:invertedImage():drawFaded(offsetRect.x, offsetRect.y, 0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
+			self.images.backgroundImage2:invertedImage():drawFaded(offsetRect.x, offsetRect.y, 0.3, gfx.image.kDitherTypeDiagonalLine)
 		end
 	end)
 	
 	self.painterBackground4 = Painter(function(rect, state)
 		local offsetRect = Rect.offset(rect, -20, 120)
 		-- background - left hill
-		self.images.backgroundImage4:drawFaded(offsetRect.x, offsetRect.y, 0.9, playdate.graphics.image.kDitherTypeBayer4x4)
+		self.images.backgroundImage4:drawFaded(offsetRect.x, offsetRect.y, 0.9, gfx.image.kDitherTypeBayer4x4)
 	end)
 	
 	self.painterBackgroundAssets = Painter(function(rect, state)
@@ -122,18 +126,18 @@ function WidgetTitle:_load()
 	
 	local painterTitleRectangleOutline = Painter(function(rect, state)
 		-- title rectangle outline
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillRect(0, 0, rect.w, rect.h)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillRect(0, 0, rect.w, rect.h)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0.3, gfx.image.kDitherTypeDiagonalLine)
+		gfx.fillRect(rect.x, rect.y, rect.w, rect.h)
 	end)
 	
 	local painterTitleRectangleFill = Painter(function(rect, state)
 		-- title rectangle fill
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRect(rect.x, rect.y, rect.w, rect.h)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.setDitherPattern(0.3, gfx.image.kDitherTypeDiagonalLine)
+		gfx.fillRect(rect.x, rect.y, rect.w, rect.h)
 	end)
 	
 	local painterTitleText = Painter(function(rect, state)
@@ -156,43 +160,43 @@ end
 
 function WidgetTitle:_animate(animation, queueFinishedCallback)
 	if animation == self.kAnimations.onFirstOpen then
-		self.animators.animator1 = playdate.graphics.animator.new(800, 240, 0, playdate.easingFunctions.outExpo, 100)
-		self.animators.animator2 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outExpo, 500)
-		self.animators.animator3 = playdate.graphics.animator.new(800, 150, 0, playdate.easingFunctions.outCirc, 1000)
-		self.animators.animatorWheel = playdate.graphics.animator.new(
+		self.animators.animator1 = gfx.animator.new(800, 240, 0, easing.outExpo, 100)
+		self.animators.animator2 = gfx.animator.new(800, 150, 0, easing.outExpo, 500)
+		self.animators.animator3 = gfx.animator.new(800, 150, 0, easing.outCirc, 1000)
+		self.animators.animatorWheel = gfx.animator.new(
 			800, 
-			playdate.geometry.point.new(-200, -30), 
-			playdate.geometry.point.new(0, 0), 
-			playdate.easingFunctions.outQuad, 
+			geo.point.new(-200, -30), 
+			geo.point.new(0, 0), 
+			easing.outQuad, 
 			800
 		)
 		
 		queueFinishedCallback(1800)
 	elseif animation == self.kAnimations.fromLevelSelect then
-		self.animators.animatorOut = playdate.graphics.animator.new(
+		self.animators.animatorOut = gfx.animator.new(
 			800, 
 			math.min(240, self.animators.animatorOut:currentValue()), 
 			0, 
-			playdate.easingFunctions.outExpo, 
+			easing.outExpo, 
 			200
 		)
-		self.animators.animatorOutWheel = playdate.graphics.animator.new(0, playdate.geometry.point.new(0, 0), playdate.geometry.point.new(0, 0), playdate.easingFunctions.outCirc, 0)
+		self.animators.animatorOutWheel = gfx.animator.new(0, geo.point.new(0, 0), geo.point.new(0, 0), easing.outCirc, 0)
 		self.animators.animatorWheel:reset()
 		
 		queueFinishedCallback(1000)
 	elseif animation == self.kAnimations.toLevelSelect then
 		local animatorValue = self:getAnimatorValue(self.animators.animatorOut)
-		self.animators.animatorOut = playdate.graphics.animator.new(
+		self.animators.animatorOut = gfx.animator.new(
 			800, 
 			math.max(0, animatorValue), 
 			240, 
-			playdate.easingFunctions.inExpo, 200
+			easing.inExpo, 200
 		)
-		self.animators.animatorOutWheel = playdate.graphics.animator.new(
+		self.animators.animatorOutWheel = gfx.animator.new(
 			800, 
-			playdate.geometry.point.new(0, 0), 
-			playdate.geometry.point.new(450, 100),  
-			playdate.easingFunctions.inQuad, 
+			geo.point.new(0, 0), 
+			geo.point.new(450, 100),  
+			easing.inQuad, 
 			500
 		)
 		
@@ -233,13 +237,13 @@ function WidgetTitle:_update()
 	end
 	
 	if self.tick ~= tickPrevious then
-		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+		gfx.sprite.addDirtyRect(0, 0, 400, 240)
 	end
 	
 	self.painters.painterWheel:markDirty()
 	self.painters.painterButton:markDirty()
 	
 	if self:isAnimating() == true then
-		playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+		gfx.sprite.addDirtyRect(0, 0, 400, 240)
 	end
 end

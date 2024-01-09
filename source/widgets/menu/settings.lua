@@ -1,5 +1,7 @@
 import "settings/entry"
 
+local gfx <const> = playdate.graphics
+
 class("WidgetMenuSettings").extends(Widget)
 
 WidgetMenuSettings.type = {
@@ -23,34 +25,34 @@ end
 
 function WidgetMenuSettings:_load()
 	self.painters.frame = Painter(function(rect)
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.7, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0.7, gfx.image.kDitherTypeDiagonalLine)
+		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
-		playdate.graphics.drawTextAligned("SETTINGS MENU", rect.x + rect.w / 2, rect.y + rect.h / 2, kTextAlignment.center)
+		gfx.drawTextAligned("SETTINGS MENU", rect.x + rect.w / 2, rect.y + rect.h / 2, kTextAlignment.center)
 	end)
 	
-	local imageScrew1 = playdate.graphics.image.new(kAssetsImages.screw)
+	local imageScrew1 = gfx.image.new(kAssetsImages.screw)
 	
 	local painterCardOutline = Painter(function(rect)
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.7, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0.7, gfx.image.kDitherTypeDiagonalLine)
+		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
 		local rectBorder = Rect.inset(rect, 10, 14)
 		local rectBorderInner = Rect.inset(rectBorder, 4, 6)
 		local rectBorderInnerShadow = Rect.offset(rectBorderInner, -1, -1)
 		
-		playdate.graphics.setColor(playdate.graphics.kColorBlack)
-		playdate.graphics.setDitherPattern(0.3, playdate.graphics.image.kDitherTypeDiagonalLine)
-		playdate.graphics.setLineWidth(3)
-		playdate.graphics.drawRoundRect(rectBorderInnerShadow.x, rectBorderInnerShadow.y, rectBorderInnerShadow.w, rectBorderInnerShadow.h, 6)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0.3, gfx.image.kDitherTypeDiagonalLine)
+		gfx.setLineWidth(3)
+		gfx.drawRoundRect(rectBorderInnerShadow.x, rectBorderInnerShadow.y, rectBorderInnerShadow.w, rectBorderInnerShadow.h, 6)
 		
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillRoundRect(rectBorderInner.x, rectBorderInner.y, rectBorderInner.w, rectBorderInner.h, 6)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillRoundRect(rectBorderInner.x, rectBorderInner.y, rectBorderInner.w, rectBorderInner.h, 6)
 		
 		local size = imageScrew1:getSize()
 		imageScrew1:rotatedImage(90):draw(rect.x + 4, rect.y + 4)
@@ -62,8 +64,8 @@ function WidgetMenuSettings:_load()
 	self.painters.card = Painter(function(rect)
 		-- Painter background
 		
-		playdate.graphics.setColor(playdate.graphics.kColorWhite)
-		playdate.graphics.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
 		painterCardOutline:draw(rect)
 	end)
@@ -165,5 +167,5 @@ function WidgetMenuSettings:_changeState(stateFrom, stateTo)
 	self.entries[stateFrom]:setState(self.entries[stateFrom].kStateKeys.isSelected, self.entries[stateFrom].kStates.isSelected.unselected)
 	self.entries[stateTo]:setState(self.entries[stateTo].kStateKeys.isSelected, self.entries[stateTo].kStates.isSelected.selected)
 	
-	playdate.graphics.sprite.addDirtyRect(0, 0, 400, 240)
+	gfx.sprite.addDirtyRect(0, 0, 400, 240)
 end

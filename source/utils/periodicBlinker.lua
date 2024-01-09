@@ -1,10 +1,12 @@
+local timer <const> = playdate.timer
+local gfx <const> = playdate.graphics
 
 -- Creates a blinker and a timer that restarts the blinker periodically. Returns blinker, timer, and a destroy method that can be called to remove both.
 function periodicBlinker(blinkerConfig, delay)
 	-- blinker "loop" parameter cannot be false.
 	assert(blinkerConfig.loop ~= true)
 	
-	local blinker = playdate.graphics.animation.blinker.new(
+	local blinker = gfx.animation.blinker.new(
 		blinkerConfig.onDuration,
 		blinkerConfig.offDuration,
 		blinkerConfig.loop,
@@ -16,7 +18,7 @@ function periodicBlinker(blinkerConfig, delay)
 		blinker.onDuration + blinker.offDuration) * blinker.cycles / 2
 	local timerDelay = blinkerDuration + delay
 	
-	local timer = playdate.timer.new(timerDelay)
+	local timer = timer.new(timerDelay)
 	timer.repeats = true
 	timer.discardOnCompletion = false
 	

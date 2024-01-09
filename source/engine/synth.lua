@@ -1,5 +1,7 @@
 import "settings"
 
+local sound <const> = playdate.sound
+
 synth = {
 	_synthData = {},
 	config = {
@@ -8,7 +10,7 @@ synth = {
 }
 
 function synth:create(key, config)
-	local player = playdate.sound.synth.new(config.sample)
+	local player = sound.synth.new(config.sample)
 	player:setAttack(config.attack)
 	player:setDecay(config.decay)
 	

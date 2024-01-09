@@ -1,7 +1,9 @@
 import "engine"
 import "constant"
 
-class('Platform').extends(playdate.graphics.sprite)
+local gfx <const> = playdate.graphics
+
+class('Platform').extends(gfx.sprite)
 
 local platformImage
 
@@ -11,7 +13,7 @@ end
 
 function Platform:init()
 	if platformImage == nil then
-		platformImage = playdate.graphics.image.new(kAssetsImages.platform)
+		platformImage = gfx.image.new(kAssetsImages.platform)
 	end
 	
 	Platform.super.init(self, platformImage)

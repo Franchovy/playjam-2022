@@ -1,7 +1,8 @@
+local gfx <const> = playdate.graphics
 function getColorDrawModeFill(color)
-	if color == playdate.graphics.kColorWhite then
-		return playdate.graphics.kDrawModeFillWhite
-	elseif color == playdate.graphics.kColorBlack then
-		return playdate.graphics.kDrawModeFillBlack
+	if color == gfx.kColorWhite then
+		return gfx.kDrawModeFillWhite
+	elseif color == gfx.kColorBlack then
+		return gfx.kDrawModeFillBlack
 	end
 end
