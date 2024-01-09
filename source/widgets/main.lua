@@ -176,7 +176,7 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 			
 			if self.children.play == nil then
 				self.children.menu:unload()
-				--self.children.menu = nil
+				self.children.menu = nil
 				
 				collectgarbage("collect")
 				
@@ -187,10 +187,12 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 				self.children.play.signals.returnToMenu = self.onReturnToMenu
 				self.children.play.signals.getNextLevelConfig = self.getNextLevelConfig
 				
-				self.children.transition:setState(self.children.transition.kStates.open)
-				self.children.transition.signals.animationFinished = function()
-					self.children.transition:setVisible(false)
-				end
+				playdate.timer.performAfterDelay(100, function()
+					self.children.transition:setState(self.children.transition.kStates.open)
+					self.children.transition.signals.animationFinished = function()
+						self.children.transition:setVisible(false)
+					end
+				end)
 			end
 		end
 	elseif stateFrom == self.kStates.play and (stateTo == self.kStates.menu) then
