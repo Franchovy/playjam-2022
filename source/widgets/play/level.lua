@@ -12,8 +12,9 @@ function WidgetLevel:init(config)
 	self:setStateInitial({
 		ready = 1,
 		playing = 2,
-		--frozen = 3,
-		unloaded = 4
+		unloaded = 3,
+		restartCheckpoint = 4,
+		restartLevel = 5,
 	}, 1)
 	
 	self.sprites = {}
@@ -137,6 +138,7 @@ function WidgetLevel:_load()
 	
 	self.loadIndex = 1
 	
+	self.wheel.positionInitial = self.wheel.position 
 	self.resetWheel()
 	self:updateDrawOffset(self.wheel.position.x)
 end
@@ -174,13 +176,44 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.ready and (stateTo == self.kStates.playing) then
 		self.wheel.sprite.ignoresPlayerInput = false
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.unloaded) then
-		self.spriteCycler:unloadAll()
-
 		self.periodicBlinker:stop()
+
+		self.spriteCycler:unloadAll()
 		
-		--self.wheel.sprite:remove()
-	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.ready) then
+		self.spriteCycler:discardLoadConfig(self.loadIndex)
+		self.loadIndex -= 1
 		
+	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.restartCheckpoint) then
+		self.loadIndex += 1
+	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.restartLevel) then
+		self.spriteCycler:discardLoadConfig(1, self.loadIndex)
+		self.loadIndex = 1
+		self.previousLoadPoint = nil
+		self.wheel.position = self.wheel.positionInitial
+	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.nextLevel) then
+		self.spriteCycler:discardLoadConfig(1, self.loadIndex)
+		self.loadIndex = 1
+		self.previousLoadPoint = nil
+		
+		self.wheel.sprite:remove()
+		self.wheel.sprite = nil
+		self.wheel = nil
+		
+		local mt = { __gc = function() print("Garbage collected previous level") end}
+		setmetatable(self.levelObjects, mt)
+		self.levelObjects = nil
+		
+		self.levelObjects = LogicalSprite.loadObjects(self.config.objects)
+		self.spriteCycler:load(self.levelObjects)
+		self.configHandler:load(self.levelObjects)
+		
+		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
+		self.spriteCycler:loadInitialSprites(initialChunk, 1, self.loadIndex)
+		
+		self.wheel.positionInitial = self.wheel.position 
+		self.resetWheel()
+		self:updateDrawOffset(self.wheel.position.x)
+	elseif (stateFrom == self.kStates.restartCheckpoint or (stateFrom == self.kStates.restartLevel)) and (stateTo == self.kStates.ready) then
 		self.periodicBlinker:start()
 		
 		-- Initialize sprite cycling using initial wheel position

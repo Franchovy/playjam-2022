@@ -149,6 +149,10 @@ function WidgetPlay:_load()
 	
 	self.timers.levelTimer = timer.new(999000)
 	self.timers.levelTimer:pause()
+	
+	timer.performAfterDelay(4000, function()
+		self:setState(self.kStates.levelComplete)
+	end)
 end
 
 function WidgetPlay:_draw(rect)
@@ -186,8 +190,8 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		self.children.transition.signals.animationFinished = function()
 			self.children.gameOver:setVisible(false)
 			
+			self.children.level:setState(self.children.level.kStates.restartCheckpoint)
 			self.children.level:setState(self.children.level.kStates.ready)
-			self.children.level.loadIndex += 1
 
 			collectgarbage("collect")
 			
@@ -219,9 +223,6 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				self.data.coins = checkpointData.coins
 				self.data.time = checkpointData.time
 				self.timers.levelTimer:reset()
-				
-				self.children.level.spriteCycler:discardLoadConfig(self.children.level.loadIndex)
-				self.children.level.loadIndex -= 1
 				
 				self.children.level:setState(self.children.level.kStates.unloaded)
 				
@@ -324,19 +325,17 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				self.children.gameOver:setVisible(false)
 			end
 			
-			if stateFrom == self.kStates.levelComplete then
-				self.loadTheme()
-				self.resetData()
-			end
+			self.resetData()
 			
 			self.children.level:setState(self.children.level.kStates.unloaded)
 			
-			self.children.level.spriteCycler:discardLoadConfig(1, self.children.level.loadIndex)
-			self.children.level.loadIndex = 1
-			self.children.level.previousLoadPoint = nil
+			if stateFrom == self.kStates.levelComplete then
+				self.loadTheme()
+				self.children.level:setState(self.children.level.kStates.nextLevel)
+			else
+				self.children.level:setState(self.children.level.kStates.restartLevel)
+			end
 			
-			self.data.coins = 0
-			self.data.time = 0
 			self.timers.levelTimer:reset()
 			self.children.level:setState(self.children.level.kStates.ready)
 			
