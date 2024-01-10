@@ -220,7 +220,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				self.data.time = checkpointData.time
 				self.timers.levelTimer:reset()
 				
-				self.children.level.spriteCycler:discardConfigForIndexes({self.children.level.loadIndex})
+				self.children.level.spriteCycler:discardLoadConfig(self.children.level.loadIndex)
 				self.children.level.loadIndex -= 1
 				
 				self.children.level:setState(self.children.level.kStates.unloaded)
@@ -331,11 +331,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			
 			self.children.level:setState(self.children.level.kStates.unloaded)
 			
-			local loadedIndexes = {}
-			for i=1, self.children.level.loadIndex do
-				table.insert(loadedIndexes, i)
-			end
-			self.children.level.spriteCycler:discardConfigForIndexes(loadedIndexes)
+			self.children.level.spriteCycler:discardLoadConfig(1, self.children.level.loadIndex)
 			self.children.level.loadIndex = 1
 			self.children.level.previousLoadPoint = nil
 			
