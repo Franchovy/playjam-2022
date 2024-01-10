@@ -14,11 +14,15 @@ local _removevalue <const> = table.removevalue
 local generationConfig = { left = 1, right = 2 }
 
 function SpriteCycler:init(chunkLength, recycledSpriteIds, createSpriteCallback)
-	self.chunksLoaded = {}
-	self.spritesToRecycle = {}
+	self.chunksLoaded = table.create(16, 4)
 	self.chunkLength = chunkLength
-	self.recycledSpriteIds = recycledSpriteIds
 	self.createSpriteCallback = createSpriteCallback
+	
+	self.spritesToRecycle = table.create(0, #recycledSpriteIds)
+	for _, spriteId in pairs(recycledSpriteIds) do
+		self.spritesToRecycle[spriteId] = table.create(32, 0)
+	end
+	
 	self.spritesWithConfig = { ["coin"] = true, ["checkpoint"] = true }
 	self.spritesPersisted = { ["player"] = true }
 end
@@ -28,7 +32,7 @@ end
 -- Returns the chunk where the first sprite with id is found. Useful for getting the starting chunk of a level.
 function SpriteCycler:getFirstInstanceChunk(id)
 	for k, chunk in pairs(self.data) do
-		for _, object in pairs(chunk[1]) do
+		for _, object in pairs(chunk) do
 			if object.id == id then
 				return k
 			end
@@ -44,18 +48,39 @@ function SpriteCycler:load(objects)
 	
 	-- Load chunks from level config
 	
-	local chunksData = self:getChunksDataForLevel(objects, self.chunkLength)
+	local data = table.create(16, 5)
+	local _chunkLength = self.chunkLength
+	
+	for _, object in pairs(objects) do
+		-- Create Chunk in level chunks
+		chunk = _ceil((object.position.x) / _chunkLength)
+		
+		-- Create chunk if needed
+		if data[chunk] == nil then
+			data[chunk] = table.create(60, 0)
+		end
+		
+		-- Create and insert object data
+		
+		local spriteData = {
+			id = object.id,
+			position = {
+				x = object.position.x,
+				y = object.position.y,
+			},
+			config = object.config,
+			isActive = false,
+			sprite = nil
+		}
+		
+		_insert(data[chunk], spriteData)
+	end
 	
 	-- Create Empty chunks if needed
 	
-	self:fillEmptyChunks(chunksData)
+	--self:fillEmptyChunks(data)
 	
-	-- Load item IDs for recycling sprites
-	for _, v in pairs(self.recycledSpriteIds) do
-		self.spritesToRecycle[v] = {}
-	end
-	
-	self.data = chunksData
+	self.data = data
 end
 
 function SpriteCycler:preloadSprites(...)
@@ -121,7 +146,7 @@ function SpriteCycler:saveConfigWithIndex(loadIndex)
 	print("Saving with load index: ".. loadIndex)
 	local count = 0
 	for _, chunk in pairs(self.chunksLoaded) do
-		for _, object in pairs(self.data[chunk][1]) do
+		for _, object in pairs(self.data[chunk]) do
 			if object.sprite ~= nil and (self.spritesWithConfig[object.id] == true) then
 				local sprite = object.sprite
 
@@ -139,10 +164,14 @@ function SpriteCycler:saveConfigWithIndex(loadIndex)
 	print("Saved config for ".. count.. " sprites.")
 end
 
-function SpriteCycler:discardConfigForIndexes(loadIndexes)
-	for _, i in pairs(loadIndexes) do
+function SpriteCycler:discardLoadConfig(loadIndexStart, loadIndexFinish)
+	if loadIndexFinish == nil then
+		loadIndexFinish = loadIndexStart
+	end
+	
+	for i=loadIndexStart, loadIndexFinish do
 		for k, chunk in pairs(self.data) do
-			for _, object in pairs(chunk[1]) do
+			for _, object in pairs(chunk) do
 				if object.config[i] ~= nil then
 					for k, _ in pairs(object.config[i]) do 
 						object.config[i].k = nil

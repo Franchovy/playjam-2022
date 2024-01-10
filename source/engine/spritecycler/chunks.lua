@@ -1,23 +1,4 @@
 
-function SpriteCycler:getChunksDataForLevel(objects, chunkLength)
-	local chunksData = {}
-	
-	for _, object in pairs(objects) do
-		-- Create Chunk in level chunks
-		chunkIndexX = math.ceil((object.position.x) / chunkLength)
-		chunkIndexY = math.ceil((object.position.y + 1) / chunkLength)
-		
-		-- Create chunk if needed
-		table.setIfNil(chunksData, chunkIndexX)
-		table.setIfNil(chunksData[chunkIndexX], chunkIndexY)
-		
-		-- Insert object data
-		local spriteData = self:spritePositionData(object)
-		table.insert(chunksData[chunkIndexX][chunkIndexY], spriteData)
-	end
-	
-	return chunksData
-end
 
 function SpriteCycler:fillEmptyChunks(chunksData)
 	local chunkIndexesX = {}
