@@ -1,3 +1,5 @@
+import "logicalSprite"
+
 class("SpriteCycler").extends()
 
 local _ceil <const> = math.ceil
@@ -121,16 +123,7 @@ function SpriteCycler:load(objects)
 		
 		-- Create and insert object data
 		
-		local spriteData = {
-			id = object.id,
-			position = {
-				x = object.position.x,
-				y = object.position.y,
-			},
-			config = object.config,
-			isActive = false,
-			sprite = nil
-		}
+		local spriteData = LogicalSprite(object)
 		
 		_insert(data[chunk], spriteData)
 	end
