@@ -50,7 +50,7 @@ local function _loadChunk(self, chunk, shouldLoad, loadIndex)
 					config = _getIndexedConfig(object.config, loadIndex)
 				end
 				
-				object.sprite = _createSpriteCallback(object.id, object.position, config, spriteToRecycle)
+				object.sprite = _createSpriteCallback(object.id, object.position, object, config, spriteToRecycle)
 			else
 				-- UNLOAD SPRITE
 				local sprite = _removekey(object, "sprite")
@@ -95,7 +95,7 @@ function SpriteCycler:getFirstInstanceChunk(id)
 	for k, chunk in pairs(self.data) do
 		for _, object in pairs(chunk) do
 			if object.id == id then
-				return k
+				return math.ceil(object.position.x / self.chunkLength)
 			end
 		end
 	end

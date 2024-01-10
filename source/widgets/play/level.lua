@@ -30,12 +30,11 @@ function WidgetLevel:_load()
 	
 	-- Wheel setup
 	
-	function setupSpriteWheel(wheel)
-		self.wheel = wheel
-		
+	function _setupWheelSpriteSignals(wheel)		
 		wheel.signals.onTouchCheckpoint = function()
-			local position = self.wheel:getRecentCheckpoint()
+			local position = wheel:getRecentCheckpoint()
 			self.previousLoadPoint = { x = position.x / kGame.gridSize, y = position.y / kGame.gridSize }
+			self.wheel.position = self.previousLoadPoint
 			
 			self.spriteCycler:saveConfigWithIndex(self.loadIndex)
 			
@@ -55,12 +54,17 @@ function WidgetLevel:_load()
 		end
 	end
 	
+	self.resetWheel = function()
+		self.wheel.sprite:resetValues()
+		self.wheel.sprite:setAwaitingInput()
+	end
+	
 	-- Sprite Cycler
 	
 	local chunkLength = AppConfig["chunkLength"]
 	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint", "levelEnd"}
 	
-	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, config, spriteToRecycle)
+	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, levelObject, config, spriteToRecycle)
 		local sprite = spriteToRecycle;
 		
 		if sprite == nil then
@@ -74,19 +78,11 @@ function WidgetLevel:_load()
 			elseif id == "checkpoint" then
 				sprite = Checkpoint.new()
 			elseif id == "player" then
-				if self.wheel == nil then
-					sprite = Wheel.new()
-				else
-					sprite = self.wheel
-				end
+				assert(self.wheel == nil)
+				self.wheel = levelObject
 				
-				sprite:resetValues()
-				sprite:setAwaitingInput()
-				setupSpriteWheel(sprite)
-				
-				if self.previousLoadPoint ~= nil then
-					position = self.previousLoadPoint
-				end
+				sprite = Wheel.new()
+				_setupWheelSpriteSignals(sprite)
 			elseif id == "levelEnd" then
 				sprite = LevelEnd.new()
 			else 
@@ -140,7 +136,9 @@ function WidgetLevel:_load()
 	--
 	
 	self.loadIndex = 1
-	gfx.setDrawOffset(initialChunk * chunkLength - 100, 0)
+	
+	self.resetWheel()
+	self:updateDrawOffset(self.wheel.position.x)
 end
 
 function WidgetLevel:_update()
@@ -149,7 +147,7 @@ function WidgetLevel:_update()
 	end
 	
 	if self.state == self.kStates.ready then
-		self:updateDrawOffset()
+		self:updateDrawOffset(self.wheel.position.x * kGame.gridSize)
 		
 		if playdate.buttonIsPressed(playdate.kButtonA) or (math.abs(playdate.getCrankChange()) > 5) then
 			self.signals.startPlaying()
@@ -162,48 +160,47 @@ function WidgetLevel:_update()
 	self.spriteCycler:update(drawOffsetX, drawOffsetY, self.loadIndex)
 	
 	if self.state == self.kStates.playing then
-		local updatedCoinCount = self.wheel:getCoinCountUpdate()
+		local updatedCoinCount = self.wheel.sprite:getCoinCountUpdate()
 		
 		if updatedCoinCount > 0 then
 			self.signals.collectCoin(updatedCoinCount)
 		end
 		
-		self:updateDrawOffset()
+		self:updateDrawOffset(self.wheel.sprite.x)
 	end
 end
 
 function WidgetLevel:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.ready and (stateTo == self.kStates.playing) then
-		self.wheel.ignoresPlayerInput = false
+		self.wheel.sprite.ignoresPlayerInput = false
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.unloaded) then
 		self.spriteCycler:unloadAll()
 
 		self.periodicBlinker:stop()
 		
-		self.wheel:remove()
+		--self.wheel.sprite:remove()
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.ready) then
 		
 		self.periodicBlinker:start()
 		
 		-- Initialize sprite cycling using initial wheel position
 		
-		self.spriteCycler:load(self.config.objects)
-		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		
 		self.spriteCycler:loadInitialSprites(initialChunk, 1, self.loadIndex)
 		
-		self:updateDrawOffset()
+		self.wheel.sprite:moveTo(self.wheel.position.x * kGame.gridSize, self.wheel.position.y * kGame.gridSize)
+		self.resetWheel()
 	end
 end
 
-function WidgetLevel:updateDrawOffset()
+function WidgetLevel:updateDrawOffset(x)
 	local drawOffset = gfx.getDrawOffset()
-	local relativeX = self.wheel.x + drawOffset
+	local relativeX = x + drawOffset
 	if relativeX > 150 then
-		gfx.setDrawOffset(-self.wheel.x + 150, 0)
+		gfx.setDrawOffset(-x + 150, 0)
 	elseif relativeX < 80 then
-		gfx.setDrawOffset(-self.wheel.x + 80, 0)
+		gfx.setDrawOffset(-x + 80, 0)
 	end
 end
 
@@ -212,5 +209,5 @@ function WidgetLevel:_unload()
 	
 	self.periodicBlinker:stop()
 	
-	self.wheel:remove()
+	self.wheel.sprite:remove()
 end
