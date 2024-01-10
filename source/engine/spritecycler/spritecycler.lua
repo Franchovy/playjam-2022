@@ -172,11 +172,7 @@ function SpriteCycler:discardLoadConfig(loadIndexStart, loadIndexFinish)
 	for i=loadIndexStart, loadIndexFinish do
 		for k, chunk in pairs(self.data) do
 			for _, object in pairs(chunk) do
-				if object.config[i] ~= nil then
-					for k, _ in pairs(object.config[i]) do 
-						object.config[i].k = nil
-					end
-				end
+				object.config[i] = nil
 			end
 		end
 	end
