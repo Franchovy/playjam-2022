@@ -3,7 +3,7 @@ function loadLevelFromFile(filepath)
 	
 	for _, object in pairs(config.objects) do
 		if object.config ~= nil then
-			local configArray = {}
+			local configArray = table.create(4, 1)
 			configArray[0] = object.config
 			object.config = configArray
 		end

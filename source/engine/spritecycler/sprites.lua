@@ -37,12 +37,14 @@ function SpriteCycler:chunkLoader(chunk, shouldLoad, loadIndex)
 		
 		if shouldLoad then
 			-- LOAD SPRITE
+			local spriteToRecycle
 			if _spritesToRecycle[object.id] ~= nil then
-				local spriteToRecycle = table.remove(_spritesToRecycle[object.id])
+				spriteToRecycle = table.remove(_spritesToRecycle[object.id])
 			end
 			
+			local config
 			if _spritesWithConfig[object.id] == true then
-				local config = _getIndexedConfig(self, object.config, loadIndex)
+				config = _getIndexedConfig(self, object.config, loadIndex)
 			end
 			
 			object.sprite = _createSpriteCallback(object.id, object.position, config, spriteToRecycle)
@@ -53,7 +55,7 @@ function SpriteCycler:chunkLoader(chunk, shouldLoad, loadIndex)
 			-- Save the active config to the active load index. Else, discard the active config.
 			if _spritesWithConfig[object.id] == true and (loadIndex ~= nil) then
 				if object.config[loadIndex] == nil then
-					object.config[loadIndex] = {}
+					object.config[loadIndex] = table.create(0, 1)
 				end
 				
 				sprite:writeConfig(object.config[loadIndex])
