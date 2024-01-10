@@ -198,9 +198,6 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 		self.wheel.sprite:remove()
 		self.wheel.sprite = nil
 		self.wheel = nil
-		
-		local mt = { __gc = function() print("Garbage collected previous level") end}
-		setmetatable(self.levelObjects, mt)
 		self.levelObjects = nil
 		
 		self.levelObjects = LogicalSprite.loadObjects(self.config.objects)
