@@ -1,8 +1,4 @@
 
-function SpriteCycler:chunkExists(x, y)
-	return (self.data[x] ~= nil) and (self.data[x][y] ~= nil)
-end
-
 function SpriteCycler:getChunksDataForLevel(objects, chunkLength)
 	local chunksData = {}
 	

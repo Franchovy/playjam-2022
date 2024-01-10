@@ -92,12 +92,8 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY, loadIndex)
 	-- Convert to grid coordinates
 	local drawOffsetX, drawOffsetY = (-drawOffsetX / kGame.gridSize), (drawOffsetY / kGame.gridSize)
 	
-	--
-	
 	local currentChunk = _ceil(drawOffsetX / self.chunkLength)
 	local chunksShouldLoad = _range(currentChunk - generationConfig.left, currentChunk + generationConfig.right)
-	
-	-- Get chunks to unload
 	
 	for _, chunk in pairs(chunksShouldLoad) do
 		if not _contains(self.chunksLoaded, chunk) then
@@ -115,27 +111,27 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY, loadIndex)
 end
 
 function SpriteCycler:unloadAll()
-	local count = self:unloadSpritesInChunksIfNeeded(self.chunksLoaded, nil)
-	print("Unloaded ".. count.. " sprites from level.")
+	for _, chunk in pairs(self.chunksLoaded) do
+		_chunkLoader(self, chunk, false, loadIndex)
+		_removevalue(self.chunksLoaded, chunk)
+	end
 end
 
 function SpriteCycler:saveConfigWithIndex(loadIndex)
 	print("Saving with load index: ".. loadIndex)
 	local count = 0
 	for _, chunk in pairs(self.chunksLoaded) do
-		if self:chunkExists(chunk, 1) then
-			for _, object in pairs(self.data[chunk][1]) do
-				if object.sprite ~= nil and (self.spritesWithConfig[object.id] == true) then
-					local sprite = object.sprite
+		for _, object in pairs(self.data[chunk][1]) do
+			if object.sprite ~= nil and (self.spritesWithConfig[object.id] == true) then
+				local sprite = object.sprite
 
-					if object.config[loadIndex] == nil then
-						object.config[loadIndex] = table.create(4, 0)
-					end
-
-					sprite:writeConfig(object.config[loadIndex])
-										
-					count += 1
+				if object.config[loadIndex] == nil then
+					object.config[loadIndex] = table.create(4, 0)
 				end
+
+				sprite:writeConfig(object.config[loadIndex])
+									
+				count += 1
 			end
 		end
 	end
@@ -145,11 +141,13 @@ end
 
 function SpriteCycler:discardConfigForIndexes(loadIndexes)
 	for _, i in pairs(loadIndexes) do
-		print("Discarding index: ".. i)
-		
 		for k, chunk in pairs(self.data) do
 			for _, object in pairs(chunk[1]) do
-				object.config[i] = nil
+				if object.config[i] ~= nil then
+					for k, _ in pairs(object.config[i]) do 
+						object.config[i].k = nil
+					end
+				end
 			end
 		end
 	end
