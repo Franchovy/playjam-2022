@@ -113,6 +113,9 @@ function WidgetLevel:_load()
 	self.levelObjects = LogicalSprite.loadObjects(self.config.objects)
 	self.spriteCycler:load(self.levelObjects)
 	
+	self.configHandler = ConfigHandler({"coin", "checkpoint"})
+	self.configHandler:load(self.levelObjects)
+	
 	--
 	
 	self.spriteCycler:preloadSprites({

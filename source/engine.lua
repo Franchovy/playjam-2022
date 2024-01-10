@@ -10,6 +10,8 @@ import "CoreLibs/timer"
 
 import "extensions"
 
+import "engine/configHandler"
+import "engine/logicalSprite"
 import "engine/fileplayer"
 import "engine/painter"
 import "engine/sampleplayer"
