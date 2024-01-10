@@ -136,7 +136,7 @@ function WidgetLevel:_load()
 	--
 	
 	self.loadIndex = 1
-	self:updateDrawOffset()
+	gfx.setDrawOffset(initialChunk * chunkLength - 100, 0)
 end
 
 function WidgetLevel:_update()

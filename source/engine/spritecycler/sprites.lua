@@ -1,6 +1,8 @@
 import "extensions"
 import "chunks"
 
+local _removekey = table.removekey
+
 function SpriteCycler:spritePositionData(object)
 	local spriteData = {
 		id = object.id,
@@ -14,6 +16,56 @@ function SpriteCycler:spritePositionData(object)
 	}
 	
 	return spriteData
+end
+
+function SpriteCycler:chunkLoader(chunk, shouldLoad, loadIndex)
+	local _chunkData = self.data[chunk][1]
+	local _spritesToRecycle = self.spritesToRecycle
+	local _spritesWithConfig = self.spritesWithConfig
+	local _createSpriteCallback = self.createSpriteCallback
+	local _getIndexedConfig = self.getIndexedConfig
+	local _recycleSprite = self.recycleSprite
+	local _spritesPersisted = self.spritesPersisted
+	
+	for _, object in pairs(_chunkData) do
+		if _spritesPersisted[object.id] == true and (object.sprite ~= nil) then
+			do break end
+		end
+			
+		assert(object.sprite == nil == shouldLoad, 
+			"A chunk's sprite did not correspond to its loaded state. Are you trying to load/unload an already loaded/unloaded chunk?")
+		
+		if shouldLoad then
+			-- LOAD SPRITE
+			if _spritesToRecycle[object.id] ~= nil then
+				local spriteToRecycle = table.remove(_spritesToRecycle[object.id])
+			end
+			
+			if _spritesWithConfig[object.id] == true then
+				local config = _getIndexedConfig(self, object.config, loadIndex)
+			end
+			
+			object.sprite = _createSpriteCallback(object.id, object.position, config, spriteToRecycle)
+		else
+			-- UNLOAD SPRITE
+			local sprite = _removekey(object, "sprite")
+			
+			-- Save the active config to the active load index. Else, discard the active config.
+			if _spritesWithConfig[object.id] == true and (loadIndex ~= nil) then
+				if object.config[loadIndex] == nil then
+					object.config[loadIndex] = {}
+				end
+				
+				sprite:writeConfig(object.config[loadIndex])
+			end
+			
+			sprite:remove()
+			
+			if _spritesToRecycle[object.id] ~= nil then
+				_recycleSprite(self, sprite, object.id)
+			end
+		end
+	end
 end
 
 function SpriteCycler:loadSpritesInChunksIfNeeded(chunksToLoad, loadIndex)
@@ -86,27 +138,6 @@ function SpriteCycler:unloadSpritesInChunksIfNeeded(chunksToUnload, loadIndex)
 	end
 	
 	return count
-end
-
-function SpriteCycler:createRecycledSprite(id)
-	local sprite = self.createSpriteCallback(id)
-	
-	table.insert(self.spritesToRecycle[id], sprite)
-end
-
-function SpriteCycler:getRecycledSprite(id) 
-	if self.spritesToRecycle[id] == nil then
-		-- sprite is not registered as recyclable
-		return nil
-	end
-	
-	if #self.spritesToRecycle[id] == 0 then
-		-- No sprites to recycle
-		return nil
-	end
-	
-	local sprite = table.remove(self.spritesToRecycle[id])
-	return sprite
 end
 
 function SpriteCycler:recycleSprite(sprite, id)

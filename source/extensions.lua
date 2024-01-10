@@ -104,6 +104,15 @@ function table.setIfNil(table, key)
 	end
 end
 
+-- Create a table with values from rangeStart to rangeEnd
+function table.range(rangeStart, rangeEnd)
+	local t = table.create(rangeEnd - rangeStart, 0)
+	for i=rangeStart, rangeEnd do
+		table.insert(t, i)
+	end
+	return t
+end
+
 function table.deepcopy(orig)
 	local orig_type = type(orig)
 	local copy

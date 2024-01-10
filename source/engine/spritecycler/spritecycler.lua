@@ -3,7 +3,15 @@ class("SpriteCycler").extends()
 import "sprites"
 import "chunks"
 
-local generationConfig = { left = 1, right = 2}
+local _ceil <const> = math.ceil
+local _range <const> = table.range
+local _contains <const> = table.contains
+local _chunkLoader <const> = SpriteCycler.chunkLoader
+local _insert <const> = table.insert
+local _remove <const> = table.remove
+local _removevalue <const> = table.removevalue
+
+local generationConfig = { left = 1, right = 2 }
 
 function SpriteCycler:init(chunkLength, recycledSpriteIds, createSpriteCallback)
 	self.chunksLoaded = {}
@@ -11,6 +19,8 @@ function SpriteCycler:init(chunkLength, recycledSpriteIds, createSpriteCallback)
 	self.chunkLength = chunkLength
 	self.recycledSpriteIds = recycledSpriteIds
 	self.createSpriteCallback = createSpriteCallback
+	self.spritesWithConfig = { ["coin"] = true, ["checkpoint"] = true }
+	self.spritesPersisted = { ["player"] = true }
 end
 
 -- Level Data
@@ -50,12 +60,17 @@ end
 
 function SpriteCycler:preloadSprites(...)
 	local spriteIdCountPairs = {...}
+	local _createSpriteCallback = self.createSpriteCallback
+	local _spritesToRecycle = self.spritesToRecycle
+	
 	for _, v in pairs(spriteIdCountPairs) do
 		local id = v.id
 		local count = v.count
 		
 		for i=1,count do
-			self:createRecycledSprite(id)
+			local sprite = _createSpriteCallback(id)
+			
+			_insert(_spritesToRecycle[id], sprite)
 		end
 	end
 end
@@ -63,12 +78,14 @@ end
 -- Lifecycle
 
 function SpriteCycler:loadInitialSprites(initialChunkX, initialChunkY, loadIndex)
-	local chunksToLoad = self:chunksToGenerate(initialChunkX, generationConfig)
+	assert(self.chunksToLoad == nil, "Cannot initialize when already initialized!")
+	self.chunksLoaded = table.range(initialChunkX - generationConfig.left, initialChunkX + generationConfig.right)
 	
 	-- load Sprites In Chunk If Needed
 	
-	local _, _ = self:loadSpritesInChunksIfNeeded(chunksToLoad, loadIndex)
-	self.chunksLoaded = chunksToLoad
+	for _, chunk in pairs(self.chunksLoaded) do
+		_chunkLoader(self, chunk, true, loadIndex)
+	end
 end
 
 function SpriteCycler:update(drawOffsetX, drawOffsetY, loadIndex)
@@ -77,41 +94,23 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY, loadIndex)
 	
 	--
 	
-	local currentChunk = math.ceil(drawOffsetX / self.chunkLength) 
-	local chunksShouldLoad = self:chunksToGenerate(currentChunk, generationConfig)
+	local currentChunk = _ceil(drawOffsetX / self.chunkLength)
+	local chunksShouldLoad = _range(currentChunk - generationConfig.left, currentChunk + generationConfig.right)
 	
 	-- Get chunks to unload
 	
-	local chunksToLoad = {}
 	for _, chunk in pairs(chunksShouldLoad) do
-		if self:chunkExists(chunk, 1) and not table.contains(self.chunksLoaded, chunk) then
-			table.insert(chunksToLoad, chunk)
-		end
-	end
-	local chunksToUnload = {}
-	for _, chunk in pairs(self.chunksLoaded) do
-		if self:chunkExists(chunk, 1) and not table.contains(chunksShouldLoad, chunk) then
-			table.insert(chunksToUnload, chunk)
+		if not _contains(self.chunksLoaded, chunk) then
+			_chunkLoader(self, chunk, true, loadIndex)
+			_insert(self.chunksLoaded, chunk)
 		end
 	end
 	
-	if (#chunksToLoad > 0) or (#chunksToUnload > 0) then
-		-- Load and Unload
-		
-		print("Loading chunks: ")
-		printTable(chunksToLoad)
-		
-		print("Unloading chunks: ")
-		printTable(chunksToUnload)
-		
-		local spritesUnloadedCount = self:unloadSpritesInChunksIfNeeded(chunksToUnload, loadIndex)
-		local spritesLoadedCount, spritesRecycledCount = self:loadSpritesInChunksIfNeeded(chunksToLoad, loadIndex)
-		
-		print(spritesUnloadedCount.." sprites were unloaded.")
-		print(spritesLoadedCount.." sprites were loaded, ".. spritesRecycledCount.. " of which were recycled.")
-		
-		--print("Data objects: ".. #self.data.objects)
-		--print("Available recycled sprites: ".. #self.spritesToRecycle)
+	for _, chunk in pairs(self.chunksLoaded) do
+		if not _contains(chunksShouldLoad, chunk) then
+			_chunkLoader(self, chunk, false, loadIndex)
+			_removevalue(self.chunksLoaded, chunk)
+		end
 	end
 end
 
@@ -121,15 +120,16 @@ function SpriteCycler:unloadAll()
 end
 
 function SpriteCycler:saveConfigWithIndex(loadIndex)
+	print("Saving with load index: ".. loadIndex)
 	local count = 0
 	for _, chunk in pairs(self.chunksLoaded) do
 		if self:chunkExists(chunk, 1) then
 			for _, object in pairs(self.data[chunk][1]) do
-				if object.sprite ~= nil then
+				if object.sprite ~= nil and (self.spritesWithConfig[object.id] == true) then
 					local sprite = object.sprite
 
 					if object.config[loadIndex] == nil then
-						object.config[loadIndex] = {}
+						object.config[loadIndex] = table.create(4, 0)
 					end
 
 					sprite:writeConfig(object.config[loadIndex])

@@ -3,18 +3,6 @@ function SpriteCycler:chunkExists(x, y)
 	return (self.data[x] ~= nil) and (self.data[x][y] ~= nil)
 end
 
-function SpriteCycler:chunksToGenerate(currentChunk, generationConfig)
-	local chunksToGenerate = {}
-	local startChunk = currentChunk - generationConfig.left
-	local endChunk = currentChunk + generationConfig.right
-	
-	for i=startChunk, endChunk do
-		table.insert(chunksToGenerate, i)
-	end
-	
-	return chunksToGenerate
-end
-
 function SpriteCycler:getChunksDataForLevel(objects, chunkLength)
 	local chunksData = {}
 	
