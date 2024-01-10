@@ -1,31 +1,38 @@
 local geo <const> = playdate.geometry
+
+local _type <const> = type
+local _assert <const> = assert
+
 function animators(widget)
 	
 	function widget:getAnimatorValue(...)
-		local animators = {...}
-		local type
-		local value
-		for _, animator in pairs(animators) do
-			if value == nil then
-				if getmetatable(animator:currentValue()) == nil then
-					value = 0
-					type = "number"
-				elseif getmetatable(animator:currentValue()).__name == "playdate.geometry.point" then
-					value = geo.point.new(0, 0)
-					type = "playdate.geometry.point"
+		local _animators = {...}
+		local _isNumberList
+		local _value
+		for _, animator in pairs(_animators) do
+			local _currentValue = animator:currentValue()
+			local _isNumber = _type(_currentValue) == "number"
+			if _isNumberList == nil then
+				_isNumberList = _isNumber
+				
+				if _isNumber then
+					_value = 0
+				else
+					_value = geo.point.new(0, 0)
 				end
+			else
+				_assert(_isNumber == _isNumberList)
 			end
 			
-			if type == "number" then
-				value += animator:currentValue()
-			elseif type == "playdate.geometry.point" then
-				assert(getmetatable(animator:currentValue()).__name == "playdate.geometry.point", "Error: Attempted to add animators with different value types.")
-				value:offset(animator:currentValue().x, animator:currentValue().y)
+			if _isNumber then
+				_value += _currentValue
+			else
+				_value:offset(_currentValue.x, _currentValue.y)
 			end
 		end
 		
-		if value ~= nil then
-			return value
+		if _value ~= nil then
+			return _value
 		else
 			return 0
 		end
@@ -50,15 +57,14 @@ function animators(widget)
 	end
 	
 	widget:_addUpdateCallback(function(self)
-		local state = self._state
-		state.wasAnimating = self._state.isAnimating ~= nil and self._state.isAnimating or false
-		state.isAnimating = false
+		local _state = self._state
+		_state.wasAnimating = _state.isAnimating ~= nil and _state.isAnimating or false
+		_state.isAnimating = false
 		
-		local state = self._state
 		for _, animator in pairs(self.animators) do
 			animator:update()
 			
-			state.isAnimating = state.isAnimating or animator:isAnimating()
+			_state.isAnimating = _state.isAnimating or animator:isAnimating()
 		end
 	end)
 	

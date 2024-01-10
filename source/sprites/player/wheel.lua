@@ -4,6 +4,7 @@ import "utils/images"
 import "playdate"
 
 local gfx <const> = playdate.graphics
+
 class("Wheel").extends(gfx.sprite)
 
 import "speed"
