@@ -1,9 +1,9 @@
 
-function chunkExists(self, x, y)
+function SpriteCycler:chunkExists(x, y)
 	return (self.data[x] ~= nil) and (self.data[x][y] ~= nil)
 end
 
-function chunksToGenerate(currentChunk, generationConfig)
+function SpriteCycler:chunksToGenerate(currentChunk, generationConfig)
 	local chunksToGenerate = {}
 	local startChunk = currentChunk - generationConfig.left
 	local endChunk = currentChunk + generationConfig.right
@@ -15,7 +15,7 @@ function chunksToGenerate(currentChunk, generationConfig)
 	return chunksToGenerate
 end
 
-function getChunksDataForLevel(objects, chunkLength)
+function SpriteCycler:getChunksDataForLevel(objects, chunkLength)
 	local chunksData = {}
 	
 	for _, object in pairs(objects) do
@@ -28,14 +28,14 @@ function getChunksDataForLevel(objects, chunkLength)
 		table.setIfNil(chunksData[chunkIndexX], chunkIndexY)
 		
 		-- Insert object data
-		local spriteData = spritePositionData(object)
+		local spriteData = self:spritePositionData(object)
 		table.insert(chunksData[chunkIndexX][chunkIndexY], spriteData)
 	end
 	
 	return chunksData
 end
 
-function fillEmptyChunks(chunksData)
+function SpriteCycler:fillEmptyChunks(chunksData)
 	local chunkIndexesX = {}
 	local chunkIndexesY = {}
 	

@@ -1,7 +1,7 @@
 import "extensions"
 import "chunks"
 
-function spritePositionData(object)
+function SpriteCycler:spritePositionData(object)
 	local spriteData = {
 		id = object.id,
 		position = {
@@ -16,20 +16,20 @@ function spritePositionData(object)
 	return spriteData
 end
 
-function loadSpritesInChunksIfNeeded(self, chunksToLoad, loadIndex)
+function SpriteCycler:loadSpritesInChunksIfNeeded(chunksToLoad, loadIndex)
 	local count = 0
 	local recycledSpriteCount = 0
 	
 	for _, chunk in pairs(chunksToLoad) do
-		if chunkExists(self, chunk, 1) and not table.contains(self.chunksLoaded, chunk) then
+		if self:chunkExists(chunk, 1) and not table.contains(self.chunksLoaded, chunk) then
 			-- Load chunk
 			local chunkData = self.data[chunk][1]
 			
 			for _, object in pairs(chunkData) do
 				if self.spritesToRecycle[object.id] ~= nil or object.sprite == nil then
-					local spriteToRecycle = getRecycledSprite(self, object.id)
+					local spriteToRecycle = self:getRecycledSprite(object.id)
 					
-					local config = getIndexedConfig(object.config, loadIndex)
+					local config = self:getIndexedConfig(object.config, loadIndex)
 					object.sprite = self.createSpriteCallback(object.id, object.position, config, spriteToRecycle)
 					
 					count += 1
@@ -47,11 +47,11 @@ function loadSpritesInChunksIfNeeded(self, chunksToLoad, loadIndex)
 	return count, recycledSpriteCount
 end
 
-function unloadSpritesInChunksIfNeeded(self, chunksToUnload, loadIndex)
+function SpriteCycler:unloadSpritesInChunksIfNeeded(chunksToUnload, loadIndex)
 	local count = 0
 	
 	for _, chunk in pairs(chunksToUnload) do
-		if chunkExists(self, chunk, 1) and table.contains(self.chunksLoaded, chunk) then
+		if self:chunkExists(chunk, 1) and table.contains(self.chunksLoaded, chunk) then
 			local chunkData = self.data[chunk][1]
 			
 			for _, object in pairs(chunkData) do
@@ -75,7 +75,7 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload, loadIndex)
 					
 					sprite:remove()
 					
-					recycleSprite(self, sprite, object.id)
+					self:recycleSprite(sprite, object.id)
 					
 					count += 1
 				end
@@ -88,13 +88,13 @@ function unloadSpritesInChunksIfNeeded(self, chunksToUnload, loadIndex)
 	return count
 end
 
-function createRecycledSprite(self, id)
+function SpriteCycler:createRecycledSprite(id)
 	local sprite = self.createSpriteCallback(id)
 	
 	table.insert(self.spritesToRecycle[id], sprite)
 end
 
-function getRecycledSprite(self, id) 
+function SpriteCycler:getRecycledSprite(id) 
 	if self.spritesToRecycle[id] == nil then
 		-- sprite is not registered as recyclable
 		return nil
@@ -109,7 +109,7 @@ function getRecycledSprite(self, id)
 	return sprite
 end
 
-function recycleSprite(self, sprite, id)
+function SpriteCycler:recycleSprite(sprite, id)
 	if self.spritesToRecycle[id] == nil then
 		-- sprite is not registered for recycling
 		return
@@ -118,7 +118,7 @@ function recycleSprite(self, sprite, id)
 	table.insert(self.spritesToRecycle[id], sprite)
 end
 
-function debugPrintRecycledSprites(self)
+function SpriteCycler:debugPrintRecycledSprites()
 	local printContents = {}
 	for k, v in pairs(self.spritesToRecycle) do
 		printContents[k] = #v
@@ -127,7 +127,7 @@ function debugPrintRecycledSprites(self)
 	printTable(printContents)
 end
 
-function getIndexedConfig(config, loadIndex)
+function SpriteCycler:getIndexedConfig(config, loadIndex)
 	for i=loadIndex, 0, -1 do
 		if config[i] ~= nil then
 			return config[i]
