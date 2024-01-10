@@ -110,7 +110,8 @@ function WidgetLevel:_load()
 	
 	-- Load level into spritecycler
 	
-	self.spriteCycler:load(self.config.objects)
+	self.levelObjects = LogicalSprite.loadObjects(self.config.objects)
+	self.spriteCycler:load(self.levelObjects)
 	
 	--
 	

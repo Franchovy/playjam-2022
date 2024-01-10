@@ -105,27 +105,22 @@ function SpriteCycler:hasLoadedInitialLevel()
 	return self.data ~= nil
 end
 
-function SpriteCycler:load(objects)
-	
+function SpriteCycler:load(levelObjects)
 	-- Load chunks from level config
 	
 	local data = _create(16, 5)
 	local _chunkLength = self.chunkLength
 	
-	for _, object in pairs(objects) do
-		-- Create Chunk in level chunks
-		chunk = _ceil((object.position.x) / _chunkLength)
-		
+	for _, levelObject in pairs(levelObjects) do
 		-- Create chunk if needed
-		if data[chunk] == nil then
-			data[chunk] = _create(60, 0)
+		local _chunkIndex = _ceil((levelObject.position.x) / _chunkLength)
+		
+		if data[_chunkIndex] == nil then
+			data[_chunkIndex] = _create(60, 0)
 		end
 		
-		-- Create and insert object data
-		
-		local spriteData = LogicalSprite(object)
-		
-		_insert(data[chunk], spriteData)
+		-- Insert level object into chunk data
+		_insert(data[_chunkIndex], levelObject)
 	end
 	
 	self.data = data
