@@ -65,7 +65,9 @@ function WidgetLevel:_load()
 	local chunkLength = AppConfig["chunkLength"]
 	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint", "levelEnd"}
 	
-	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds, function(id, position, levelObject, config, spriteToRecycle)
+	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds)
+	
+	self.spriteCycler.createSpriteCallback = function(id, position, levelObject, config, spriteToRecycle)
 		local sprite = spriteToRecycle;
 		
 		if sprite == nil then
@@ -103,7 +105,7 @@ function WidgetLevel:_load()
 		end
 		
 		return sprite
-	end)
+	end
 	
 	-- Load level into spritecycler
 	

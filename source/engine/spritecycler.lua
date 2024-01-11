@@ -74,10 +74,9 @@ local function _loadChunk(self, chunk, shouldLoad, loadIndex)
 	end
 end
 
-function SpriteCycler:init(chunkLength, recycledSpriteIds, createSpriteCallback)
+function SpriteCycler:init(chunkLength, recycledSpriteIds)
 	self.chunksLoaded = _create(16, 4)
 	self.chunkLength = chunkLength
-	self.createSpriteCallback = createSpriteCallback
 	
 	self.spritesToRecycle = _create(0, #recycledSpriteIds)
 	for _, spriteId in pairs(recycledSpriteIds) do
