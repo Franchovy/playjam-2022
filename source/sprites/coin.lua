@@ -39,7 +39,7 @@ function Coin:loadConfig(config)
 	self:updateImage()
 end
 
-function Coin:writeConfig(config)
+function Coin:copyConfig(config)
 	config.isPicked = self.config.isPicked
 end
 

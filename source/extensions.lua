@@ -113,19 +113,11 @@ function table.range(rangeStart, rangeEnd)
 	return t
 end
 
-function table.deepcopy(orig)
-	local orig_type = type(orig)
-	local copy
-	if orig_type == 'table' then
-		copy = {}
-		for orig_key, orig_value in next, orig, nil do
-			copy[table.deepcopy(orig_key)] = table.deepcopy(orig_value)
-		end
-		setmetatable(copy, table.deepcopy(getmetatable(orig)))
-	else -- number, string, boolean, etc
-		copy = orig
+-- Erases all contents of the table without destroying the table.
+function table.erase(t)
+	for k, _ in pairs(t) do
+		t[k] = nil
 	end
-	return copy
 end
 
 function table.shallowEqual(table1, table2)

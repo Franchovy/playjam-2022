@@ -66,54 +66,48 @@ function WidgetLevel:_load()
 	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint", "levelEnd"}
 	
 	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds)
+	self.configHandler = ConfigHandler({"coin", "checkpoint"})
+	
+	LogicalSprite.setCreateSpriteFromIdCallback(function(id)
+		if id == "platform" then
+			return Platform.new()
+		elseif id == "killBlock" then
+			return KillBlock.new(self.periodicBlinker)
+		elseif id == "coin" then
+			return Coin.new()
+		elseif id == "checkpoint" then
+			return Checkpoint.new()
+		elseif id == "player" then
+			local sprite = Wheel.new()
+			_setupWheelSpriteSignals(sprite)
+			return sprite
+		elseif id == "levelEnd" then
+			return LevelEnd.new()
+		else 
+			print("Unrecognized ID: ".. id)
+		end
+	end)
+	
+	local _createSpriteFromId = LogicalSprite.createSpriteFromId
 	
 	LogicalSprite.setCreateSpriteCallback(function(levelObject, spriteToRecycle)
+		assert(levelObject.sprite == nil, "Level object already has a sprite!")
 		local sprite
-		local id
-		local config
-		local position
 		
-		if type(levelObject) == "table" then
-			assert(levelObject.sprite == nil, "Attempted to create a sprite for a LogicalSprite that already has one.")
-		
-			sprite = spriteToRecycle
-			id = levelObject.id
-			config = levelObject.config
-			position = levelObject.position
-		elseif type(levelObject) == "string" then
-			-- ID only
-			id = levelObject
-		end
-		
-		if sprite == nil then
-			-- Create sprites
-			if id == "platform" then
-				sprite = Platform.new()
-			elseif id == "killBlock" then
-				sprite = KillBlock.new(self.periodicBlinker)
-			elseif id == "coin" then
-				sprite = Coin.new()
-			elseif id == "checkpoint" then
-				sprite = Checkpoint.new()
-			elseif id == "player" then
+		if spriteToRecycle == nil then
+			sprite = _createSpriteFromId(levelObject.id)
+			
+			if levelObject.id == "player" then
 				assert(self.wheel == nil)
 				self.wheel = levelObject
-				
-				sprite = Wheel.new()
-				_setupWheelSpriteSignals(sprite)
-			elseif id == "levelEnd" then
-				sprite = LevelEnd.new()
-			else 
-				print("Unrecognized ID: ".. id)
 			end
 			
 			sprite:setZIndex(kZIndex.level)
+		else
+			sprite = spriteToRecycle
 		end
 		
-		if config ~= nil then
-			sprite:loadConfig(config)
-		end
-		
+		local position = levelObject.position
 		if position ~= nil then
 			sprite:moveTo(kGame.gridSize * position.x, kGame.gridSize * position.y)
 			sprite:add()
@@ -122,12 +116,29 @@ function WidgetLevel:_load()
 		return sprite
 	end)
 	
+	local _configHandler = self.configHandler
+	local _discardConfig = self.configHandler.discardConfig
+	
+	LogicalSprite.setDiscardConfigCallback(function(levelObject, shouldDiscardAll)
+		_discardConfig(_configHandler, levelObject, self.loadIndex, shouldDiscardAll)
+	end)
+	
+	local _saveConfig = self.configHandler.saveConfig
+	
+	LogicalSprite.setSaveConfigCallback(function(levelObject)
+		_saveConfig(_configHandler, levelObject, self.loadIndex)
+	end)
+	
+	local _loadConfig = self.configHandler.loadConfig
+	
+	LogicalSprite.setLoadConfigCallback(function(levelObject)
+		_loadConfig(_configHandler, levelObject, self.loadIndex)
+	end)
+	
 	-- Load level into spritecycler
 	
 	self.levelObjects = LogicalSprite.loadObjects(self.config.objects)
 	self.spriteCycler:load(self.levelObjects)
-	
-	self.configHandler = ConfigHandler({"coin", "checkpoint"})
 	self.configHandler:load(self.levelObjects)
 	
 	--
@@ -148,12 +159,12 @@ function WidgetLevel:_load()
 	
 	-- Initialize sprite cycling using initial wheel position
 	
+	self.loadIndex = 1
+	
 	local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 	self.spriteCycler:loadChunk(initialChunk, 0)
 	
 	--
-	
-	self.loadIndex = 1
 	
 	self.wheel.positionInitial = self.wheel.position 
 	self.resetWheel()
@@ -197,18 +208,18 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 
 		self.spriteCycler:unloadAll()
 		
-		self.spriteCycler:discardLoadConfig(self.loadIndex)
+		self.spriteCycler:discardLoadConfig(false)
 		self.loadIndex -= 1
 		
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.restartCheckpoint) then
 		self.loadIndex += 1
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.restartLevel) then
-		self.spriteCycler:discardLoadConfig(1, self.loadIndex)
+		self.spriteCycler:discardLoadConfig(true)
 		self.loadIndex = 1
 		self.previousLoadPoint = nil
 		self.wheel.position = self.wheel.positionInitial
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.nextLevel) then
-		self.spriteCycler:discardLoadConfig(1, self.loadIndex)
+		self.spriteCycler:discardLoadConfig(true)
 		self.loadIndex = 1
 		self.previousLoadPoint = nil
 		
@@ -222,7 +233,7 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 		self.configHandler:load(self.levelObjects)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
-		self.spriteCycler:loadInitialSprites(initialChunk, 1, self.loadIndex)
+		self.spriteCycler:loadChunk(initialChunk, self.loadIndex)
 		
 		self.wheel.positionInitial = self.wheel.position 
 		self.resetWheel()
@@ -234,7 +245,7 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		
-		self.spriteCycler:loadInitialSprites(initialChunk, 1, self.loadIndex)
+		self.spriteCycler:loadChunk(initialChunk, self.loadIndex)
 		
 		self.wheel.sprite:moveTo(self.wheel.position.x * kGame.gridSize, self.wheel.position.y * kGame.gridSize)
 		self.resetWheel()

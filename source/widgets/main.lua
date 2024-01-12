@@ -2,12 +2,15 @@ import "constant"
 import "engine"
 import "menu"
 import "play"
-import "utils/level"
 
 local timer <const> = playdate.timer
 local file <const> = playdate.file
 
 class("WidgetMain").extends(Widget)
+
+local function _loadLevelFromFile(filepath)
+	return json.decodeFile(filepath)
+end
 
 function WidgetMain:init()
 	self:supply(Widget.deps.state)
@@ -105,7 +108,7 @@ function WidgetMain:_load()
 		end
 		
 		if self.level ~= nil then
-			return loadLevelFromFile(self.level.path)
+			return _loadLevelFromFile(self.level.path)
 		end
 	end
 	
@@ -171,7 +174,7 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 		
 		self.children.transition.signals.animationFinished = function()
 			self.children.menu:setVisible(false)
-			local levelConfig = loadLevelFromFile(self.level.path)
+			local levelConfig = _loadLevelFromFile(self.level.path)
 			
 			if self.children.play == nil then
 				self.children.menu:unload()

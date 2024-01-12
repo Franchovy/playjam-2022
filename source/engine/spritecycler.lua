@@ -13,15 +13,7 @@ local _create <const> = table.create
 
 local generationConfig = { left = 1, right = 2 }
 
-local function _getIndexedConfig(config, loadIndex)
-	for i=loadIndex, 0, -1 do
-		if config[i] ~= nil then
-			return config[i]
-		end
-	end
-end
-
-local function _loadChunk(self, chunk, shouldLoad, loadIndex)
+local function _loadChunk(self, chunk, shouldLoad)
 	local _chunkData = self.data[chunk]
 	if _chunkData == nil then
 		return
@@ -45,25 +37,13 @@ local function _loadChunk(self, chunk, shouldLoad, loadIndex)
 					spriteToRecycle = table.remove(_spritesToRecycle[object.id])
 				end
 				
-				local config
-				if _spritesWithConfig[object.id] == true then
-					config = _getIndexedConfig(object.config, loadIndex)
-				end
-				
 				object:createSprite(spriteToRecycle)
+				object:loadConfig()
 			else
 				-- UNLOAD SPRITE
+				object:saveConfig()
+				
 				local sprite = _removekey(object, "sprite")
-				
-				-- Save the active config to the active load index. Else, discard the active config.
-				if _spritesWithConfig[object.id] == true and (loadIndex ~= nil) then
-					if object.config[loadIndex] == nil then
-						object.config[loadIndex] = _create(0, 1)
-					end
-					
-					sprite:writeConfig(object.config[loadIndex])
-				end
-				
 				sprite:remove()
 				
 				if _spritesToRecycle[object.id] ~= nil then
@@ -144,18 +124,18 @@ end
 
 -- Lifecycle
 
-function SpriteCycler:loadInitialSprites(initialChunkX, loadIndex)
+function SpriteCycler:loadChunk(initialChunkX)
 	assert(#self.chunksLoaded == 0, "Cannot initialize when already initialized!")
 	self.chunksLoaded = table.range(initialChunkX - generationConfig.left, initialChunkX + generationConfig.right)
 	
 	-- load Sprites In Chunk If Needed
 	
 	for _, chunk in pairs(self.chunksLoaded) do
-		_loadChunk(self, chunk, true, loadIndex)
+		_loadChunk(self, chunk, true)
 	end
 end
 
-function SpriteCycler:update(drawOffsetX, drawOffsetY, loadIndex)
+function SpriteCycler:update(drawOffsetX, drawOffsetY)
 	-- Convert to grid coordinates
 	local drawOffsetX, drawOffsetY = (-drawOffsetX / kGame.gridSize), (drawOffsetY / kGame.gridSize)
 	
@@ -164,14 +144,14 @@ function SpriteCycler:update(drawOffsetX, drawOffsetY, loadIndex)
 	
 	for _, chunk in pairs(chunksShouldLoad) do
 		if not _contains(self.chunksLoaded, chunk) then
-			_loadChunk(self, chunk, true, loadIndex)
+			_loadChunk(self, chunk, true)
 			_insert(self.chunksLoaded, chunk)
 		end
 	end
 	
 	for _, chunk in pairs(self.chunksLoaded) do
 		if not _contains(chunksShouldLoad, chunk) then
-			_loadChunk(self, chunk, false, loadIndex)
+			_loadChunk(self, chunk, false)
 			_removevalue(self.chunksLoaded, chunk)
 		end
 	end
@@ -179,43 +159,29 @@ end
 
 function SpriteCycler:unloadAll()
 	for _, chunk in pairs(self.chunksLoaded) do
-		_loadChunk(self, chunk, false, loadIndex)
+		_loadChunk(self, chunk, false)
 		_removevalue(self.chunksLoaded, chunk)
 	end
 end
 
-function SpriteCycler:saveConfigWithIndex(loadIndex)
-	print("Saving with load index: ".. loadIndex)
-	local count = 0
+function SpriteCycler:saveConfigWithIndex()
+	local _saveConfig = LogicalSprite.saveConfig
 	for _, chunk in pairs(self.chunksLoaded) do
 		for _, object in pairs(self.data[chunk]) do
-			if object.sprite ~= nil and (self.spritesWithConfig[object.id] == true) then
-				local sprite = object.sprite
-
-				if object.config[loadIndex] == nil then
-					object.config[loadIndex] = _create(4, 0)
-				end
-
-				sprite:writeConfig(object.config[loadIndex])
-									
-				count += 1
-			end
+			_saveConfig(object)
 		end
 	end
-	
-	print("Saved config for ".. count.. " sprites.")
 end
 
-function SpriteCycler:discardLoadConfig(loadIndexStart, loadIndexFinish)
+function SpriteCycler:discardLoadConfig(discardAll)
 	if loadIndexFinish == nil then
 		loadIndexFinish = loadIndexStart
 	end
 	
-	for i=loadIndexStart, loadIndexFinish do
-		for k, chunk in pairs(self.data) do
-			for _, object in pairs(chunk) do
-				object.config[i] = nil
-			end
+	local _discardConfig = LogicalSprite.discardConfig
+	for k, chunk in pairs(self.data) do
+		for _, object in pairs(chunk) do
+			_discardConfig(object, discardAll)
 		end
 	end
 end

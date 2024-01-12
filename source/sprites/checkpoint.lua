@@ -56,7 +56,7 @@ function Checkpoint:loadConfig(config)
 	self:updateImage()
 end
 
-function Checkpoint:writeConfig(config)
+function Checkpoint:copyConfig(config)
 	config.isSet = self.config.isSet
 end
 
