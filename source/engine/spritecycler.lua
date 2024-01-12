@@ -50,7 +50,7 @@ local function _loadChunk(self, chunk, shouldLoad, loadIndex)
 					config = _getIndexedConfig(object.config, loadIndex)
 				end
 				
-				object.sprite = _createSpriteCallback(object.id, object.position, object, config, spriteToRecycle)
+				object:createSprite(spriteToRecycle)
 			else
 				-- UNLOAD SPRITE
 				local sprite = _removekey(object, "sprite")
@@ -127,7 +127,7 @@ end
 
 function SpriteCycler:preloadSprites(...)
 	local spriteIdCountPairs = {...}
-	local _createSpriteCallback = self.createSpriteCallback
+	local _createSpriteFromId = LogicalSprite.createSpriteFromId
 	local _spritesToRecycle = self.spritesToRecycle
 	
 	for _, v in pairs(spriteIdCountPairs) do
@@ -135,7 +135,7 @@ function SpriteCycler:preloadSprites(...)
 		local count = v.count
 		
 		for i=1,count do
-			local sprite = _createSpriteCallback(id)
+			local sprite = _createSpriteFromId(id)
 			
 			_insert(_spritesToRecycle[id], sprite)
 		end
@@ -144,8 +144,8 @@ end
 
 -- Lifecycle
 
-function SpriteCycler:loadInitialSprites(initialChunkX, initialChunkY, loadIndex)
-	assert(self.chunksToLoad == nil, "Cannot initialize when already initialized!")
+function SpriteCycler:loadInitialSprites(initialChunkX, loadIndex)
+	assert(#self.chunksLoaded == 0, "Cannot initialize when already initialized!")
 	self.chunksLoaded = table.range(initialChunkX - generationConfig.left, initialChunkX + generationConfig.right)
 	
 	-- load Sprites In Chunk If Needed

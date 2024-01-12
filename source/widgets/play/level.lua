@@ -67,8 +67,23 @@ function WidgetLevel:_load()
 	
 	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds)
 	
-	self.spriteCycler.createSpriteCallback = function(id, position, levelObject, config, spriteToRecycle)
-		local sprite = spriteToRecycle;
+	LogicalSprite.setCreateSpriteCallback(function(levelObject, spriteToRecycle)
+		local sprite
+		local id
+		local config
+		local position
+		
+		if type(levelObject) == "table" then
+			assert(levelObject.sprite == nil, "Attempted to create a sprite for a LogicalSprite that already has one.")
+		
+			sprite = spriteToRecycle
+			id = levelObject.id
+			config = levelObject.config
+			position = levelObject.position
+		elseif type(levelObject) == "string" then
+			-- ID only
+			id = levelObject
+		end
 		
 		if sprite == nil then
 			-- Create sprites
@@ -105,7 +120,7 @@ function WidgetLevel:_load()
 		end
 		
 		return sprite
-	end
+	end)
 	
 	-- Load level into spritecycler
 	
@@ -134,7 +149,7 @@ function WidgetLevel:_load()
 	-- Initialize sprite cycling using initial wheel position
 	
 	local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
-	self.spriteCycler:loadInitialSprites(initialChunk, 1, 0)
+	self.spriteCycler:loadChunk(initialChunk, 0)
 	
 	--
 	
