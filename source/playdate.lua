@@ -27,6 +27,10 @@ import "CoreLibs/sprites"
 import "playdate/extensions/sprite"
 import "playdate/constant/kCollisionResponse"
 
+-- Geometry
+
+import "playdate/extensions/geometry"
+
 -- Animations
 
 import "CoreLibs/animation"

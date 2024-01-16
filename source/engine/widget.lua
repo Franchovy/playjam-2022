@@ -13,6 +13,7 @@ import "widget/input"
 import "widget/state"
 import "widget/animators"
 import "widget/animations"
+import "widget/frame"
 import "widget/keyValueState"
 import "widget/samples"
 import "widget/fileplayer"
@@ -28,7 +29,7 @@ function Widget.new(class, ...)
 		isVisible = true
 	}
 	
-	widget.children = {}
+	widget.children = table.create(0, 4)
 	
 	return widget
 end

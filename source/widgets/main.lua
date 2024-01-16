@@ -5,6 +5,7 @@ import "play"
 
 local timer <const> = playdate.timer
 local file <const> = playdate.file
+local disp <const> = playdate.display
 
 class("WidgetMain").extends(Widget)
 
@@ -15,10 +16,12 @@ end
 function WidgetMain:init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.input)
+	self:supply(Widget.deps.frame)
 	
 	self.kStates = { menu = 1, play = 2 }
 	self.state = self.kStates.menu
 	
+	self:setFrame(disp.getRect())
 	self:createSprite(kZIndex.main)
 	
 	self.data = {}
@@ -149,14 +152,12 @@ end
 
 function WidgetMain:_draw(frame, rect)
 	if self.children.menu ~= nil then
-		self.children.menu:draw(frame, rect)
+		self.children.menu:draw(frame:toLegacyRect(), rect)
 	end
 		
 	if self.children.play ~= nil then
-		self.children.play:draw(frame, rect)
+		self.children.play:draw(frame:toLegacyRect(), rect)
 	end
-	
-	self.frame = frame
 end
 
 function WidgetMain:_update()
