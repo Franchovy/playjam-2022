@@ -130,14 +130,17 @@ function table.shallowEqual(table1, table2)
 	return true
 end
 
-function table.weakValuesTable()
-	local t = {}
-	local mt = {
-		__mode = "v"
-	}
-	setmetatable(t, mt)
-	return t
-end
+table.weakValuesMetatable = {
+	__mode = "v"
+}
+
+table.weakKeysMetatable = {
+	__mode = "k"
+}
+
+table.weakKeysValuesMetatable = {
+	__mode = "kv"
+}
 
 -- Extensions on "math"
 

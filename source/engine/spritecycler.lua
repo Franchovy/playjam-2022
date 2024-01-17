@@ -96,6 +96,7 @@ function SpriteCycler:load(levelObjects)
 		
 		if data[_chunkIndex] == nil then
 			data[_chunkIndex] = _create(60, 0)
+			setmetatable(data[_chunkIndex], table.weakValuesMetatable)
 		end
 		
 		-- Insert level object into chunk data

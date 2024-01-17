@@ -1,8 +1,10 @@
 local sound <const> = playdate.sound
 local config = {
 	volume = 1,
-	sampleplayers = {} -- Warning: Memory leak here! Using a weak table (using table.weakValuesTable) for some reason loses all data inside. Investigate
+	sampleplayers = table.create(0, 24)
 }
+
+setmetatable(config.sampleplayers, table.weakValuesMetatable)
 
 function samples(widget)
 	function widget:loadSample(path, volume, key)

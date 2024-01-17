@@ -4,7 +4,8 @@ local sound <const> = playdate.sound
 
 class("FilePlayer").extends()
 
-FilePlayer._fileplayers = table.weakValuesTable()
+FilePlayer._fileplayers = table.create(0, 4)
+setmetatable(FilePlayer._fileplayers, table.weakValuesMetatable)
 
 function FilePlayer:init(loopPath, introPath)
 	if introPath ~= nil then

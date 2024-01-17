@@ -9,6 +9,7 @@ local _max = math.max
 
 function ConfigHandler:init(configSpriteIds)
 	self.data = table.create(0, 500)
+	setmetatable(self.data, table.weakKeysMetatable)
 	
 	_spriteNeedsConfig = table.create(0, 10)
 	for _, spriteId in pairs(configSpriteIds) do
