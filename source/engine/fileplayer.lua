@@ -5,6 +5,9 @@ local sound <const> = playdate.sound
 class("FilePlayer").extends()
 
 FilePlayer._fileplayers = table.create(0, 4)
+FilePlayer.config = {
+	volume = 1.0
+}
 setmetatable(FilePlayer._fileplayers, table.weakValuesMetatable)
 
 function FilePlayer:init(loopPath, introPath)
@@ -15,6 +18,8 @@ function FilePlayer:init(loopPath, introPath)
 		-- Load File
 		self.intro:play(0)
 		self.intro:pause()
+		
+		self.intro:setVolume(FilePlayer.config.volume)
 	end
 	
 	self.loop = sound.fileplayer.new(loopPath)
@@ -24,6 +29,8 @@ function FilePlayer:init(loopPath, introPath)
 	self.loop:pause()
 	
 	self.isPlayingIntro = self.intro ~= nil
+	
+	self.loop:setVolume(FilePlayer.config.volume)
 	
 	table.insert(FilePlayer._fileplayers, self)
 end
@@ -55,6 +62,8 @@ function FilePlayer:onIntroFinished()
 end
 
 Settings:addCallback(kSettingsKeys.musicVolume, function(value)
+	FilePlayer.config.volume = value
+	
 	for _, player in pairs(FilePlayer._fileplayers) do
 		if player.intro ~= nil then
 			player.intro:setVolume(value)
