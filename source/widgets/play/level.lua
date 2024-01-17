@@ -205,10 +205,12 @@ function WidgetLevel:_load()
 		local drawOffsetTarget = -_spriteWheel.x + 100 - velocityOffset
 		local newOffset = (drawOffsetCurrentX - drawOffsetTarget) / _cameraVelocity
 		
-		local cielY = 28
+		local cielY = 72
 		local newOffsetY = 0
 		if _spriteWheel.y < cielY then
 			newOffsetY = (drawOffsetCurrentY + (cielY - _spriteWheel.y)) / 2
+		else 
+			newOffsetY = math.approach(0, drawOffsetCurrentY, 4)
 		end
 
 		_setDrawOffset(drawOffsetCurrentX - newOffset, newOffsetY)
