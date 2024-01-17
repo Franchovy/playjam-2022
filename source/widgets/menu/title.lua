@@ -247,3 +247,10 @@ function WidgetTitle:_update()
 		gfx.sprite.addDirtyRect(0, 0, 400, 240)
 	end
 end
+
+function WidgetTitle:_unload()
+	self.imagetables = nil
+	self.images = nil
+	self.painters = nil
+	self.animators = nil
+end

@@ -58,3 +58,8 @@ end
 function LevelSelectEntry:_changeState(stateFrom, stateTo)
 	
 end
+
+function LevelSelectEntry:_unload()
+	self.painters = nil
+	self.images = nil
+end

@@ -200,3 +200,13 @@ function WidgetLevelSelect:_changeState(_, stateTo)
 	
 	gfx.sprite.addDirtyRect(0, 0, 400, 240)
 end
+
+function WidgetLevelSelect:_unload()
+	self.samples = nil
+	self.painters = nil
+	self.animators = nil
+	self.images = nil
+	
+	for _, child in pairs(self.children) do child:unload() end
+	self.children = nil
+end

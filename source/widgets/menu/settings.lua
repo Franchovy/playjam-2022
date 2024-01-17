@@ -169,3 +169,11 @@ function WidgetMenuSettings:_changeState(stateFrom, stateTo)
 	
 	gfx.sprite.addDirtyRect(0, 0, 400, 240)
 end
+
+function WidgetMenuSettings:_unload()
+	self.samples = nil
+	self.painters = nil
+	
+	for _, child in pairs(self.children) do child:unload() end
+	self.children = nil
+end

@@ -191,9 +191,10 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 end
 
 function WidgetMenu:_unload()
-	self.samples = {}
-	self.painters.background = nil
-	self.children.title = nil
-	self.children.levelSelect = nil
-	self.children.title = nil
+	self.samples = nil
+	self.painters = nil
+	self.fileplayer = nil
+	
+	for _, child in pairs(self.children) do child:unload() end
+	self.children = nil
 end

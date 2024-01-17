@@ -119,6 +119,7 @@ function LevelSelectPreview:_draw(rect)
 	self.painters.contents:draw(insetRect, { starsCount = self.data.starsCount })
 end
 
-function LevelSelectPreview:_update()
-	
+function LevelSelectPreview:_unload()
+	self.painters = nil
+	self.images = nil
 end

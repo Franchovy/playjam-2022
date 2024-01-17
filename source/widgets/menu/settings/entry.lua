@@ -106,3 +106,8 @@ function WidgetMenuSettingsEntry:_handleInput(input)
 		end
 	end
 end
+
+function WidgetMenuSettingsEntry:_unload()
+	self.samples = nil
+	self.painters = nil
+end

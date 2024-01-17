@@ -34,3 +34,8 @@ end
 function Widget:_update()
 	
 end
+
+function Widget:_unload()
+	self.painters = nil
+	self.images = nil
+end
