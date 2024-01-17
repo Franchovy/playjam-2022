@@ -90,3 +90,9 @@ function WidgetHUD:_changeState(stateFrom, stateTo)
 		self.animators.hideAnimator = gfx.animator.new(400, 0, -200, easing.inQuint)
 	end
 end
+
+function WidgetHUD:_unload()	
+	self.images = nil
+	self.animators = nil
+	self.painters = nil
+end

@@ -56,3 +56,8 @@ function WidgetStar:_update()
 	self._state.wasAnimating = self._state.isAnimating ~= nil and self._state.isAnimating or false
 	self._state.isAnimating = self.timers.timer ~= nil and (self.timers.timer.paused == false) and (self.timers.timer.timeLeft > 0)
 end
+
+function WidgetStar:_unload()
+	self.imageTables = nil
+	self.timers = nil
+end

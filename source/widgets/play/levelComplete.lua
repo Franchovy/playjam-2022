@@ -303,40 +303,11 @@ function LevelComplete:_changeState(stateFrom, stateTo)
 end
 
 function LevelComplete:_unload()
+	self.images = nil
+	self.blinkers = nil
+	self.samples = nil
+	self.painters = nil
 	
-	self:unloadSample(kAssetsSounds.levelCompleteBlink)
-	self:unloadSample(kAssetsSounds.levelCompleteCard)
-	
-	self.images.titleInGame = nil
-	self.images.title = nil
-	self.images.coin = nil
-	
-	self.images.textLabelCoins = nil
-	self.images.textLabelTime = nil
-	
-	self.images.textCoins = nil
-	self.images.textTime = nil
-	
-	self.images.textPressAButton = nil
-	
-	self.blinkers.blinkerTitle = nil
-	
-	self.blinkers.blinkerPressAButton1 = nil
-	self.blinkers.blinkerPressAButton2 = nil
-	
-	self.painters.frame = nil
-	
-	self.painters.pressAButton:unload()
-	self.painters.pressAButton = nil
-	
-	for i=1, #self.stars do
-		self.stars[i] = nil
-		self.children["star"..i] = star
-	end
-	
-	self.stars = nil
-	self.animators.card = nil
-	
-	self.children.menu:unload()
-	self.children.menu = nil
+	for _, child in pairs(self.children) do child:unload() end
+	self.children = nil
 end

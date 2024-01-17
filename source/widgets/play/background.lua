@@ -77,4 +77,6 @@ function WidgetBackground:_update()
 	end
 end
 
-
+function WidgetBackground:_unload()
+	self.sprite:remove()
+end

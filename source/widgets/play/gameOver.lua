@@ -74,3 +74,13 @@ end
 function WidgetGameOver:_update()
 	
 end
+
+function WidgetGameOver:_unload()
+	self.sprite:remove()
+	
+	self.images = nil
+	self.painters = nil
+	
+	for _, child in pairs(self.children) do child:unload() end
+	self.children = nil
+end

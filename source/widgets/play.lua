@@ -355,40 +355,11 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 end
 
 function WidgetPlay:_unload()
-	if self.children.levelComplete ~= nil then
-		self.children.levelComplete = nil
-	end
+	self.samples = nil
+	self.painters = nil
+	self.fileplayer = nil
+	self.timers = nil
 	
-	if self.children.transition ~= nil then
-		self.children.transition = nil
-	end
-	
-	if self.children.level ~= nil then
-		self.children.level:unload()
-		self.children.level = nil
-	end
-		
-	if self.children.hud ~= nil then
-		self.children.hud = nil
-	end
-		
-	if self.children.gameOver ~= nil then
-		self.children.gameOver.sprite:remove()
-		self.children.gameOver = nil
-	end
-		
-	if self.theme ~= nil then
-		self.theme = nil
-	end
-		
-	if self.filePlayer ~= nil then
-		self.filePlayer = nil
-	end
-	
-	if self.children.background ~= nil then
-		self.children.background.sprite:remove()
-		self.children.background = nil
-	end
-		
-	self.timers.levelTimer = nil
+	for _, child in pairs(self.children) do child:unload() end
+	self.children = nil
 end

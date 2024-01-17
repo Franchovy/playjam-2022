@@ -264,8 +264,12 @@ end
 
 function WidgetLevel:_unload()
 	self.spriteCycler:unloadAll()
-	
 	self.periodicBlinker:stop()
-	
 	self.wheel.sprite:remove()
+	
+	for _, sprite in pairs(self.sprites) do sprite:remove() end
+	self.sprites = nil
+	
+	for _, child in pairs(self.children) do child:unload() end
+	self.children = nil
 end
