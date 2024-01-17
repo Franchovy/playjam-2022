@@ -67,7 +67,7 @@ function Wheel:init()
 		sample = sampleSynth,
 		attack = 0.5,
 		decay = 1.2,
-		volume = 0.35,
+		volume = 0.12,
 		frequency = 440
 	}
 	
