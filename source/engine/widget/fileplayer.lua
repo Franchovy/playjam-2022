@@ -1,8 +1,10 @@
 local sound <const> = playdate.sound
 local config = {
 	volume = 1,
-	fileplayers = {} -- TODO: Same memory leak issue as dep.samples here.
+	fileplayers = table.create(0, 1)
 }
+
+setmetatable(config.fileplayers, table.weakValuesTable)
 
 function fileplayer(widget)
 	function widget:loadFilePlayer(path)
