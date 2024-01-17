@@ -2,6 +2,14 @@ import "utils/screenShake"
 
 local gfx <const> = playdate.graphics
 
+local _gridSize <const> = kGame.gridSize
+local _getDrawOffset <const> = gfx.getDrawOffset
+local _setDrawOffset <const> = gfx.setDrawOffset
+local _approach <const> = math.approach
+local _abs <const> = math.abs
+local _pow <const> = math.pow
+local _sign <const> = math.sign
+
 class("WidgetLevel").extends(Widget)
 
 function WidgetLevel:init(config)
@@ -55,9 +63,14 @@ function WidgetLevel:_load()
 		end
 	end
 	
+	local _logicalPositionWheel = nil
+	local _spriteWheel = nil
+	
 	self.resetWheel = function()
 		self.wheel.sprite:resetValues()
 		self.wheel.sprite:setAwaitingInput()
+		_spriteWheel = self.wheel.sprite
+		_logicalPositionWheel = self.wheel.position
 	end
 	
 	-- Sprite Cycler
@@ -169,21 +182,36 @@ function WidgetLevel:_load()
 	self.wheel.positionInitial = self.wheel.position 
 	self.resetWheel()
 	
-	local _logicalPositionWheel = self.wheel.position
-	local _gridSize = kGame.gridSize
-	local _spriteWheel = self.wheel.sprite
-	local _getDrawOffset = gfx.getDrawOffset
-	local _setDrawOffset = gfx.setDrawOffset
-	
 	self.setNeutralDrawOffset = function()
 		_setDrawOffset(-_logicalPositionWheel.x * _gridSize + 100, 0)
 	end
 	
+	local _cameraVelocity = 12
 	self.setMovingDrawOffset = function()
-		local drawOffsetCurrent = _getDrawOffset()
-		local drawOffsetTarget = -_spriteWheel.x + 100 - (_spriteWheel.velocityX * 10)	
-		local newOffset = (drawOffsetCurrent - drawOffsetTarget) / 6
-		_setDrawOffset(drawOffsetCurrent - newOffset, 0)
+		local drawOffsetCurrentX, drawOffsetCurrentY = _getDrawOffset()
+		
+		local velocityOffset = _pow(_abs(_spriteWheel.velocityX), 2) * _sign(_spriteWheel.velocityX)
+		
+		if _abs(velocityOffset) > 10 then
+			_cameraVelocity = _approach(_cameraVelocity, 6, 0.1)
+		else 
+			_cameraVelocity = _approach(_cameraVelocity, 12, 1.5)
+		end
+		
+		if _spriteWheel.velocityX < 0 then
+			velocityOffset *= 2
+		end
+		
+		local drawOffsetTarget = -_spriteWheel.x + 100 - velocityOffset
+		local newOffset = (drawOffsetCurrentX - drawOffsetTarget) / _cameraVelocity
+		
+		local cielY = 28
+		local newOffsetY = 0
+		if _spriteWheel.y < cielY then
+			newOffsetY = (drawOffsetCurrentY + (cielY - _spriteWheel.y)) / 2
+		end
+
+		_setDrawOffset(drawOffsetCurrentX - newOffset, newOffsetY)
 	end
 
 	self:setNeutralDrawOffset()
