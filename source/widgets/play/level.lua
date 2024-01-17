@@ -168,7 +168,25 @@ function WidgetLevel:_load()
 	
 	self.wheel.positionInitial = self.wheel.position 
 	self.resetWheel()
-	self:updateDrawOffset(self.wheel.position.x)
+	
+	local _logicalPositionWheel = self.wheel.position
+	local _gridSize = kGame.gridSize
+	local _spriteWheel = self.wheel.sprite
+	local _getDrawOffset = gfx.getDrawOffset
+	local _setDrawOffset = gfx.setDrawOffset
+	
+	self.setNeutralDrawOffset = function()
+		_setDrawOffset(-_logicalPositionWheel.x * _gridSize + 100, 0)
+	end
+	
+	self.setMovingDrawOffset = function()
+		local drawOffsetCurrent = _getDrawOffset()
+		local drawOffsetTarget = -_spriteWheel.x + 100 - (_spriteWheel.velocityX * 10)	
+		local newOffset = (drawOffsetCurrent - drawOffsetTarget) / 6
+		_setDrawOffset(drawOffsetCurrent - newOffset, 0)
+	end
+
+	self:setNeutralDrawOffset()
 end
 
 function WidgetLevel:_update()
@@ -177,7 +195,7 @@ function WidgetLevel:_update()
 	end
 	
 	if self.state == self.kStates.ready then
-		self:updateDrawOffset(self.wheel.position.x * kGame.gridSize)
+		self:setNeutralDrawOffset()
 		
 		if playdate.buttonIsPressed(playdate.kButtonA) or (math.abs(playdate.getCrankChange()) > 5) then
 			self.signals.startPlaying()
@@ -196,7 +214,7 @@ function WidgetLevel:_update()
 			self.signals.collectCoin(updatedCoinCount)
 		end
 		
-		self:updateDrawOffset(self.wheel.sprite.x)
+		self:setMovingDrawOffset()
 	end
 end
 
@@ -210,7 +228,6 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 		
 		self.spriteCycler:discardLoadConfig(false)
 		self.loadIndex -= 1
-		
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.restartCheckpoint) then
 		self.loadIndex += 1
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.restartLevel) then
@@ -218,6 +235,7 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 		self.loadIndex = 1
 		self.previousLoadPoint = nil
 		self.wheel.position = self.wheel.positionInitial
+		self:setNeutralDrawOffset()
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.nextLevel) then
 		self.spriteCycler:discardLoadConfig(true)
 		self.loadIndex = 1
@@ -237,7 +255,7 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 		
 		self.wheel.positionInitial = self.wheel.position 
 		self.resetWheel()
-		self:updateDrawOffset(self.wheel.position.x)
+		self:setNeutralDrawOffset()
 	elseif (stateFrom == self.kStates.restartCheckpoint or (stateFrom == self.kStates.restartLevel)) and (stateTo == self.kStates.ready) then
 		self.periodicBlinker:start()
 		
@@ -249,16 +267,7 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 		
 		self.wheel.sprite:moveTo(self.wheel.position.x * kGame.gridSize, self.wheel.position.y * kGame.gridSize)
 		self.resetWheel()
-	end
-end
-
-function WidgetLevel:updateDrawOffset(x)
-	local drawOffset = gfx.getDrawOffset()
-	local relativeX = x + drawOffset
-	if relativeX > 150 then
-		gfx.setDrawOffset(-x + 150, 0)
-	elseif relativeX < 80 then
-		gfx.setDrawOffset(-x + 80, 0)
+		self:setNeutralDrawOffset()
 	end
 end
 
