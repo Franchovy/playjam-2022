@@ -51,11 +51,14 @@ local function _transform(transformFunction)
 	end
 end
 
---function playdate.geometry.rect.tOffset(rect, offsetX, offsetY)
+--function playdate.geometry.rect:tOffset(rect, offsetX, offsetY)
 playdate.geometry.rect.tOffset = _transform(playdate.geometry.rect.offset)
 
---function playdate.geometry.rect.tCenter(rect, rectContainer)
+--function playdate.geometry.rect:tCenter(rect, rectContainer)
 playdate.geometry.rect.tCenter = _transform(playdate.geometry.rect.center)
 
 --function playdate.geometry.rect:tSet(rectOrX, y, w, h)
 playdate.geometry.rect.tSet = _transform(playdate.geometry.rect.set)
+
+--function playdate.geometry.rect:inset(dx, dy)
+playdate.geometry.rect.tInset = _transform(playdate.geometry.rect.inset)

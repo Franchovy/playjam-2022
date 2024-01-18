@@ -9,6 +9,8 @@ import "utils/themes"
 
 local gfx <const> = playdate.graphics
 local timer <const> = playdate.timer
+local disp <const> = playdate.display
+local geo <const> = playdate.geometry
 
 class("WidgetPlay").extends(Widget)
 
@@ -16,6 +18,9 @@ function WidgetPlay:init(config)
 	self.config = config
 	
 	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.frame)
+	
+	self:setFrame(disp.getRect())
 	
 	self:setStateInitial({
 		start = 1,
@@ -158,16 +163,19 @@ function WidgetPlay:_load()
 	self.timers.levelTimer:pause()
 end
 
-function WidgetPlay:_draw(rect)
+function WidgetPlay:_draw(frame, rect)
+	-- Warning: this is a work-around, see WidgetTitle:_draw() for description
+	local _rects = self.rects
+	if _rects.hud == nil then
+		return
+	end
+	
 	if self.children.levelComplete ~= nil then
-		local insetRect = Rect.inset(rect, 30, 20)
-		self.children.levelComplete:draw(insetRect)
+		self.children.levelComplete:draw(_rects.levelComplete:toLegacyRect())
 	end
 
-	self.children.gameOver:draw(rect)
-	
-	local topAlignedRect = Rect.with(Rect.inset(rect, 7), { h = 29 })
-	self.children.hud:draw(topAlignedRect)
+	self.children.gameOver:draw(frame:toLegacyRect())
+	self.children.hud:draw(_rects.hud:toLegacyRect())
 end
 
 function WidgetPlay:_update()
@@ -179,6 +187,16 @@ function WidgetPlay:_update()
 	if playdate.isCrankDocked() and (self.state == self.kStates.playing or (self.state == self.kStates.start)) then
 		g.showCrankIndicator = true
 	end
+	
+	-- perform layout 
+	local _assign <const> = geo.rect.assign
+	local _frame = self.frame
+	local _rects = self.rects
+	local _tInset = geo.rect.tInset
+	local _tSet = geo.rect.tSet
+	
+	_rects.levelComplete = _tInset(_assign(_rects.levelComplete, _frame), 30, 20)
+	_rects.hud = _tSet(_tInset(_assign(_rects.hud, _frame), 7, 7), nil, nil, nil, 29)
 end
 
 function WidgetPlay:_changeState(stateFrom, stateTo)
