@@ -292,6 +292,11 @@ function LevelComplete:_changeState(stateFrom, stateTo)
 		end
 		
 		timer.performAfterDelay(100 + #self.stars * 700 + 700, function()
+		-- Safeguard in case of unloading before timer callback
+			if self.blinkers == nil then
+				return
+			end
+			
 			self.blinkers.blinkerPressAButton1:startLoop()
 			self.blinkers.blinkerPressAButton2:startLoop()
 		end)
