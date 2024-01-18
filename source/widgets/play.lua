@@ -12,6 +12,10 @@ local timer <const> = playdate.timer
 local disp <const> = playdate.display
 local geo <const> = playdate.geometry
 
+local _assign <const> = geo.rect.assign
+local _tInset <const> = geo.rect.tInset
+local _tSet <const> = geo.rect.tSet
+
 class("WidgetPlay").extends(Widget)
 
 function WidgetPlay:init(config)
@@ -80,6 +84,7 @@ function WidgetPlay:_load()
 	
 	self.children.hud = Widget.new(WidgetHUD)
 	self.children.hud:load()
+	self.children.hud:setFrame(_tSet(_tInset(_assign(nil, self.frame), 7, 7), nil, nil, nil, 29))
 	
 	self.children.level.signals.collectCoin = function(coinCount)
 		self.data.coins += coinCount
@@ -161,12 +166,14 @@ function WidgetPlay:_load()
 	
 	self.timers.levelTimer = timer.new(999000)
 	self.timers.levelTimer:pause()
+	
+	self.children.hud:setState(self.children.hud.kStates.onScreen)
 end
 
 function WidgetPlay:_draw(frame, rect)
 	-- Warning: this is a work-around, see WidgetTitle:_draw() for description
 	local _rects = self.rects
-	if _rects.hud == nil then
+	if _rects.levelComplete == nil then
 		return
 	end
 	
@@ -175,7 +182,7 @@ function WidgetPlay:_draw(frame, rect)
 	end
 
 	self.children.gameOver:draw(frame:toLegacyRect())
-	self.children.hud:draw(_rects.hud:toLegacyRect())
+	self.children.hud:draw(rect)
 end
 
 function WidgetPlay:_update()
@@ -189,14 +196,10 @@ function WidgetPlay:_update()
 	end
 	
 	-- perform layout 
-	local _assign <const> = geo.rect.assign
 	local _frame = self.frame
 	local _rects = self.rects
-	local _tInset = geo.rect.tInset
-	local _tSet = geo.rect.tSet
 	
 	_rects.levelComplete = _tInset(_assign(_rects.levelComplete, _frame), 30, 20)
-	_rects.hud = _tSet(_tInset(_assign(_rects.hud, _frame), 7, 7), nil, nil, nil, 29)
 end
 
 function WidgetPlay:_changeState(stateFrom, stateTo)

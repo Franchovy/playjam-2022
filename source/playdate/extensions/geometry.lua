@@ -1,5 +1,16 @@
 local _type = type
 
+local _new = playdate.geometry.rect.new
+
+function playdate.geometry.rect.new(x, y, w, h)
+	return _new(
+		x == nil and 0 or x,
+		y == nil and 0 or y,
+		w == nil and 0 or w,
+		h == nil and 0 or h
+	)
+end
+
 function playdate.geometry.rect:set(rectOrX, y, w, h)
 	if _type(rectOrX) == "userdata" then
 		self.x = rectOrX.x
