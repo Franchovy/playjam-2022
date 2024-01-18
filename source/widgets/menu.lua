@@ -6,6 +6,7 @@ import "menu/settings"
 
 local gfx <const> = playdate.graphics
 local timer <const> = playdate.timer
+local disp <const> = playdate.display
 
 class("WidgetMenu").extends(Widget)
 
@@ -16,6 +17,9 @@ function WidgetMenu:init(config)
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.fileplayer)
+	self:supply(Widget.deps.frame)
+	
+	self:setFrame(disp.getRect())
 	
 	self.painters = {}
 	self.signals = {}
@@ -104,14 +108,12 @@ function WidgetMenu:_load()
 end
 
 function WidgetMenu:_draw(rect)
-	-- Paint children
+	local _frame = self.frame
 	
-	self.painters.background:draw(rect)
-	
-	self.children.title:draw(rect)
-	self.children.levelSelect:draw(rect)
-	
-	self.children.menuSettings:draw(rect)
+	self.painters.background:draw(_frame)
+	self.children.title:draw(_frame, rect)
+	self.children.levelSelect:draw(_frame:toLegacyRect(), rect)
+	self.children.menuSettings:draw(_frame:toLegacyRect(), rect)
 end
 
 function WidgetMenu:_update()

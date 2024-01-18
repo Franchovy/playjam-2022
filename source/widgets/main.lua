@@ -152,7 +152,7 @@ end
 
 function WidgetMain:_draw(frame, rect)
 	if self.children.menu ~= nil then
-		self.children.menu:draw(frame:toLegacyRect(), rect)
+		self.children.menu:draw(rect)
 	end
 		
 	if self.children.play ~= nil then

@@ -42,6 +42,7 @@ function frame(widget)
 	end
 	
 	widget.frame = geo.rect.new(0,0,0,0)
+	widget.rects = table.create(0, 5)
 	
 	widget:_addUpdateCallback(function(self)
 		local _state = self._state

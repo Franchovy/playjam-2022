@@ -4,11 +4,20 @@ import "utils/position"
 local gfx <const> = playdate.graphics
 local easing <const> = playdate.easingFunctions
 local geo <const> = playdate.geometry
+local disp <const> = playdate.display
+
+local _assign <const> = geo.rect.assign
+local _tOffset <const> = geo.rect.tOffset
+local _tSet <const> = geo.rect.tSet
+local _tCenter <const> = geo.rect.tCenter
 
 class("WidgetTitle").extends(Widget)
 
 function WidgetTitle:init()
 	self:supply(Widget.deps.animations)
+	self:supply(Widget.deps.frame)
+	
+	self:setFrame(disp.getRect())
 	
 	self:setAnimations({
 		onFirstOpen = 1,
@@ -204,28 +213,29 @@ function WidgetTitle:_animate(animation, queueFinishedCallback)
 	end
 end
 
-function WidgetTitle:_draw(frame, rect)	
-	local animatorValueBackground = self:getAnimatorValue(self.animators.animator1, self.animators.animatorOut)
+function WidgetTitle:_draw(rect)
 	
-	local rectOffsetTop = Rect.offset(frame, 0, -20 - animatorValueBackground)
-	local rectOffsetLeft = Rect.offset(frame, -animatorValueBackground, -20)
-	local rectOffsetRight = Rect.offset(frame, animatorValueBackground, -20)
-	self.painterBackground1:draw(rectOffsetTop)
-	self.painterBackground2:draw(rectOffsetRight)
-	self.painterBackground3:draw(rectOffsetTop, { tick = self.tick })
-	self.painterBackground4:draw(rectOffsetLeft)
-	self.painterBackgroundAssets:draw(rectOffsetRight)
+	local frame = self.frame
+	local _rects = self.rects
 	
-	local animatorValueWheel = self:getAnimatorValue(self.animators.animatorWheel, self.animators.animatorOutWheel)
-	self.painters.painterWheel:draw({x = animatorValueWheel.x - 60, y = 30 + animatorValueWheel.y, w = 280, h = 120}, { index = self.index % 36 })
+	-- Warning: This is a Work-around! What should really happen is: 
+	-- 1) in _animate, toggle :setVisible to true.
+	-- 2) setting visible should only take effect NEXT frame, not current frame. and 
+	-- 3) draw happens once a full round of update() has been called, performing the layout as needed.
+	-- ... But for now, we just check if the layout has been performed by checking this rect.
+	if _rects.top == nil then
+		return
+	end
+	self.painterBackground1:draw(_rects.top)
+	self.painterBackground2:draw(_rects.right)
+	self.painterBackground3:draw(_rects.top, { tick = self.tick })
+	self.painterBackground4:draw(_rects.left)
+	self.painterBackgroundAssets:draw(_rects.right)
 	
-	local animatorValueTitle =  self:getAnimatorValue(self.animators.animator2, self.animators.animatorOut)
-	local titleRect = Rect.with(Rect.offset(frame, 0, 130 + animatorValueTitle), { h = 57 })
-	self.painters.painterTitle:draw(titleRect)
+	self.painters.painterWheel:draw(_rects.wheel, { index = self.index % 36 })
+	self.painters.painterTitle:draw(_rects.title)
 	
-	local animatorValueButton =  self:getAnimatorValue(self.animators.animator2, self.animators.animatorOut)
-	local buttonRect = Rect.offset(Rect.with(Rect.center(Rect.size(160, 27), frame), { y = 200 }), 0, animatorValueButton)
-	self.painters.painterButton:draw(buttonRect, { tick = self.tick })
+	self.painters.painterButton:draw(_rects.button, { tick = self.tick })
 end
 
 function WidgetTitle:_update()
@@ -245,6 +255,25 @@ function WidgetTitle:_update()
 	
 	if self:isAnimating() == true then
 		gfx.sprite.addDirtyRect(0, 0, 400, 240)
+		
+		-- animation update: perform layout
+		
+		local _animators = self.animators
+		local _rects = self.rects
+		local frame = self.frame
+		local _getAnimatorValue = self.getAnimatorValue
+		
+		local animatorValueBackground = _getAnimatorValue(self, _animators.animator1, _animators.animatorOut)
+		local animatorValueWheel = _getAnimatorValue(self, _animators.animatorWheel, _animators.animatorOutWheel)
+		local animatorValueTitle =  _getAnimatorValue(self, _animators.animator2, _animators.animatorOut)
+		local animatorValueButton =  _getAnimatorValue(self, _animators.animator2, _animators.animatorOut)
+		
+		_rects.top = _tOffset(_assign(_rects.top, frame), 0, -20 - animatorValueBackground)
+		_rects.left = _tOffset(_assign(_rects.left, frame), -animatorValueBackground, -20)
+		_rects.right = _tOffset(_assign(_rects.right, frame), animatorValueBackground, -20)
+		_rects.wheel = _assign(_rects.wheel, animatorValueWheel.x - 60, 30 + animatorValueWheel.y, 280, 120)
+		_rects.title = _tSet(_tOffset(_assign(_rects.title, frame), 0, 130 + animatorValueTitle), nil, nil, nil, 57)
+		_rects.button = _tOffset(_tSet(_tCenter(_assign(_rects.button, 0, 0, 160, 27), frame), nil, 200), 0, animatorValueButton)
 	end
 end
 

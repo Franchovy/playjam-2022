@@ -7,13 +7,55 @@ function playdate.geometry.rect:set(rectOrX, y, w, h)
 		self.w = rectOrX.w
 		self.h = rectOrX.h
 	else
-		self.x = rectOrX
-		self.y = y
-		self.w = w
-		self.h = h
+		if rectOrX ~= nil then self.x = rectOrX end
+		if y ~= nil then self.y = y end
+		if w ~= nil then self.w = w end
+		if h ~= nil then self.h = h end
 	end
 end
 
 function playdate.geometry.rect:toLegacyRect()
 	return Rect.make(self.x, self.y, self.w, self.h)
 end
+
+function playdate.geometry.rect.assign(rect, rectOrX, y, w, h)
+	if rect == nil then
+		if _type(rectOrX) == "userdata" then
+			return rectOrX:copy()
+		end
+		
+		return playdate.geometry.rect.new(rectOrX, y, w, h)
+	else
+		rect:set(rectOrX, y, w, h)
+		return rect
+	end
+end
+
+-- 
+
+function playdate.geometry.rect.center(rect, rectContainer)
+	rect:set(
+		rectContainer.x + (rectContainer.w - rect.w) / 2,
+		rectContainer.y + (rectContainer.h - rect.h) / 2,
+		rect.w,
+		rect.h
+	)
+end
+
+-- "T" methods - transform methods. Transforms and returns input for convenience.
+
+local function _transform(transformFunction)
+	return function (rect, ...)
+		transformFunction(rect, ...)
+		return rect
+	end
+end
+
+--function playdate.geometry.rect.tOffset(rect, offsetX, offsetY)
+playdate.geometry.rect.tOffset = _transform(playdate.geometry.rect.offset)
+
+--function playdate.geometry.rect.tCenter(rect, rectContainer)
+playdate.geometry.rect.tCenter = _transform(playdate.geometry.rect.center)
+
+--function playdate.geometry.rect:tSet(rectOrX, y, w, h)
+playdate.geometry.rect.tSet = _transform(playdate.geometry.rect.set)
