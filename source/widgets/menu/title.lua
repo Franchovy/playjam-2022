@@ -213,9 +213,7 @@ function WidgetTitle:_animate(animation, queueFinishedCallback)
 	end
 end
 
-function WidgetTitle:_draw(rect)
-	
-	local frame = self.frame
+function WidgetTitle:_draw(frame, rect)
 	local _rects = self.rects
 	
 	-- Warning: This is a Work-around! What should really happen is: 
@@ -226,13 +224,14 @@ function WidgetTitle:_draw(rect)
 	if _rects.top == nil then
 		return
 	end
+	
 	self.painterBackground1:draw(_rects.top)
 	self.painterBackground2:draw(_rects.right)
 	self.painterBackground3:draw(_rects.top, { tick = self.tick })
 	self.painterBackground4:draw(_rects.left)
 	self.painterBackgroundAssets:draw(_rects.right)
 	
-	self.painters.painterWheel:draw(_rects.wheel, { index = self.index % 36 })
+	self.painters.painterWheel:draw(_rects.wheel, { index = self.index % 36 }) 
 	self.painters.painterTitle:draw(_rects.title)
 	
 	self.painters.painterButton:draw(_rects.button, { tick = self.tick })

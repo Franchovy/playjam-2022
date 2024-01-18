@@ -107,13 +107,11 @@ function WidgetMenu:_load()
 	end)
 end
 
-function WidgetMenu:_draw(rect)
-	local _frame = self.frame
-	
-	self.painters.background:draw(_frame)
-	self.children.title:draw(_frame, rect)
-	self.children.levelSelect:draw(_frame:toLegacyRect(), rect)
-	self.children.menuSettings:draw(_frame:toLegacyRect(), rect)
+function WidgetMenu:_draw(frame, rect)
+	self.painters.background:draw(frame)
+	self.children.title:draw(rect)
+	self.children.levelSelect:draw(frame:toLegacyRect(), rect)
+	self.children.menuSettings:draw(frame:toLegacyRect(), rect)
 end
 
 function WidgetMenu:_update()
