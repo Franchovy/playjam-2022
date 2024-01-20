@@ -303,6 +303,9 @@ end
 
 function WidgetLevel:_unload()
 	self.spriteCycler:unloadAll()
+	self.spriteCycler = nil
+	self.configHandler = nil
+	
 	self.periodicBlinker:stop()
 	self.wheel.sprite:remove()
 	
