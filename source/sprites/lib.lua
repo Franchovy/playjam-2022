@@ -1,6 +1,6 @@
 import "coin"
 import "killBlock"
 import "platform"
-import "player/wheel"
+import "wheel"
 import "levelend"
 import "checkpoint"
