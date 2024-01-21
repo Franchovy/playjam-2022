@@ -4,6 +4,7 @@ import "play/levelComplete"
 import "play/gameOver"
 import "play/background"
 import "play/hud"
+import "play/system"
 import "utils/themes"
 
 local gfx <const> = playdate.graphics
@@ -88,6 +89,9 @@ function WidgetPlay:_load()
 	self.children.gameOver.signals.restartCheckpoint = function() 
 		self:setState(self.kStates.checkpoint)
  	end
+
+	 self.children.systemMenu = Widget.new(WidgetSystem)
+	 self.children.systemMenu:load()
 	
 	function self.restartLevel() 
 		self.resetData()
@@ -107,6 +111,9 @@ function WidgetPlay:_load()
 	
 	self.children.gameOver.signals.restartLevel = self.restartLevel
 	self.children.gameOver.signals.returnToMenu = self.returnToMenu
+
+	self.children.systemMenu.signals.restartLevel = self.restartLevel
+	self.children.systemMenu.signals.returnToMenu = self.returnToMenu
 	
 	-- Level Theme
 	
@@ -307,7 +314,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 	elseif stateTo == self.kStates.start then
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.closed)
-		
+
 		if AppConfig.enableBackgroundMusic == true then
 			self.filePlayer:stop()
 		end
