@@ -1,46 +1,93 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "build",
-      "type": "shell",
-      "command": "mkdir -p ${config:playdate.output}; pdc -k source ${config:playdate.output} ",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "silent",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": false,
-        "clear": false,
-        "revealProblems": "onProblem"
-      },
-      "problemMatcher": {
-        "owner": "lua",
-        "pattern": {
-          "regexp": "^(warning|error):\\s+(.*):(\\d+):\\s+(.*)$",
-          "severity": 1,
-          "file": 2,
-          "line": 3,
-          "message": 4
-        }
-      },
-      "dependsOn": ["incrementBuild"]
-    },
-    {
-      "label" : "incrementBuild",
-      "type" : "shell",
-      "command" : "./.vscode/buildnum.sh",
-      "presentation": {
-        "echo": true,
-        "reveal": "silent",
-        "showReuseMessage": false,
-        "clear": true,
-      },
-    },
-    
-  ]
-}
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+	  {
+		"label": "Invoke Build and Run script",
+		"type": "shell",
+		"command": "&",
+		"windows": {
+			"args": [
+				"${workspaceFolder}\\Build and Run (Simulator).ps1",
+				"-build",
+				"'${workspaceFolder}\\builds'",
+				"-source",
+				"'${workspaceFolder}\\source'",
+				"-name",
+				"'${workspaceFolderBasename}'"
+			]
+		},
+		"linux": {
+			"command": "${workspaceFolder}/build_and_run.sh",
+			"args": [
+				"build"
+			]
+		},
+		"presentation": {
+		  "showReuseMessage": false,
+		  "reveal": "always",
+		  "panel": "shared"
+		}
+	  },
+	  {
+		"label": "Invoke Run script",
+		"type": "shell",
+		"command": "&",
+		"windows": {
+			"args": [
+				"${workspaceFolder}\\Build and Run (Simulator).ps1",
+				"-build",
+				"'${workspaceFolder}\\builds'",
+				"-source",
+				"'${workspaceFolder}\\source'",
+				"-name",
+				"'${workspaceFolderBasename}'",
+				"-dontbuild"
+			]
+		},
+		"linux": {
+			"command": "${workspaceFolder}/build_and_run.sh",
+			"args": [
+				"run"
+			]
+		},
+		"presentation": {
+		  "showReuseMessage": false,
+		  "reveal": "always",
+		  "panel": "shared"
+		}
+	  },
+	  {
+		"label": "Build and Run (Simulator)",
+		"dependsOn": ["Invoke Build and Run script"],
+		"dependsOrder": "sequence",
+		"presentation": {
+		  "showReuseMessage": false,
+		  "reveal": "always",
+		  "panel": "shared"
+		},
+		"problemMatcher": [],
+		"group": {
+		  "kind": "build",
+		  "isDefault": true
+		}
+	  },
+	  {
+		"label": "Run (Simulator)",
+		"dependsOn": ["Invoke Run script"],
+		"dependsOrder": "sequence",
+		"presentation": {
+		  "showReuseMessage": false,
+		  "reveal": "always",
+		  "panel": "shared"
+		},
+		"problemMatcher": [],
+		"group": {
+		  "kind": "test",
+		  "isDefault": true
+		}
+	  }
+	]
+  }
+  
