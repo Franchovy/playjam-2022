@@ -3,13 +3,19 @@ import "utils/textPainter"
 
 local gfx <const> = playdate.graphics
 local easing <const> = playdate.easingFunctions
+local geo <const> = playdate.geometry
+
+local _assign <const> = geo.rect.assign
+local _tOffset <const> = geo.rect.tOffset
 
 class("WidgetHUD").extends(Widget)
 
 function WidgetHUD:init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animators)
-	self:setStateInitial({onScreen = 1, offScreen = 2}, 1)
+	self:supply(Widget.deps.frame)
+		
+	self:setStateInitial({onScreen = 1, offScreen = 2}, 2)
 	
 	self.images = {}
 	self.painters = {}
@@ -44,19 +50,17 @@ function WidgetHUD:_load()
 	self.data.coinsLabelText = ""
 end
 
-function WidgetHUD:_draw(frame)
-	local animatorValue = self:getAnimatorValue(self.animators.hideAnimator)
-	local offsetRect = Rect.offset(frame, 0, animatorValue)
-	self.painters.frame:draw(offsetRect)
+function WidgetHUD:_draw(frame, rect)
+	local _rects = self.rects
+	-- TODO: Same warning as WidgetTitle
+	if _rects.frame == nil then
+		return
+	end
 	
-	self.textPainter:drawText(self.data.timeLabelText, offsetRect.x + 10, offsetRect.y + 7)
-	
-	local coinImageSize = self.images.coin:getSize()
-	self.textPainter:drawTextAlignedRight(self.data.coinsLabelText, offsetRect.x + offsetRect.w - 10 - coinImageSize, offsetRect.y + 7)
-	
-	self.images.coin:draw(offsetRect.x + offsetRect.w - 10 - coinImageSize, offsetRect.y + 3)
-	
-	self.frame = frame
+	self.painters.frame:draw(_rects.frame)
+	self.textPainter:drawText(self.data.timeLabelText, _rects.timeText.x, _rects.timeText.y)
+	self.textPainter:drawTextAlignedRight(self.data.coinsLabelText, _rects.coinsText.x, _rects.coinsText.y)
+	self.images.coin:draw(_rects.coinImage.x, _rects.coinImage.y)
 end
 
 function WidgetHUD:_update()
@@ -66,19 +70,26 @@ function WidgetHUD:_update()
 	local coinsLabelTextPrevious = self.data.coinsLabelText
 	self.data.coinsLabelText = ""..self.data.coins
 	
-	if self.frame ~= nil then
-		if self:isAnimating() == true then
-			gfx.sprite.addDirtyRect(0, 0, self.frame.x + self.frame.w, self.frame.y + self.frame.h)
-		else	
-			local labelWidth = 150
-			
-			if self.data.coinsLabelText ~= coinsLabelTextPrevious then
-				gfx.sprite.addDirtyRect(self.frame.x + self.frame.w - labelWidth - 10, self.frame.y, labelWidth, self.frame.h)
-			end
-			
-			if self.data.timeLabelText ~= timeLabelTextPrevious then
-				gfx.sprite.addDirtyRect(self.frame.x + 10, self.frame.y, labelWidth, self.frame.h)
-			end
+	if self:isAnimating() == true then
+		local animatorValue = self:getAnimatorValue(self.animators.hideAnimator)
+		local coinImageSize = self.images.coin:getSize()
+		local _rects = self.rects
+		local _frame = self.frame
+		_rects.frame = _tOffset(_assign(_rects.frame, _frame), 0, animatorValue)
+		_rects.timeText = _tOffset(_assign(_rects.timeText, _rects.frame), 10, 7)
+		_rects.coinsText = _tOffset(_assign(_rects.coinsText, _rects.frame), _rects.frame.w - 10 - coinImageSize, 7)
+		_rects.coinImage = _tOffset(_assign(_rects.coinImage, _rects.frame), _rects.frame.w - 10 - coinImageSize, 3)
+		
+		gfx.sprite.addDirtyRect(0, 0, self.frame.x + self.frame.w, self.frame.y + self.frame.h)
+	else	
+		local labelWidth = 150
+		
+		if self.data.coinsLabelText ~= coinsLabelTextPrevious then
+			gfx.sprite.addDirtyRect(self.frame.x + self.frame.w - labelWidth - 10, self.frame.y, labelWidth, self.frame.h)
+		end
+		
+		if self.data.timeLabelText ~= timeLabelTextPrevious then
+			gfx.sprite.addDirtyRect(self.frame.x + 10, self.frame.y, labelWidth, self.frame.h)
 		end
 	end
 end
