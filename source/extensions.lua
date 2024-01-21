@@ -182,11 +182,3 @@ function math.sign(value)
 		return 0
 	end
 end
-
--- Useful methods
-
-function setIfNil(value, valueIfNil)
-	if value == nil then
-		value = valueIfNil
-	end
-end
