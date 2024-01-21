@@ -20,9 +20,10 @@ function WidgetLevel:init(config)
 	self:setStateInitial({
 		ready = 1,
 		playing = 2,
-		unloaded = 3,
-		restartCheckpoint = 4,
-		restartLevel = 5,
+		freeze = 3,
+		unloaded = 4,
+		restartCheckpoint = 5,
+		restartLevel = 6,
 	}, 1)
 	
 	self.sprites = {}
@@ -249,9 +250,11 @@ function WidgetLevel:_update()
 end
 
 function WidgetLevel:_changeState(stateFrom, stateTo)
+	self.wheel.sprite.isFrozen = not (stateTo == self.kStates.playing)
+	
 	if stateFrom == self.kStates.ready and (stateTo == self.kStates.playing) then
 		self.wheel.sprite.ignoresPlayerInput = false
-	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.unloaded) then
+	elseif stateTo == self.kStates.unloaded then
 		self.periodicBlinker:stop()
 
 		self.spriteCycler:unloadAll()

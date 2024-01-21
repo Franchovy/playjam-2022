@@ -114,8 +114,6 @@ function WidgetPlay:_load()
 			self.filePlayer:stop()
 		end
 		
-		self.children.level:setState(self.children.level.kStates.unloaded)
-		
 		self.signals.returnToMenu()
 	end
 	
@@ -330,11 +328,15 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		end)
 		
 		timer.performAfterDelay(3000, function()
+			self.children.level:setState(self.children.level.kStates.frozen)
+			
 			self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
 		end)
 	elseif stateTo == self.kStates.start then
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.closed)
+		
+		self.children.level:setState(self.children.level.kStates.frozen)
 
 		if AppConfig.enableBackgroundMusic == true then
 			self.filePlayer:stop()
