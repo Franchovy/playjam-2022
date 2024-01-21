@@ -4,10 +4,17 @@ import "play/levelComplete"
 import "play/gameOver"
 import "play/background"
 import "play/hud"
+import "play/system"
 import "utils/themes"
 
 local gfx <const> = playdate.graphics
 local timer <const> = playdate.timer
+local disp <const> = playdate.display
+local geo <const> = playdate.geometry
+
+local _assign <const> = geo.rect.assign
+local _tInset <const> = geo.rect.tInset
+local _tSet <const> = geo.rect.tSet
 
 class("WidgetPlay").extends(Widget)
 
@@ -15,6 +22,9 @@ function WidgetPlay:init(config)
 	self.config = config
 	
 	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.frame)
+	
+	self:setFrame(disp.getRect())
 	
 	self:setStateInitial({
 		start = 1,
@@ -74,6 +84,7 @@ function WidgetPlay:_load()
 	
 	self.children.hud = Widget.new(WidgetHUD)
 	self.children.hud:load()
+	self.children.hud:setFrame(_tSet(_tInset(_assign(nil, self.frame), 7, 7), nil, nil, nil, 29))
 	
 	self.children.level.signals.collectCoin = function(coinCount)
 		self.data.coins += coinCount
@@ -88,6 +99,9 @@ function WidgetPlay:_load()
 	self.children.gameOver.signals.restartCheckpoint = function() 
 		self:setState(self.kStates.checkpoint)
  	end
+
+	 self.children.systemMenu = Widget.new(WidgetSystem)
+	 self.children.systemMenu:load()
 	
 	function self.restartLevel() 
 		self.resetData()
@@ -100,13 +114,14 @@ function WidgetPlay:_load()
 			self.filePlayer:stop()
 		end
 		
-		self.children.level:setState(self.children.level.kStates.unloaded)
-		
 		self.signals.returnToMenu()
 	end
 	
 	self.children.gameOver.signals.restartLevel = self.restartLevel
 	self.children.gameOver.signals.returnToMenu = self.returnToMenu
+
+	self.children.systemMenu.signals.restartLevel = self.restartLevel
+	self.children.systemMenu.signals.returnToMenu = self.returnToMenu
 	
 	-- Level Theme
 	
@@ -149,18 +164,23 @@ function WidgetPlay:_load()
 	
 	self.timers.levelTimer = timer.new(999000)
 	self.timers.levelTimer:pause()
+	
+	self.children.hud:setState(self.children.hud.kStates.onScreen)
 end
 
-function WidgetPlay:_draw(rect)
+function WidgetPlay:_draw(frame, rect)
+	-- Warning: this is a work-around, see WidgetTitle:_draw() for description
+	local _rects = self.rects
+	if _rects.levelComplete == nil then
+		return
+	end
+	
 	if self.children.levelComplete ~= nil then
-		local insetRect = Rect.inset(rect, 30, 20)
-		self.children.levelComplete:draw(insetRect)
+		self.children.levelComplete:draw(_rects.levelComplete:toLegacyRect())
 	end
 
-	self.children.gameOver:draw(rect)
-	
-	local topAlignedRect = Rect.with(Rect.inset(rect, 7), { h = 29 })
-	self.children.hud:draw(topAlignedRect)
+	self.children.gameOver:draw(frame:toLegacyRect())
+	self.children.hud:draw(rect)
 end
 
 function WidgetPlay:_update()
@@ -172,6 +192,12 @@ function WidgetPlay:_update()
 	if playdate.isCrankDocked() and (self.state == self.kStates.playing or (self.state == self.kStates.start)) then
 		g.showCrankIndicator = true
 	end
+	
+	-- perform layout 
+	local _frame = self.frame
+	local _rects = self.rects
+	
+	_rects.levelComplete = _tInset(_assign(_rects.levelComplete, _frame), 30, 20)
 end
 
 function WidgetPlay:_changeState(stateFrom, stateTo)
@@ -302,12 +328,16 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		end)
 		
 		timer.performAfterDelay(3000, function()
+			self.children.level:setState(self.children.level.kStates.frozen)
+			
 			self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
 		end)
 	elseif stateTo == self.kStates.start then
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.closed)
 		
+		self.children.level:setState(self.children.level.kStates.frozen)
+
 		if AppConfig.enableBackgroundMusic == true then
 			self.filePlayer:stop()
 		end

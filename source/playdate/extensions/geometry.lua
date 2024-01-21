@@ -1,5 +1,16 @@
 local _type = type
 
+local _new = playdate.geometry.rect.new
+
+function playdate.geometry.rect.new(x, y, w, h)
+	return _new(
+		x == nil and 0 or x,
+		y == nil and 0 or y,
+		w == nil and 0 or w,
+		h == nil and 0 or h
+	)
+end
+
 function playdate.geometry.rect:set(rectOrX, y, w, h)
 	if _type(rectOrX) == "userdata" then
 		self.x = rectOrX.x
@@ -51,11 +62,14 @@ local function _transform(transformFunction)
 	end
 end
 
---function playdate.geometry.rect.tOffset(rect, offsetX, offsetY)
+--function playdate.geometry.rect:tOffset(rect, offsetX, offsetY)
 playdate.geometry.rect.tOffset = _transform(playdate.geometry.rect.offset)
 
---function playdate.geometry.rect.tCenter(rect, rectContainer)
+--function playdate.geometry.rect:tCenter(rect, rectContainer)
 playdate.geometry.rect.tCenter = _transform(playdate.geometry.rect.center)
 
 --function playdate.geometry.rect:tSet(rectOrX, y, w, h)
 playdate.geometry.rect.tSet = _transform(playdate.geometry.rect.set)
+
+--function playdate.geometry.rect:inset(dx, dy)
+playdate.geometry.rect.tInset = _transform(playdate.geometry.rect.inset)
