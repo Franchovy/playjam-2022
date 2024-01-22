@@ -228,7 +228,7 @@ function WidgetLevel:_update()
 	if self.state == self.kStates.ready then
 		self:setNeutralDrawOffset()
 		
-		if playdate.buttonIsPressed(playdate.kButtonA) or (math.abs(playdate.getCrankChange()) > 5) then
+		if playdate.buttonIsPressed(playdate.kButtonA | playdate.kButtonB) or (math.abs(playdate.getCrankChange()) > 5) then
 			self.signals.startPlaying()
 		end
 	end
