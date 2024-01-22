@@ -66,7 +66,7 @@ function Widget:createSprite(zIndex)
 		sprite.draw = function(s, x, y, w, h)
 			local frame = Rect.make(s.x, s.y, s.width, s.height)
 			local drawRect = Rect.make(x, y, w, h)
-			self:draw(frame, self.state, drawRect)
+			self:draw(frame, drawRect)
 		end
 		
 		sprite:add()
