@@ -1,11 +1,12 @@
 import "engine"
+import "engine/colliderSprite"
 import "constant"
 import "utils/images"
 import "playdate"
 
 local gfx <const> = playdate.graphics
 
-class("Wheel").extends(gfx.sprite)
+class("Wheel").extends(ColliderSprite)
 
 local maxFallSpeed <const> = 14
 local gravity <const> = 1.4
@@ -37,7 +38,7 @@ function Wheel:init()
 	Wheel.super.init(self)
 	
 	self.imagetable = gfx.imagetable.new(kAssetsImages.wheel)
-	
+
 	self:setImage(self.imagetable[1])
 	self:setCenter(0, 0)
 	
@@ -157,6 +158,9 @@ local currentTicks = 0
 -- Movement
 
 function Wheel:update()
+	-- important, update the physics
+	Wheel.super:update()
+
 	local input = self.input
 	
 	-- Update if player has died
