@@ -5,13 +5,14 @@ import "sprites/lib"
 import "config"
 import "widgets"
 import "utils/fonts"
+import "runTests"
 
 local topLevelWidget
 
 -- Globals table -- Use sparingly!
 g = {
 	showCrankIndicator = false,
-	runTests = false	-- run some tests before initializing the game
+	runTests = true	-- run some tests before initializing the game
 }
 
 function initialize()
