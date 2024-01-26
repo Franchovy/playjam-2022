@@ -10,7 +10,8 @@ local topLevelWidget
 
 -- Globals table -- Use sparingly!
 g = {
-	showCrankIndicator = false
+	showCrankIndicator = false,
+	runTests = false	-- run some tests before initializing the game
 }
 
 function initialize()
@@ -48,5 +49,9 @@ function playdate.update()
 end
 
 -- Start game
+
+if g.runTests then
+	runTests()
+end
 
 initialize()
