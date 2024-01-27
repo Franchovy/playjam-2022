@@ -1,5 +1,6 @@
 import "playdate"
 import "constant"
+import "bit32"
 
 local gfx <const> = playdate.graphics
 
@@ -187,6 +188,33 @@ ColliderSprite.calculateAabbToAabbResolution = function(overlapInfo)
     else
         return {x = 0, y = yMove}
     end
+end
+
+-- given two collision types, returns true if we should check overlap between both colliders
+-- this function was abstracted away to make it easier to test
+-- In game logic, it's probably better to call ColliderSprite:checkOverlapWith
+function ColliderSprite.shouldCheckOverlap(firstCollisionType, secondCollisionType)
+    local mask = bit32.bor(firstCollisionType, secondCollisionType)
+
+    -- If any is set to "ignore" mode we just return false
+    if bit32.band(mask, kCollisionType.ignore) == kCollisionType.ignore then
+        return false
+    end
+
+    local truthTable = {
+        [bit32.bor(kCollisionType.dynamic, kCollisionType.dynamic)] = true,
+        [bit32.bor(kCollisionType.dynamic, kCollisionType.static)] = true,
+        [bit32.bor(kCollisionType.dynamic, kCollisionType.trigger)] = true,
+        [bit32.bor(kCollisionType.static, kCollisionType.trigger)] = false,
+        [bit32.bor(kCollisionType.static, kCollisionType.static)] = false,
+        [bit32.bor(kCollisionType.trigger, kCollisionType.trigger)] = true,
+    }
+
+    return truthTable[mask]
+end
+
+function ColliderSprite:checkOverlapWith(other)
+    return ColliderSprite.shouldCheckOverlap(self.getCollisionType(), other.getCollisionType())
 end
 
 -- Returns true if two ColliderSprites overlap regardless of collision masks, collision enabled or collision types
