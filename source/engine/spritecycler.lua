@@ -186,3 +186,25 @@ function SpriteCycler:discardLoadConfig(discardAll)
 		end
 	end
 end
+
+function SpriteCycler:getSpritesOfChunk(chunk)
+	local sprites = {}
+	for _, object in pairs(self.data[chunk]) do
+		table.insert(sprites, object.sprite)
+	end
+
+	return sprites
+end
+
+function SpriteCycler:getChunkWithWheel()
+	for _, chunk in pairs(self.chunksLoaded) do
+		for _, object in pairs(self.data[chunk]) do
+			local sprite = object.sprite
+			if getmetatable(sprite).__name == "Wheel" then
+				return self.getSpritesOfChunk(chunk)
+			end
+		end
+	end
+
+	return nil
+end
