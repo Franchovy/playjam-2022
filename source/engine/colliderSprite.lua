@@ -1,6 +1,5 @@
 import "playdate"
 import "constant"
-import "bit32"
 
 local gfx <const> = playdate.graphics
 
@@ -194,20 +193,20 @@ end
 -- this function was abstracted away to make it easier to test
 -- In game logic, it's probably better to call ColliderSprite:checkOverlapWith
 function ColliderSprite.shouldCheckOverlap(firstCollisionType, secondCollisionType)
-    local mask = bit32.bor(firstCollisionType, secondCollisionType)
+    local mask = firstCollisionType | secondCollisionType
 
     -- If any is set to "ignore" mode we just return false
-    if bit32.band(mask, kCollisionType.ignore) == kCollisionType.ignore then
+    if mask & kCollisionType.ignore == kCollisionType.ignore then
         return false
     end
 
     local truthTable = {
-        [bit32.bor(kCollisionType.dynamic, kCollisionType.dynamic)] = true,
-        [bit32.bor(kCollisionType.dynamic, kCollisionType.static)] = true,
-        [bit32.bor(kCollisionType.dynamic, kCollisionType.trigger)] = true,
-        [bit32.bor(kCollisionType.static, kCollisionType.trigger)] = false,
-        [bit32.bor(kCollisionType.static, kCollisionType.static)] = false,
-        [bit32.bor(kCollisionType.trigger, kCollisionType.trigger)] = true,
+        [kCollisionType.dynamic | kCollisionType.dynamic] = true,
+        [kCollisionType.dynamic | kCollisionType.static] = true,
+        [kCollisionType.dynamic | kCollisionType.trigger] = true,
+        [kCollisionType.static | kCollisionType.trigger] = false,
+        [kCollisionType.static | kCollisionType.static] = false,
+        [kCollisionType.trigger | kCollisionType.trigger] = true,
     }
 
     return truthTable[mask]
