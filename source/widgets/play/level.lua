@@ -254,6 +254,8 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 	
 	if stateFrom == self.kStates.ready and (stateTo == self.kStates.playing) then
 		self.wheel.sprite.ignoresPlayerInput = false
+		
+		self.periodicBlinker:start()
 	elseif stateTo == self.kStates.unloaded then
 		self.periodicBlinker:stop()
 
