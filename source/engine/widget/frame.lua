@@ -1,9 +1,13 @@
 local gfx <const> = playdate.graphics
 local geo <const> = playdate.geometry
 
-function frame(widget)
-	function widget:setNeedsLayout()
-		self._state.needsLayout = true
+function frame(widget, config)
+	config = config or {}
+	
+	if config.isVisible ~= nil then
+		widget._state.isVisible = config.isVisible
+	else
+		widget._state.isVisible = true
 	end
 	
 	function widget:draw(rect)
@@ -47,8 +51,7 @@ function frame(widget)
 
 	widget.frame = geo.rect.new(0,0,0,0)
 	widget.rects = table.create(0, 5)
-	
-	widget._state.isVisible = true
+
 	local isVisibleActual = widget._state.isVisible
 	
 	function widget:setVisible(isVisibleNew)

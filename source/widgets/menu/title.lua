@@ -17,7 +17,7 @@ function WidgetTitle:init()
 	WidgetTitle.super.init(self)
 	
 	self:supply(Widget.deps.animations)
-	self:supply(Widget.deps.frame)
+	self:supply(Widget.deps.frame, { isVisible = false })
 	
 	self:setFrame(disp.getRect())
 	
@@ -218,15 +218,6 @@ end
 function WidgetTitle:_draw(frame, rect)
 	local _rects = self.rects
 	
-	-- Warning: This is a Work-around! What should really happen is: 
-	-- 1) in _animate, toggle :setVisible to true.
-	-- 2) setting visible should only take effect NEXT frame, not current frame. and 
-	-- 3) draw happens once a full round of update() has been called, performing the layout as needed.
-	-- ... But for now, we just check if the layout has been performed by checking this rect.
-	if _rects.top == nil then
-		return
-	end
-	
 	self.painterBackground1:draw(_rects.top)
 	self.painterBackground2:draw(_rects.right)
 	self.painterBackground3:draw(_rects.top, { tick = self.tick })
@@ -255,10 +246,6 @@ function WidgetTitle:_update()
 	self.painters.painterButton:markDirty()
 	
 	if self:isAnimating() == true then
-		gfx.sprite.addDirtyRect(0, 0, 400, 240)
-		
-		-- animation update: perform layout
-		
 		local _animators = self.animators
 		local _rects = self.rects
 		local frame = self.frame
@@ -275,6 +262,9 @@ function WidgetTitle:_update()
 		_rects.wheel = _assign(_rects.wheel, animatorValueWheel.x - 60, 30 + animatorValueWheel.y, 280, 120)
 		_rects.title = _tSet(_tOffset(_assign(_rects.title, frame), 0, 130 + animatorValueTitle), nil, nil, nil, 57)
 		_rects.button = _tOffset(_tSet(_tCenter(_assign(_rects.button, 0, 0, 160, 27), frame), nil, 200), 0, animatorValueButton)
+		
+		gfx.sprite.addDirtyRect(0, 0, 400, 240)
+		self:setVisible(true)
 	end
 end
 

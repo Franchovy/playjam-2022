@@ -38,7 +38,7 @@ function Widget.new(class, ...)
 	return widget
 end
 
-function Widget:supply(dep)
+function Widget:supply(dep, config)
 	if dep._config ~= nil then
 		if dep._config.dependsOn ~= nil then
 			for _, dep in pairs(dep._config.dependsOn) do
@@ -49,7 +49,7 @@ function Widget:supply(dep)
 		end
 	end
 	
-	dep._supply(self)
+	dep._supply(self, config)
 end
 
 function Widget:createSprite(zIndex)
