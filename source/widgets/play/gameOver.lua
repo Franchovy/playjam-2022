@@ -7,13 +7,14 @@ class("WidgetGameOver").extends(Widget)
 function WidgetGameOver:init(config)
 	self.config = config
 	
+	self:supply(Widget.deps.input)
+	
 	self.painters = {}
 	self.images = {}
 	
 	self:createSprite(kZIndex.overlay)
 	
 	self.signals = {}
-
 end
 
 function WidgetGameOver:_load()
@@ -72,7 +73,7 @@ function WidgetGameOver:_draw(rect)
 end
 
 function WidgetGameOver:_update()
-	
+	self:passInput(self.children.entriesMenu)
 end
 
 function WidgetGameOver:_unload()

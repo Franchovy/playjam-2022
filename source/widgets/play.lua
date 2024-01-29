@@ -169,10 +169,6 @@ function WidgetPlay:_load()
 	self.timers.levelTimer:pause()
 	
 	self.children.hud:setState(self.children.hud.kStates.onScreen)
-	
-	timer.performAfterDelay(4000, function()
-		self:setState(self.kStates.levelComplete)
-	end)
 end
 
 function WidgetPlay:_draw(frame, rect)
@@ -205,6 +201,8 @@ function WidgetPlay:_update()
 	
 	if self.state == self.kStates.levelComplete then
 		self:passInput(self.children.levelComplete)
+	elseif self.state == self.kStates.gameOver then
+		self:passInput(self.children.gameOver)
 	end
 end
 
