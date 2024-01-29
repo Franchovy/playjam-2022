@@ -126,6 +126,10 @@ function WidgetPlay:_load()
 	self.children.systemMenu.signals.restartLevel = self.restartLevel
 	self.children.systemMenu.signals.returnToMenu = self.returnToMenu
 	
+	-- Level complete (layout only)
+	
+	self.rects.levelComplete = _tInset(_assign(self.rects.levelComplete, self.frame), 30, 20)
+	
 	-- Level Theme
 	
 	self.loadTheme = function()
@@ -191,13 +195,6 @@ function WidgetPlay:_update()
 	if playdate.isCrankDocked() and (self.state == self.kStates.playing or (self.state == self.kStates.start)) then
 		g.showCrankIndicator = true
 	end
-	
-	-- perform layout 
-	local _frame = self.frame
-	local _rects = self.rects
-	
-	_rects.levelComplete = _tInset(_assign(_rects.levelComplete, _frame), 30, 20)
-	self:setVisible(true)
 	
 	if self.state == self.kStates.levelComplete then
 		self:passInput(self.children.levelComplete)
