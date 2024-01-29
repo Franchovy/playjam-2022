@@ -13,6 +13,7 @@ function LevelComplete:init(config)
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animators)
+	self:supply(Widget.deps.input)
 	
 	self:setStateInitial({
 		text = 1,
@@ -262,7 +263,6 @@ function LevelComplete:_update()
 	end
 	
 	if self.state == self.kStates.menu then
-		
 		local menuIsVisible = self.children.menu:isVisible()
 		if menuIsVisible ~= self.previousVisibleMenu then
 			gfx.sprite.addDirtyRect(37, 130, 326, 85)
@@ -270,12 +270,16 @@ function LevelComplete:_update()
 		self.previousVisibleMenu = menuIsVisible
 	end
 	
-	if playdate.buttonJustPressed(playdate.kButtonA) or (playdate.buttonJustPressed(playdate.kButtonB)) then
-		if self.state == self.kStates.overlay then
-			self:playSample(kAssetsSounds.menuAccept)
-			
-			self:setState(self.kStates.menu)
-		end
+	if self.state == self.kStates.overlay then
+		self:filterInput(playdate.kButtonA | playdate.kButtonB)
+	end
+end
+
+function LevelComplete:_handleInput(input)
+	if input.pressed & (playdate.kButtonA | playdate.kButtonB) ~= 0 then
+		self:playSample(kAssetsSounds.menuAccept)
+		
+		self:setState(self.kStates.menu)
 	end
 end
 

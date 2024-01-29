@@ -167,6 +167,8 @@ function WidgetMain:_update()
 	
 	if self.state == self.kStates.menu and (self.children.menu ~= nil) then
 		self:passInput(self.children.menu)
+	elseif self.state == self.kStates.play and (self.children.play ~= nil) then
+		self:passInput(self.children.play)
 	end
 end
 

@@ -24,6 +24,7 @@ function WidgetPlay:init(config)
 	self.config = config
 	
 	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.frame)
 	
 	self:setFrame(disp.getRect())
@@ -168,6 +169,10 @@ function WidgetPlay:_load()
 	self.timers.levelTimer:pause()
 	
 	self.children.hud:setState(self.children.hud.kStates.onScreen)
+	
+	timer.performAfterDelay(4000, function()
+		self:setState(self.kStates.levelComplete)
+	end)
 end
 
 function WidgetPlay:_draw(frame, rect)
@@ -197,6 +202,10 @@ function WidgetPlay:_update()
 	
 	_rects.levelComplete = _tInset(_assign(_rects.levelComplete, _frame), 30, 20)
 	self:setVisible(true)
+	
+	if self.state == self.kStates.levelComplete then
+		self:passInput(self.children.levelComplete)
+	end
 end
 
 function WidgetPlay:_changeState(stateFrom, stateTo)
@@ -315,6 +324,8 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			
 			self.children.level.config.objects = self.config.objects
 			self.children.level.config.objectives = self.config.objectives
+			
+			self.children.level:setState(self.children.level.kStates.unloaded)
 			
 			self:setState(self.kStates.start)
 		end
