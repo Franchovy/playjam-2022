@@ -91,12 +91,6 @@ function Widget:createSprite(zIndex)
 	end
 end
 
-function Widget.load(self)
-	self:_load()
-	
-	self._state.isLoaded = true
-end
-
 function Widget.setVisible(self, isVisible)
 	self._state.isVisible = isVisible
 	
@@ -109,6 +103,18 @@ end
 
 function Widget.isVisible(self)
 	return self._state.isVisible
+end
+
+function Widget.load(self)
+	self:_load()
+	
+	self._state.isLoaded = true
+	
+	if self._loadCallbacks ~= nil then
+		for _, callback in pairs(self._loadCallbacks) do
+			callback(self)
+		end
+	end
 end
 
 function Widget.unload(self)
@@ -147,6 +153,14 @@ function Widget:update()
 			callback(self)
 		end
 	end
+end
+
+function Widget:_addLoadCallback(callback)
+	if self._loadCallbacks == nil then
+		self._loadCallbacks = {}
+	end
+	
+	table.insert(self._loadCallbacks, callback)
 end
 
 function Widget:_addUpdateCallback(callback)

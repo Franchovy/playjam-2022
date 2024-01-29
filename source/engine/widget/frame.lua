@@ -10,14 +10,6 @@ function frame(widget, config)
 		widget._state.isVisible = true
 	end
 	
-	function widget:draw(rect)
-		if self._state.isLoaded == false or (self._state.isVisible == false) then
-			return
-		end
-	
-		self:_draw(self.frame, rect)
-	end
-	
 	function widget:setFrame(rect)
 		self.frame:set(rect)
 		
@@ -57,6 +49,26 @@ function frame(widget, config)
 	function widget:setVisible(isVisibleNew)
 		isVisibleActual = isVisibleNew
 	end
+	
+	local _state = widget._state
+	local _frame = widget.frame
+	local _draw = nil
+	
+	function widget:draw(rect)
+		if _draw == nil then
+			return
+		end
+		
+		if (_state.isLoaded and _state.isVisible) == false then
+			return
+		end
+	
+		_draw(self, _frame, rect)
+	end
+	
+	widget:_addLoadCallback(function(self)
+		_draw = self._draw
+	end)
 	
 	widget:_addUpdateCallback(function(self)
 		if self._state.isVisible ~= isVisibleActual then
