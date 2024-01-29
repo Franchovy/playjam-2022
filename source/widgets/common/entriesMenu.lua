@@ -1,6 +1,7 @@
 import "entriesMenu/entry"
 
 local gfx <const> = playdate.graphics
+local filter <const> = playdate.kButtonA | playdate.kButtonB | playdate.kButtonUp | playdate.kButtonDown
 
 class("WidgetEntriesMenu").extends(Widget)
 
@@ -9,6 +10,7 @@ function WidgetEntriesMenu:init(config)
 	
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.samples)
+	self:supply(Widget.deps.input)
 	
 	self:setStateInitial(self.config, 1)
 	
@@ -65,13 +67,17 @@ function WidgetEntriesMenu:_draw(frame)
 end
 
 function WidgetEntriesMenu:_update()
-	if playdate.buttonJustPressed(playdate.kButtonA) or (playdate.buttonJustPressed(playdate.kButtonB)) then
+	self:filterInput(filter)
+end
+
+function WidgetEntriesMenu:_handleInput(input)
+	if input.pressed & (playdate.kButtonA | playdate.kButtonB) ~= 0 then
 		self:playSample(kAssetsSounds.menuAccept)
-				
+		
 		self.signals.entrySelected(self.state)
 	end
 	
-	if playdate.buttonJustPressed(playdate.kButtonDown) then
+	if input.pressed & playdate.kButtonDown ~= 0 then
 		if self.state < #self.entries then
 			self:playSample(kAssetsSounds.menuSelect)
 			self:setState(self.state + 1)
@@ -84,7 +90,7 @@ function WidgetEntriesMenu:_update()
 		end
 	end
 	
-	if playdate.buttonJustPressed(playdate.kButtonUp) then
+	if input.pressed & playdate.kButtonUp ~= 0 then
 		if self.state > 1 then
 			self:playSample(kAssetsSounds.menuSelect)
 			self:setState(self.state - 1)

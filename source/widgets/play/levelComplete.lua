@@ -8,6 +8,8 @@ local timer <const> = playdate.timer
 class("LevelComplete").extends(Widget)
 
 function LevelComplete:init(config)
+	LevelComplete.super.init(self)
+	
 	self.config = config
 	
 	self:supply(Widget.deps.samples)
@@ -252,6 +254,8 @@ function LevelComplete:_update()
 	end
 	
 	if self.state == self.kStates.overlay then
+		self:filterInput(playdate.kButtonA | playdate.kButtonB)
+		
 		local blinker1 = self.blinkers.blinkerPressAButton1.on
 		local blinker2 = self.blinkers.blinkerPressAButton2.on
 		
@@ -263,15 +267,13 @@ function LevelComplete:_update()
 	end
 	
 	if self.state == self.kStates.menu then
+		self:passInput(self.children.menu)
+		
 		local menuIsVisible = self.children.menu:isVisible()
 		if menuIsVisible ~= self.previousVisibleMenu then
 			gfx.sprite.addDirtyRect(37, 130, 326, 85)
 		end
 		self.previousVisibleMenu = menuIsVisible
-	end
-	
-	if self.state == self.kStates.overlay then
-		self:filterInput(playdate.kButtonA | playdate.kButtonB)
 	end
 end
 
