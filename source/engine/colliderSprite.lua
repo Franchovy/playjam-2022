@@ -1,5 +1,6 @@
 import "playdate"
-import "constant"
+import "constant/kColliderType"
+import "constant/kCollisionType"
 
 local gfx <const> = playdate.graphics
 
