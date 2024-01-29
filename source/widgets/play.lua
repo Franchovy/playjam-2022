@@ -342,6 +342,8 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.closed)
 		
+		self.timers.levelTimer:pause()
+		
 		self.children.level:setState(self.children.level.kStates.frozen)
 		
 		if AppConfig.enableBackgroundMusic == true then
@@ -367,6 +369,8 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			else
 				self.children.level:setState(self.children.level.kStates.restartLevel)
 			end
+			
+			self.children.hud:setState(self.children.hud.kStates.offScreen)
 			
 			self.timers.levelTimer:reset()
 			self.children.level:setState(self.children.level.kStates.ready)

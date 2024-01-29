@@ -4,6 +4,7 @@ import "playdate"
 import "utils/periodicBlinker"
 
 local gfx <const> = playdate.graphics
+local periodicBlinkerKillblock
 
 class('KillBlock').extends(gfx.sprite)
 
@@ -30,7 +31,10 @@ function KillBlock:init(periodicBlinker)
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)
 	
-	self.periodicBlinker = periodicBlinker
+	if periodicBlinkerKillblock == nil then
+		periodicBlinkerKillblock = periodicBlinker
+	end
+	
 	self:setGroupMask(kCollisionGroups.static)
 	
 	self.isImageInverted = false
@@ -39,8 +43,8 @@ end
 function KillBlock:update()
 	KillBlock.super.update(self)
 	
-	if self.periodicBlinker.hasChanged then
-		self.isImageInverted = not self.isImageInverted
+	if periodicBlinkerKillblock.hasChanged then
+		self.isImageInverted = periodicBlinkerKillblock.blinker.on
 		
 		if self.isImageInverted == true then
 			self:setImage(imageInverted)
