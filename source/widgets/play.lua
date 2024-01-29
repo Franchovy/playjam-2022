@@ -323,8 +323,6 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			self.children.level.config.objects = self.config.objects
 			self.children.level.config.objectives = self.config.objectives
 			
-			self.children.level:setState(self.children.level.kStates.unloaded)
-			
 			self:setState(self.kStates.start)
 		end
 		
@@ -345,7 +343,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		self.children.transition:setState(self.children.transition.kStates.closed)
 		
 		self.children.level:setState(self.children.level.kStates.frozen)
-
+		
 		if AppConfig.enableBackgroundMusic == true then
 			self.filePlayer:stop()
 		end
