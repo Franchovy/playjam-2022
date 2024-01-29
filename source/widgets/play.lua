@@ -182,7 +182,10 @@ function WidgetPlay:_draw(frame, rect)
 		self.children.levelComplete:draw(_rects.levelComplete:toLegacyRect())
 	end
 
-	self.children.gameOver:draw(frame:toLegacyRect())
+	if self.state == self.kStates.gameOver then
+		self.children.gameOver:draw(frame:toLegacyRect())
+	end
+	
 	self.children.hud:draw(rect)
 end
 
