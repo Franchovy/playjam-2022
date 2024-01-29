@@ -1,4 +1,3 @@
-import "utils/value"
 
 local gfx <const> = playdate.graphics
 
