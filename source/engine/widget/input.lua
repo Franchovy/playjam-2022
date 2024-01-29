@@ -1,9 +1,18 @@
 local emptyInput = { pressed = 0, released = 0, current = 0 }
 
+local function clear(input)
+	input.current = 0
+	input.pressed = 0
+	input.released = 0
+end
+
 local function input(widget)
+	widget._filter = playdate.kButtonsAny
+	widget._input = table.shallowcopy(emptyInput)
+	local _input = widget._input
+	
 	function widget:registerDeviceInput()
-		local current, pressed, released = playdate.getButtonState()
-		self._input = { current = current, pressed = pressed, released = released }
+		_input.current, _input.pressed, _input.released = playdate.getButtonState()
 	end
 	
 	function widget:passInput(child, filter)
@@ -11,15 +20,11 @@ local function input(widget)
 			filter = playdate.kButtonsAny
 		end
 		
-		local input = table.shallowcopy(self._input)
+		local input = child._input
 		
-		if filter ~= nil then
-			input.pressed = input.pressed & filter
-			input.current = input.current & filter
-			input.released = input.released & filter
-		end
-		
-		child._input = input
+		input.pressed = _input.pressed & filter
+		input.current = _input.current & filter
+		input.released = _input.released & filter
 		
 		self:filterInput(playdate.kButtonsAny ~ filter)
 	end
@@ -29,20 +34,15 @@ local function input(widget)
 	end
 	
 	widget:_addUpdateCallback(function(self)
-		local input = self._input
-		
-		if ((input.pressed | input.released | input.current) & self._filter) ~= 0 then
+		if ((_input.pressed | _input.released | _input.current) & self._filter) ~= 0 then
 			if self._handleInput ~= nil then
-				self:_handleInput(input)
+				self:_handleInput(_input)
 			end
 		end
 		
-		self._input = emptyInput
+		clear(_input)
 		self._filter = playdate.kButtonsAny
 	end)
-	
-	widget._input = emptyInput
-	widget._filter = playdate.kButtonsAny
 end
 
 Widget.register("input", input)
