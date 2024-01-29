@@ -14,6 +14,8 @@ local _tCenter <const> = geo.rect.tCenter
 class("WidgetTitle").extends(Widget)
 
 function WidgetTitle:init()
+	WidgetTitle.super.init(self)
+	
 	self:supply(Widget.deps.animations)
 	self:supply(Widget.deps.frame)
 	

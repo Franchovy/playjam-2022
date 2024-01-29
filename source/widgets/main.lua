@@ -14,6 +14,8 @@ local function _loadLevelFromFile(filepath)
 end
 
 function WidgetMain:init()
+	WidgetMain.super.init(self)
+	
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.frame)

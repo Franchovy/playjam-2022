@@ -19,6 +19,8 @@ local _tSet <const> = geo.rect.tSet
 class("WidgetPlay").extends(Widget)
 
 function WidgetPlay:init(config)
+	WidgetPlay.super.init(self)
+	
 	self.config = config
 	
 	self:supply(Widget.deps.state)

@@ -21,6 +21,10 @@ import "widget/fileplayer"
 local disp <const> = playdate.display
 local gfx <const> = playdate.graphics
 
+function Widget.init(self)
+	self._state = {}
+end
+
 function Widget.new(class, ...)
 	local widget = class(...)
 	
@@ -111,11 +115,13 @@ function Widget:isLoaded()
 end
 
 function Widget:update()
-	if self._state.isLoaded == false or (self._state.isVisible == false) then
+	if self._state.isLoaded == false then
 		return
 	end
 	
-	self:_update()
+	if self._update ~= nil then
+		self:_update()
+	end
 	
 	if self.children ~= nil then
 		for _, child in pairs(self.children) do

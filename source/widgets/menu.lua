@@ -10,7 +10,9 @@ local disp <const> = playdate.display
 
 class("WidgetMenu").extends(Widget)
 
-function WidgetMenu:init(config)	
+function WidgetMenu:init(config)
+	WidgetMenu.super.init(self)
+	
 	self.config = config
 	
 	self:supply(Widget.deps.state)

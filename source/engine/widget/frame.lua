@@ -3,7 +3,7 @@ local geo <const> = playdate.geometry
 
 function frame(widget)
 	function widget:setNeedsLayout()
-		self._needsLayout = true
+		self._state.needsLayout = true
 	end
 	
 	function widget:draw(rect)
@@ -41,16 +41,23 @@ function frame(widget)
 		self.sprite = sprite
 	end
 	
+	function widget:isVisible()
+		return self._state.isVisible
+	end
+
 	widget.frame = geo.rect.new(0,0,0,0)
 	widget.rects = table.create(0, 5)
 	
+	widget._state.isVisible = true
+	local isVisibleActual = widget._state.isVisible
+	
+	function widget:setVisible(isVisibleNew)
+		isVisibleActual = isVisibleNew
+	end
+	
 	widget:_addUpdateCallback(function(self)
-		local _state = self._state
-		
-		if self._needsLayout then
-			self:_layout()
-			
-			self._needsLayout = false
+		if self._state.isVisible ~= isVisibleActual then
+			self._state.isVisible = isVisibleActual
 		end
 	end)
 end
