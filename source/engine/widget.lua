@@ -28,10 +28,23 @@ end
 function Widget.new(class, ...)
 	local widget = class(...)
 	
-	widget._state = {
-		isLoaded = false,
-		isVisible = true
-	}
+	ifNil(widget._state, 
+		function()
+			widget._state = {
+				isLoaded = false,
+				isVisble = true
+			}
+		end,
+		function()
+			ifNil(widget._state.isLoaded, function()
+				widget._state.isLoaded = false
+			end)
+			
+			ifNil(widget._state.isVisible, function()
+				widget._state.isVisible = true
+			end)
+		end
+	)
 	
 	widget.children = table.create(0, 4)
 	

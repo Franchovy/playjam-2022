@@ -15,7 +15,7 @@ function WidgetHUD:init()
 	
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animators)
-	self:supply(Widget.deps.frame)
+	self:supply(Widget.deps.frame, { isVisible = false })
 		
 	self:setStateInitial({onScreen = 1, offScreen = 2}, 2)
 	
@@ -54,10 +54,6 @@ end
 
 function WidgetHUD:_draw(frame, rect)
 	local _rects = self.rects
-	-- TODO: Same warning as WidgetTitle
-	if _rects.frame == nil then
-		return
-	end
 	
 	self.painters.frame:draw(_rects.frame)
 	self.textPainter:drawText(self.data.timeLabelText, _rects.timeText.x, _rects.timeText.y)
@@ -83,6 +79,7 @@ function WidgetHUD:_update()
 		_rects.coinImage = _tOffset(_assign(_rects.coinImage, _rects.frame), _rects.frame.w - 10 - coinImageSize, 3)
 		
 		gfx.sprite.addDirtyRect(0, 0, self.frame.x + self.frame.w, self.frame.y + self.frame.h)
+		self:setVisible(true)
 	else	
 		local labelWidth = 150
 		

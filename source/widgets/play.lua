@@ -171,11 +171,7 @@ function WidgetPlay:_load()
 end
 
 function WidgetPlay:_draw(frame, rect)
-	-- Warning: this is a work-around, see WidgetTitle:_draw() for description
 	local _rects = self.rects
-	if _rects.levelComplete == nil then
-		return
-	end
 	
 	if self.children.levelComplete ~= nil then
 		self.children.levelComplete:draw(_rects.levelComplete:toLegacyRect())
@@ -200,6 +196,7 @@ function WidgetPlay:_update()
 	local _rects = self.rects
 	
 	_rects.levelComplete = _tInset(_assign(_rects.levelComplete, _frame), 30, 20)
+	self:setVisible(true)
 end
 
 function WidgetPlay:_changeState(stateFrom, stateTo)
