@@ -47,7 +47,7 @@ function LevelSelectEntry:_load()
 			
 			gfx.setColor(gfx.kColorBlack)
 			gfx.setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
-			gfx.fillRoundRect(imageRect:insetBy(-7, -1), 4)
+			gfx.fillRoundRect(imageRect:insetBy(-6, 0), 4)
 			
 			imageLock:draw(imageRect.x, imageRect.y)
 		end
