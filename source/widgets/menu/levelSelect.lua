@@ -149,8 +149,16 @@ function WidgetLevelSelect:_handleInput(input)
 	if input.pressed & playdate.kButtonA ~= 0 then
 		local index = self.state
 		if index <= #self.config.levels then
-			-- Load level
-			self.signals.select({ type = WidgetLevelSelect.kMenuActionType.play, level = self.config.levels[index] })
+			local level = self.config.levels[index]
+			
+			if self.config.locked[level.title] ~= true then
+				-- Load level
+				self.signals.select({ type = WidgetLevelSelect.kMenuActionType.play, level = level })
+			else
+				self:playSample(kAssetsSounds.menuSelectFail)
+				
+				self:animate(self.kAnimations.error)
+			end
 		elseif index == 4 then
 			-- Settings
 			self.signals.select({ type = WidgetLevelSelect.kMenuActionType.menu, name = "settings" })
