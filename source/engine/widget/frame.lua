@@ -43,7 +43,7 @@ function frame(widget, config)
 		self.sprite = sprite
 	end
 		
-	function LevelSelectEntry:setNeedsLayout()
+	function widget:setNeedsLayout()
 		self._state.needsLayout = true
 	end
 	
@@ -74,6 +74,13 @@ function frame(widget, config)
 		end
 	
 		_draw(self, _frame, rect)
+	end
+	
+	function widget:performLayout()
+		if self._performLayout ~= nil then
+			self:_performLayout()
+			self._state.needsLayout = false
+		end
 	end
 	
 	widget:_addLoadCallback(function(self)

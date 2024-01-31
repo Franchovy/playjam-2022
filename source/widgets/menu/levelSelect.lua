@@ -33,7 +33,7 @@ function WidgetLevelSelect:init(config)
 	self:supply(Widget.deps.animations)
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.input)
-	self:supply(Widget.deps.frame)
+	self:supply(Widget.deps.frame, { needsLayout = true })
 	
 	self:setFrame(disp.getRect())
 	
@@ -100,13 +100,11 @@ function WidgetLevelSelect:_load()
 		_rects.entry[i] = _assign(_rects.entry[i], _frame.x - 5, _frame.y + i * 39 - 19, cardWidth, 40)
 		entry:setFrame(_rects.entry[i])
 	end
+	
+	self.animators.card = gfx.animator.new(0, 800, 800)
 end
 
 function WidgetLevelSelect:_draw(frame, rect)
-	if self.hasPerformedLayout ~= true then
-		return
-	end
-	
 	local _rects = self.rects
 	
 	_painterMenuCard:draw(_rects.card)
@@ -122,26 +120,29 @@ end
 
 function WidgetLevelSelect:_update()
 	if self:hasAnimationChanged() == true then
-		local xOffset = self:getAnimatorValue(self.animators.card)
-		local previewX = self:getAnimatorValue(self.animators.preview) + cardWidth
-		
-		local _rects = self.rects
-		local _frame = self.frame
-		
-		_rects.card = _tOffset(_tSet(_assign(_rects.card, _frame), nil, nil, cardWidth), xOffset, 0)
-		
-		for i, entry in ipairs(self.entries) do
-			_rects.entry[i] = _tSet(_rects.entry[i], _frame.x - 5 + xOffset)
-			
-			entry:setFrame(_rects.entry[i])
-			entry:setNeedsLayout()
-		end
-		
-		_rects.preview = _tSet(_assign(_rects.preview, _frame), previewX, nil, _frame.w - cardWidth)
+		self:performLayout()
 
 		gfx.sprite.addDirtyRect(0, 0, 400, 240)
-		self.hasPerformedLayout = true
 	end
+end
+
+function WidgetLevelSelect:_performLayout()
+	local xOffset = self:getAnimatorValue(self.animators.card)
+	local previewX = self:getAnimatorValue(self.animators.preview) + cardWidth
+	
+	local _rects = self.rects
+	local _frame = self.frame
+	
+	_rects.card = _tOffset(_tSet(_assign(_rects.card, _frame), nil, nil, cardWidth), xOffset, 0)
+	
+	for i, entry in ipairs(self.entries) do
+		_rects.entry[i] = _tSet(_rects.entry[i], _frame.x - 5 + xOffset)
+		
+		entry:setFrame(_rects.entry[i])
+		entry:setNeedsLayout()
+	end
+	
+	_rects.preview = _tSet(_assign(_rects.preview, _frame), previewX, nil, _frame.w - cardWidth)
 end
 
 function WidgetLevelSelect:_handleInput(input)
