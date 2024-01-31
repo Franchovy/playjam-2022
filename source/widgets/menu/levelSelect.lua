@@ -1,6 +1,7 @@
 import "levelSelect/entry"
 import "levelSelect/preview"
 import "levelSelect/previewImage"
+import "widgets/common/painters"
 
 local easing <const> = playdate.easingFunctions
 local gfx <const> = playdate.graphics
@@ -13,6 +14,8 @@ local _tSet <const> = geo.rect.tSet
 local _create <const> = table.create
 
 local cardWidth <const> = 220
+
+local _painterMenuCard = Painter.commonPainters.menuCard
 
 class("WidgetLevelSelect").extends(Widget)
 
@@ -78,45 +81,6 @@ function WidgetLevelSelect:_load()
 	table.insert(self.previews, previewSettings)
 	self.children["preview"..4] = previewSettings
 	
-	self.images.screw1 = gfx.image.new(kAssetsImages.screw)
-	self.images.screw2 = gfx.image.new(kAssetsImages.screw):rotatedImage(45)
-	self.images.screw3 = gfx.image.new(kAssetsImages.screw):rotatedImage(90)
-	
-	local painterCardOutline = Painter(function(rect)
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.7, gfx.image.kDitherTypeDiagonalLine)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		local rectInset = Rect.inset(rect, 10, 14)
-		
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.3, gfx.image.kDitherTypeDiagonalLine)
-		gfx.setLineWidth(3)
-		gfx.drawRoundRect(rectInset.x - 4, rectInset.y - 1, rectInset.w, rectInset.h, 6)
-		
-		gfx.setColor(gfx.kColorWhite)
-		gfx.fillRoundRect(rectInset.x - 3, rectInset.y, rectInset.w, rectInset.h, 6)
-		
-		local size = self.images.screw1:getSize()
-		self.images.screw2:draw(rect.x + 4, rect.y + 4)
-		self.images.screw3:draw(rect.x + rect.w - size - 4, rect.y + 4)
-		self.images.screw1:draw(rect.x + 4, rect.y + rect.h - size - 4)
-		self.images.screw2:draw(rect.x + rect.w - size - 4, rect.y + rect.h - size - 4)
-	end)
-	
-	self.painters.card = Painter(function(rect)
-		-- Painter background
-		
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.1, gfx.image.kDitherTypeDiagonalLine)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		gfx.setColor(gfx.kColorWhite)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		painterCardOutline:draw(rect)
-	end)
-	
 	for _, child in pairs(self.children) do
 		child:load()
 	end
@@ -138,7 +102,7 @@ function WidgetLevelSelect:_draw(frame, rect)
 	
 	local _rects = self.rects
 	
-	self.painters.card:draw(_rects.card)
+	_painterMenuCard:draw(_rects.card)
 	
 	for i, entry in ipairs(self.entries) do
  		entry:draw()
