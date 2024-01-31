@@ -7,7 +7,7 @@ local _assign <const> = geo.rect.assign
 local _tInset <const> = geo.rect.tInset
 
 local _outlinePainterThick = Painter.commonPainters.outlinePainterThick()
-
+local _screenPainterDark = Painter.commonPainters.darkScreenFillPainter()
 
 class("LevelSelectEntry").extends(Widget)
 
@@ -37,6 +37,13 @@ function LevelSelectEntry:_load()
 		if state.selected == true then
 			_outlinePainterThick:draw(rect)
 		end
+		
+		if self.config.locked == true then
+			_screenPainterDark:draw(rect)
+			
+			local imageLock = gfx.image.new(kAssetsImages.lock)
+			imageLock:drawCentered(rect.x + rect.w / 2, rect.y + rect.h / 2)
+		end
 	end)
 end
 
@@ -47,7 +54,7 @@ end
 function LevelSelectEntry:_performLayout()
 	local _rects = self.rects
 	local _frame = self.frame
-	_rects.painter = _tInset(_assign(_rects.painter, _frame), 20, 0)
+	_rects.painter = _tInset(_assign(_rects.painter, _frame), 20, 2)
 end
 
 function LevelSelectEntry:_changeState(stateFrom, stateTo)

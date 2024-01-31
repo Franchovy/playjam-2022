@@ -19,8 +19,8 @@ Painter.commonPainters = {
 		_setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
 		_drawRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
 	end),
-	screenFillPainter = Painter.factory(function(rect, state)
-		_setDitherPattern(0.8, gfx.image.kDitherTypeScreen)
+	darkScreenFillPainter = Painter.factory(function(rect, state)
+		_setDitherPattern(0.2, gfx.image.kDitherTypeScreen)
 		_fillRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
 	end),
 	menuCard = Painter.factory(function(rect)

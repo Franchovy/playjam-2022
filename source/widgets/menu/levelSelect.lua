@@ -59,7 +59,12 @@ function WidgetLevelSelect:_load()
 	self.previews = {}
 	
 	for i, level in ipairs(self.config.levels) do
-		local entry = Widget.new(LevelSelectEntry, { text = level.title, isSelected = i == 1, showOutline = true })
+		local entry = Widget.new(LevelSelectEntry, { 
+			text = level.title, 
+			isSelected = i == 1, 
+			showOutline = true,
+			locked = true
+		})
 		table.insert(self.entries, entry)
 		self.children["entry"..i] = entry
 		
