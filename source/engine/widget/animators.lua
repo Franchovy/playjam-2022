@@ -56,6 +56,10 @@ function animators(widget)
 		return self._state.isAnimating == true
 	end
 	
+	function widget:hasAnimationChanged()
+		return self._state.wasAnimating or self._state.isAnimating == true
+	end
+	
 	widget:_addUpdateCallback(function(self)
 		local _state = self._state
 		_state.wasAnimating = _state.isAnimating ~= nil and _state.isAnimating or false

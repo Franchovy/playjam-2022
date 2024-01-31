@@ -139,11 +139,7 @@ function WidgetLevelSelect:_draw(frame, rect)
 end
 
 function WidgetLevelSelect:_update()
-	if self:wasAnimating() == true then
-		gfx.sprite.addDirtyRect(0, 0, 400, 240)
-	end
-	
-	if self:isAnimating() == true then
+	if self:hasAnimationChanged() == true then
 		local cardWidth = 220
 		local xOffset = self:getAnimatorValue(self.animators.card)
 		local previewX = self:getAnimatorValue(self.animators.preview) + cardWidth
@@ -166,6 +162,7 @@ function WidgetLevelSelect:_update()
 		
 		_rects.preview = _tSet(_assign(_rects.preview, _frame), previewX, nil, _frame.w - cardWidth)
 
+		gfx.sprite.addDirtyRect(0, 0, 400, 240)
 		self.hasPerformedLayout = true
 	end
 end
