@@ -38,6 +38,24 @@ function LevelSelectPreview:_load()
 		return image
 	end
 	local overlayImage = createOverlayImage()
+	local createLockedImage = function()
+		local w, h = self.images.level:getSize()
+		local image = gfx.image.new(w, h)
+		gfx.pushContext(image)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.fillRoundRect(0, 0, w, h, 7)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.setDitherPattern(0.8, gfx.image.kDitherTypeScreen)
+		gfx.fillRoundRect(0, 0, w, h, 7)
+		setCurrentFont(kAssetsFonts.twinbee2x)
+		local fontHeight = gfx.getFont():getHeight()
+		gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+		gfx.drawTextAligned("LOCKED", w / 2, (h - fontHeight) / 2, kTextAlignment.center)
+		gfx.popContext()
+		return image
+	end
+	local overlayImage = createOverlayImage()
+	local createLockedImage = createLockedImage()
 	
 	self.images.star = gfx.image.new(kAssetsImages.starMenu):scaledImage(0.5)
 	
@@ -116,20 +134,32 @@ function LevelSelectPreview:_load()
 		
 		local _, levelImageSizeH = self.images.level:getSize()
 		local imageX, imageY = 7, fontHeight + topPadding + margin
-		self.images.level:draw(imageX, imageY)
+		
+		if self.config.locked == true then
+			gfx.setColor(gfx.kColorBlack)
+			gfx.setDitherPattern(0.6, gfx.image.kDitherTypeScreen)
+			gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+			
+			createLockedImage:draw(imageX, imageY)
+		else
+			self.images.level:draw(imageX, imageY)
+		end
+		
 		overlayImage:draw(imageX, imageY)
 		
-		local insetRect = Rect.inset(rect, 5, levelImageSizeH + fontHeight + topPadding + margin * 2, 5, 7)
-		if state.starsCount ~= nil then
-			layout:draw(insetRect, state)
-		else
-			noHighScore:draw(insetRect, state)
+		if self.config.locked ~= true then
+			local insetRect = Rect.inset(rect, 5, levelImageSizeH + fontHeight + topPadding + margin * 2, 5, 7)
+			if state.starsCount ~= nil then
+				layout:draw(insetRect, state)
+			else
+				noHighScore:draw(insetRect, state)
+			end
 		end
 	end)
 end
 
 function LevelSelectPreview:_draw(rect)
-	local insetRect = Rect.inset(rect, 8, 30)
+	local insetRect = self.config.locked ~= true and Rect.inset(rect, 8, 30) or Rect.inset(rect, 8, 60)
 	
 	self.painters.background:draw(insetRect)
 	
