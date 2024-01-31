@@ -4,6 +4,12 @@ local gfx <const> = playdate.graphics
 
 class("Painter").extends()
 
+function Painter.factory(drawFunction)
+	return function()
+		return Painter(drawFunction) 
+	end
+end
+
 function Painter:init(drawFunction)
 	self.drawFunction = drawFunction
 	

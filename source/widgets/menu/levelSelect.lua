@@ -15,7 +15,7 @@ local _create <const> = table.create
 
 local cardWidth <const> = 220
 
-local _painterMenuCard = Painter.commonPainters.menuCard
+local _painterMenuCard = Painter.commonPainters.menuCard()
 
 class("WidgetLevelSelect").extends(Widget)
 

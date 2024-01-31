@@ -6,7 +6,7 @@ local geo <const> = playdate.geometry
 local _assign <const> = geo.rect.assign
 local _tInset <const> = geo.rect.tInset
 
-local _outlinePainterThick = Painter.commonPainters.outlinePainterThick
+local _outlinePainterThick = Painter.commonPainters.outlinePainterThick()
 
 
 class("LevelSelectEntry").extends(Widget)

@@ -1,6 +1,7 @@
 import "settings/entry"
 
 local gfx <const> = playdate.graphics
+local _painterMenuCard = Painter.commonPainters.menuCard()
 
 class("WidgetMenuSettings").extends(Widget)
 
@@ -33,41 +34,6 @@ function WidgetMenuSettings:_load()
 		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
 		gfx.drawTextAligned("SETTINGS MENU", rect.x + rect.w / 2, rect.y + rect.h / 2, kTextAlignment.center)
-	end)
-	
-	local imageScrew1 = gfx.image.new(kAssetsImages.screw)
-	
-	local painterCardOutline = Painter(function(rect)
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.7, gfx.image.kDitherTypeDiagonalLine)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		local rectBorder = Rect.inset(rect, 10, 14)
-		local rectBorderInner = Rect.inset(rectBorder, 4, 6)
-		local rectBorderInnerShadow = Rect.offset(rectBorderInner, -1, -1)
-		
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.3, gfx.image.kDitherTypeDiagonalLine)
-		gfx.setLineWidth(3)
-		gfx.drawRoundRect(rectBorderInnerShadow.x, rectBorderInnerShadow.y, rectBorderInnerShadow.w, rectBorderInnerShadow.h, 6)
-		
-		gfx.setColor(gfx.kColorWhite)
-		gfx.fillRoundRect(rectBorderInner.x, rectBorderInner.y, rectBorderInner.w, rectBorderInner.h, 6)
-		
-		local size = imageScrew1:getSize()
-		imageScrew1:rotatedImage(90):draw(rect.x + 4, rect.y + 4)
-		imageScrew1:rotatedImage(45):draw(rect.x + rect.w - size - 4, rect.y + 4)
-		imageScrew1:draw(rect.x + 4, rect.y + rect.h - size - 4)
-		imageScrew1:draw(rect.x + rect.w - size - 4, rect.y + rect.h - size - 4)
-	end)
-	
-	self.painters.card = Painter(function(rect)
-		-- Painter background
-		
-		gfx.setColor(gfx.kColorWhite)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		painterCardOutline:draw(rect)
 	end)
 	
 	local function entryCallback(entry, key, value)
@@ -127,7 +93,7 @@ end
 
 function WidgetMenuSettings:_draw(frame, rect)
 	local insetRect = Rect.inset(frame, 12, 6)
-	self.painters.card:draw(insetRect)
+	_painterMenuCard:draw(insetRect)
 	
 	local entryHeight = 32
 	local margin = 4
