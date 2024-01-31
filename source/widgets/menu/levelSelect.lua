@@ -59,11 +59,12 @@ function WidgetLevelSelect:_load()
 	self.previews = {}
 	
 	for i, level in ipairs(self.config.levels) do
+		local isLocked = self.config.locked[level.title]
 		local entry = Widget.new(LevelSelectEntry, { 
 			text = level.title, 
 			isSelected = i == 1, 
 			showOutline = true,
-			locked = true
+			locked = isLocked
 		})
 		table.insert(self.entries, entry)
 		self.children["entry"..i] = entry
@@ -73,7 +74,7 @@ function WidgetLevelSelect:_load()
 			title = level.title,
 			imagePath = level.menuImagePath,
 			score = score,
-			locked = true
+			locked = isLocked
 		})
 		table.insert(self.previews, preview)
 		self.children["preview"..i] = preview
