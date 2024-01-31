@@ -17,7 +17,7 @@ function LevelSelectEntry:init(config)
 	self.config = config
 	
 	self:supply(Widget.deps.state)
-	self:supply(Widget.deps.frame)
+	self:supply(Widget.deps.frame, { needsLayout = true })
 	
 	local isSelected = config.isSelected == true
 	self:setStateInitial({ selected = 1, unselected = 2}, isSelected and 1 or 2)
@@ -41,25 +41,13 @@ function LevelSelectEntry:_load()
 end
 
 function LevelSelectEntry:_draw(frame, rect)
-	if self.hasPerformedLayout ~= true then
-		return
-	end
-	
 	self.painters.painter:draw(self.rects.painter, { selected = (self.state == self.kStates.selected) })
 end
 
-function LevelSelectEntry:needsPerformLayout()
-	self.hasPerformedLayout = false
-end
-
-function LevelSelectEntry:_update()
-	if self.hasPerformedLayout ~= true then
-		local _rects = self.rects
-		local _frame = self.frame
-		_rects.painter = _tInset(_assign(_rects.painter, _frame), 20, 0)
-		
-		self.hasPerformedLayout = true
-	end
+function LevelSelectEntry:_performLayout()
+	local _rects = self.rects
+	local _frame = self.frame
+	_rects.painter = _tInset(_assign(_rects.painter, _frame), 20, 0)
 end
 
 function LevelSelectEntry:_changeState(stateFrom, stateTo)

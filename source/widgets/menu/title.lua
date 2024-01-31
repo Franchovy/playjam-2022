@@ -169,6 +169,59 @@ function WidgetTitle:_load()
 	end)
 end
 
+function WidgetTitle:_draw(frame, rect)
+	local _rects = self.rects
+	
+	self.painterBackground1:draw(_rects.top)
+	self.painterBackground2:draw(_rects.right)
+	self.painterBackground3:draw(_rects.top, { tick = self.tick })
+	self.painterBackground4:draw(_rects.left)
+	self.painterBackgroundAssets:draw(_rects.right)
+	
+	self.painters.painterWheel:draw(_rects.wheel, { index = self.index % 36 }) 
+	self.painters.painterTitle:draw(_rects.title)
+	
+	self.painters.painterButton:draw(_rects.button, { tick = self.tick })
+end
+
+function WidgetTitle:_update()
+	self.index += 2
+	
+	local tickPrevious = self.tick
+	if self.index % 40 > 32 then
+		self.tick = self.tick == 0 and 1 or 0
+	end
+	
+	if self.tick ~= tickPrevious then
+		gfx.sprite.addDirtyRect(0, 0, 400, 240)
+	end
+	
+	self.painters.painterWheel:markDirty()
+	self.painters.painterButton:markDirty()
+	
+	if self:hasAnimationChanged() == true then
+		local _animators = self.animators
+		local _rects = self.rects
+		local frame = self.frame
+		local _getAnimatorValue = self.getAnimatorValue
+		
+		local animatorValueBackground = _getAnimatorValue(self, _animators.animator1, _animators.animatorOut)
+		local animatorValueWheel = _getAnimatorValue(self, _animators.animatorWheel, _animators.animatorOutWheel)
+		local animatorValueTitle =  _getAnimatorValue(self, _animators.animator2, _animators.animatorOut)
+		local animatorValueButton =  _getAnimatorValue(self, _animators.animator2, _animators.animatorOut)
+		
+		_rects.top = _tOffset(_assign(_rects.top, frame), 0, -20 - animatorValueBackground)
+		_rects.left = _tOffset(_assign(_rects.left, frame), -animatorValueBackground, -20)
+		_rects.right = _tOffset(_assign(_rects.right, frame), animatorValueBackground, -20)
+		_rects.wheel = _assign(_rects.wheel, animatorValueWheel.x - 60, 30 + animatorValueWheel.y, 280, 120)
+		_rects.title = _tSet(_tOffset(_assign(_rects.title, frame), 0, 130 + animatorValueTitle), nil, nil, nil, 57)
+		_rects.button = _tOffset(_tSet(_tCenter(_assign(_rects.button, 0, 0, 160, 27), frame), nil, 200), 0, animatorValueButton)
+		
+		gfx.sprite.addDirtyRect(0, 0, 400, 240)
+		self:setVisible(true)
+	end
+end
+
 function WidgetTitle:_animate(animation, queueFinishedCallback)
 	if animation == self.kAnimations.onFirstOpen then
 		self.animators.animator1 = gfx.animator.new(800, 240, 0, easing.outExpo, 100)
@@ -212,59 +265,6 @@ function WidgetTitle:_animate(animation, queueFinishedCallback)
 		)
 		
 		queueFinishedCallback(1300)
-	end
-end
-
-function WidgetTitle:_draw(frame, rect)
-	local _rects = self.rects
-	
-	self.painterBackground1:draw(_rects.top)
-	self.painterBackground2:draw(_rects.right)
-	self.painterBackground3:draw(_rects.top, { tick = self.tick })
-	self.painterBackground4:draw(_rects.left)
-	self.painterBackgroundAssets:draw(_rects.right)
-	
-	self.painters.painterWheel:draw(_rects.wheel, { index = self.index % 36 }) 
-	self.painters.painterTitle:draw(_rects.title)
-	
-	self.painters.painterButton:draw(_rects.button, { tick = self.tick })
-end
-
-function WidgetTitle:_update()
-	self.index += 2
-	
-	local tickPrevious = self.tick
-	if self.index % 40 > 32 then
-		self.tick = self.tick == 0 and 1 or 0
-	end
-	
-	if self.tick ~= tickPrevious then
-		gfx.sprite.addDirtyRect(0, 0, 400, 240)
-	end
-	
-	self.painters.painterWheel:markDirty()
-	self.painters.painterButton:markDirty()
-	
-	if self:isAnimating() == true then
-		local _animators = self.animators
-		local _rects = self.rects
-		local frame = self.frame
-		local _getAnimatorValue = self.getAnimatorValue
-		
-		local animatorValueBackground = _getAnimatorValue(self, _animators.animator1, _animators.animatorOut)
-		local animatorValueWheel = _getAnimatorValue(self, _animators.animatorWheel, _animators.animatorOutWheel)
-		local animatorValueTitle =  _getAnimatorValue(self, _animators.animator2, _animators.animatorOut)
-		local animatorValueButton =  _getAnimatorValue(self, _animators.animator2, _animators.animatorOut)
-		
-		_rects.top = _tOffset(_assign(_rects.top, frame), 0, -20 - animatorValueBackground)
-		_rects.left = _tOffset(_assign(_rects.left, frame), -animatorValueBackground, -20)
-		_rects.right = _tOffset(_assign(_rects.right, frame), animatorValueBackground, -20)
-		_rects.wheel = _assign(_rects.wheel, animatorValueWheel.x - 60, 30 + animatorValueWheel.y, 280, 120)
-		_rects.title = _tSet(_tOffset(_assign(_rects.title, frame), 0, 130 + animatorValueTitle), nil, nil, nil, 57)
-		_rects.button = _tOffset(_tSet(_tCenter(_assign(_rects.button, 0, 0, 160, 27), frame), nil, 200), 0, animatorValueButton)
-		
-		gfx.sprite.addDirtyRect(0, 0, 400, 240)
-		self:setVisible(true)
 	end
 end
 

@@ -10,6 +10,12 @@ function frame(widget, config)
 		widget._state.isVisible = true
 	end
 	
+	if config.needsLayout ~= nil then
+		widget._state.needsLayout = config.needsLayout
+	else
+		widget._state.needsLayout = false
+	end
+	
 	function widget:setFrame(rect)
 		self.frame:set(rect)
 		
@@ -36,6 +42,10 @@ function frame(widget, config)
 		
 		self.sprite = sprite
 	end
+		
+	function LevelSelectEntry:setNeedsLayout()
+		self._state.needsLayout = true
+	end
 	
 	function widget:isVisible()
 		return self._state.isVisible
@@ -59,7 +69,7 @@ function frame(widget, config)
 			return
 		end
 		
-		if (_state.isLoaded and _state.isVisible) == false then
+		if (_state.isLoaded and _state.isVisible and not _state.needsLayout) == false then
 			return
 		end
 	
@@ -73,6 +83,15 @@ function frame(widget, config)
 	widget:_addUpdateCallback(function(self)
 		if self._state.isVisible ~= isVisibleActual then
 			self._state.isVisible = isVisibleActual
+		end
+		
+		if self._state.needsLayout == true then
+			if self._performLayout == nil then
+				error("Layout was needed but no _layout() function exists for this widget.", 2)
+			end
+			
+			self:_performLayout()
+			self._state.needsLayout = false
 		end
 	end)
 end

@@ -12,6 +12,8 @@ local _assign <const> = geo.rect.assign
 local _tSet <const> = geo.rect.tSet
 local _create <const> = table.create
 
+local cardWidth <const> = 220
+
 class("WidgetLevelSelect").extends(Widget)
 
 WidgetLevelSelect.kMenuActionType = {
@@ -118,6 +120,15 @@ function WidgetLevelSelect:_load()
 	for _, child in pairs(self.children) do
 		child:load()
 	end
+	
+	local _rects = self.rects
+	local _frame = self.frame
+	
+	_rects.entry = _create(#self.entries, 0)
+	for i, entry in ipairs(self.entries) do
+		_rects.entry[i] = _assign(_rects.entry[i], _frame.x - 5, _frame.y + i * 39 - 19, cardWidth, 40)
+		entry:setFrame(_rects.entry[i])
+	end
 end
 
 function WidgetLevelSelect:_draw(frame, rect)
@@ -140,7 +151,6 @@ end
 
 function WidgetLevelSelect:_update()
 	if self:hasAnimationChanged() == true then
-		local cardWidth = 220
 		local xOffset = self:getAnimatorValue(self.animators.card)
 		local previewX = self:getAnimatorValue(self.animators.preview) + cardWidth
 		
@@ -149,15 +159,11 @@ function WidgetLevelSelect:_update()
 		
 		_rects.card = _tOffset(_tSet(_assign(_rects.card, _frame), nil, nil, cardWidth), xOffset, 0)
 		
-		if _rects.entry == nil then
-			_rects.entry = _create(#self.entries, 0)
-		end
-		
 		for i, entry in ipairs(self.entries) do
-			_rects.entry[i] = _assign(_rects.entry[i], _frame.x - 5 + xOffset, _frame.y + i * 39 - 19, cardWidth, 40)
+			_rects.entry[i] = _tSet(_rects.entry[i], _frame.x - 5 + xOffset)
 			
 			entry:setFrame(_rects.entry[i])
-			entry:needsPerformLayout()
+			entry:setNeedsLayout()
 		end
 		
 		_rects.preview = _tSet(_assign(_rects.preview, _frame), previewX, nil, _frame.w - cardWidth)
