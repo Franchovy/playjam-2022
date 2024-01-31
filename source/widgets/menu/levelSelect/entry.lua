@@ -6,9 +6,9 @@ local geo <const> = playdate.geometry
 local _assign <const> = geo.rect.assign
 local _tInset <const> = geo.rect.tInset
 
-local _outlinePainterThick = Painter.commonPainters.outlinePainterThick()
-local _screenPainterDark = Painter.commonPainters.darkScreenFillPainter()
-
+local _outlinePainterThick <const> = Painter.commonPainters.outlinePainterThick()
+local _screenPainterDark <const> = Painter.commonPainters.darkScreenFillPainter()
+local _fillPainterLight <const> = Painter.commonPainters.fillPainterLight()
 class("LevelSelectEntry").extends(Widget)
 
 function LevelSelectEntry:init(config)
@@ -34,15 +34,26 @@ function LevelSelectEntry:_load()
 
 		gfx.drawText(self.config.text, rect.x + margin, rect.y + (rect.h - fontHeight) / 2)
 		
-		if state.selected == true then
-			_outlinePainterThick:draw(rect)
-		end
-		
 		if self.config.locked == true then
+			_fillPainterLight:draw(rect)
 			_screenPainterDark:draw(rect)
 			
 			local imageLock = gfx.image.new(kAssetsImages.lock)
-			imageLock:drawCentered(rect.x + rect.w / 2, rect.y + rect.h / 2)
+			local imageLockW, imageLockH = imageLock:getSize()
+			local imageRect = geo.rect.new(rect.x + (rect.w - imageLockW) / 2, rect.y + (rect.h - imageLockH) / 2, imageLockW, imageLockH)
+			
+			gfx.setColor(gfx.kColorWhite)
+			gfx.fillRoundRect(imageRect:insetBy(-8, -2), 4)
+			
+			gfx.setColor(gfx.kColorBlack)
+			gfx.setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
+			gfx.fillRoundRect(imageRect:insetBy(-7, -1), 4)
+			
+			imageLock:draw(imageRect.x, imageRect.y)
+		end
+		
+		if state.selected == true then
+			_outlinePainterThick:draw(rect)
 		end
 	end)
 end

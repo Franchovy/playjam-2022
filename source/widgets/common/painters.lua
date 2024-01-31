@@ -16,11 +16,15 @@ Painter.commonPainters = {
 	outlinePainterThick = Painter.factory(function(rect, state)
 		_setColor(gfx.kColorBlack)
 		_setLineWidth(3)
-		_setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
 		_drawRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
 	end),
 	darkScreenFillPainter = Painter.factory(function(rect, state)
-		_setDitherPattern(0.2, gfx.image.kDitherTypeScreen)
+		_setDitherPattern(0.3, gfx.image.kDitherTypeDiagonalLine)
+		_fillRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
+	end),
+	fillPainterLight = Painter.factory(function(rect, state)
+		_setColor(gfx.kColorWhite)
+		_setDitherPattern(0.8, gfx.image.kDitherTypeDiagonalLine)
 		_fillRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
 	end),
 	menuCard = Painter.factory(function(rect)
