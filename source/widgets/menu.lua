@@ -112,7 +112,7 @@ end
 function WidgetMenu:_draw(frame, rect)
 	self.painters.background:draw(frame)
 	self.children.title:draw(rect)
-	self.children.levelSelect:draw(frame:toLegacyRect(), rect)
+	self.children.levelSelect:draw(rect)
 	self.children.menuSettings:draw(frame:toLegacyRect(), rect)
 end
 

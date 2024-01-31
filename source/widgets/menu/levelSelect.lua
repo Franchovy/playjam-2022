@@ -4,6 +4,13 @@ import "levelSelect/previewImage"
 
 local easing <const> = playdate.easingFunctions
 local gfx <const> = playdate.graphics
+local disp <const> = playdate.display
+local geo <const> = playdate.geometry
+
+local _tOffset <const> = geo.rect.tOffset
+local _assign <const> = geo.rect.assign
+local _tSet <const> = geo.rect.tSet
+local _create <const> = table.create
 
 class("WidgetLevelSelect").extends(Widget)
 
@@ -13,12 +20,17 @@ WidgetLevelSelect.kMenuActionType = {
 }
 
 function WidgetLevelSelect:init(config)
+	WidgetLevelSelect.super.init(self)
+	
 	self.config = config
 	
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animations)
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.input)
+	self:supply(Widget.deps.frame)
+	
+	self:setFrame(disp.getRect())
 	
 	self:setAnimations({
 		intro = 1,
@@ -108,29 +120,51 @@ function WidgetLevelSelect:_load()
 	end
 end
 
-function WidgetLevelSelect:_draw(rect)
-	local cardWidth = 220
-	local xOffset = self:getAnimatorValue(self.animators.card)
-	
-	self.painters.card:draw(Rect.offset(Rect.with(rect, { w = cardWidth }), xOffset, 0))
-	
-	for i, entry in ipairs(self.entries) do
- 		entry:draw(Rect.make(rect.x - 5 + xOffset, rect.y + i * 45 - 25, cardWidth, 40))
+function WidgetLevelSelect:_draw(frame, rect)
+	if self.hasPerformedLayout ~= true then
+		return
 	end
 	
-	local previewX = self:getAnimatorValue(self.animators.preview) + cardWidth
+	local _rects = self.rects
+	
+	self.painters.card:draw(_rects.card)
+	
+	for i, entry in ipairs(self.entries) do
+ 		entry:draw(_rects.entry[i]:toLegacyRect())
+	end
 	
 	if self.previews[self.state] ~= nil then
-		self.previews[self.state]:draw(Rect.with(rect, { x = previewX, w = rect.w - cardWidth }))
+		self.previews[self.state]:draw(_rects.preview)
 	end
 end
 
 function WidgetLevelSelect:_update()
-	if self.wasAnimating == true then
+	if self:wasAnimating() == true then
 		gfx.sprite.addDirtyRect(0, 0, 400, 240)
 	end
 	
-	self.wasAnimating = self:isAnimating()
+	if self:isAnimating() == true then
+		local cardWidth = 220
+		local xOffset = self:getAnimatorValue(self.animators.card)
+		local previewX = self:getAnimatorValue(self.animators.preview) + cardWidth
+		
+		local _rects = self.rects
+		local _frame = self.frame
+		
+		_rects.card = _tOffset(_tSet(_assign(_rects.card, _frame), nil, nil, cardWidth), xOffset, 0)
+		
+		if _rects.entry == nil then
+			_rects.entry = _create(#self.entries, 0)
+		end
+		
+		for i, entry in ipairs(self.entries) do
+			_rects.entry[i] = _assign(_rects.entry[i], _frame.x - 5 + xOffset, _frame.y + i * 45 - 25, cardWidth, 40)
+		end
+		
+		_rects.preview = _tSet(_assign(_rects.preview, _frame), previewX, nil, _frame.w - cardWidth)
+
+		self.hasPerformedLayout = true
+	end
 end
 
 function WidgetLevelSelect:_handleInput(input)
