@@ -1,12 +1,23 @@
+import "widgets/common/painters"
 
 local gfx <const> = playdate.graphics
+local geo <const> = playdate.geometry
+
+local _assign <const> = geo.rect.assign
+local _tInset <const> = geo.rect.tInset
+
+local _outlinePainterThick = Painter.commonPainters.outlinePainterThick
+
 
 class("LevelSelectEntry").extends(Widget)
 
 function LevelSelectEntry:init(config)
+	LevelSelectEntry.super.init(self)
+	
 	self.config = config
 	
 	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.frame)
 	
 	local isSelected = config.isSelected == true
 	self:setStateInitial({ selected = 1, unselected = 2}, isSelected and 1 or 2)
@@ -16,42 +27,39 @@ function LevelSelectEntry:init(config)
 end
 
 function LevelSelectEntry:_load()
-	self.images.title = gfx.imageWithText(self.config.text, 200, 70):scaledImage(2)
-	
-	self.painters.outline = Painter(function(rect, state)
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
-		gfx.setLineWidth(1)
-		gfx.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+	self.painters.painter = Painter(function(rect, state)
+		setCurrentFont(kAssetsFonts.twinbee2x)
+		local fontHeight = gfx.getFont():getHeight()
+		local margin = 10
+
+		gfx.drawText(self.config.text, rect.x + margin, rect.y + (rect.h - fontHeight) / 2)
 		
-		gfx.setDitherPattern(0.8, gfx.image.kDitherTypeScreen)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
-	end)
-	
-	self.painters.outlineSelected = Painter(function(rect, state)
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setLineWidth(3)
-		gfx.setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
-		gfx.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
+		if state.selected == true then
+			_outlinePainterThick:draw(rect)
+		end
 	end)
 end
 
-function LevelSelectEntry:_draw(rect)
-	local outlineRect = Rect.inset(rect, 20, 0)
-	
-	self.images.title:draw(outlineRect.x + 10, outlineRect.y + 12)
-	
-	if self.state == self.kStates.unselected then
-		if self.config.showOutline then	
-			self.painters.outline:draw(outlineRect)
-		end
-	else
-		self.painters.outlineSelected:draw(outlineRect)
+function LevelSelectEntry:_draw(frame, rect)
+	if self.hasPerformedLayout ~= true then
+		return
 	end
+	
+	self.painters.painter:draw(self.rects.painter, { selected = (self.state == self.kStates.selected) })
+end
+
+function LevelSelectEntry:needsPerformLayout()
+	self.hasPerformedLayout = false
 end
 
 function LevelSelectEntry:_update()
-	
+	if self.hasPerformedLayout ~= true then
+		local _rects = self.rects
+		local _frame = self.frame
+		_rects.painter = _tInset(_assign(_rects.painter, _frame), 20, 0)
+		
+		self.hasPerformedLayout = true
+	end
 end
 
 function LevelSelectEntry:_changeState(stateFrom, stateTo)

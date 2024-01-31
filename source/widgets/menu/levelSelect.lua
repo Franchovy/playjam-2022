@@ -130,7 +130,7 @@ function WidgetLevelSelect:_draw(frame, rect)
 	self.painters.card:draw(_rects.card)
 	
 	for i, entry in ipairs(self.entries) do
- 		entry:draw(_rects.entry[i]:toLegacyRect())
+ 		entry:draw()
 	end
 	
 	if self.previews[self.state] ~= nil then
@@ -158,7 +158,10 @@ function WidgetLevelSelect:_update()
 		end
 		
 		for i, entry in ipairs(self.entries) do
-			_rects.entry[i] = _assign(_rects.entry[i], _frame.x - 5 + xOffset, _frame.y + i * 45 - 25, cardWidth, 40)
+			_rects.entry[i] = _assign(_rects.entry[i], _frame.x - 5 + xOffset, _frame.y + i * 39 - 19, cardWidth, 40)
+			
+			entry:setFrame(_rects.entry[i])
+			entry:needsPerformLayout()
 		end
 		
 		_rects.preview = _tSet(_assign(_rects.preview, _frame), previewX, nil, _frame.w - cardWidth)
