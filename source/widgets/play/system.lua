@@ -1,23 +1,21 @@
 class("WidgetSystem").extends(Widget)
 
-function WidgetSystem:init()
-    self.menu = playdate.getSystemMenu()
+local menu <const> = playdate.getSystemMenu()
 
+function WidgetSystem:init()
     self.signals = {}
 end
 
 function WidgetSystem:_load()
-    self.menu:addMenuItem("Restart level", 
-    function()
+    menu:addMenuItem("restart level", function()
         self.signals.restartLevel()
     end)
 
-    self.menu:addMenuItem("Return menu",
-    function()
+    menu:addMenuItem("main menu", function()
         self.signals.returnToMenu()
     end)
 end
 
 function WidgetSystem:_unload()
-    self.menu:removeAllMenuItems()
+    menu:removeAllMenuItems()
 end
