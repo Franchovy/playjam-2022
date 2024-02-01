@@ -1,0 +1,34 @@
+name: Upload to Itch.io
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Butler (itch.io)
+      run: | # download butler
+        curl  -L -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default 
+        unzip butler.zip
+        chmod +x butler
+        ./butler -v
+
+    - name: Build
+      run: |
+        ./scripts/increment_build.sh
+        ./scripts/build.sh
+
+    - name: Upload to Itch.io
+      env:
+        BUTLER_API_KEY: ${{ secrets.BUTLERAPIKEY }}
+        BUILD_VERSION: cat ./source/pdxinfo | grep -o 'buildNumber=[0-9]*' | awk -F= '{print $2}'
+      run: |
+        butler push ./Wheel\ Runner.pdx franchovy/wheel-runner:channel --userversion $BUILD_VERSION
+
