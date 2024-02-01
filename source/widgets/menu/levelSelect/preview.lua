@@ -17,25 +17,56 @@ end
 
 function LevelSelectPreview:_load()
 	self.images.level = gfx.image.new(self.config.imagePath)
-	self.images.star = gfx.image.new(kAssetsImages.starMenu):scaledImage(0.5)
-	
-	local scoreCoins
-	if self.config.score ~= nil then
-		scoreCoins = self.config.score.coinCount.."/"..self.config.score.coinCountObjective
-	else
-		scoreCoins = "-"
+	local createMaskImage = function()
+		local w, h = self.images.level:getSize()
+		local image = gfx.image.new(w, h, gfx.kColorBlack)
+		gfx.pushContext(image)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillRoundRect(0, 0, w, h, 7)
+		gfx.popContext()
+		return image
 	end
+	self.images.level:setMaskImage(createMaskImage())
+	local createOverlayImage = function()
+		local w, h = self.images.level:getSize()
+		local image = gfx.image.new(w, h)
+		gfx.pushContext(image)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setLineWidth(3)
+		gfx.drawRoundRect(0, 0, w, h, 7)
+		gfx.popContext()
+		return image
+	end
+	local overlayImage = createOverlayImage()
+	local createLockedImage = function()
+		local w, h = self.images.level:getSize()
+		local image = gfx.image.new(w, h)
+		gfx.pushContext(image)
+		gfx.setColor(gfx.kColorBlack)
+		gfx.fillRoundRect(0, 0, w, h, 7)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.setDitherPattern(0.8, gfx.image.kDitherTypeScreen)
+		gfx.fillRoundRect(0, 0, w, h, 7)
+		setCurrentFont(kAssetsFonts.twinbee2x)
+		local fontHeight = gfx.getFont():getHeight()
+		gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+		gfx.drawTextAligned("LOCKED", w / 2, (h - fontHeight) / 2, kTextAlignment.center)
+		gfx.popContext()
+		return image
+	end
+	local overlayImage = createOverlayImage()
+	local createLockedImage = createLockedImage()
+	
+	self.images.star = gfx.image.new(kAssetsImages.starMenu):scaledImage(0.5)
 	
 	local scoreTime
 	if self.config.score ~= nil then
-		scoreTime = self.config.score.timeString.."/"..self.config.score.timeStringObjective
+		scoreTime = "⌛ "..self.config.score.timeString.."/"..self.config.score.timeStringObjective
 	else
 		scoreTime = "-"
 	end
 	
-	self.images.labelCoins = gfx.imageWithText(scoreCoins, 100, 20)
-	self.images.labelTime = gfx.imageWithText(scoreTime, 100, 20)
-	self.images.labelTitle = gfx.imageWithText(self.config.title, 100, 20):scaledImage(1.5)
+	setCurrentFont(kAssetsFonts.twinbee15x)
 	self.images.labelMissing = gfx.imageWithText("NO HIGHSCORE", 200, 20)
 	
 	local scoreStars
@@ -89,30 +120,46 @@ function LevelSelectPreview:_load()
 			self.painters.star:draw(Rect.with(starRect, {x = starOffsetInitial + (starOffset * (i - 1))}))
 		end
 		
-		self.images.labelCoins:draw(rect.x, rect.y + starImageH + 5)
-		
-		local labelTimeImageWidth, labelHeight = self.images.labelTime:getSize()
-		self.images.labelTime:draw(rect.x + rect.w - labelTimeImageWidth, rect.y + starImageH + 5)
+		setCurrentFont(kAssetsFonts.twinbee15x)
+		local fontHeight = gfx.getFont():getHeight()
+		gfx.drawTextAligned(scoreTime, rect.x + rect.w / 2, rect.y + starImageH + 7, kTextAlignment.center)
 	end)
 	
-	self.painters.contents = Painter(function(rect, state)
+	self.painters.contents = Painter(function(rect, state)		
+		setCurrentFont(kAssetsFonts.twinbee2x)
+		local fontHeight = gfx.getFont():getHeight()
+		local topPadding = 8
+		local margin = 6
+		gfx.drawTextAligned(self.config.title, rect.x + rect.w / 2, topPadding, kTextAlignment.center)
+		
 		local _, levelImageSizeH = self.images.level:getSize()
-		self.images.level:draw(7, 10)
+		local imageX, imageY = 7, fontHeight + topPadding + margin
 		
-		local labelTitleSizeW, labelTitleSizeH = self.images.labelTitle:getSize()
-		self.images.labelTitle:draw(rect.x + (rect.w - labelTitleSizeW) / 2, 10 + levelImageSizeH + 5)
-		
-		local insetRect = Rect.inset(rect, 5, 10 + levelImageSizeH + 5 + labelTitleSizeH + 5, 5, 7)
-		if state.starsCount ~= nil then
-			layout:draw(insetRect, state)
+		if self.config.locked == true then
+			gfx.setColor(gfx.kColorBlack)
+			gfx.setDitherPattern(0.6, gfx.image.kDitherTypeScreen)
+			gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+			
+			createLockedImage:draw(imageX, imageY)
 		else
-			noHighScore:draw(insetRect, state)
+			self.images.level:draw(imageX, imageY)
+		end
+		
+		overlayImage:draw(imageX, imageY)
+		
+		if self.config.locked ~= true then
+			local insetRect = Rect.inset(rect, 5, levelImageSizeH + fontHeight + topPadding + margin * 2, 5, 7)
+			if state.starsCount ~= nil then
+				layout:draw(insetRect, state)
+			else
+				noHighScore:draw(insetRect, state)
+			end
 		end
 	end)
 end
 
 function LevelSelectPreview:_draw(rect)
-	local insetRect = Rect.inset(rect, 8, 35)
+	local insetRect = self.config.locked ~= true and Rect.inset(rect, 8, 30) or Rect.inset(rect, 8, 60)
 	
 	self.painters.background:draw(insetRect)
 	

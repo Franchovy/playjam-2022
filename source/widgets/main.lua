@@ -91,6 +91,7 @@ function WidgetMain:_load()
 		end
 		
 		self:loadHighscores()
+		self:loadLevelsLocked()
 	end
 	
 	self.onReturnToMenu = function()
@@ -138,11 +139,27 @@ function WidgetMain:_load()
 		self.data.highscores = data
 	end
 	
+	function self:loadLevelsLocked()
+		local data = table.create(0, #kLevels)
+		
+		local shouldLockLevel = false
+		for i, level in ipairs(kLevels) do
+			data[level.title] = shouldLockLevel
+			
+			if not shouldLockLevel and self.data.highscores[level.title] == nil then
+				shouldLockLevel = true
+			end
+		end
+		
+		self.data.levelsLocked = data
+	end
+	
 	self:loadHighscores()
+	self:loadLevelsLocked()
 	
 	--
 	
-	self.children.menu = Widget.new(WidgetMenu, { levels = kLevels, scores = self.data.highscores })
+	self.children.menu = Widget.new(WidgetMenu, { levels = kLevels, scores = self.data.highscores, locked = self.data.levelsLocked })
 	self.children.menu:load()
 	
 	self.children.menu.signals.play = self.onMenuPressedPlay
@@ -214,7 +231,7 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 			
 			collectgarbage("collect")
 			
-			self.children.menu = Widget.new(WidgetMenu, { levels = kLevels, scores = self.data.highscores })
+			self.children.menu = Widget.new(WidgetMenu, { levels = kLevels, scores = self.data.highscores, locked = self.data.levelsLocked })
 			self.children.menu:load()
 			
 			self.children.menu.signals.play = self.onMenuPressedPlay

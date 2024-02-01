@@ -25,7 +25,8 @@ kAssetsImages = {
 	screw = dirImages.."menu/screw",
 	transitionBackground = dirImages.."transition/background",
 	transitionForeground = dirImages.."transition/foreground",
-	menuSettings = dirImages.."menu/settings"
+	menuSettings = dirImages.."menu/settings",
+	lock = dirImages.."menu/lock"
 }
 
 kAssetsSounds = {

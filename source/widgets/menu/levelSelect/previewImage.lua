@@ -10,7 +10,8 @@ end
 
 function LevelSelectPreviewImage:_load()
 	self.images.image = gfx.image.new(self.config.path)
-	self.images.title = gfx.imageWithText(self.config.title, 100, 20):scaledImage(1.5)
+	setCurrentFont(kAssetsFonts.twinbee15x)
+	self.images.title = gfx.imageWithText(self.config.title, 100, 20)
 	
 	self.painters.title = Painter(function(rect)
 		gfx.setColor(gfx.kColorBlack)

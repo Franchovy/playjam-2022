@@ -23,8 +23,6 @@ function initialize()
 	playdate.timer.performAfterDelay(1, function()
 		topLevelWidget:load()
 	end)
-	
-	playdate.setMinimumGCTime(2)
 end
 
 function playdate.update()

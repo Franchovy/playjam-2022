@@ -7,6 +7,16 @@ function textPainter(config)
 		textPainter.config.scale = 1
 	end
 	
+	if textPainter.config.scale == 1 then
+		setCurrentFont(kAssetsFonts.twinbee)
+	elseif textPainter.config.scale == 1.5 then
+		setCurrentFont(kAssetsFonts.twinbee15x)
+	elseif textPainter.config.scale == 2 then	
+		setCurrentFont(kAssetsFonts.twinbee2x)
+	else
+		error("Font scale is unavailable.", 2)
+	end
+	
 	if textPainter.config.spacing == nil then
 		textPainter.config.spacing = 0
 	end
@@ -18,7 +28,7 @@ function textPainter(config)
 			local char = chars:sub(i, i)
 			
 			local textSizeW, textSizeH = gfx.getTextSize(char)
-			textPainter.images[char] = gfx.imageWithText(char, textSizeW, textSizeH):scaledImage(textPainter.config.scale)
+			textPainter.images[char] = gfx.imageWithText(char, textSizeW, textSizeH)
 		end
 	end
 	

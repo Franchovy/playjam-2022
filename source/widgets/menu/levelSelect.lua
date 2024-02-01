@@ -1,9 +1,21 @@
 import "levelSelect/entry"
 import "levelSelect/preview"
 import "levelSelect/previewImage"
+import "widgets/common/painters"
 
 local easing <const> = playdate.easingFunctions
 local gfx <const> = playdate.graphics
+local disp <const> = playdate.display
+local geo <const> = playdate.geometry
+
+local _tOffset <const> = geo.rect.tOffset
+local _assign <const> = geo.rect.assign
+local _tSet <const> = geo.rect.tSet
+local _create <const> = table.create
+
+local cardWidth <const> = 220
+
+local _painterMenuCard = Painter.commonPainters.menuCard()
 
 class("WidgetLevelSelect").extends(Widget)
 
@@ -13,12 +25,17 @@ WidgetLevelSelect.kMenuActionType = {
 }
 
 function WidgetLevelSelect:init(config)
+	WidgetLevelSelect.super.init(self)
+	
 	self.config = config
 	
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animations)
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.input)
+	self:supply(Widget.deps.frame, { needsLayout = true })
+	
+	self:setFrame(disp.getRect())
 	
 	self:setAnimations({
 		intro = 1,
@@ -42,7 +59,13 @@ function WidgetLevelSelect:_load()
 	self.previews = {}
 	
 	for i, level in ipairs(self.config.levels) do
-		local entry = Widget.new(LevelSelectEntry, { text = level.title, isSelected = i == 1, showOutline = true })
+		local isLocked = self.config.locked[level.title]
+		local entry = Widget.new(LevelSelectEntry, { 
+			text = level.title, 
+			isSelected = i == 1, 
+			showOutline = true,
+			locked = isLocked
+		})
 		table.insert(self.entries, entry)
 		self.children["entry"..i] = entry
 		
@@ -50,7 +73,8 @@ function WidgetLevelSelect:_load()
 		local preview = Widget.new(LevelSelectPreview, {
 			title = level.title,
 			imagePath = level.menuImagePath,
-			score = score
+			score = score,
+			locked = isLocked
 		})
 		table.insert(self.previews, preview)
 		self.children["preview"..i] = preview
@@ -64,81 +88,77 @@ function WidgetLevelSelect:_load()
 	table.insert(self.previews, previewSettings)
 	self.children["preview"..4] = previewSettings
 	
-	self.images.screw1 = gfx.image.new(kAssetsImages.screw)
-	self.images.screw2 = gfx.image.new(kAssetsImages.screw):rotatedImage(45)
-	self.images.screw3 = gfx.image.new(kAssetsImages.screw):rotatedImage(90)
-	
-	local painterCardOutline = Painter(function(rect)
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.7, gfx.image.kDitherTypeDiagonalLine)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		local rectInset = Rect.inset(rect, 10, 14)
-		
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.3, gfx.image.kDitherTypeDiagonalLine)
-		gfx.setLineWidth(3)
-		gfx.drawRoundRect(rectInset.x - 4, rectInset.y - 1, rectInset.w, rectInset.h, 6)
-		
-		gfx.setColor(gfx.kColorWhite)
-		gfx.fillRoundRect(rectInset.x - 3, rectInset.y, rectInset.w, rectInset.h, 6)
-		
-		local size = self.images.screw1:getSize()
-		self.images.screw2:draw(rect.x + 4, rect.y + 4)
-		self.images.screw3:draw(rect.x + rect.w - size - 4, rect.y + 4)
-		self.images.screw1:draw(rect.x + 4, rect.y + rect.h - size - 4)
-		self.images.screw2:draw(rect.x + rect.w - size - 4, rect.y + rect.h - size - 4)
-	end)
-	
-	self.painters.card = Painter(function(rect)
-		-- Painter background
-		
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.1, gfx.image.kDitherTypeDiagonalLine)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		gfx.setColor(gfx.kColorWhite)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		painterCardOutline:draw(rect)
-	end)
-	
 	for _, child in pairs(self.children) do
 		child:load()
 	end
-end
-
-function WidgetLevelSelect:_draw(rect)
-	local cardWidth = 220
-	local xOffset = self:getAnimatorValue(self.animators.card)
 	
-	self.painters.card:draw(Rect.offset(Rect.with(rect, { w = cardWidth }), xOffset, 0))
+	local _rects = self.rects
+	local _frame = self.frame
 	
+	_rects.entry = _create(#self.entries, 0)
 	for i, entry in ipairs(self.entries) do
- 		entry:draw(Rect.make(rect.x - 5 + xOffset, rect.y + i * 45 - 25, cardWidth, 40))
+		_rects.entry[i] = _assign(_rects.entry[i], _frame.x - 5, _frame.y + i * 39 - 19, cardWidth, 40)
+		entry:setFrame(_rects.entry[i])
 	end
 	
-	local previewX = self:getAnimatorValue(self.animators.preview) + cardWidth
+	self.animators.card = gfx.animator.new(0, 800, 800)
+end
+
+function WidgetLevelSelect:_draw(frame, rect)
+	local _rects = self.rects
+	
+	_painterMenuCard:draw(_rects.card)
+	
+	for i, entry in ipairs(self.entries) do
+ 		entry:draw()
+	end
 	
 	if self.previews[self.state] ~= nil then
-		self.previews[self.state]:draw(Rect.with(rect, { x = previewX, w = rect.w - cardWidth }))
+		self.previews[self.state]:draw(_rects.preview)
 	end
 end
 
 function WidgetLevelSelect:_update()
-	if self.wasAnimating == true then
+	if self:hasAnimationChanged() == true then
+		self:performLayout()
+
 		gfx.sprite.addDirtyRect(0, 0, 400, 240)
 	end
+end
+
+function WidgetLevelSelect:_performLayout()
+	local xOffset = self:getAnimatorValue(self.animators.card)
+	local previewX = self:getAnimatorValue(self.animators.preview) + cardWidth
 	
-	self.wasAnimating = self:isAnimating()
+	local _rects = self.rects
+	local _frame = self.frame
+	
+	_rects.card = _tOffset(_tSet(_assign(_rects.card, _frame), nil, nil, cardWidth), xOffset, 0)
+	
+	for i, entry in ipairs(self.entries) do
+		_rects.entry[i] = _tSet(_rects.entry[i], _frame.x - 5 + xOffset)
+		
+		entry:setFrame(_rects.entry[i])
+		entry:setNeedsLayout()
+	end
+	
+	_rects.preview = _tSet(_assign(_rects.preview, _frame), previewX, nil, _frame.w - cardWidth)
 end
 
 function WidgetLevelSelect:_handleInput(input)
 	if input.pressed & playdate.kButtonA ~= 0 then
 		local index = self.state
 		if index <= #self.config.levels then
-			-- Load level
-			self.signals.select({ type = WidgetLevelSelect.kMenuActionType.play, level = self.config.levels[index] })
+			local level = self.config.levels[index]
+			
+			if self.config.locked[level.title] ~= true then
+				-- Load level
+				self.signals.select({ type = WidgetLevelSelect.kMenuActionType.play, level = level })
+			else
+				self:playSample(kAssetsSounds.menuSelectFail)
+				
+				self:animate(self.kAnimations.error)
+			end
 		elseif index == 4 then
 			-- Settings
 			self.signals.select({ type = WidgetLevelSelect.kMenuActionType.menu, name = "settings" })

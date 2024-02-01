@@ -23,7 +23,9 @@ function WidgetTransition:_load()
 	self.images.background = gfx.image.new(kAssetsImages.transitionBackground)
 	self.images.foreground = gfx.image.new(kAssetsImages.transitionForeground)
 	self.images.wheel = gfx.imagetable.new(kAssetsImages.wheel):getImage(1):invertedImage()
-	self.images.text = gfx.imageWithText("LOADING...", 250, 25):scaledImage(2):invertedImage()
+	
+	setCurrentFont(kAssetsFonts.twinbee2x)
+	self.images.text = gfx.imageWithText("LOADING...", 250, 25):invertedImage()
 	
 	self.painters.screen = Painter(function(rect)
 		gfx.setColor(gfx.kColorBlack)
