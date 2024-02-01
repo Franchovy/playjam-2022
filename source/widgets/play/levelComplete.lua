@@ -278,6 +278,10 @@ function LevelComplete:_update()
 end
 
 function LevelComplete:_handleInput(input)
+	if self.state ~= self.kStates.overlay then
+		return
+	end
+		
 	if input.pressed & (playdate.kButtonA | playdate.kButtonB) ~= 0 then
 		self:playSample(kAssetsSounds.menuAccept)
 		
