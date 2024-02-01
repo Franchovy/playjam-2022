@@ -14,9 +14,6 @@ echo "Current build number: $currentBuildNumber"
 # Update the text file with the new build number
 updatedTextFile=$(echo "$TEXTFILE" | sed "s/buildNumber=$currentBuildNumber/buildNumber=$newBuildNumber/")
 
-# Save the new build number to an environment variable (
-$newBuildNumber >> "$GITHUB_ENV"
-
 # Print the updated text file and the new build number
 echo "$updatedTextFile" > ./source/pdxinfo
 echo "New Build Number: $newBuildNumber"
