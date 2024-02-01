@@ -23,10 +23,21 @@ jobs:
         echo "Checking valid install:"
         ./butler -V
 
-#    - name: Build
-#      run: |
-#        chmod +x ./scripts/build.sh
-#        ./scripts/build.sh
+    - name: Set up Playdate SDK
+      run: | 
+        curl -L -o playdateSDK https://download.panic.com/playdate_sdk/Linux/PlaydateSDK-latest.tar.gz
+        mkdir _pd-sdk
+        tar -zxf playdateSDK -C _pd-sdk
+        cd _pd-sdk/*/
+        # sudo chown runner setup.sh && chmod +x setup.sh
+        sudo ./setup.sh || true
+        echo "PLAYDATE_SDK_PATH=$PWD" >> $GITHUB_ENV
+        echo "$PWD/bin" >> $GITHUB_PATH
+
+    - name: Build PDX
+      run: |
+        chmod +x ./scripts/build.sh
+        ./scripts/build.sh
 
     - name: Get Build Number
       run: | 
