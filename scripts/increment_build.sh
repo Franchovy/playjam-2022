@@ -17,3 +17,7 @@ updatedTextFile=$(echo "$TEXTFILE" | sed "s/buildNumber=$currentBuildNumber/buil
 # Print the updated text file and the new build number
 echo "$updatedTextFile" > ./source/pdxinfo
 echo "New Build Number: $newBuildNumber"
+
+git a source/pdxinfo
+git c -m "Incremented build number: $newBuildNumber"
+git push
