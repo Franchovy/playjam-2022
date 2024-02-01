@@ -47,5 +47,6 @@ jobs:
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLERAPIKEY }}
       run: |
-        ./butler push ./Wheel\ Runner.pdx franchovy/wheel-runner:channel --userversion $BUILD_VERSION
+        zip -r Wheel\ Runner.pdx.zip Wheel\ Runner.pdx
+        ./butler push ./Wheel\ Runner.pdx.zip franchovy/wheel-runner:channel --userversion $BUILD_VERSION
 
