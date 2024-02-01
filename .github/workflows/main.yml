@@ -1,0 +1,36 @@
+name: Upload to Itch.io
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+
+    - name: Install Dependencies
+      run: |
+        npm install -g butler
+
+    - name: Build
+      run: |
+        ./scripts/increment_build.sh
+        ./scripts/build.sh
+
+    - name: Upload to Itch.io
+      run: |
+        butler push ./Wheel\ Runner.pdx franchovy/wheel-runner:channel --userversion $BUILD_VERSION
+      env:
+        BUTLER_API_KEY: ${{ secrets.ButlerApiKey }}
+        BUILD_VERSION: cat ./source/pdxinfo | grep -o 'buildNumber=[0-9]*' | awk -F= '{print $2}'
+
