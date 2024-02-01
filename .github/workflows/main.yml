@@ -15,20 +15,26 @@ jobs:
 
     - name: Set up Butler (itch.io)
       run: | # download butler
-        curl  -L -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default 
+        echo "Downloading butler CI tool..."
+        curl --silent -L -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+        echo "Unzipping butler..."
         unzip butler.zip
         chmod +x butler
-        ./butler -v
+        echo "Checking valid install:"
+        ./butler -V
 
-    - name: Build
-      run: |
-        ./scripts/increment_build.sh
-        ./scripts/build.sh
+#    - name: Build
+#      run: |
+#        chmod +x ./scripts/build.sh
+#        ./scripts/build.sh
+
+    - name: Get Build Number
+      run: | 
+        echo "BUILD_VERSION=$(cat ./source/pdxinfo | grep -o 'buildNumber=[0-9]*' | awk -F= '{print $2}')" >> $GITHUB_ENV
 
     - name: Upload to Itch.io
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLERAPIKEY }}
-        BUILD_VERSION: cat ./source/pdxinfo | grep -o 'buildNumber=[0-9]*' | awk -F= '{print $2}'
       run: |
-        butler push ./Wheel\ Runner.pdx franchovy/wheel-runner:channel --userversion $BUILD_VERSION
+        ./butler push ./Wheel\ Runner.pdx franchovy/wheel-runner:channel --userversion $BUILD_VERSION
 
