@@ -1,6 +1,7 @@
 import "playdate"
 import "constant/kColliderType"
 import "constant/kCollisionType"
+import "collisionSolver"
 
 local gfx <const> = playdate.graphics
 
@@ -48,6 +49,13 @@ end
 function ColliderSprite:setCollisionType(collisionType)
     -- TODO: add failsafe if collision type is invalid
     self._collisionType = collisionType
+end
+
+function ColliderSprite:readyToCollide()
+    local solverInstance = CollisionSolver.instance()
+    if solverInstance then
+        solverInstance:addCollider(self)
+    end
 end
 
 function ColliderSprite:getCollisionType()
@@ -190,33 +198,6 @@ ColliderSprite.calculateAabbToAabbResolution = function(overlapInfo)
     end
 end
 
--- given two collision types, returns true if we should check overlap between both colliders
--- this function was abstracted away to make it easier to test
--- In game logic, it's probably better to call ColliderSprite:checkOverlapWith
-function ColliderSprite.shouldCheckOverlap(firstCollisionType, secondCollisionType)
-    local mask = firstCollisionType | secondCollisionType
-
-    -- If any is set to "ignore" mode we just return false
-    if mask & kCollisionType.ignore == kCollisionType.ignore then
-        return false
-    end
-
-    local truthTable = {
-        [kCollisionType.dynamic | kCollisionType.dynamic] = true,
-        [kCollisionType.dynamic | kCollisionType.static] = true,
-        [kCollisionType.dynamic | kCollisionType.trigger] = true,
-        [kCollisionType.static | kCollisionType.trigger] = false,
-        [kCollisionType.static | kCollisionType.static] = false,
-        [kCollisionType.trigger | kCollisionType.trigger] = true,
-    }
-
-    return truthTable[mask]
-end
-
-function ColliderSprite:checkOverlapWith(other)
-    return ColliderSprite.shouldCheckOverlap(self.getCollisionType(), other.getCollisionType())
-end
-
 -- Returns true if two ColliderSprites overlap regardless of collision masks, collision enabled or collision types
 function ColliderSprite:overlapsWith(other)
     -- Maps each pair of collider type to a collision checking function 
@@ -229,4 +210,8 @@ function ColliderSprite:overlapsWith(other)
     }
 
     return collisionFunctions[self._colliderType * 10 + other._colliderType](self._collider, other._collider)
+end
+
+function ColliderSprite:collisionWith(other)
+    -- Function called by the collisionsolver when a collision is detected. Children should implement
 end

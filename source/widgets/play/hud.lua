@@ -65,7 +65,7 @@ end
 
 function WidgetHUD:_update()
 	local timeLabelTextPrevious = self.data.timeLabelText
-	self.data.timeLabelText = convertToTimeString(self.data.time, 2)
+	--self.data.timeLabelText = convertToTimeString(self.data.time, 2)
 	
 	local coinsLabelTextPrevious = self.data.coinsLabelText
 	self.data.coinsLabelText = ""..self.data.coins

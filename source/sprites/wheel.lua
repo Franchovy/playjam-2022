@@ -38,15 +38,16 @@ function Wheel:init()
 	Wheel.super.init(self)
 	
 	self.imagetable = gfx.imagetable.new(kAssetsImages.wheel)
-
+	
 	self:setImage(self.imagetable[1])
 	self:setCenter(0, 0)
 	
 	self.type = kSpriteTypes.player
 	
-	self:setCollideRect(self:getBounds())
-	self:setGroupMask(kCollisionGroups.player)
-	self:setCollidesWithGroupsMask(kCollisionGroups.static)
+	local x, y, w, h = self:getBounds()
+	self:setCollider(kColliderType.circle, playdate.geometry.arc.new(x + w / 2, y + h / 2, w / 2, 0, 360))
+	self:setCollisionType(kCollisionType.dynamic)
+	self:readyToCollide()
 	
 	self.collisionResponse = function(self, other)
 		if other.type == kSpriteTypes.platform then
@@ -155,12 +156,17 @@ end
 local previousTicks = 0
 local currentTicks = 0
 
+
+function Wheel:collisionWith(other)
+
+end
 -- Movement
 
 function Wheel:update()
 	-- important, update the physics
 	Wheel.super:update()
 
+	--[[
 	local input = self.input
 	
 	-- Update if player has died
@@ -330,6 +336,7 @@ function Wheel:update()
 		gfx.sprite.addDirtyRect(previousBounds[1] + drawOffsetX, previousBounds[2], previousBounds[3], previousBounds[4])
 		gfx.sprite.addDirtyRect(currentBounds[1] + drawOffsetX, currentBounds[2], currentBounds[3], currentBounds[4])
 	end
+	]]
 end
 
 -- Movement / Speed

@@ -127,6 +127,10 @@ function WidgetLevel:_load()
 			sprite:add()
 		end
 		
+		if sprite.ready ~= nil then
+			sprite:ready()
+		end
+
 		return sprite
 	end)
 	

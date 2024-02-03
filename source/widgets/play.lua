@@ -6,6 +6,7 @@ import "play/background"
 import "play/hud"
 import "play/system"
 import "utils/themes"
+import "engine/collisionSolver"
 
 local gfx <const> = playdate.graphics
 local timer <const> = playdate.timer
@@ -40,6 +41,8 @@ function WidgetPlay:init(config)
 end
 
 function WidgetPlay:_load()
+	CollisionSolver() -- instanciate a collision solver 
+
 	self.children.transition = Widget.new(WidgetTransition)
 	self.children.transition:load()
 	self.children.transition:setVisible(false)
@@ -197,7 +200,9 @@ function WidgetPlay:_update()
 	local _frame = self.frame
 	local _rects = self.rects
 	
-	_rects.levelComplete = _tInset(_assign(_rects.levelComplete, _frame), 30, 20)
+	--_rects.levelComplete = _tInset(_assign(_rects.levelComplete, _frame), 30, 20)
+
+	CollisionSolver.instance():update()
 end
 
 function WidgetPlay:_changeState(stateFrom, stateTo)
