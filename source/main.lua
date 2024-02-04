@@ -6,6 +6,7 @@ import "config"
 import "widgets"
 import "utils/fonts"
 import "runTests"
+import "engine/debugCanvas"
 
 local topLevelWidget
 
@@ -20,6 +21,7 @@ function initialize()
 	playdate.graphics.setFontTracking(1)
 	
 	topLevelWidget = Widget.new(WidgetMain)
+	DebugCanvas()
 	
 	playdate.timer.performAfterDelay(1, function()
 		topLevelWidget:load()
@@ -47,6 +49,7 @@ function playdate.update()
 	end
 	
 	playdate.drawFPS(10, 10)
+	DebugCanvas.instance():draw()
 end
 
 -- Start game

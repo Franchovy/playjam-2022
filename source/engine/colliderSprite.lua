@@ -12,6 +12,7 @@ function ColliderSprite:init()
     ColliderSprite.super.init(self)
 
     self._collider = {}
+    self._colliderPosRelative = {x = 0, y = 0}
     self._colliderType = kColliderType.none
     self._collisionType = kCollisionType.ignore -- Defaults to ignore to preserve computation
 end
@@ -35,6 +36,9 @@ function ColliderSprite:setCollider(colliderType, collider)
         collider.startAngle = 0
         collider.endAngle = 360
     end
+
+    self._colliderPosRelative.x = collider.x
+    self._colliderPosRelative.y = collider.y
 
     self._collider = collider
     self._colliderType = colliderType
@@ -60,6 +64,15 @@ end
 
 function ColliderSprite:getCollisionType()
     return self._collisionType
+end
+
+function ColliderSprite:moveTo(x, y)
+    if (self._collider) then
+        self._collider.x = x + self._colliderPosRelative.x
+        self._collider.y = y + self._colliderPosRelative.x
+    end
+    
+    gfx.sprite.moveTo(self, x, y)
 end
 
 local function rectMin(rect)

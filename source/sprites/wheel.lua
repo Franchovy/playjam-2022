@@ -3,6 +3,7 @@ import "engine/colliderSprite"
 import "constant"
 import "utils/images"
 import "playdate"
+import "engine/debugCanvas"
 
 local gfx <const> = playdate.graphics
 
@@ -48,6 +49,13 @@ function Wheel:init()
 	self:setCollider(kColliderType.circle, playdate.geometry.arc.new(x + w / 2, y + h / 2, w / 2, 0, 360))
 	self:setCollisionType(kCollisionType.dynamic)
 	self:readyToCollide()
+
+	DebugCanvas.instance():addPersistentDrawCall(function ()
+		local x, y, w, h = self:getBounds()
+		gfx.setColor(gfx.kColorWhite)
+		gfx.setLineWidth(3)
+		gfx.drawCircleAtPoint(x + w / 2, y + h / 2, w / 2)
+	end)
 	
 	self.collisionResponse = function(self, other)
 		if other.type == kSpriteTypes.platform then
@@ -158,7 +166,14 @@ local currentTicks = 0
 
 
 function Wheel:collisionWith(other)
-
+	local x, y, w, h = other:getBounds()
+	DebugCanvas.instance():addDrawCall(function()
+		gfx.pushContext()
+			gfx.setColor(gfx.kColorWhite)
+			gfx.setLineWidth(3)
+			gfx.drawRect(x, y, w, h)
+		gfx.popContext()
+	end)
 end
 -- Movement
 
@@ -166,15 +181,18 @@ function Wheel:update()
 	-- important, update the physics
 	Wheel.super:update()
 
-	--[[
-	local input = self.input
-	
-	-- Update if player has died
+	self:moveTo(self.x, self.y + gravity)
 	
 	if self.y > 260 and (self.hasJustDied == false) then
 		self:setIsDead()
 		return
 	end
+
+	--[[
+	local input = self.input
+	
+	-- Update if player has died
+	
 	
 	-- Ignore input 
 	
@@ -208,14 +226,6 @@ function Wheel:update()
 	end
 	
 	local previousBounds = { self:getBounds() }
-	
-	if self.isFrozen == false then
-		self.velocityY = math.min(self.velocityY + gravity, maxFallSpeed)
-		self.velocityX = self:calculateSpeed(crankTicks, self.velocityX)
-	else
-		self.velocityY = 0
-		self.velocityX = 0
-	end
 	
 	-- Reset values that get re-calculated
 	

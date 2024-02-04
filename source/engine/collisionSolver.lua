@@ -1,4 +1,8 @@
+import "engine/debugCanvas"
+
 class("CollisionSolver").extends()
+
+local gfx <const> = playdate.graphics
 
 local instance = nil
 function CollisionSolver:init()
@@ -62,15 +66,15 @@ end
 
 function CollisionSolver:_getCollidersAtGridPosition(collisionType, gridPosX, gridPosY)
     local gridContent = self.colliders[collisionType]
-
+    
     local gridX = gridContent[gridPosX]
     if gridX == nil then return nil end
-
+    
     local gridY = gridX[gridPosY]
     if gridY == nil then return nil end
 
     -- this the array that contains colliders
-    return gridX[gridPosY]
+    return gridY
 end
 
 function CollisionSolver:_getCornersGridCoordinates(collider)
@@ -186,38 +190,38 @@ function CollisionSolver:checkCollisionsOnGrid(colliders, collisionTypeForGrid)
 
         -- check along the bottom range first 
         for i=blX,brX do
-            local colliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, blY)
-            _performCollisionCheckGrid(colliders)
+            local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, blY)
+            _performCollisionCheckGrid(collider, gridColliders)
             -- we do the check a second time with y offset by one just to have a larger sample
-            colliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, blY+1)
-            _performCollisionCheckGrid(colliders)
+            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, blY+1)
+            _performCollisionCheckGrid(collider, gridColliders)
         end
         
         -- do the same thing but along the right range
         for i=trY,brY do
-            local colliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, trX, i)
-            _performCollisionCheckGrid(colliders)
+            local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, trX, i)
+            _performCollisionCheckGrid(collider, gridColliders)
             -- we do the check a second time with y offset by one just to have a larger sample
-            colliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, trX+1, i)
-            _performCollisionCheckGrid(colliders)
+            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, trX+1, i)
+            _performCollisionCheckGrid(collider, gridColliders)
         end
 
         -- top range
         for i=tlX,trX do
-            local colliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, tlY)
-            _performCollisionCheckGrid(colliders)
+            local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, tlY)
+            _performCollisionCheckGrid(collider, gridColliders)
             -- we do the check a second time with y offset by one just to have a larger sample
-            colliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, tlY-1)
-            _performCollisionCheckGrid(colliders)
+            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, tlY-1)
+            _performCollisionCheckGrid(collider, gridColliders)
         end
         
         -- left range
         for i=tlY,blY do
-            local colliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, tlX, i)
-            _performCollisionCheckGrid(colliders)
+            local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, tlX, i)
+            _performCollisionCheckGrid(collider, gridColliders)
             -- we do the check a second time with y offset by one just to have a larger sample
-            colliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, tlX-1, i)
-            _performCollisionCheckGrid(colliders)
+            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, tlX-1, i)
+            _performCollisionCheckGrid(collider, gridColliders)
         end
     end
 end
