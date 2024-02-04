@@ -137,15 +137,48 @@ function CollisionSolver:shouldCheckOverlap(firstCollisionType, secondCollisionT
     return overlapTruthTable[mask]
 end
 
--- this function is internal to checkCollisions below
--- but declared outside for memory allocation optimization
-local _performCollisionCheck = function(colliderA, colliderB)
-    if colliderA:overlapsWith(colliderB) then
+-- given a calculated resolution movement amount, determines how collider A and collider B should move and by what amount
+function CollisionSolver:_determineResolutionMvt(collisionTypeA, collisionTypeB, resolutionAmtX, resolutionAmtY)
+    -- both colliders are dynamic, split the resolution amount between the two
+    if collisionTypeA == kCollisionType.dynamic and collisionTypeB == kCollisionType.dynamic then
+        local halfResolutionX = resolutionAmtX / 2
+        local halfResolutionY = resolutionAmtY / 2
+        return -halfResolutionX, -halfResolutionY, halfResolutionX, halfResolutionY
+    end
+
+    -- resolution amount is calculated for collider B so we need to invert it if A is the one supposed to move
+    if collisionTypeA == kCollisionType.dynamic then
+        return -resolutionAmtX, -resolutionAmtY, 0, 0
+    end
+
+    -- preserve resolution amt as is
+    if collisionTypeB == kCollisionType.dynamic then
+        return 0, 0, resolutionAmtX, resolutionAmtY
+    end
+
+    -- no dynamic colliders
+    return 0, 0, 0, 0
+ end
+
+function CollisionSolver:_checkAndResolve(colliderA, colliderB)
+    local overlaps, overlapInfo, resolutionFunction = colliderA:overlapsWith(colliderB)
+    
+    if overlaps then
+        local resolutionX, resolutionY = resolutionFunction(overlapInfo)
+
+        -- calculate the actual resolution amount depending on collision types
+        local resolutionAX, resolutionAY, resolutionBX, resolutionBY = self:_determineResolutionMvt(
+            colliderA:getCollisionType(),
+            colliderB:getCollisionType(),
+            resolutionX, resolutionY
+        )
+
+        colliderA:moveTo(colliderA.x + resolutionAX, colliderA.y + resolutionAY)
+        colliderB:moveTo(colliderB.x + resolutionBX, colliderB.y + resolutionBY)
+
         colliderA:collisionWith(colliderB)
         colliderB:collisionWith(colliderA)
-        return true
     end
-    return false
 end
 
 -- runs a collision check with every possible pairs of two lists or a single list
@@ -154,32 +187,41 @@ function CollisionSolver:checkCollisions(colliders, otherColliders)
         for i, collider in pairs(colliders) do
             for j=i+1, #colliders do
                 local otherCollider = colliders[j]
-                _performCollisionCheck(collider, otherCollider) 
+                self:_checkAndResolve(collider, otherCollider) 
             end
         end
     else -- check against other group
         for _, collider in pairs(colliders) do
             for _, otherCollider in pairs(otherColliders) do
-                _performCollisionCheck(collider, otherCollider)
+                self:_checkAndResolve(collider, otherCollider)
             end
         end
     end
 end
 
--- this function is internal to checkCollisionsOnGrid below
--- but declared outside for memory allocation optimization
-local _performCollisionCheckGrid = function(collider, gridColliders)
+function CollisionSolver:_checkAndResolveGrid(collider, gridColliders)
     if gridColliders == nil then return end
 
     for _, gridCollider in pairs(gridColliders) do
-        if collider:overlapsWith(gridCollider) then
-            collider:collisionWith(gridCollider)
+        local overlaps, overlapInfo, resolutionFunction = gridCollider:overlapsWith(collider)
+
+        if overlaps then
+            local resolutionX, resolutionY = resolutionFunction(overlapInfo)
+            
+            -- calculate the actual resolution amount depending on collision types
+            local resolutionAX, resolutionAY, resolutionBX, resolutionBY = self:_determineResolutionMvt(
+                gridCollider:getCollisionType(),
+                collider:getCollisionType(),
+                resolutionX, resolutionY
+            )
+
+            gridCollider:moveTo(gridCollider.x + resolutionAX, gridCollider.y + resolutionAY)
+            collider:moveTo(collider.x + resolutionBX, collider.y + resolutionBY)
+
             gridCollider:collisionWith(collider)
-            return true
+            collider:collisionWith(gridCollider)
         end
     end
-
-    return false
 end
 
 -- Runs a collision check against colliders positioned on a grid, much faster than checkCollisions
@@ -191,37 +233,25 @@ function CollisionSolver:checkCollisionsOnGrid(colliders, collisionTypeForGrid)
         -- check along the bottom range first 
         for i=blX,brX do
             local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, blY)
-            _performCollisionCheckGrid(collider, gridColliders)
-            -- we do the check a second time with y offset by one just to have a larger sample
-            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, blY+1)
-            _performCollisionCheckGrid(collider, gridColliders)
+            self:_checkAndResolveGrid(collider, gridColliders)
         end
         
         -- do the same thing but along the right range
         for i=trY,brY do
             local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, trX, i)
-            _performCollisionCheckGrid(collider, gridColliders)
-            -- we do the check a second time with y offset by one just to have a larger sample
-            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, trX+1, i)
-            _performCollisionCheckGrid(collider, gridColliders)
+            self:_checkAndResolveGrid(collider, gridColliders)
         end
 
         -- top range
         for i=tlX,trX do
             local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, tlY)
-            _performCollisionCheckGrid(collider, gridColliders)
-            -- we do the check a second time with y offset by one just to have a larger sample
-            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, tlY-1)
-            _performCollisionCheckGrid(collider, gridColliders)
+            self:_checkAndResolveGrid(collider, gridColliders)
         end
         
         -- left range
         for i=tlY,blY do
             local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, tlX, i)
-            _performCollisionCheckGrid(collider, gridColliders)
-            -- we do the check a second time with y offset by one just to have a larger sample
-            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, tlX-1, i)
-            _performCollisionCheckGrid(collider, gridColliders)
+            self:_checkAndResolveGrid(collider, gridColliders)
         end
     end
 end

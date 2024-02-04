@@ -50,12 +50,14 @@ function Wheel:init()
 	self:setCollisionType(kCollisionType.dynamic)
 	self:readyToCollide()
 
+	--[[
 	DebugCanvas.instance():addPersistentDrawCall(function ()
 		local x, y, w, h = self:getBounds()
 		gfx.setColor(gfx.kColorWhite)
 		gfx.setLineWidth(3)
 		gfx.drawCircleAtPoint(x + w / 2, y + h / 2, w / 2)
 	end)
+	]]
 	
 	self.collisionResponse = function(self, other)
 		if other.type == kSpriteTypes.platform then
@@ -166,6 +168,7 @@ local currentTicks = 0
 
 
 function Wheel:collisionWith(other)
+	--[[
 	local x, y, w, h = other:getBounds()
 	DebugCanvas.instance():addDrawCall(function()
 		gfx.pushContext()
@@ -174,6 +177,7 @@ function Wheel:collisionWith(other)
 			gfx.drawRect(x, y, w, h)
 		gfx.popContext()
 	end)
+	]]
 end
 -- Movement
 
@@ -181,7 +185,7 @@ function Wheel:update()
 	-- important, update the physics
 	Wheel.super:update()
 
-	self:moveTo(self.x, self.y + gravity)
+	self:moveTo(self.x + 1.5, self.y + gravity)
 	
 	if self.y > 260 and (self.hasJustDied == false) then
 		self:setIsDead()

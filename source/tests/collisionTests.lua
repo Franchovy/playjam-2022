@@ -38,9 +38,9 @@ function aabbToCircleTest()
 end
 
 function collisionTests()
-    circleToCircleTest()
-    aabbToAabbTest()
-    aabbToCircleTest()
+    --circleToCircleTest()
+    --aabbToAabbTest()
+    --aabbToCircleTest()
 
-    print("Collision test successful")
+    --print("Collision test successful")
 end

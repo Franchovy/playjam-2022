@@ -5,6 +5,20 @@ import "collisionSolver"
 
 local gfx <const> = playdate.graphics
 
+class("Collider").extends()
+function Collider:init(pdGeometry)
+    self.geo = pdGeometry
+
+    self.relativePos = {
+        x = pdGeometry.x,
+        y = pdGeometry.y
+    }
+    
+    if getmetatable(pdGeometry) == playdate.geometry.arc then
+        self.sqRadius = self.geo.radius * self.geo.radius
+    end
+end
+
 -- Base class for a gfx.sprite that overrides default sdk collision handling
 class("ColliderSprite").extends(gfx.sprite)
 
@@ -12,7 +26,6 @@ function ColliderSprite:init()
     ColliderSprite.super.init(self)
 
     self._collider = {}
-    self._colliderPosRelative = {x = 0, y = 0}
     self._colliderType = kColliderType.none
     self._collisionType = kCollisionType.ignore -- Defaults to ignore to preserve computation
 end
@@ -37,10 +50,7 @@ function ColliderSprite:setCollider(colliderType, collider)
         collider.endAngle = 360
     end
 
-    self._colliderPosRelative.x = collider.x
-    self._colliderPosRelative.y = collider.y
-
-    self._collider = collider
+    self._collider = Collider(collider)
     self._colliderType = colliderType
 end
 
@@ -68,53 +78,57 @@ end
 
 function ColliderSprite:moveTo(x, y)
     if (self._collider) then
-        self._collider.x = x + self._colliderPosRelative.x
-        self._collider.y = y + self._colliderPosRelative.x
+        self._collider.geo.x = x + self._collider.relativePos.x
+        self._collider.geo.y = y + self._collider.relativePos.y
     end
-    
+
     gfx.sprite.moveTo(self, x, y)
 end
 
-local function rectMin(rect)
-    return rect.x, rect.y
+local rectMin = function(r)
+    return r.x, r.y
 end
 
-local function rectMax(rect)
-    return rect.x + rect.width, rect.y + rect.height
+local rectMax = function(r)
+    return r.x+r.width, r.y+r.height
 end
 
 -- Returns true if a rect and a circle intersect
 ColliderSprite.aabbToCircle = function(rect, circle)
-    local rectMinX, rectMinY = rectMin(rect)
-    local rectMaxX, rectMaxY = rectMax(rect)
+    local sqRadius, circleX, circleY = circle.sqRadius, circle.geo.x, circle.geo.y
+    local rect = rect.geo
+
+    local minX, minY = rectMin(rect)
+    local maxX, maxY = rectMax(rect)
 
     -- Here we clamp the circle position to be in bound of the rectangle tested against
-    local closestPointX, closestPointY = circle.x, circle.y
-    if closestPointX < rectMinX then
-        closestPointX = rectMinX
-    elseif closestPointX > rectMaxX then
-        closestPointX = rectMaxX
+    local closestPointX, closestPointY = circleX, circleY
+    if closestPointX < minX then
+        closestPointX = minX
+    elseif closestPointX > maxX then
+        closestPointX = maxX
     end
 
-    if closestPointY < rectMinY then
-        closestPointY = rectMinY
-    elseif closestPointY > rectMaxY then
-        closestPointY = rectMaxY
+    if closestPointY < minY then
+        closestPointY = minY
+    elseif closestPointY > maxY then
+        closestPointY = maxY
     end
 
-    local sqDistance = playdate.geometry.squaredDistanceToPoint(closestPointX, closestPointY, circle.x, circle.y)
+    local sqDistance = playdate.geometry.squaredDistanceToPoint(closestPointX, closestPointY, circleX, circleY)
 
-    local overlap = sqDistance <= circle.radius * circle.radius -- is there an actual overlap
+    local overlap = sqDistance <= sqRadius -- is there an actual overlap
 
-    local overlapInformation = {}
-    if overlap then
-        -- some data needed for resolution
-        overlapInformation = {circle = playdate.geometry.arc.copy(circle), closestPoint = {x = closestPointX, y = closestPointY}, sqDistance = sqDistance}
-    end
+    local overlapInformation = overlap and {
+        circle = playdate.geometry.arc.copy(circle.geo),
+        closestPoint = {x = closestPointX, y = closestPointY},
+        sqDistance = sqDistance
+    } or nil
 
-    return overlap, overlapInformation
+    return overlap, overlapInformation, ColliderSprite.aabbToCircleResolution
 end
 
+-- returns by how much the circle should move to resolve the collision
 ColliderSprite.aabbToCircleResolution = function(overlapInfo)
     local distance = math.sqrt(overlapInfo.sqDistance)
     local overlap = overlapInfo.circle.radius - distance
@@ -122,10 +136,7 @@ ColliderSprite.aabbToCircleResolution = function(overlapInfo)
     local moveDirX = (overlapInfo.circle.x - overlapInfo.closestPoint.x) / distance
     local moveDirY = (overlapInfo.circle.y - overlapInfo.closestPoint.y) / distance
 
-    return {
-        x = moveDirX * overlap,
-        y = moveDirY * overlap
-    }
+    return moveDirX * overlap, moveDirY * overlap
 end
 
 -- Convenience function for ColliderSprite:overlapsWith
@@ -135,6 +146,8 @@ end
 
 -- Returns true if a circle and a circle intersect
 ColliderSprite.circleToCircle = function(a, b)
+    local a, b = a.geo, b.geo
+
     local radiiSum = a.radius + b.radius
     local overlap = playdate.geometry.squaredDistanceToPoint(a.x, a.y, b.x, b.y) <= radiiSum * radiiSum
     
@@ -143,7 +156,7 @@ ColliderSprite.circleToCircle = function(a, b)
         overlapInfo = {a = playdate.geometry.arc.copy(a), b = playdate.geometry.arc.copy(b)}
     end
 
-    return overlap, overlapInfo
+    return overlap, overlapInfo, ColliderSprite.circleToCircleResolution
 end
 
 -- Returns the smallest amount by how much b should move to resolve the collision, asssumes both circle are overlapping
@@ -160,23 +173,26 @@ ColliderSprite.circleToCircleResolution = function(overlapInfo)
     local moveDirX = bToA_x / bToALength
     local moveDirY = bToA_y / bToALength
 
-    return {x = a.x + moveDirX * radiiSum, y = a.y + moveDirY * radiiSum}
+    return a.x + moveDirX * radiiSum, a.y + moveDirY * radiiSum
 end
 
 -- Returns true if a rect and a rect intersect
 ColliderSprite.aabbToAabb = function(a, b)
-    local aMinX, aMinY = rectMin(a)
-    local aMaxX, aMaxY = rectMax(a)
-    local bMinX, bMinY = rectMin(b)
-    local bMaxX, bMaxY = rectMax(b)
+    local a, b = a.geo, b.geo
+    local x,y,w,h = playdate.geometry.rect.fast_intersection(
+        a.x, a.y, a.width, a.height,
+        b.x, b.y, b.width, b.height)
 
-    local overX = ((bMinX <= aMaxX) and (aMinX <= bMaxX))
-    local overY = ((bMinY <= aMaxY) and (aMinY <= bMaxY))
+    local overlap = x == 0 and y == 0 and w == 0 and h == 0
 
-    local overlap = overX and overY
+    local overlapInfo = nil
 
-    local overlapInfo = {}
     if overlap then
+        local aMinX, aMinY = rectMin(a)
+        local bMinX, bMinY = rectMin(b)
+        local aMaxX, aMaxY = rectMax(a)
+        local bMaxX, bMaxY = rectMax(b)
+
         overlapInfo = {
             aMin = {x = aMinX, y = aMinY},
             bMin = {x = bMinX, y = bMinY},
@@ -185,16 +201,13 @@ ColliderSprite.aabbToAabb = function(a, b)
         }
     end
 
-    return overlap, overlapInfo
+    return overlap, overlapInfo, ColliderSprite.calculateAabbToAabbResolution
 end
 
 -- Returns the smallest amount by how much b should move to resolve the collision, assumes both rectangles are overlapping
 ColliderSprite.calculateAabbToAabbResolution = function(overlapInfo)
-
-    local aMin = overlapInfo.aMin
-    local aMax = overlapInfo.aMax
-    local bMin = overlapInfo.bMin
-    local bMax = overlapInfo.bMax
+    local aMin, aMax = overlapInfo.aMin, overlapInfo.aMax
+    local bMin, bMax = overlapInfo.bMin, overlapInfo.bMax
 
     local moveLeft = aMin.x - bMax.x
     local moveRight = aMax.x - bMin.x
@@ -205,9 +218,9 @@ ColliderSprite.calculateAabbToAabbResolution = function(overlapInfo)
     local yMove = math.abs(moveUp) < math.abs(moveDown) and moveUp or moveDown
 
     if math.abs(xMove) < math.abs(yMove) then
-        return {x = xMove, y = 0}
+        return xMove, 0
     else
-        return {x = 0, y = yMove}
+        return 0, yMove
     end
 end
 
