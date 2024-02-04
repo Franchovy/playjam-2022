@@ -23,7 +23,7 @@ function Platform:init()
 	
 	self.type = kSpriteTypes.platform
 	
-	self:setCollider(kColliderType.rect, playdate.geometry.rect.new(0, 0, self:getSize()))
+	self:setCollider(kColliderType.rect, rectNew(0, 0, self:getSize()))
 	self:setCollisionType(kCollisionType.static)
 	self:setCenter(0, 0)
 	

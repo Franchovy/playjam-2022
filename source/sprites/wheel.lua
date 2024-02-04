@@ -46,7 +46,7 @@ function Wheel:init()
 	self.type = kSpriteTypes.player
 	
 	local x, y, w, h = self:getBounds()
-	self:setCollider(kColliderType.circle, playdate.geometry.arc.new(x + w / 2, y + h / 2, w / 2, 0, 360))
+	self:setCollider(kColliderType.circle, circleNew(x + w / 2, y + h / 2, w / 2))
 	self:setCollisionType(kCollisionType.dynamic)
 	self:readyToCollide()
 

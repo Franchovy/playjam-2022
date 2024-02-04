@@ -230,27 +230,28 @@ function CollisionSolver:checkCollisionsOnGrid(colliders, collisionTypeForGrid)
     for _, collider in pairs(colliders) do
         local tlX, tlY, trX, trY, brX, brY, blX, blY = self:_getCornersGridCoordinates(collider)
 
+        local gridColliders = {}
         -- check along the bottom range first 
         for i=blX,brX do
-            local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, blY)
+            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, blY)
             self:_checkAndResolveGrid(collider, gridColliders)
         end
         
         -- do the same thing but along the right range
         for i=trY,brY do
-            local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, trX, i)
+            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, trX, i)
             self:_checkAndResolveGrid(collider, gridColliders)
         end
 
         -- top range
         for i=tlX,trX do
-            local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, tlY)
+            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, tlY)
             self:_checkAndResolveGrid(collider, gridColliders)
         end
         
         -- left range
         for i=tlY,blY do
-            local gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, tlX, i)
+            gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, tlX, i)
             self:_checkAndResolveGrid(collider, gridColliders)
         end
     end

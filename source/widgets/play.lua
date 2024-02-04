@@ -151,8 +151,8 @@ function WidgetPlay:_load()
 				self.children.background = nil
 			end
 			
-			self.children.background = Widget.new(WidgetBackground, { theme = self.config.theme })
-			self.children.background:load()
+			--self.children.background = Widget.new(WidgetBackground, { theme = self.config.theme })
+			--self.children.background:load()
 		end
 		
 		collectgarbage("collect")
