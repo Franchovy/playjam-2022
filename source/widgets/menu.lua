@@ -84,12 +84,12 @@ function WidgetMenu:_load()
 	for i, world in ipairs(self.config.levels) do
 		local entries = {}
 		
-		for i, level in ipairs(self.config.levels) do
+		for i, level in ipairs(world.levels) do
 			local class = WidgetMenuEntry
 			local classPreview = WidgetMenuLevelPreview
 			local configPreview = {
 				title = level.title,
-				imagePath = level.menuImagePath,
+				imagePath = world.imagePath,
 				score = level.score,
 				locked = level.locked,
 			}
@@ -224,7 +224,7 @@ function WidgetMenu:_draw(frame, rect)
 		if self.currentMenu == self.children.menuSettings then
 			self.children.menuSettings:draw(frame:toLegacyRect(), rect)
 		else
-			self.children.menuLevelSelect:draw(rect)
+			self.currentMenu:draw(rect)
 		end
 	end
 end
@@ -290,6 +290,11 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		
 		self.children.menuHome:animate(self.children.menuHome.kAnimations.outro, function()
 			self.children.menuHome:setVisible(false)
+			
+			if self.currentMenu:isLoaded() == false then
+				self.currentMenu:load()
+			end
+			
 			self.currentMenu:setVisible(true)
 			
 			-- TODO: Add animation to sub menu

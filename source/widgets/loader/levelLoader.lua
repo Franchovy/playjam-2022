@@ -81,7 +81,7 @@ function WidgetLoaderLevel:_load()
 						local levelScore = levelScores[levelName]
 						
 						table.insert(levels, {
-							title = levelName,
+							title = levelName:upper(),
 							score = levelScore,
 							locked = shouldLockLevel
 						})
@@ -94,7 +94,7 @@ function WidgetLoaderLevel:_load()
 				end
 				
 				table.insert(levelsData, {
-					title = worldName,
+					title = worldName:upper(),
 					levels = levels,
 					locked = shouldLockWorld,
 					score = worldScore,
