@@ -1,6 +1,6 @@
 import "utils/position"
 import "utils/rect"
-import "menu/levelSelect"
+import "menu/home"
 import "menu/title"
 import "menu/settings"
 
@@ -50,12 +50,12 @@ function WidgetMenu:_load()
 	self.children.title = Widget.new(WidgetTitle)
 	self.children.title:load()
 	
-	self.children.levelSelect = Widget.new(WidgetLevelSelect, { levels = self.config.levels, scores = self.config.scores, locked = self.config.locked })
-	self.children.levelSelect:load()
-	self.children.levelSelect:setVisible(false)
+	self.children.menuHome = Widget.new(WidgetMenuHome, { levels = self.config.levels, scores = self.config.scores, locked = self.config.locked })
+	self.children.menuHome:load()
+	self.children.menuHome:setVisible(false)
 	
-	self.children.levelSelect.signals.select = function(args)
-		if args.type == WidgetLevelSelect.kMenuActionType.play and (args.level ~= nil) then
+	self.children.menuHome.signals.select = function(args)
+		if args.type == WidgetMenuHome.kMenuActionType.play and (args.level ~= nil) then
 			
 			if AppConfig.enableBackgroundMusic == true then
 				self:stopFilePlayer()
@@ -64,7 +64,7 @@ function WidgetMenu:_load()
 			self:playSample(kAssetsSounds.menuAccept)
 			
 			self.signals.play(args.level)
-		elseif args.type == WidgetLevelSelect.kMenuActionType.menu then
+		elseif args.type == WidgetMenuHome.kMenuActionType.menu then
 			self:setState(self.kStates.subMenu)
 		end
 	end
@@ -112,7 +112,7 @@ end
 function WidgetMenu:_draw(frame, rect)
 	self.painters.background:draw(frame)
 	self.children.title:draw(rect)
-	self.children.levelSelect:draw(rect)
+	self.children.menuHome:draw(rect)
 	self.children.menuSettings:draw(frame:toLegacyRect(), rect)
 end
 
@@ -128,7 +128,7 @@ function WidgetMenu:_update()
 	elseif self.state == self.kStates.default then
 		self:filterInput(playdate.kButtonA)
 	elseif self.state == self.kStates.menu then
-		self:passInput(self.children.levelSelect)
+		self:passInput(self.children.menuHome)
 	end
 end
 
@@ -148,17 +148,17 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.default and (stateTo == self.kStates.menu) then
 		self:playSample(kAssetsSounds.menuAccept)
 		
-		if self.children.levelSelect == nil then
-			self.children.levelSelect = Widget.new(LevelSelect)
-			self.children.levelSelect:load()
+		if self.children.menuHome == nil then
+			self.children.menuHome = Widget.new(LevelSelect)
+			self.children.menuHome:load()
 		end
 		
 		self.children.title:animate(self.children.title.kAnimations.toLevelSelect, function(animationChanged)
 			if not animationChanged then
 				self.children.title:setVisible(false)
-				self.children.levelSelect:setVisible(true)
+				self.children.menuHome:setVisible(true)
 				
-				self.children.levelSelect:animate(self.children.levelSelect.kAnimations.intro)
+				self.children.menuHome:animate(self.children.menuHome.kAnimations.intro)
 			end
 		end)
 	end
@@ -167,7 +167,7 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		self:playSample(kAssetsSounds.menuAccept)
 		
 		self.children.title:setVisible(true)
-		self.children.levelSelect:setVisible(false)
+		self.children.menuHome:setVisible(false)
 		
 		self.children.title:animate(self.children.title.kAnimations.fromLevelSelect)
 	end
@@ -175,8 +175,8 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.menu and (stateTo == self.kStates.subMenu) then
 		self:playSample(kAssetsSounds.menuAccept)
 		
-		self.children.levelSelect:animate(self.children.levelSelect.kAnimations.outro, function()
-			self.children.levelSelect:setVisible(false)
+		self.children.menuHome:animate(self.children.menuHome.kAnimations.outro, function()
+			self.children.menuHome:setVisible(false)
 			self.children.menuSettings:setVisible(true)
 			
 			gfx.sprite.addDirtyRect(0, 0, 400, 240)
@@ -186,9 +186,9 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.subMenu and (stateTo == self.kStates.menu) then
 		self:playSample(kAssetsSounds.menuAccept)
 		self.children.menuSettings:setVisible(false)
-		self.children.levelSelect:setVisible(true)
+		self.children.menuHome:setVisible(true)
 		
-		self.children.levelSelect:animate(self.children.levelSelect.kAnimations.intro)
+		self.children.menuHome:animate(self.children.menuHome.kAnimations.intro)
 	end
 end
 
