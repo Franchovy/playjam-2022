@@ -1,6 +1,3 @@
-import "common/entry"
-import "common/preview"
-import "common/previewImage"
 import "widgets/common/painters"
 
 local easing <const> = playdate.easingFunctions
@@ -17,15 +14,15 @@ local cardWidth <const> = 220
 
 local _painterMenuCard = Painter.commonPainters.menuCard()
 
-class("WidgetMenuHome").extends(Widget)
+class("WidgetPreviewMenu").extends(Widget)
 
-WidgetMenuHome.kMenuActionType = {
+WidgetPreviewMenu.kMenuActionType = {
 	play = "play",
 	menu = "menu"
 }
 
-function WidgetMenuHome:init(config)
-	WidgetMenuHome.super.init(self)
+function WidgetPreviewMenu:init(config)
+	WidgetPreviewMenu.super.init(self)
 	
 	self.config = config
 	
@@ -43,50 +40,41 @@ function WidgetMenuHome:init(config)
 		outro = 3
 	})
 	
-	self:setStateInitial({1, 2, 3, 4}, 1)
+	local states = {}
+	for i, entry in ipairs(config.entries) do
+		table.insert(states, i)
+	end
+	
+	self:setStateInitial(states, 1)
 	
 	self.painters = {}
 	self.images = {}
-	
 	self.signals = {}
 end
 
-function WidgetMenuHome:_load()
+function WidgetPreviewMenu:_load()
 	self:loadSample(kAssetsSounds.menuSelect)
 	self:loadSample(kAssetsSounds.menuSelectFail)
 	
 	self.entries = {}
 	self.previews = {}
 	
-	for i, level in ipairs(self.config.levels) do
-		local isLocked = self.config.locked[level.title]
-		local entry = Widget.new(WidgetMenuEntry, { 
-			text = level.title, 
-			isSelected = i == 1, 
-			showOutline = true,
-			locked = isLocked
-		})
-		table.insert(self.entries, entry)
-		self.children["entry"..i] = entry
+	-- entry: { class, config, preview: { class, config } }
+	
+	for i, entry in ipairs(self.config.entries) do
+		if i == 1 then
+			entry.config.isSelected = true
+		end
 		
-		local score = self.config.scores[level.title]
-		local preview = Widget.new(WidgetMenuPreview, {
-			title = level.title,
-			imagePath = level.menuImagePath,
-			score = score,
-			locked = isLocked
-		})
-		table.insert(self.previews, preview)
-		self.children["preview"..i] = preview
+		local widgetEntry = Widget.new(entry.class, entry.config)
+		table.insert(self.entries, widgetEntry)
+		self.children["entry"..i] = widgetEntry
+	
+		local preview = entry.preview
+		local widgetPreview = Widget.new(preview.class, preview.config)
+		table.insert(self.previews, widgetPreview)
+		self.children["preview"..i] = widgetPreview
 	end
-	
-	local entrySettings = Widget.new(WidgetMenuEntry, { text = "SETTINGS", showOutline = false })
-	table.insert(self.entries, entrySettings)
-	self.children.entrySettings = entrySettings
-	
-	local previewSettings = Widget.new(WidgetMenuPreviewImage, { path = kAssetsImages.menuSettings, title = "SETTINGS" })
-	table.insert(self.previews, previewSettings)
-	self.children["preview"..4] = previewSettings
 	
 	for _, child in pairs(self.children) do
 		child:load()
@@ -104,7 +92,7 @@ function WidgetMenuHome:_load()
 	self.animators.card = gfx.animator.new(0, 800, 800)
 end
 
-function WidgetMenuHome:_draw(frame, rect)
+function WidgetPreviewMenu:_draw(frame, rect)
 	local _rects = self.rects
 	
 	_painterMenuCard:draw(_rects.card)
@@ -118,7 +106,7 @@ function WidgetMenuHome:_draw(frame, rect)
 	end
 end
 
-function WidgetMenuHome:_update()
+function WidgetPreviewMenu:_update()
 	if self:hasAnimationChanged() == true then
 		self:performLayout()
 
@@ -126,7 +114,7 @@ function WidgetMenuHome:_update()
 	end
 end
 
-function WidgetMenuHome:_performLayout()
+function WidgetPreviewMenu:_performLayout()
 	local xOffset = self:getAnimatorValue(self.animators.card)
 	local previewX = self:getAnimatorValue(self.animators.preview) + cardWidth
 	
@@ -145,23 +133,16 @@ function WidgetMenuHome:_performLayout()
 	_rects.preview = _tSet(_assign(_rects.preview, _frame), previewX, nil, _frame.w - cardWidth)
 end
 
-function WidgetMenuHome:_handleInput(input)
+function WidgetPreviewMenu:_handleInput(input)
 	if input.pressed & playdate.kButtonA ~= 0 then
-		local index = self.state
-		if index <= #self.config.levels then
-			local level = self.config.levels[index]
+		local success = self.signals.entrySelected(self.entries[self.state])
+		
+		if success == true then
+			self:playSample(kAssetsSounds.menuSelect)
+		elseif success == false then
+			self:playSample(kAssetsSounds.menuSelectFail)
 			
-			if self.config.locked[level.title] ~= true then
-				-- Load level
-				self.signals.select({ type = WidgetMenuHome.kMenuActionType.play, level = level })
-			else
-				self:playSample(kAssetsSounds.menuSelectFail)
-				
-				self:animate(self.kAnimations.error)
-			end
-		elseif index == 4 then
-			-- Settings
-			self.signals.select({ type = WidgetMenuHome.kMenuActionType.menu, name = "settings" })
+			self:animate(self.kAnimations.error)
 		end
 	end
 	
@@ -190,7 +171,7 @@ function WidgetMenuHome:_handleInput(input)
 	end
 end
 
-function WidgetMenuHome:_animate(animation, queueFinishedCallback)
+function WidgetPreviewMenu:_animate(animation, queueFinishedCallback)
 	if animation == self.kAnimations.intro then
 		self.animators.card = gfx.animator.new(800, -240, 0, easing.outExpo)
 		self.animators.preview = gfx.animator.new(600, 240, 0, easing.inCubic)
@@ -209,7 +190,7 @@ function WidgetMenuHome:_animate(animation, queueFinishedCallback)
 	end
 end
 
-function WidgetMenuHome:_changeState(_, stateTo)
+function WidgetPreviewMenu:_changeState(_, stateTo)
 	for i, entry in ipairs(self.entries) do
 		if i == stateTo then
 			entry:setState(entry.kStates.selected)
@@ -221,7 +202,7 @@ function WidgetMenuHome:_changeState(_, stateTo)
 	gfx.sprite.addDirtyRect(0, 0, 400, 240)
 end
 
-function WidgetMenuHome:_unload()
+function WidgetPreviewMenu:_unload()
 	self.samples = nil
 	self.painters = nil
 	self.animators = nil

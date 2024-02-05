@@ -2,9 +2,9 @@ import "assets"
 
 local gfx <const> = playdate.graphics
 
-class("WidgetMenuPreview").extends(Widget)
+class("WidgetMenuLevelPreview").extends(Widget)
 
-function WidgetMenuPreview:init(config)
+function WidgetMenuLevelPreview:init(config)
 	self.config = config
 	
 	self.images = {}
@@ -15,7 +15,7 @@ function WidgetMenuPreview:init(config)
 	self.data = {}
 end
 
-function WidgetMenuPreview:_load()
+function WidgetMenuLevelPreview:_load()
 	self.images.level = gfx.image.new(self.config.imagePath)
 	local createMaskImage = function()
 		local w, h = self.images.level:getSize()
@@ -158,7 +158,7 @@ function WidgetMenuPreview:_load()
 	end)
 end
 
-function WidgetMenuPreview:_draw(rect)
+function WidgetMenuLevelPreview:_draw(rect)
 	local insetRect = self.config.locked ~= true and Rect.inset(rect, 8, 30) or Rect.inset(rect, 8, 60)
 	
 	self.painters.background:draw(insetRect)
@@ -166,7 +166,7 @@ function WidgetMenuPreview:_draw(rect)
 	self.painters.contents:draw(insetRect, { starsCount = self.data.starsCount })
 end
 
-function WidgetMenuPreview:_unload()
+function WidgetMenuLevelPreview:_unload()
 	self.painters = nil
 	self.images = nil
 end

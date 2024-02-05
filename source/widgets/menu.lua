@@ -1,6 +1,9 @@
 import "utils/position"
 import "utils/rect"
-import "menu/home"
+import "menu/common/previewMenu"
+import "menu/common/levelPreview"
+import "menu/common/entry"
+import "menu/common/previewImage"
 import "menu/title"
 import "menu/settings"
 
@@ -50,23 +53,70 @@ function WidgetMenu:_load()
 	self.children.title = Widget.new(WidgetTitle)
 	self.children.title:load()
 	
-	self.children.menuHome = Widget.new(WidgetMenuHome, { levels = self.config.levels, scores = self.config.scores, locked = self.config.locked })
+	--
+	
+	local entries = {}
+	
+	-- Insert levels
+	
+	for i, level in ipairs(self.config.levels) do
+		local class = WidgetMenuEntry
+		local classPreview = WidgetMenuLevelPreview
+		local isLocked = self.config.locked[level.title]
+		local configPreview = {
+			title = level.title,
+			imagePath = level.menuImagePath,
+			score = score,
+			locked = isLocked,
+		}
+		local config = {
+			text = level.title,
+			locked = isLocked
+		}
+		table.insert(entries, {
+			class = class,
+			config = config,
+			preview = {
+				class = classPreview,
+				config = configPreview,
+				score = score
+			}
+		})
+	end
+	
+	-- Insert settings and other options
+	
+	-- TODO: Level Select sub menu
+	-- TODO: Unlockable Skins / Powers sub menu
+	
+	table.insert(entries, {
+		class = WidgetMenuEntry,
+		config = { 
+			text = "SETTINGS",
+		},
+		preview = {
+			class = WidgetMenuPreviewImage,
+			config = { 
+				path = kAssetsImages.menuSettings, 
+				title = "SETTINGS" 
+			}
+		}
+	})
+	
+	--
+	
+	self.children.menuHome = Widget.new(WidgetPreviewMenu, { entries = entries })
 	self.children.menuHome:load()
 	self.children.menuHome:setVisible(false)
 	
-	self.children.menuHome.signals.select = function(args)
-		if args.type == WidgetMenuHome.kMenuActionType.play and (args.level ~= nil) then
-			
-			if AppConfig.enableBackgroundMusic == true then
-				self:stopFilePlayer()
-			end
-			
-			self:playSample(kAssetsSounds.menuAccept)
-			
-			self.signals.play(args.level)
-		elseif args.type == WidgetMenuHome.kMenuActionType.menu then
-			self:setState(self.kStates.subMenu)
+	self.children.menuHome.signals.entrySelected = function(entry)
+		if entry.config.locked == true then
+			return false
 		end
+		
+		self:setState(self.kStates.subMenu)
+		
+		return true
 	end
 	
 	local valuesMenuEntriesTypeOptions = {"OFF","1","2","3","4","5","6","7","8","9","10"}
