@@ -78,45 +78,49 @@ function WidgetMenu:_load()
 		self:setState(self.kStates.menu)
 	end
 	
-	-- Level Select
+	-- Level Select sub-menus, one for each world
 	
-	local entries = {}
-	
-	for i, level in ipairs(self.config.levels) do
-		local class = WidgetMenuEntry
-		local classPreview = WidgetMenuLevelPreview
-		local isLocked = self.config.locked[level.title]
-		local configPreview = {
-			title = level.title,
-			imagePath = level.menuImagePath,
-			score = score,
-			locked = isLocked,
-		}
-		local config = {
-			text = level.title,
-			locked = isLocked
-		}
-		table.insert(entries, {
-			class = class,
-			config = config,
-			preview = {
-				class = classPreview,
-				config = configPreview,
-				score = score
+	self.worldLevelSelects = table.create(0, #self.config.levels)
+	for i, world in ipairs(self.config.levels) do
+		local entries = {}
+		
+		for i, level in ipairs(self.config.levels) do
+			local class = WidgetMenuEntry
+			local classPreview = WidgetMenuLevelPreview
+			local configPreview = {
+				title = level.title,
+				imagePath = level.menuImagePath,
+				score = level.score,
+				locked = level.locked,
 			}
-		})
-	end
-	
-	self.children.menuLevelSelect = Widget.new(WidgetPreviewMenu, { entries = entries, enableBackButton = true })
-	self.children.menuLevelSelect:load()
-	self.children.menuLevelSelect.signals.entrySelected = function(entry)
-		if entry == nil then
-			-- "back" pressed
-			self:setState(self.kStates.menu)
-			return true
+			local config = {
+				text = level.title,
+				locked = isLocked
+			}
+			table.insert(entries, {
+				class = class,
+				config = config,
+				preview = {
+					class = classPreview,
+					config = configPreview,
+					score = score
+				}
+			})
 		end
 		
-		return false
+		local menuLevelSelect = Widget.new(WidgetPreviewMenu, { entries = entries, enableBackButton = true })
+		menuLevelSelect.signals.entrySelected = function(entry)
+			if entry == nil then
+				-- "back" pressed
+				self:setState(self.kStates.menu)
+				return true
+			end
+			
+			return false
+		end
+		
+		self.children["worldLevelSelects"..i] = menuLevelSelect
+		self.worldLevelSelects[world] = menuLevelSelect
 	end
 	
 	-- Main Menu ("Home" Menu)
@@ -125,20 +129,19 @@ function WidgetMenu:_load()
 	
 	-- Insert levels
 	
-	for i, level in ipairs(self.config.levels) do
+	for i, world in ipairs(self.config.levels) do
 		local class = WidgetMenuEntry
 		local classPreview = WidgetMenuLevelPreview
-		local isLocked = self.config.locked[level.title]
 		local configPreview = {
-			title = level.title,
-			imagePath = level.menuImagePath,
-			score = score,
-			locked = isLocked,
+			title = world.title,
+			imagePath = world.imagePath,
+			score = world.score,
+			locked = world.locked,
 		}
 		local config = {
-			text = level.title,
-			locked = isLocked,
-			menu = self.children.menuLevelSelect
+			text = world.title,
+			locked = world.locked,
+			menu = self.worldLevelSelects[world]
 		}
 		table.insert(entries, {
 			class = class,
@@ -146,7 +149,7 @@ function WidgetMenu:_load()
 			preview = {
 				class = classPreview,
 				config = configPreview,
-				score = score
+				score = world.score
 			}
 		})
 	end

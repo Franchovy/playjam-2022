@@ -2,9 +2,10 @@ import "constant"
 import "engine"
 import "menu"
 import "play"
+import "loader/levelLoader"
+import "loader/settings"
 
 local timer <const> = playdate.timer
-local file <const> = playdate.file
 local disp <const> = playdate.display
 
 class("WidgetMain").extends(Widget)
@@ -32,67 +33,8 @@ function WidgetMain:init()
 end
 
 function WidgetMain:_load()
-	if Settings:existsSettingsFile() then
-		Settings:readFromFile()
-	else 
-		Settings:setDefaultValues()
-	end
-	
-	self.onPlaythroughComplete = function(data)
-		-- TODO: if stats enabled, write (append) playthrough data into an existing or new file
-		
-		-- Write data into high-scores file
-		
-		if not file.exists(kFilePath.saves) then
-			file.mkdir(kFilePath.saves)
-		end
-		
-		local filePath = kFilePath.saves.. "/".. self.level.title
-		
-		local saveFileRead = file.open(filePath, file.kFileRead)
-		
-		local shouldWriteToFile
-		local existingContents
-		
-		if saveFileRead ~= nil then
-			existingContents = json.decodeFile(saveFileRead)
-		end
-		
-		if saveFileRead == nil or (existingContents == nil) then	
-			shouldWriteToFile = true
-		else
-			function scoreCalculation(coinCount, time, timeObjective)
-			    function timeStringToNumber(timeString)
-					if timeString:find(":")  then
-						local minutes, seconds = timeString:match("(%d+):(%d+)")
-						return tonumber(minutes) * 60 + tonumber(seconds)
-					else
-						return tonumber(timeString)
-					end
-				end
-				
-				return coinCount + (timeStringToNumber(timeObjective) - timeStringToNumber(time)) * 50
-			end
-			
-			local previousScore = scoreCalculation(existingContents.coinCount, existingContents.timeString, existingContents.timeStringObjective)
-			local currentScore = scoreCalculation(data.coinCount, data.timeString, data.timeStringObjective)
-			
-			shouldWriteToFile = previousScore < currentScore
-		end
-		
-		if saveFileRead ~= nil then
-			saveFileRead:close()
-		end
-		
-		if shouldWriteToFile then
-			local saveFileWrite = file.open(filePath, file.kFileWrite)
-			json.encodeToFile(saveFileWrite, true, data)
-			saveFileWrite:close()
-		end
-		
-		self:loadHighscores()
-		self:loadLevelsLocked()
-	end
+	self.children.loaderSettings = Widget.new(WidgetLoaderSettings)
+	self.children.loaderSettings:load()
 	
 	self.onReturnToMenu = function()
 		self:setState(self.kStates.menu)
@@ -118,48 +60,43 @@ function WidgetMain:_load()
 		end
 	end
 	
-	-- High Scores
+	self.children.loaderLevel = Widget.new(WidgetLoaderLevel)
+	self.children.loaderLevel:load()
+	self.children.loaderLevel:refresh()
 	
-	function self:loadHighscores()
-		if not file.exists(kFilePath.saves) then
-			file.mkdir(kFilePath.saves)
-		end
-		
-		local data = {}
-		local saveFiles = file.listFiles(kFilePath.saves)
-		for _, fileName in pairs(saveFiles) do
-			local path = kFilePath.saves.. "/".. fileName
-			local saveFile = file.open(path, file.kFileRead)
-			
-			if saveFile ~= nil then
-				data[fileName] = json.decodeFile(saveFile)
-			end
-		end
-		
-		self.data.highscores = data
-	end
-	
-	function self:loadLevelsLocked()
-		local data = table.create(0, #kLevels)
-		
-		local shouldLockLevel = false
-		for i, level in ipairs(kLevels) do
-			data[level.title] = shouldLockLevel
-			
-			if not shouldLockLevel and self.data.highscores[level.title] == nil then
-				shouldLockLevel = true
-			end
-		end
-		
-		self.data.levelsLocked = data
-	end
-	
-	self:loadHighscores()
-	self:loadLevelsLocked()
+	local levels, scores, levelsLocked = self.children.loaderLevel:getLevels()
 	
 	--
 	
-	self.children.menu = Widget.new(WidgetMenu, { levels = kLevels, scores = self.data.highscores, locked = self.data.levelsLocked })
+	--[[ 
+		levels (worlds): { 
+			1 = { 
+				title = "mountain", 
+				levels = { 
+					1 = { 
+						title = "1",
+						score = { 
+							time = 90,
+							stars = 3
+						}, 
+						objectives = { 
+							1 = 110,
+							2 = 90,
+							3 = 60,
+							4 = 50
+						},
+						locked = false
+					},
+					...
+				},
+				score = 12,
+				locked = false
+			},
+			...
+		}
+	--]]
+	
+	self.children.menu = Widget.new(WidgetMenu, { levels = levels })
 	self.children.menu:load()
 	
 	self.children.menu.signals.play = self.onMenuPressedPlay

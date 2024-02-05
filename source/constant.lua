@@ -1,6 +1,5 @@
 import "constant/kCollisionGroups"
 import "constant/kFilePath"
-import "constant/kLevels"
 import "constant/kGame"
 import "constant/kSettingsKeys"
 import "constant/kSpriteTypes"
