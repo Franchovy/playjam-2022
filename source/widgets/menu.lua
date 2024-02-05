@@ -47,14 +47,40 @@ function WidgetMenu:_load()
 		gfx.fillRect(0, 0, rect.w, rect.h)
 	end)
 	
-	self.children.title = Widget.new(WidgetTitle)
-	self.children.title:load()
+	-- Pre-load sub-menus
 	
-	--
+	-- Settings
+	
+	local valuesMenuEntriesTypeOptions = {"OFF","1","2","3","4","5","6","7","8","9","10"}
+	local entries = {
+		{
+			title = "SFX VOLUME",
+			type = WidgetMenuSettings.type.options,
+			values = valuesMenuEntriesTypeOptions,
+			key = kSettingsKeys.sfxVolume
+		},
+		{
+			title = "MUSIC VOLUME",
+			type = WidgetMenuSettings.type.options,
+			values = valuesMenuEntriesTypeOptions,
+			key = kSettingsKeys.musicVolume
+		},
+		{
+			title = "BACK",
+			type = WidgetMenuSettings.type.button
+		}
+	}
+	self.children.menuSettings = Widget.new(WidgetMenuSettings, { entries = entries })
+	self.children.menuSettings:load()
+	self.children.menuSettings:setVisible(false)
+	
+	self.children.menuSettings.signals.close = function()
+		self:setState(self.kStates.menu)
+	end
+	
+	-- Level Select
 	
 	local entries = {}
-	
-	-- Insert levels
 	
 	for i, level in ipairs(self.config.levels) do
 		local class = WidgetMenuEntry
@@ -81,21 +107,67 @@ function WidgetMenu:_load()
 		})
 	end
 	
+	self.children.menuLevelSelect = Widget.new(WidgetPreviewMenu, { entries = entries, enableBackButton = true })
+	self.children.menuLevelSelect:load()
+	self.children.menuLevelSelect.signals.entrySelected = function(entry)
+		if entry == nil then
+			-- "back" pressed
+			self:setState(self.kStates.menu)
+			return true
+		end
+		
+		return false
+	end
+	
+	-- Main Menu ("Home" Menu)
+	
+	local entries = {}
+	
+	-- Insert levels
+	
+	for i, level in ipairs(self.config.levels) do
+		local class = WidgetMenuEntry
+		local classPreview = WidgetMenuLevelPreview
+		local isLocked = self.config.locked[level.title]
+		local configPreview = {
+			title = level.title,
+			imagePath = level.menuImagePath,
+			score = score,
+			locked = isLocked,
+		}
+		local config = {
+			text = level.title,
+			locked = isLocked,
+			menu = self.children.menuLevelSelect
+		}
+		table.insert(entries, {
+			class = class,
+			config = config,
+			preview = {
+				class = classPreview,
+				config = configPreview,
+				score = score
+			}
+		})
+	end
+	
 	-- Insert settings and other options
 	
 	-- TODO: Level Select sub menu
+	
 	-- TODO: Unlockable Skins / Powers sub menu
 	
 	table.insert(entries, {
 		class = WidgetMenuEntry,
 		config = { 
 			text = "SETTINGS",
+			menu = self.children.menuSettings
 		},
 		preview = {
 			class = WidgetMenuPreviewImage,
 			config = { 
 				path = kAssetsImages.menuSettings, 
-				title = "SETTINGS" 
+				title = "SETTINGS"
 			}
 		}
 	})
@@ -111,37 +183,21 @@ function WidgetMenu:_load()
 			return false
 		end
 		
-		self:setState(self.kStates.subMenu)
+		if entry.config.menu ~= nil then
+			self.currentMenu = entry.config.menu
+			
+			self:setState(self.kStates.subMenu)
+			
+			return true
+		end
 		
-		return true
+		return false
 	end
 	
-	local valuesMenuEntriesTypeOptions = {"OFF","1","2","3","4","5","6","7","8","9","10"}
-	local dataSettingsMenuEntries = {
-		{
-			title = "SFX VOLUME",
-			type = WidgetMenuSettings.type.options,
-			values = valuesMenuEntriesTypeOptions,
-			key = kSettingsKeys.sfxVolume
-		},
-		{
-			title = "MUSIC VOLUME",
-			type = WidgetMenuSettings.type.options,
-			values = valuesMenuEntriesTypeOptions,
-			key = kSettingsKeys.musicVolume
-		},
-		{
-			title = "BACK",
-			type = WidgetMenuSettings.type.button
-		}
-	}
-	self.children.menuSettings = Widget.new(WidgetMenuSettings, { entries = dataSettingsMenuEntries })
-	self.children.menuSettings:load()
-	self.children.menuSettings:setVisible(false)
+	-- Display Title
 	
-	self.children.menuSettings.signals.close = function()
-		self:setState(self.kStates.menu)
-	end
+	self.children.title = Widget.new(WidgetTitle)
+	self.children.title:load()
 	
 	self.children.title:animate(self.children.title.kAnimations.onFirstOpen)
 
@@ -160,7 +216,14 @@ function WidgetMenu:_draw(frame, rect)
 	self.painters.background:draw(frame)
 	self.children.title:draw(rect)
 	self.children.menuHome:draw(rect)
-	self.children.menuSettings:draw(frame:toLegacyRect(), rect)
+	
+	if self.state == self.kStates.subMenu then
+		if self.currentMenu == self.children.menuSettings then
+			self.children.menuSettings:draw(frame:toLegacyRect(), rect)
+		else
+			self.children.menuLevelSelect:draw(rect)
+		end
+	end
 end
 
 function WidgetMenu:_update()
@@ -170,8 +233,8 @@ function WidgetMenu:_update()
 		self.tick = self.tick == 0 and 1 or 0
 	end
 	
-	if self.state == self.kStates.subMenu then
-		self:passInput(self.children.menuSettings)
+	if self.state == self.kStates.subMenu and self.currentMenu ~= nil then
+		self:passInput(self.currentMenu)
 	elseif self.state == self.kStates.default then
 		self:filterInput(playdate.kButtonA)
 	elseif self.state == self.kStates.menu then
@@ -224,7 +287,9 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		
 		self.children.menuHome:animate(self.children.menuHome.kAnimations.outro, function()
 			self.children.menuHome:setVisible(false)
-			self.children.menuSettings:setVisible(true)
+			self.currentMenu:setVisible(true)
+			
+			-- TODO: Add animation to sub menu
 			
 			gfx.sprite.addDirtyRect(0, 0, 400, 240)
 		end)
@@ -232,8 +297,9 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 	
 	if stateFrom == self.kStates.subMenu and (stateTo == self.kStates.menu) then
 		self:playSample(kAssetsSounds.menuAccept)
-		self.children.menuSettings:setVisible(false)
+		self.currentMenu:setVisible(false)
 		self.children.menuHome:setVisible(true)
+		self.currentMenu = nil
 		
 		self.children.menuHome:animate(self.children.menuHome.kAnimations.intro)
 	end

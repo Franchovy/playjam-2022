@@ -36,6 +36,8 @@ function WidgetTitle:init()
 end
 
 function WidgetTitle:_load()
+	setCurrentFont(kAssetsFonts.twinbee)
+	
 	self.imagetables.particles = gfx.imagetable.new(kAssetsImages.particles)
 	self.imagetables.wheel = gfx.imagetable.new(kAssetsImages.wheel):scaled(2)
 	self.images.backgroundImage = gfx.image.new(kAssetsImages.background)

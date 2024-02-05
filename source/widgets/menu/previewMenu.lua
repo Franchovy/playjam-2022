@@ -48,6 +48,10 @@ function WidgetPreviewMenu:init(config)
 		table.insert(states, i)
 	end
 	
+	if self.config.enableBackButton == true then
+		table.insert(states, #states + 1)
+	end
+	
 	self:setStateInitial(states, 1)
 	
 	self.painters = {}
@@ -77,6 +81,12 @@ function WidgetPreviewMenu:_load()
 		local widgetPreview = Widget.new(preview.class, preview.config)
 		table.insert(self.previews, widgetPreview)
 		self.children["preview"..i] = widgetPreview
+	end
+	
+	if self.config.enableBackButton == true then
+		local widgetEntry = Widget.new(WidgetMenuEntry, { text = "BACK" })
+		table.insert(self.entries, widgetEntry)
+		self.children["entry"..#self.kStates] = widgetEntry
 	end
 	
 	for _, child in pairs(self.children) do
@@ -138,7 +148,13 @@ end
 
 function WidgetPreviewMenu:_handleInput(input)
 	if input.pressed & playdate.kButtonA ~= 0 then
-		local success = self.signals.entrySelected(self.entries[self.state])
+		local success
+		
+		if self.config.enableBackButton == true and self.state == #self.kStates then
+			success = self.signals.entrySelected(nil)
+		else
+			success = self.signals.entrySelected(self.entries[self.state])
+		end
 		
 		if success == true then
 			self:playSample(kAssetsSounds.menuSelect)
