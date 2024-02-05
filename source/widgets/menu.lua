@@ -1,9 +1,6 @@
 import "utils/position"
 import "utils/rect"
-import "menu/common/previewMenu"
-import "menu/common/levelPreview"
-import "menu/common/entry"
-import "menu/common/previewImage"
+import "menu/previewMenu"
 import "menu/title"
 import "menu/settings"
 

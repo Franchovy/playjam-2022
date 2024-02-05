@@ -1,4 +1,7 @@
 import "widgets/common/painters"
+import "previewMenu/levelPreview"
+import "previewMenu/entry"
+import "previewMenu/previewImage"
 
 local easing <const> = playdate.easingFunctions
 local gfx <const> = playdate.graphics
