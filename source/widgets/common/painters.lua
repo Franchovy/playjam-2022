@@ -52,5 +52,45 @@ Painter.commonPainters = {
 		imageScrew:drawRotated(rect.x + 6, rect.y + 6, 45)
 		imageScrew:drawRotated(rect.x + rect.w - size - 2, rect.y + rect.h - size - 2, 45)
 		imageScrew:drawRotated(rect.x + rect.w - size, rect.y + 8, 90)
+	end),
+	whiteBackgroundFrame = Painter.factory(function(rect)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+		
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setLineWidth(2)
+		gfx.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+	end),
+	lockedCover = Painter.factory(function(frame)
+		-- Background opaque fill
+		gfx.setColor(gfx.kColorBlack)
+		gfx.fillRoundRect(frame.x, frame.y, frame.w, frame.h, 7)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.setDitherPattern(0.8, gfx.image.kDitherTypeScreen)
+		gfx.fillRoundRect(frame.x, frame.y, frame.w, frame.h, 7)
+		
+		-- "Locked" text
+		setCurrentFont(kAssetsFonts.twinbee2x)
+		local fontHeight = gfx.getFont():getHeight()
+		gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+		gfx.drawTextAligned("LOCKED", frame.w / 2, (frame.h - fontHeight) / 2, kTextAlignment.center)
+	end),
+	roundedCornerImage = Painter.factory(function(frame, state, image) 
+		-- Mask image
+		local maskImage = gfx.image.new(frame.w, frame.h)
+		gfx.pushContext(maskImage)
+		maskImage:clear(gfx.kColorBlack)
+		gfx.setColor(gfx.kColorWhite)
+		gfx.fillRoundRect(frame.x, frame.y, frame.w, frame.h, 7)
+		gfx.popContext()
+		image:setMaskImage(maskImage)
+		
+		-- Image
+		image:draw(frame.x, frame.y)
+		
+		-- Overlay
+		gfx.setColor(gfx.kColorBlack)
+		gfx.setLineWidth(3)
+		gfx.drawRoundRect(frame.x, frame.y, frame.w, frame.h, 7)
 	end)
 }
