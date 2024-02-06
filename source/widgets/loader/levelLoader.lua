@@ -75,7 +75,7 @@ function WidgetLoaderLevel:_load()
 			if file.isdir(dirWorld) then
 				local worldNameRaw = pathWorld:match("^[^/]+")
 				local worldIndex = tonumber(worldNameRaw:sub(1, 1))
-				local worldName = worldNameRaw:sub(3)
+				local worldName = worldNameRaw:sub(3):upper()
 				local levels = table.create(8, 0)
 				local worldScore, levelScores = getScoresForWorld(worldName)
 				local imagePath = nil
@@ -85,11 +85,11 @@ function WidgetLoaderLevel:_load()
 				for _, file in pairs(rawFiles) do
 					if file:match("^.+.json$") ~= nil then
 						local levelIndex = tonumber(file:sub(1, 1))
-						local levelName = file:sub(3, #file-5)
+						local levelName = file:sub(3, #file-5):upper()
 						local levelScore = levelScores[levelName]
 						
 						levels[levelIndex] = {
-							title = levelName:upper(),
+							title = levelName,
 							score = levelScore,
 							locked = shouldLockLevel,
 							path = dirWorld..file
@@ -103,7 +103,7 @@ function WidgetLoaderLevel:_load()
 				end
 				
 				levelsData[worldIndex] = {
-					title = worldName:upper(),
+					title = worldName,
 					levels = levels,
 					locked = shouldLockWorld,
 					score = worldScore,
