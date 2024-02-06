@@ -87,7 +87,7 @@ function WidgetLoaderLevel:_load()
 						})
 						
 						-- Set if to lock next level
-						shouldLockLevel = shouldLockLevel and levelScore ~= nil
+						shouldLockLevel = shouldLockLevel or levelScore == nil
 					elseif file:match("^preview") then
 						imagePath = dirWorld..file
 					end
@@ -102,7 +102,7 @@ function WidgetLoaderLevel:_load()
 				})
 				
 				-- Set if to lock next world
-				shouldLockWorld = shouldLockWorld and worldScore ~= nil
+				shouldLockWorld = shouldLockWorld or worldScore == nil
 			end
 		end
 		
