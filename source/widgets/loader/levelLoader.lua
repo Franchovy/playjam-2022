@@ -83,7 +83,8 @@ function WidgetLoaderLevel:_load()
 						table.insert(levels, {
 							title = levelName:upper(),
 							score = levelScore,
-							locked = shouldLockLevel
+							locked = shouldLockLevel,
+							path = dirWorld..levelName..".json"
 						})
 						
 						-- Set if to lock next level
@@ -98,6 +99,7 @@ function WidgetLoaderLevel:_load()
 					levels = levels,
 					locked = shouldLockWorld,
 					score = worldScore,
+					path = dirWorld,
 					imagePath = imagePath
 				})
 				
@@ -109,14 +111,14 @@ function WidgetLoaderLevel:_load()
 		self.levels = levelsData
 	end
 	
-	local writePlaythroughToFile = function(data, levelTitle)
+	local writePlaythroughToFile = function(worldTitle, levelTitle, stars, time)
 		-- Write data into high-scores file
 		
 		if not file.exists(kFilePath.saves) then
 			file.mkdir(kFilePath.saves)
 		end
 		
-		local filePath = kFilePath.saves.. "/".. levelTitle
+		local filePath = kFilePath.saves.. "/".. worldTitle
 		
 		local saveFileRead = file.open(filePath, file.kFileRead)
 		
@@ -125,36 +127,33 @@ function WidgetLoaderLevel:_load()
 		
 		if saveFileRead ~= nil then
 			existingContents = json.decodeFile(saveFileRead)
-		end
-		
-		if saveFileRead == nil or (existingContents == nil) then	
-			shouldWriteToFile = true
-		else
-			function scoreCalculation(coinCount, time, timeObjective)
-				function timeStringToNumber(timeString)
-					if timeString:find(":")  then
-						local minutes, seconds = timeString:match("(%d+):(%d+)")
-						return tonumber(minutes) * 60 + tonumber(seconds)
-					else
-						return tonumber(timeString)
-					end
-				end
-				
-				return coinCount + (timeStringToNumber(timeObjective) - timeStringToNumber(time)) * 50
-			end
 			
-			local previousScore = scoreCalculation(existingContents.coinCount, existingContents.timeString, existingContents.timeStringObjective)
-			local currentScore = scoreCalculation(data.coinCount, data.timeString, data.timeStringObjective)
-			
-			shouldWriteToFile = previousScore < currentScore
-		end
-		
-		if saveFileRead ~= nil then
 			saveFileRead:close()
 		end
 		
+		if existingContents[levelTitle] ~= nil and existingContents[levelTitle].time ~= nil then
+			shouldWriteToFile = time < existingContents[levelTitle].time
+		else
+			shouldWriteToFile = true
+		end
+		
+		-- Inside save file: 
+		--[[ mountain.json
+			{ 
+				"levelName": {
+					time: 185312 (ms),
+					stars: 3
+				}
+			}
+		--]]
+		
 		if shouldWriteToFile then
 			local saveFileWrite = file.open(filePath, file.kFileWrite)
+			local data = existingContents or {}
+			data[levelTitle] = {
+				time = time,
+				stars = stars
+			}
 			json.encodeToFile(saveFileWrite, true, data)
 			saveFileWrite:close()
 		end
@@ -172,8 +171,8 @@ function WidgetLoaderLevel:_load()
 	
 	-- Interface functions
 	
-	self.onPlaythroughComplete = function(self, data, levelTitle)
-		writePlaythroughToFile(data, levelTitle)
+	self.onPlaythroughComplete = function(self, worldTitle, levelTitle, stars, time)
+		writePlaythroughToFile(worldTitle, levelTitle, stars, time)
 	end
 	
 	self.refresh = function(self)

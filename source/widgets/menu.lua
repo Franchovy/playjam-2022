@@ -94,7 +94,8 @@ function WidgetMenu:_load()
 				locked = level.locked,
 			}
 			local config = {
-				text = level.title,
+				title = level.title,
+				path = level.path,
 				locked = isLocked
 			}
 			table.insert(entries, {
@@ -116,7 +117,13 @@ function WidgetMenu:_load()
 				return true
 			end
 			
-			return false
+			self.signals.loadLevel {
+				levelTitle = entry.config.title,
+				worldTitle = world.title,
+				filepath = entry.config.path
+			}
+			
+			return true
 		end
 		
 		self.children["worldLevelSelects"..i] = menuLevelSelect
@@ -139,7 +146,7 @@ function WidgetMenu:_load()
 			locked = world.locked,
 		}
 		local config = {
-			text = world.title,
+			title = world.title,
 			locked = world.locked,
 			menu = self.worldLevelSelects[world]
 		}
@@ -163,7 +170,7 @@ function WidgetMenu:_load()
 	table.insert(entries, {
 		class = WidgetMenuEntry,
 		config = { 
-			text = "SETTINGS",
+			title = "SETTINGS",
 			menu = self.children.menuSettings
 		},
 		preview = {

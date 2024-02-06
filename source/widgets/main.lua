@@ -40,12 +40,22 @@ function WidgetMain:_load()
 		self:setState(self.kStates.menu)
 	end
 	
-	self.onMenuPressedPlay = function(level)
-		self.level = level
+	self.onMenuPressedPlay = function(config)
+		self.data.currentLevel = {
+			worldTitle = config.worldTitle,
+			levelTitle = config.levelTitle,
+			filepath = config.filepath
+		}
+		
 		self:setState(self.kStates.play)
 	end
 	
 	self.getNextLevelConfig = function()
+		do
+			return nil
+		end
+		
+		-- TODO: Update to use levelLoader
 		for _, v in pairs(kLevels) do
 			if self.level == nil then
 				self.level = v
@@ -99,7 +109,7 @@ function WidgetMain:_load()
 	self.children.menu = Widget.new(WidgetMenu, { levels = levels })
 	self.children.menu:load()
 	
-	self.children.menu.signals.play = self.onMenuPressedPlay
+	self.children.menu.signals.loadLevel = self.onMenuPressedPlay
 	
 	self.children.transition = Widget.new(WidgetTransition, { showLoading = true })
 	self.children.transition:load()
@@ -128,12 +138,15 @@ end
 
 function WidgetMain:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.menu and (stateTo == self.kStates.play) then
+		assert(self.data.currentLevel ~= nil, "Error: Cannot play without setting a level!")
+		
 		self.children.transition:setVisible(true)
 		self.children.transition:setState(self.children.transition.kStates.closed)
 		
 		self.children.transition.signals.animationFinished = function()
 			self.children.menu:setVisible(false)
-			local levelConfig = _loadLevelFromFile(self.level.path)
+			local levelConfig = _loadLevelFromFile(self.data.currentLevel.filepath)
+			assert(levelConfig ~= nil, "Error: Missing level data!")
 			
 			if self.children.play == nil then
 				self.children.menu:unload()

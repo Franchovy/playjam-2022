@@ -272,7 +272,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		local stars = 1
 		
 		local coinCountObjective = self.config.objectives[1].coins
-		local timeObjective = self.config.objectives[2].time
+		local timeObjective = self.config.objectives[2].time * 1000
 		local timeValue = self.data.time + self.timers.levelTimer.currentTime
 		
 		for _, objective in pairs(self.config.objectives) do
@@ -291,18 +291,12 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			end
 		end
 		
-		local timeString = convertToTimeString(timeValue, 1)
-		local timeStringObjective = convertToTimeString(timeObjective * 1000, 1)
-		
-		local objectives = {
+		self.signals.saveLevelScore {
+			
 			stars = stars,
-			timeString = timeString,
-			coinCount = self.data.coins,
-			timeStringObjective = timeStringObjective,
-			coinCountObjective = coinCountObjective
+			time = timeValue,
+			timeObjective = timeObjective * 1000
 		}
-		
-		self.signals.saveLevelScore(objectives)
 		
 		self.children.levelComplete = Widget.new(LevelComplete, {
 			objectives = objectives,

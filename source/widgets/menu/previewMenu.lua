@@ -84,7 +84,7 @@ function WidgetPreviewMenu:_load()
 	end
 	
 	if self.config.enableBackButton == true then
-		local widgetEntry = Widget.new(WidgetMenuEntry, { text = "BACK" })
+		local widgetEntry = Widget.new(WidgetMenuEntry, { title = "BACK" })
 		table.insert(self.entries, widgetEntry)
 		self.children["entry"..#self.kStates] = widgetEntry
 	end

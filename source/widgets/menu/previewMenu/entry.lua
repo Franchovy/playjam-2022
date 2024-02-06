@@ -32,7 +32,7 @@ function WidgetMenuEntry:_load()
 		local fontHeight = gfx.getFont():getHeight()
 		local margin = 10
 
-		gfx.drawText(self.config.text, rect.x + margin, rect.y + (rect.h - fontHeight) / 2)
+		gfx.drawText(self.config.title, rect.x + margin, rect.y + (rect.h - fontHeight) / 2)
 		
 		if self.config.locked == true then
 			_fillPainterLight:draw(rect)
