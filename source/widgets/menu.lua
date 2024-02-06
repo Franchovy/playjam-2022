@@ -305,14 +305,22 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 			self.currentMenu:setVisible(true)
 			
 			-- TODO: Add animation to sub menu
-			
-			gfx.sprite.addDirtyRect(0, 0, 400, 240)
+			if self.currentMenu == self.children.menuSettings then
+				gfx.sprite.addDirtyRect(0, 0, 400, 240)
+			else
+				self.currentMenu:animate(self.currentMenu.kAnimations.intro)
+			end
 		end)
 	end
 	
 	if stateFrom == self.kStates.subMenu and (stateTo == self.kStates.menu) then
 		self:playSample(kAssetsSounds.menuAccept)
 		self.currentMenu:setVisible(false)
+		
+		if self.currentMenu ~= self.children.menuSettings then
+			self.currentMenu:animate(self.currentMenu.kAnimations.outro)
+		end
+		
 		self.children.menuHome:setVisible(true)
 		self.currentMenu = nil
 		
