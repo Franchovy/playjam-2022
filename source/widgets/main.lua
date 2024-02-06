@@ -74,7 +74,7 @@ function WidgetMain:_load()
 	self.children.loaderLevel:load()
 	self.children.loaderLevel:refresh()
 	
-	local levels, scores, levelsLocked = self.children.loaderLevel:getLevels()
+	local levels = self.children.loaderLevel:getLevels()
 	
 	self.children.menu = Widget.new(WidgetMenu, { levels = levels })
 	self.children.menu:load()
@@ -151,7 +151,11 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 			
 			collectgarbage("collect")
 			
-			self.children.menu = Widget.new(WidgetMenu, { levels = kLevels, scores = self.data.highscores, locked = self.data.levelsLocked })
+			self.children.loaderLevel:refresh()
+			
+			local levels = self.children.loaderLevel:getLevels()
+			
+			self.children.menu = Widget.new(WidgetMenu, { levels = levels })
 			self.children.menu:load()
 			
 			self.children.menu.signals.play = self.onMenuPressedPlay

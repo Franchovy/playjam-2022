@@ -1,5 +1,5 @@
 
-function convertToTimeString(timeValueMs, decimalsCount)
+function convertMsTimeToString(timeValueMs, decimalsCount)
 	local timeInSeconds = timeValueMs / 1000
 	
 	if timeInSeconds < 60 then

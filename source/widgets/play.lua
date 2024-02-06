@@ -15,6 +15,7 @@ local geo <const> = playdate.geometry
 local _assign <const> = geo.rect.assign
 local _tInset <const> = geo.rect.tInset
 local _tSet <const> = geo.rect.tSet
+local _convertMsTimeToString <const> = convertMsTimeToString
 
 class("WidgetPlay").extends(Widget)
 
@@ -269,38 +270,29 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		self.timers.levelTimer:pause()
 		
 		-- Calculate objectives reached
-		local stars = 1
+		local stars = 0
+		local objectives = self.config.level.objectives
+		local timeValue = (self.data.time + self.timers.levelTimer.currentTime) / 10
 		
-		local coinCountObjective = self.config.level.objectives[1].coins
-		local timeObjective = self.config.level.objectives[2].time * 1000
-		local timeValue = self.data.time + self.timers.levelTimer.currentTime
-		
-		for _, objective in pairs(self.config.level.objectives) do
-			local objectiveReached = true
-			
-			if objective.coins ~= nil then
-				objectiveReached = objectiveReached and (self.data.coins >= objective.coins)
-			end
-			
-			if objective.time ~= nil then
-				objectiveReached = objectiveReached and timeValue <= (objective.time * 1000)
-			end
-			
-			if objectiveReached == true then
+		for _, objective in pairs(objectives) do
+			if objective > timeValue then
 				stars += 1
 			end
 		end
 		
 		self.signals.saveLevelScore {
-			stars = stars,
-			time = timeValue,
-			timeObjective = timeObjective * 1000,
+			stars = tostring(stars),
+			time = string.format("%d", math.ceil(timeValue)),
 			levelTitle = self.config.levelInfo.levelTitle,
 			worldTitle = self.config.levelInfo.worldTitle
 		}
 		
 		self.children.levelComplete = Widget.new(LevelComplete, {
-			objectives = objectives,
+			objectives = {
+				stars = stars,
+				timeString = _convertMsTimeToString(timeValue * 10, 1).."/".._convertMsTimeToString(objectives[3] * 10, 1),
+				coinsString = tostring(self.data.coins)
+			},
 			titleColor = getForegroundColorForTheme(self.theme)
 		})
 		self.children.levelComplete:load()
