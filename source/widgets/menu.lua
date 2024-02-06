@@ -90,6 +90,7 @@ function WidgetMenu:_load()
 			local configPreview = {
 				title = level.title,
 				imagePath = world.imagePath,
+				type = "level",
 				score = level.score,
 				locked = level.locked,
 			}
@@ -103,8 +104,7 @@ function WidgetMenu:_load()
 				config = config,
 				preview = {
 					class = classPreview,
-					config = configPreview,
-					score = score
+					config = configPreview
 				}
 			})
 		end
@@ -142,6 +142,7 @@ function WidgetMenu:_load()
 		local configPreview = {
 			title = world.title,
 			imagePath = world.imagePath,
+			type = "world",
 			score = world.score,
 			locked = world.locked,
 		}
@@ -155,8 +156,7 @@ function WidgetMenu:_load()
 			config = config,
 			preview = {
 				class = classPreview,
-				config = configPreview,
-				score = world.score
+				config = configPreview
 			}
 		})
 	end

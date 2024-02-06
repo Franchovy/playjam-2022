@@ -1,5 +1,6 @@
 
 local file <const> = playdate.file
+local _convertMsTimeToString <const> = convertMsTimeToString
 
 class("WidgetLoaderLevel").extends(Widget)
 
@@ -12,6 +13,15 @@ function WidgetLoaderLevel:init()
 end
 
 function WidgetLoaderLevel:_load()
+	
+	-- Load High Scores from file
+	
+	local loadSaveDataFromFile = function(path, saveData)
+		local fileData = json.decodeFile(path)
+		for i, data in pairs(fileData) do
+			saveData[i] = data
+		end
+	end
 	
 	-- Load levels
 	
@@ -27,32 +37,29 @@ function WidgetLoaderLevel:_load()
 		local levelScores = {}
 
 		local saveFilePath = kFilePath.saves.."/"..worldName..".json"
-		if file.exists(saveFilePath) == true and file.isdir(saveFilePath) then
-			local levelFiles = file.listFiles(saveFilePath)
-			for _, fileName in pairs(levelFiles) do
-				local levelTitle = saveFile:sub(1, #fileName - 5)
-				local saveData = {}
-				if fileName:match("^.+.json$") and table.contains(self.levels, levelTitle) then
-					if pcall(function() loadSaveDataFromFile(kFilePath.saves.. "/".. fileName, saveData) end) then
-						if saveData ~= nil 
-								and saveData.stars ~= nil 
-								and saveData.time ~= nil then	
-									
-							levelScores[levelTitle] = {
-								stars = saveData.stars,
-								time = saveData.time
-							}
-							
-							if worldScore == nil then
-								worldScore = 0
-							end
-							
-							worldScore += saveData.stars
+		if file.exists(saveFilePath) == true and file.isdir(saveFilePath) == false then
+			local saveData = {}
+			if pcall(function() loadSaveDataFromFile(saveFilePath, saveData) end) and saveData ~= nil then
+				for levelTitle, saveDataLevel in pairs(saveData) do
+					if saveDataLevel ~= nil 
+							and saveDataLevel.stars ~= nil 
+							and saveDataLevel.time ~= nil then	
+								
+						levelScores[levelTitle] = {
+							stars = tonumber(saveDataLevel.stars),
+							time = saveDataLevel.time,
+							timeString = _convertMsTimeToString(saveDataLevel.time * 10, 2)
+						}
+						
+						if worldScore == nil then
+							worldScore = 0
 						end
-					else
-						print("Error: could not load json file: ".. fileName)
+						
+						worldScore += saveDataLevel.stars
 					end
 				end
+			else
+				print("Error: could not load json file: ".. fileName)
 			end
 		end
 		
@@ -118,7 +125,7 @@ function WidgetLoaderLevel:_load()
 			file.mkdir(kFilePath.saves)
 		end
 		
-		local filePath = kFilePath.saves.. "/".. worldTitle..".json"
+		local filePath = kFilePath.saves.. "/".. worldTitle:lower()..".json"
 		
 		local saveFileRead = file.open(filePath, file.kFileRead)
 		
@@ -158,17 +165,7 @@ function WidgetLoaderLevel:_load()
 			saveFileWrite:close()
 		end
 	end
-	
-	
-	-- High Scores
-	
-	local loadSaveDataFromFile = function(path, saveData)
-		local fileData = json.decodeFile(path)
-		for i, data in ipairs(fileData) do
-			saveData[i] = data
-		end
-	end
-	
+
 	-- Interface functions
 	
 	self.onPlaythroughComplete = function(args)
