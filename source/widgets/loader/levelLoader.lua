@@ -75,7 +75,9 @@ function WidgetLoaderLevel:_load()
 		for i, pathWorld in ipairs(pathsWorlds) do
 			local dirWorld = kFilePath.levels.."/"..pathWorld
 			if file.isdir(dirWorld) then
-				local worldName = pathWorld:match("^[^/]+")
+				local worldNameRaw = pathWorld:match("^[^/]+")
+				local worldIndex = tonumber(worldNameRaw:sub(1, 1))
+				local worldName = worldNameRaw:sub(3)
 				local levels = table.create(8, 0)
 				local worldScore, levelScores = getScoresForWorld(worldName)
 				local imagePath = nil
@@ -84,15 +86,16 @@ function WidgetLoaderLevel:_load()
 				local rawFiles = file.listFiles(dirWorld)
 				for _, file in pairs(rawFiles) do
 					if file:match("^.+.json$") ~= nil then
-						local levelName = file:sub(1, #file-5)
+						local levelIndex = tonumber(file:sub(1, 1))
+						local levelName = file:sub(3, #file-5)
 						local levelScore = levelScores[levelName]
 						
-						table.insert(levels, {
+						levels[levelIndex] = {
 							title = levelName:upper(),
 							score = levelScore,
 							locked = shouldLockLevel,
-							path = dirWorld..levelName..".json"
-						})
+							path = dirWorld..file
+						}
 						
 						-- Set if to lock next level
 						shouldLockLevel = shouldLockLevel or levelScore == nil
@@ -101,14 +104,14 @@ function WidgetLoaderLevel:_load()
 					end
 				end
 				
-				table.insert(levelsData, {
+				levelsData[worldIndex] = {
 					title = worldName:upper(),
 					levels = levels,
 					locked = shouldLockWorld,
 					score = worldScore,
 					path = dirWorld,
 					imagePath = imagePath
-				})
+				}
 				
 				-- Set if to lock next world
 				shouldLockWorld = shouldLockWorld or worldScore == nil
