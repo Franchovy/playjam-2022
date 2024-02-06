@@ -111,7 +111,7 @@ function WidgetLoaderLevel:_load()
 		self.levels = levelsData
 	end
 	
-	local writePlaythroughToFile = function(worldTitle, levelTitle, stars, time)
+	local writePlaythroughToFile = function(worldTitle, levelTitle, stars, time, timeObjective)
 		-- Write data into high-scores file
 		
 		if not file.exists(kFilePath.saves) then
@@ -131,7 +131,7 @@ function WidgetLoaderLevel:_load()
 			saveFileRead:close()
 		end
 		
-		if existingContents[levelTitle] ~= nil and existingContents[levelTitle].time ~= nil then
+		if existingContents ~= nil and existingContents[levelTitle] ~= nil and existingContents[levelTitle].time ~= nil then
 			shouldWriteToFile = time < existingContents[levelTitle].time
 		else
 			shouldWriteToFile = true
@@ -171,8 +171,14 @@ function WidgetLoaderLevel:_load()
 	
 	-- Interface functions
 	
-	self.onPlaythroughComplete = function(self, worldTitle, levelTitle, stars, time)
-		writePlaythroughToFile(worldTitle, levelTitle, stars, time)
+	self.onPlaythroughComplete = function(args)
+		writePlaythroughToFile(
+			args.worldTitle, 
+			args.levelTitle, 
+			args.stars, 
+			args.time,
+			args.timeObjective
+		)
 	end
 	
 	self.refresh = function(self)

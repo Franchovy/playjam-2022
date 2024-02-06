@@ -321,6 +321,8 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 end
 
 function WidgetMenu:_unload()
+	self:stopFilePlayer()
+	
 	self.samples = nil
 	self.painters = nil
 	self.fileplayer = nil

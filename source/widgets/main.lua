@@ -76,36 +76,6 @@ function WidgetMain:_load()
 	
 	local levels, scores, levelsLocked = self.children.loaderLevel:getLevels()
 	
-	--
-	
-	--[[ 
-		levels (worlds): { 
-			1 = { 
-				title = "mountain", 
-				levels = { 
-					1 = { 
-						title = "1",
-						score = { 
-							time = 90,
-							stars = 3
-						}, 
-						objectives = { 
-							1 = 110,
-							2 = 90,
-							3 = 60,
-							4 = 50
-						},
-						locked = false
-					},
-					...
-				},
-				score = 12,
-				locked = false
-			},
-			...
-		}
-	--]]
-	
 	self.children.menu = Widget.new(WidgetMenu, { levels = levels })
 	self.children.menu:load()
 	
@@ -154,10 +124,10 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 				
 				collectgarbage("collect")
 				
-				self.children.play = Widget.new(WidgetPlay, levelConfig)
+				self.children.play = Widget.new(WidgetPlay, { level = levelConfig, levelInfo = self.data.currentLevel })
 				self.children.play:load()
 				
-				self.children.play.signals.saveLevelScore = self.onPlaythroughComplete
+				self.children.play.signals.saveLevelScore = self.children.loaderLevel.onPlaythroughComplete
 				self.children.play.signals.returnToMenu = self.onReturnToMenu
 				self.children.play.signals.getNextLevelConfig = self.getNextLevelConfig
 				

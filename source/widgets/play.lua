@@ -47,7 +47,7 @@ function WidgetPlay:_load()
 	self.children.transition:load()
 	self.children.transition:setVisible(false)
 	
-	self.children.level = Widget.new(WidgetLevel, { objects = self.config.objects, objectives = self.config.objectives })
+	self.children.level = Widget.new(WidgetLevel, { objects = self.config.level.objects, objectives = self.config.level.objectives })
 
 	self.children.level.signals.startPlaying = function()
 		self:setState(self.kStates.playing)
@@ -133,8 +133,8 @@ function WidgetPlay:_load()
 	-- Level Theme
 	
 	self.loadTheme = function()
-		if self.config.theme ~= nil then
-			self.theme = kThemes[self.config.theme]
+		if self.config.level.theme ~= nil then
+			self.theme = kThemes[self.config.level.theme]
 		end
 		
 		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
@@ -149,13 +149,13 @@ function WidgetPlay:_load()
 			self.filePlayer:play()
 		end
 		
-		if AppConfig.enableParalaxBackground and (self.config.theme ~= nil) then
+		if AppConfig.enableParalaxBackground and (self.config.level.theme ~= nil) then
 			if self.children.background ~= nil then
 				self.children.background.sprite:remove()
 				self.children.background = nil
 			end
 			
-			self.children.background = Widget.new(WidgetBackground, { theme = self.config.theme })
+			self.children.background = Widget.new(WidgetBackground, { theme = self.config.level.theme })
 			self.children.background:load()
 		end
 		
@@ -271,11 +271,11 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		-- Calculate objectives reached
 		local stars = 1
 		
-		local coinCountObjective = self.config.objectives[1].coins
-		local timeObjective = self.config.objectives[2].time * 1000
+		local coinCountObjective = self.config.level.objectives[1].coins
+		local timeObjective = self.config.level.objectives[2].time * 1000
 		local timeValue = self.data.time + self.timers.levelTimer.currentTime
 		
-		for _, objective in pairs(self.config.objectives) do
+		for _, objective in pairs(self.config.level.objectives) do
 			local objectiveReached = true
 			
 			if objective.coins ~= nil then
@@ -292,10 +292,11 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		end
 		
 		self.signals.saveLevelScore {
-			
 			stars = stars,
 			time = timeValue,
-			timeObjective = timeObjective * 1000
+			timeObjective = timeObjective * 1000,
+			levelTitle = self.config.levelInfo.levelTitle,
+			worldTitle = self.config.levelInfo.worldTitle
 		}
 		
 		self.children.levelComplete = Widget.new(LevelComplete, {
@@ -312,10 +313,10 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				return
 			end
 			
-			self.config = configNextLevel
+			self.config.level = configNextLevel
 			
-			self.children.level.config.objects = self.config.objects
-			self.children.level.config.objectives = self.config.objectives
+			self.children.level.config.objects = self.config.level.objects
+			self.children.level.config.objectives = self.config.level.objectives
 			
 			self:setState(self.kStates.start)
 		end

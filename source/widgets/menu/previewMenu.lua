@@ -62,6 +62,7 @@ end
 function WidgetPreviewMenu:_load()
 	self:loadSample(kAssetsSounds.menuSelect)
 	self:loadSample(kAssetsSounds.menuSelectFail)
+	self:loadSample(kAssetsSounds.menuAccept)
 	
 	self.entries = {}
 	self.previews = {}
@@ -157,7 +158,7 @@ function WidgetPreviewMenu:_handleInput(input)
 		end
 		
 		if success == true then
-			self:playSample(kAssetsSounds.menuSelect)
+			self:playSample(kAssetsSounds.menuAccept)
 		elseif success == false then
 			self:playSample(kAssetsSounds.menuSelectFail)
 			
