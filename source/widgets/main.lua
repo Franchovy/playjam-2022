@@ -51,23 +51,18 @@ function WidgetMain:_load()
 	end
 	
 	self.getNextLevelConfig = function()
-		do
-			return nil
+		local level, world = self.children.loaderLevel:getNextLevel(self.data.currentLevel)
+		
+		if world ~= nil then
+			self.data.currentLevel.worldTitle = world.title
 		end
 		
-		-- TODO: Update to use levelLoader
-		for _, v in pairs(kLevels) do
-			if self.level == nil then
-				self.level = v
-				break
-			elseif v.path == self.level.path then
-				self.level = nil
-			end
-		end
+		self.data.currentLevel.levelTitle = level.title
+		self.data.currentLevel.filePath = level.path
 		
-		if self.level ~= nil then
-			return _loadLevelFromFile(self.level.path)
-		end
+		local levelConfig = _loadLevelFromFile(level.path)
+		
+		return { level = levelConfig, levelInfo = self.data.currentLevel }
 	end
 	
 	self.children.loaderLevel = Widget.new(WidgetLoaderLevel)

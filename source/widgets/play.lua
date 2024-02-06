@@ -174,6 +174,10 @@ function WidgetPlay:_load()
 	self.timers.levelTimer:pause()
 	
 	self.children.hud:setState(self.children.hud.kStates.onScreen)
+	
+	timer.performAfterDelay(5000, function()
+		self:setState(self.kStates.levelComplete)
+	end)
 end
 
 function WidgetPlay:_draw(frame, rect)
@@ -305,7 +309,8 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				return
 			end
 			
-			self.config.level = configNextLevel
+			self.config.level = configNextLevel.level
+			self.config.levelInfo = configNextLevel.levelInfo
 			
 			self.children.level.config.objects = self.config.level.objects
 			self.children.level.config.objectives = self.config.level.objectives

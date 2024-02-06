@@ -7,9 +7,7 @@ class("WidgetLoaderLevel").extends(Widget)
 function WidgetLoaderLevel:init()
 	WidgetLoaderLevel.super.init(self)
 	
-	self.data = {
-		highscores = {}
-	}
+	self.levels = nil
 end
 
 function WidgetLoaderLevel:_load()
@@ -186,6 +184,27 @@ function WidgetLoaderLevel:_load()
 	
 	self.getLevels = function(self)
 		return self.levels
+	end
+	
+	self.getNextLevel = function(self, level)
+		local worldIndex = table.firstIndex(self.levels, function(element) return element.title == level.worldTitle end)
+		local levels = self.levels[worldIndex].levels
+		local currentLevelIndex = table.firstIndex(levels, function(element) return element.title == level.levelTitle end)
+		local nextLevelIndex = currentLevelIndex + 1
+		
+		if #levels < nextLevelIndex then
+			-- Return next world
+			local nextWorldIndex = worldIndex + 1
+			
+			if self.levels[nextWorldIndex] ~= nil then
+				return self.levels[nextWorldIndex].levels[1], self.levels[nextWorldIndex]
+			else
+				-- No worlds left!
+				return nil
+			end
+		else
+			return levels[nextLevelIndex]
+		end
 	end
 end
 

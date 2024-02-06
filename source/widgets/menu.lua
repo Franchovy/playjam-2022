@@ -97,7 +97,7 @@ function WidgetMenu:_load()
 			local config = {
 				title = level.title,
 				path = level.path,
-				locked = isLocked
+				locked = level.locked
 			}
 			table.insert(entries, {
 				class = class,
