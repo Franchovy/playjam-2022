@@ -169,6 +169,14 @@ function WidgetTitle:_load()
 		
 		self.imagetables.wheel:getImage((-state.index % 12) + 1):draw(140, 0)
 	end)
+	
+	self.animators.animatorWheel = gfx.animator.new(
+		800, 
+		geo.point.new(-200, -30), 
+		geo.point.new(0, 0), 
+		easing.outQuad, 
+		800
+	)
 end
 
 function WidgetTitle:_draw(frame, rect)
@@ -229,19 +237,14 @@ function WidgetTitle:_animate(animation, queueFinishedCallback)
 		self.animators.animator1 = gfx.animator.new(800, 240, 0, easing.outExpo, 100)
 		self.animators.animator2 = gfx.animator.new(800, 150, 0, easing.outExpo, 500)
 		self.animators.animator3 = gfx.animator.new(800, 150, 0, easing.outCirc, 1000)
-		self.animators.animatorWheel = gfx.animator.new(
-			800, 
-			geo.point.new(-200, -30), 
-			geo.point.new(0, 0), 
-			easing.outQuad, 
-			800
-		)
+		self.animators.animatorWheel:reset()
 		
 		queueFinishedCallback(1800)
 	elseif animation == self.kAnimations.fromLevelSelect then
+		local animatorValue = self.animators.animatorOut ~= nil and self.animators.animatorOut:currentValue() or 240
 		self.animators.animatorOut = gfx.animator.new(
 			800, 
-			math.min(240, self.animators.animatorOut:currentValue()), 
+			math.min(240, animatorValue), 
 			0, 
 			easing.outExpo, 
 			200

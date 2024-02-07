@@ -73,6 +73,10 @@ function animators(widget)
 	end)
 	
 	widget.animators = {}
+	
+	widget:_addUnloadCallback(function(self)
+		widget.animators = {}
+	end)
 end
 
 Widget.register("animators", animators)

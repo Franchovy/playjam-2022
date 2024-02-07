@@ -106,6 +106,10 @@ function Widget.isVisible(self)
 end
 
 function Widget.load(self)
+	if self._state.isLoaded == true then
+		return
+	end
+	
 	self:_load()
 	
 	self._state.isLoaded = true
@@ -122,10 +126,16 @@ function Widget.unload(self)
 		return
 	end
 	
-	self._state.isLoaded = false
-	
 	if self._unload ~= nil then
 		self:_unload()
+	end
+	
+	self._state.isLoaded = false
+	
+	if self._unloadCallbacks ~= nil then
+		for _, callback in pairs(self._unloadCallbacks) do
+			callback(self)
+		end
 	end
 end
 
@@ -161,6 +171,14 @@ function Widget:_addLoadCallback(callback)
 	end
 	
 	table.insert(self._loadCallbacks, callback)
+end
+
+function Widget:_addUnloadCallback(callback)
+	if self._unloadCallbacks == nil then
+		self._unloadCallbacks = {}
+	end
+	
+	table.insert(self._unloadCallbacks, callback)
 end
 
 function Widget:_addUpdateCallback(callback)
