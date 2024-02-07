@@ -139,7 +139,7 @@ function WidgetLoaderLevel:_load()
 				}
 				
 				-- Set if to lock next world
-				shouldLockWorld = shouldLockWorld or worldScore == nil
+				shouldLockWorld = shouldLockWorld or worldScore.levels == 0
 			end
 		end
 		
