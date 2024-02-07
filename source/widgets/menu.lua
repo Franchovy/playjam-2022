@@ -248,7 +248,7 @@ function WidgetMenu:_update()
 	elseif self.state == self.kStates.default then
 		self:filterInput(playdate.kButtonA)
 	elseif self.state == self.kStates.menu then
-		self:passInput(self.children.menuHome)
+		self:passInput(self.children.menuHome, playdate.kButtonsAny ~ playdate.kButtonB)
 	end
 end
 
@@ -276,8 +276,9 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		self.children.title:animate(self.children.title.kAnimations.toLevelSelect, function(animationChanged)
 			if not animationChanged then
 				self.children.title:setVisible(false)
-				self.children.menuHome:setVisible(true)
+				self.children.title:unload()
 				
+				self.children.menuHome:setVisible(true)
 				self.children.menuHome:animate(self.children.menuHome.kAnimations.intro)
 			end
 		end)
@@ -287,6 +288,8 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		self:playSample(kAssetsSounds.menuAccept)
 		
 		self.children.title:setVisible(true)
+		self.children.title:load()
+		
 		self.children.menuHome:setVisible(false)
 		
 		self.children.title:animate(self.children.title.kAnimations.fromLevelSelect)

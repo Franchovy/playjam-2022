@@ -21,8 +21,7 @@ function WidgetMain:init()
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.frame)
 	
-	self.kStates = { menu = 1, play = 2 }
-	self.state = self.kStates.menu
+	self:setStateInitial({ menu = 1, play = 2 }, 1)
 	
 	self:setFrame(disp.getRect())
 	self:createSprite(kZIndex.main)

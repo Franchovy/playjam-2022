@@ -27,16 +27,16 @@ function WidgetTitle:init()
 		fromLevelSelect = 3
 	})
 	
-	self.images = {}
-	self.imagetables = {}
-	self.painters = {}
-	
 	self.index = 0
 	self.tick = 0
 end
 
 function WidgetTitle:_load()
 	setCurrentFont(kAssetsFonts.twinbee)
+	
+	self.images = {}
+	self.imagetables = {}
+	self.painters = {}
 	
 	self.imagetables.particles = gfx.imagetable.new(kAssetsImages.particles)
 	self.imagetables.wheel = gfx.imagetable.new(kAssetsImages.wheel):scaled(2)
@@ -274,5 +274,4 @@ function WidgetTitle:_unload()
 	self.imagetables = nil
 	self.images = nil
 	self.painters = nil
-	self.animators = nil
 end

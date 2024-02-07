@@ -17,7 +17,7 @@ function WidgetMenuSettings:init(config)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.samples)
 	
-	self.state = 1
+	self:setStateInitial(nil, 1)
 	
 	self.painters = {}
 	self.entries = {}

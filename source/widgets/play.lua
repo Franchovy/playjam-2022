@@ -175,9 +175,12 @@ function WidgetPlay:_load()
 	
 	self.children.hud:setState(self.children.hud.kStates.onScreen)
 	
+-- DEBUG: Timer to trigger level complete
+	--[[ 
 	timer.performAfterDelay(5000, function()
 		self:setState(self.kStates.levelComplete)
 	end)
+	--]]
 end
 
 function WidgetPlay:_draw(frame, rect)

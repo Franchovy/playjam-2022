@@ -1,7 +1,9 @@
 local function state(widget)
+	local _state
 	
 	function widget:setStateInitial(states, state)
 		self.kStates = states
+		_state = state
 		self.state = state
 	end
 	
@@ -10,12 +12,18 @@ local function state(widget)
 			return
 		end
 		
-		if self._changeState ~= nil then
-			self:_changeState(self.state, targetState)
-		end
-		
-		self.state = targetState
+		_state = targetState
 	end
+	
+	widget:_addUpdateCallback(function()
+		if widget.state ~= _state then
+			if widget._changeState ~= nil then
+				widget:_changeState(widget.state, _state)
+			end
+			
+			widget.state = _state
+		end
+	end)
 end
 
 Widget.register("state", state)

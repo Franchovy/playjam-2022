@@ -69,7 +69,7 @@ function WidgetMenuEntry:_performLayout()
 end
 
 function WidgetMenuEntry:_changeState(stateFrom, stateTo)
-	
+	gfx.sprite.addDirtyRect(self.frame:unpack())
 end
 
 function WidgetMenuEntry:_unload()
