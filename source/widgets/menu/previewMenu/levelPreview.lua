@@ -35,11 +35,11 @@ function WidgetMenuLevelPreview:_load()
 	
 	if self.config.type == "level" then
 		if self.config.score ~= nil then
-			local scoreTime = "⌛ "..self.config.score.timeString
+			local scoreTime = "⌛"..self.config.score.timeString.."/"..self.config.objectives.timeString
 			local starsCount = self.config.score.stars
 			
 			-- TODO: Display objective time
-			--scoreTime = "⌛ "..self.config.score.timeString.."/"..self.config.score.timeStringObjective
+			--scoreTime = "⌛"..self.config.score.timeString.."/"..self.config.score.timeStringObjective
 			
 			painterObjectives = Painter(function(rect, state)
 				local starImageW, starImageH = self.images.star:getSize()
@@ -58,28 +58,21 @@ function WidgetMenuLevelPreview:_load()
 				end
 				
 				setCurrentFont(kAssetsFonts.twinbee15x)
+				gfx.setFontTracking(4)
+				
 				local fontHeight = gfx.getFont():getHeight()
 				gfx.drawTextAligned(scoreTime, rect.x + rect.w / 2, rect.y + starImageH + 7, kTextAlignment.center)
+				gfx.setFontTracking(0)
 			end)
 		end
-	elseif self.config.type == "world" then
-		-- TODO: Display total objective stars
-		local starsCount = "⭐️"..tostring(self.config.score)
-		
-		painterObjectives = Painter(function(rect, state)
-			local starImageW, starImageH = self.images.star:getSize()
-			
-			setCurrentFont(kAssetsFonts.twinbee2x)
-			local fontHeight = gfx.getFont():getHeight()
-			gfx.drawTextAligned((starsCount), rect.x + rect.w / 2, rect.y + rect.h / 2, kTextAlignment.center)
-		end)
 	end
 	
 	self.painters.contents = Painter(function(rect, state)		
 		setCurrentFont(kAssetsFonts.twinbee2x)
 		local fontHeight = gfx.getFont():getHeight()
 		local topPadding = 8
-		local margin = 6
+		
+		local margin = self.config.type == "world" and 12 or 6
 		gfx.drawTextAligned(self.config.title, rect.x + rect.w / 2, topPadding, kTextAlignment.center)
 		
 		local imageW, imageH = self.images.level:getSize()
@@ -96,9 +89,20 @@ function WidgetMenuLevelPreview:_load()
 		end
 		
 		if self.config.locked ~= true then
-			local insetRect = Rect.inset(rect, 5, imageH + fontHeight + topPadding + margin * 2, 5, 7)
+			local bottomPadding = self.config.type == "world" and 25 or 7
+			local insetRect = Rect.inset(rect, 5, imageH + fontHeight + topPadding + margin * 2, 5, bottomPadding)
 			
-			if self.config.score ~= nil or self.config.type == "world" then
+			if self.config.type == "world" then
+				local starsCount = "⭐️"..tostring(self.config.score.stars).."/"..tostring(self.config.objectives.stars)
+				local starImageW, starImageH = self.images.star:getSize()
+				
+				setCurrentFont(kAssetsFonts.twinbee2x)
+				gfx.setFontTracking(6)
+				
+				local fontHeight = gfx.getFont():getHeight()
+				gfx.drawTextAligned((starsCount), insetRect.x + insetRect.w / 2, insetRect.y + insetRect.h / 2, kTextAlignment.center)
+				gfx.setFontTracking(0)
+			elseif self.config.score ~= nil then
 				painterObjectives:draw(insetRect, starsCount)
 			else
 				setCurrentFont(kAssetsFonts.twinbee15x)
@@ -109,7 +113,15 @@ function WidgetMenuLevelPreview:_load()
 end
 
 function WidgetMenuLevelPreview:_draw(rect)
-	local insetRect = self.config.locked ~= true and Rect.inset(rect, 8, 30) or Rect.inset(rect, 8, 60)
+	local insetRect
+	
+	if self.config.locked == true then
+		insetRect = Rect.inset(rect, 8, 60)
+	elseif self.config.type == "world" then 
+		insetRect = Rect.inset(rect, 8, 40)
+	else
+		insetRect = Rect.inset(rect, 8, 30)
+	end
 	
 	self.painters.background:draw(insetRect)
 	self.painters.contents:draw(insetRect)

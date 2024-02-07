@@ -2,6 +2,9 @@
 local file <const> = playdate.file
 local _convertMsTimeToString <const> = convertMsTimeToString
 
+-- Default number of stars to score by, usually 3 but can be 4 for expert players.
+local STAR_SCORING = 3
+
 class("WidgetLoaderLevel").extends(Widget)
 
 function WidgetLoaderLevel:init()
@@ -11,6 +14,26 @@ function WidgetLoaderLevel:init()
 end
 
 function WidgetLoaderLevel:_load()
+	
+	-- Load level objectives 
+	
+	local loadObjectivesFile = function(filePath)
+		local contents = json.decodeFile(filePath)
+		local worldObjectives = { stars = 0, levels = 0 }
+		local levelObjectives = table.create(0, #contents)
+		
+		for levelName, objectives in pairs(contents) do
+			levelObjectives[levelName:upper()] = {
+				all = objectives,
+				time = objectives[STAR_SCORING],
+				timeString = _convertMsTimeToString(objectives[STAR_SCORING] * 10, 1)
+			}
+			worldObjectives.stars += STAR_SCORING
+			worldObjectives.levels += 1
+		end
+		
+		return worldObjectives, levelObjectives
+	end
 	
 	-- Load High Scores from file
 	
@@ -31,7 +54,7 @@ function WidgetLoaderLevel:_load()
 			file.mkdir(kFilePath.saves)
 		end
 
-		local worldScore = nil
+		local worldScore = { stars = 0, levels = 0 }
 		local levelScores = {}
 
 		local saveFilePath = kFilePath.saves.."/"..worldName..".json"
@@ -46,14 +69,11 @@ function WidgetLoaderLevel:_load()
 						levelScores[levelTitle] = {
 							stars = tonumber(saveDataLevel.stars),
 							time = saveDataLevel.time,
-							timeString = _convertMsTimeToString(saveDataLevel.time * 10, 2)
+							timeString = _convertMsTimeToString(saveDataLevel.time * 10, 1)
 						}
 						
-						if worldScore == nil then
-							worldScore = 0
-						end
-						
-						worldScore += saveDataLevel.stars
+						worldScore.stars += saveDataLevel.stars
+						worldScore.levels += 1
 					end
 				end
 			else
@@ -78,12 +98,12 @@ function WidgetLoaderLevel:_load()
 				local worldName = worldNameRaw:sub(3):upper()
 				local levels = table.create(8, 0)
 				local worldScore, levelScores = getScoresForWorld(worldName)
-				local imagePath = nil
 				local shouldLockLevel = shouldLockWorld
+				local imagePath, worldObjectives, levelObjectives
 				
 				local rawFiles = file.listFiles(dirWorld)
 				for _, file in pairs(rawFiles) do
-					if file:match("^.+.json$") ~= nil then
+					if file:match("^%d_.+.json$") ~= nil then
 						local levelIndex = tonumber(file:sub(1, 1))
 						local levelName = file:sub(3, #file-5):upper()
 						local levelScore = levelScores[levelName]
@@ -99,7 +119,13 @@ function WidgetLoaderLevel:_load()
 						shouldLockLevel = shouldLockLevel or levelScore == nil
 					elseif file:match("^preview") then
 						imagePath = dirWorld..file
+					elseif file:match("objectives.json") then
+						worldObjectives, levelObjectives = loadObjectivesFile(dirWorld..file)
 					end
+				end
+				
+				for _, level in ipairs(levels) do
+					level.objectives = levelObjectives[level.title]
 				end
 				
 				levelsData[worldIndex] = {
@@ -108,6 +134,7 @@ function WidgetLoaderLevel:_load()
 					locked = shouldLockWorld,
 					score = worldScore,
 					path = dirWorld,
+					objectives = worldObjectives,
 					imagePath = imagePath
 				}
 				

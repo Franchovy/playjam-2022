@@ -92,6 +92,7 @@ function WidgetMenu:_load()
 				imagePath = world.imagePath,
 				type = "level",
 				score = level.score,
+				objectives = level.objectives,
 				locked = level.locked,
 			}
 			local config = {
@@ -143,6 +144,7 @@ function WidgetMenu:_load()
 			title = world.title,
 			imagePath = world.imagePath,
 			type = "world",
+			objectives = world.objectives,
 			score = world.score,
 			locked = world.locked,
 		}
