@@ -103,6 +103,5 @@ end
 
 function WidgetHUD:_unload()	
 	self.images = nil
-	self.animators = nil
 	self.painters = nil
 end

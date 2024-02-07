@@ -32,10 +32,6 @@ function WidgetMenuPreviewImage:_draw(frame, rect)
 	self.painters.title:draw(rectTitle)
 end
 
-function WidgetMenuPreviewImage:_update()
-	
-end
-
 function WidgetMenuPreviewImage:_unload()
 	self.painters = nil
 	self.images = nil

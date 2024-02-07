@@ -390,7 +390,6 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 end
 
 function WidgetPlay:_unload()
-	self.samples = nil
 	self.painters = nil
 	self.fileplayer = nil
 	self.timers = nil

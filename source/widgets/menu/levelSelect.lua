@@ -222,9 +222,7 @@ function WidgetLevelSelect:_changeState(_, stateTo)
 end
 
 function WidgetLevelSelect:_unload()
-	self.samples = nil
 	self.painters = nil
-	self.animators = nil
 	self.images = nil
 	
 	for _, child in pairs(self.children) do child:unload() end

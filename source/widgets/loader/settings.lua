@@ -13,8 +13,3 @@ function WidgetLoaderSettings:_load()
 		Settings:setDefaultValues()
 	end
 end
-
-function WidgetLoaderSettings:_unload()
-	
-end
-	

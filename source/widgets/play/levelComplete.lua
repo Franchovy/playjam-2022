@@ -320,7 +320,6 @@ end
 function LevelComplete:_unload()
 	self.images = nil
 	self.blinkers = nil
-	self.samples = nil
 	self.painters = nil
 	
 	for _, child in pairs(self.children) do child:unload() end

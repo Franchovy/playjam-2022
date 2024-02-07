@@ -137,7 +137,6 @@ function WidgetMenuSettings:_changeState(stateFrom, stateTo)
 end
 
 function WidgetMenuSettings:_unload()
-	self.samples = nil
 	self.painters = nil
 	
 	for _, child in pairs(self.children) do child:unload() end

@@ -32,10 +32,6 @@ function LevelSelectPreviewImage:_draw(frame, rect)
 	self.painters.title:draw(rectTitle)
 end
 
-function LevelSelectPreviewImage:_update()
-	
-end
-
 function LevelSelectPreviewImage:_unload()
 	self.painters = nil
 	self.images = nil

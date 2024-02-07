@@ -68,10 +68,6 @@ function LevelSelectEntry:_performLayout()
 	_rects.painter = _tInset(_assign(_rects.painter, _frame), 20, 2)
 end
 
-function LevelSelectEntry:_changeState(stateFrom, stateTo)
-	
-end
-
 function LevelSelectEntry:_unload()
 	self.painters = nil
 	self.images = nil

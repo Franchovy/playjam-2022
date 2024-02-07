@@ -45,6 +45,10 @@ function samples(widget)
 	end
 	
 	widget.samples = {}
+	
+	widget:_addUnloadCallback(function()
+		widget.samples = {}
+	end)
 end
 
 Settings:addCallback(kSettingsKeys.sfxVolume, function(value)

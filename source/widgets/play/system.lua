@@ -14,6 +14,13 @@ function WidgetSystem:_load()
     menu:addMenuItem("main menu", function()
         self.signals.returnToMenu()
     end)
+    
+    --DEBUG: Garbage Collect
+    --[[ 
+    menu:addMenuItem("garage collect", function()
+        collectgarbage()
+    end)
+    --]]
 end
 
 function WidgetSystem:_unload()

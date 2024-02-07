@@ -207,8 +207,3 @@ function WidgetLoaderLevel:_load()
 		end
 	end
 end
-
-function WidgetLoaderLevel:_unload()
-	
-end
-	

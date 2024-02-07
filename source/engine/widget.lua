@@ -88,6 +88,11 @@ function Widget:createSprite(zIndex)
 		
 		sprite:add()
 		self.sprite = sprite
+		
+		self:_addUnloadCallback(function()
+			self.sprite:remove()
+			self.sprite = nil
+		end)
 	end
 end
 

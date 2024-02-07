@@ -268,10 +268,7 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.default and (stateTo == self.kStates.menu) then
 		self:playSample(kAssetsSounds.menuAccept)
 		
-		if self.children.menuHome == nil then
-			self.children.menuHome = Widget.new(LevelSelect)
-			self.children.menuHome:load()
-		end
+		self.children.menuHome:load()
 		
 		self.children.title:animate(self.children.title.kAnimations.toLevelSelect, function(animationChanged)
 			if not animationChanged then
@@ -291,6 +288,7 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		self.children.title:load()
 		
 		self.children.menuHome:setVisible(false)
+		self.children.menuHome:unload()
 		
 		self.children.title:animate(self.children.title.kAnimations.fromLevelSelect)
 	end
@@ -300,6 +298,7 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		
 		self.children.menuHome:animate(self.children.menuHome.kAnimations.outro, function()
 			self.children.menuHome:setVisible(false)
+			self.children.menuHome:unload()
 			
 			if self.currentMenu:isLoaded() == false then
 				self.currentMenu:load()
@@ -318,14 +317,22 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 	
 	if stateFrom == self.kStates.subMenu and (stateTo == self.kStates.menu) then
 		self:playSample(kAssetsSounds.menuAccept)
+		
 		self.currentMenu:setVisible(false)
 		
-		if self.currentMenu ~= self.children.menuSettings then
-			self.currentMenu:animate(self.currentMenu.kAnimations.outro)
+		local _currentMenu = self.currentMenu
+		self.currentMenu = nil
+		
+		if _currentMenu ~= self.children.menuSettings then
+			_currentMenu:animate(_currentMenu.kAnimations.outro, function()
+				_currentMenu:unload()
+			end)
+		else
+			_currentMenu:unload()
 		end
 		
+		self.children.menuHome:load()
 		self.children.menuHome:setVisible(true)
-		self.currentMenu = nil
 		
 		self.children.menuHome:animate(self.children.menuHome.kAnimations.intro)
 	end
@@ -334,7 +341,6 @@ end
 function WidgetMenu:_unload()
 	self:stopFilePlayer()
 	
-	self.samples = nil
 	self.painters = nil
 	self.fileplayer = nil
 	

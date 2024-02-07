@@ -41,6 +41,11 @@ function frame(widget, config)
 		end
 		
 		self.sprite = sprite
+		
+		self:_addUnloadCallback(function()
+			self.sprite:remove()
+			self.sprite = nil
+		end)
 	end
 		
 	function widget:setNeedsLayout()
