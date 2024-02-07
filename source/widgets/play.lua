@@ -291,7 +291,8 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			stars = tostring(stars),
 			time = string.format("%d", math.ceil(timeValue)),
 			levelTitle = self.config.levelInfo.levelTitle,
-			worldTitle = self.config.levelInfo.worldTitle
+			worldTitle = self.config.levelInfo.worldTitle,
+			coins = self.data.coins
 		}
 		
 		self.children.levelComplete = Widget.new(LevelComplete, {

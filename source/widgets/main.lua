@@ -2,7 +2,8 @@ import "constant"
 import "engine"
 import "menu"
 import "play"
-import "loader/levelLoader"
+import "loader/level"
+import "loader/user"
 import "loader/settings"
 
 local timer <const> = playdate.timer
@@ -64,13 +65,23 @@ function WidgetMain:_load()
 		return { level = levelConfig, levelInfo = self.data.currentLevel }
 	end
 	
+	self.onPlaythroughComplete = function(playthroughData)
+		self.children.loaderUser.onPlaythroughComplete(playthroughData)
+		self.children.loaderLevel.onPlaythroughComplete(playthroughData)
+	end
+	
+	self.children.loaderUser = Widget.new(WidgetLoaderUser)
+	self.children.loaderUser:load()
+	
+	local coins = self.children.loaderUser:getCoinCount()
+	
 	self.children.loaderLevel = Widget.new(WidgetLoaderLevel)
 	self.children.loaderLevel:load()
 	self.children.loaderLevel:refresh()
 	
 	local levels = self.children.loaderLevel:getLevels()
 	
-	self.children.menu = Widget.new(WidgetMenu, { levels = levels })
+	self.children.menu = Widget.new(WidgetMenu, { levels = levels, coins = coins })
 	self.children.menu:load()
 	
 	self.children.menu.signals.loadLevel = self.onMenuPressedPlay
@@ -121,7 +132,7 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 				self.children.play = Widget.new(WidgetPlay, { level = levelConfig, levelInfo = self.data.currentLevel })
 				self.children.play:load()
 				
-				self.children.play.signals.saveLevelScore = self.children.loaderLevel.onPlaythroughComplete
+				self.children.play.signals.saveLevelScore = self.onPlaythroughComplete
 				self.children.play.signals.returnToMenu = self.onReturnToMenu
 				self.children.play.signals.getNextLevelConfig = self.getNextLevelConfig
 				
@@ -152,7 +163,7 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 			self.children.menu = Widget.new(WidgetMenu, { levels = levels })
 			self.children.menu:load()
 			
-			self.children.menu.signals.play = self.onMenuPressedPlay
+			self.children.menu.signals.loadLevel = self.onMenuPressedPlay
 			
 			timer.performAfterDelay(100, function()
 				self.children.transition:setState(self.children.transition.kStates.open)
