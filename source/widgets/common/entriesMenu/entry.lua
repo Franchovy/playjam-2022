@@ -51,6 +51,8 @@ function WidgetEntriesMenuEntry:_draw(rect)
 		local circleRect = Rect.with(Rect.size(circleSize, circleSize), { x = math.ceil(rect.x + (marginLeft - circleSize) / 2), y = math.ceil(rect.y + marginVert) })
 		self.painters.circle:draw(circleRect)
 	end
+	
+	self.frame = rect
 end
 
 function WidgetEntriesMenuEntry:_update()
@@ -68,5 +70,7 @@ function WidgetEntriesMenuEntry:setState(state)
 end
 
 function WidgetEntriesMenuEntry:_changeState(stateFrom, stateTo)
-	
+	if self.frame ~= nil then
+		gfx.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+	end
 end

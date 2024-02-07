@@ -81,10 +81,6 @@ function WidgetEntriesMenu:_handleInput(input)
 		if self.state < #self.entries then
 			self:playSample(kAssetsSounds.menuSelect)
 			self:setState(self.state + 1)
-			
-			if self.frame ~= nil then
-				gfx.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
-			end
 		else
 			self:playSample(kAssetsSounds.menuSelectFail)
 		end
@@ -94,10 +90,6 @@ function WidgetEntriesMenu:_handleInput(input)
 		if self.state > 1 then
 			self:playSample(kAssetsSounds.menuSelect)
 			self:setState(self.state - 1)
-			
-			if self.frame ~= nil then
-				gfx.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
-			end
 		else
 			self:playSample(kAssetsSounds.menuSelectFail)
 		end
@@ -107,6 +99,10 @@ end
 function WidgetEntriesMenu:_changeState(_, stateTo)
 	for i, entry in ipairs(self.entries) do
 		entry:setState(stateTo == i and entry.kStates.selected or entry.kStates.unselected)
+		
+		if self.frame ~= nil then
+			gfx.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+		end
 	end
 end
 

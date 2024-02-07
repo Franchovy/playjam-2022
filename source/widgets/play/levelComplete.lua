@@ -219,7 +219,7 @@ function LevelComplete:_draw(rect)
 				inverted = (not blinker1 and blinker2) or (not blinker2 and blinker1) 
 			})
 		elseif self.state == self.kStates.menu then
-			local rectMenu = Rect.with(Rect.offset(rectContentBottom, 70, 8), { w = 180, h = 70 })
+			local rectMenu = Rect.with(Rect.offset(rectContentBottom, 70, 2), { w = 180, h = 70 })
 			self.children.menu:draw(rectMenu)
 		end
 	end
@@ -270,10 +270,10 @@ function LevelComplete:_update()
 		self:passInput(self.children.menu)
 		
 		local menuIsVisible = self.children.menu:isVisible()
-		if menuIsVisible ~= self.previousVisibleMenu then
+		if menuIsVisible ~= self.menuWasVisible then
 			gfx.sprite.addDirtyRect(37, 130, 326, 85)
 		end
-		self.previousVisibleMenu = menuIsVisible
+		self.menuWasVisible = menuIsVisible
 	end
 end
 
