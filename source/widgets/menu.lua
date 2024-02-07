@@ -284,11 +284,11 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.menu and (stateTo == self.kStates.default) then
 		self:playSample(kAssetsSounds.menuAccept)
 		
-		self.children.title:setVisible(true)
-		self.children.title:load()
-		
 		self.children.menuHome:setVisible(false)
 		self.children.menuHome:unload()
+		
+		self.children.title:load()
+		self.children.title:setVisible(true)
 		
 		self.children.title:animate(self.children.title.kAnimations.fromLevelSelect)
 	end
@@ -296,21 +296,23 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.menu and (stateTo == self.kStates.subMenu) then
 		self:playSample(kAssetsSounds.menuAccept)
 		
-		self.children.menuHome:animate(self.children.menuHome.kAnimations.outro, function()
-			self.children.menuHome:setVisible(false)
-			self.children.menuHome:unload()
-			
-			if self.currentMenu:isLoaded() == false then
-				self.currentMenu:load()
-			end
-			
-			self.currentMenu:setVisible(true)
-			
-			-- TODO: Add animation to sub menu
-			if self.currentMenu == self.children.menuSettings then
-				gfx.sprite.addDirtyRect(0, 0, 400, 240)
-			else
-				self.currentMenu:animate(self.currentMenu.kAnimations.intro)
+		self.children.menuHome:animate(self.children.menuHome.kAnimations.outro, function(animationChanged)
+			if not animationChanged then
+				self.children.menuHome:setVisible(false)
+				self.children.menuHome:unload()
+				
+				if self.currentMenu:isLoaded() == false then
+					self.currentMenu:load()
+				end
+				
+				self.currentMenu:setVisible(true)
+				
+				-- TODO: Add animation to sub menu
+				if self.currentMenu == self.children.menuSettings then
+					gfx.sprite.addDirtyRect(0, 0, 400, 240)
+				else
+					self.currentMenu:animate(self.currentMenu.kAnimations.intro)
+				end
 			end
 		end)
 	end

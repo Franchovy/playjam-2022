@@ -43,8 +43,14 @@ function WidgetPreviewMenu:init(config)
 		outro = 3
 	})
 	
+	self.painters = {}
+	self.images = {}
+	self.signals = {}
+end
+
+function WidgetPreviewMenu:_load()
 	local states = {}
-	for i, entry in ipairs(config.entries) do
+	for i, entry in ipairs(self.config.entries) do
 		table.insert(states, i)
 	end
 	
@@ -54,12 +60,6 @@ function WidgetPreviewMenu:init(config)
 	
 	self:setStateInitial(states, 1)
 	
-	self.painters = {}
-	self.images = {}
-	self.signals = {}
-end
-
-function WidgetPreviewMenu:_load()
 	self:loadSample(kAssetsSounds.menuSelect)
 	self:loadSample(kAssetsSounds.menuSelectFail)
 	self:loadSample(kAssetsSounds.menuAccept)
@@ -227,5 +227,4 @@ function WidgetPreviewMenu:_unload()
 	self.images = nil
 	
 	for _, child in pairs(self.children) do child:unload() end
-	self.children = nil
 end
