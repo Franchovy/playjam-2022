@@ -60,9 +60,9 @@ function WidgetPreviewMenu:_load()
 	
 	self:setStateInitial(states, 1)
 	
-	self:loadSample(kAssetsSounds.menuSelect)
-	self:loadSample(kAssetsSounds.menuSelectFail)
-	self:loadSample(kAssetsSounds.menuAccept)
+	self:loadSample(kAssetsSounds.menuSelect, 0.6)
+	self:loadSample(kAssetsSounds.menuSelectFail, 0.8)
+	self:loadSample(kAssetsSounds.menuAccept, 0.8)
 	
 	self.entries = {}
 	self.previews = {}
