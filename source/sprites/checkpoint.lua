@@ -4,6 +4,7 @@ import "utils/images"
 import "playdate"
 
 local gfx <const> = playdate.graphics
+local timer <const> = playdate.timer
 
 class("Checkpoint").extends(gfx.sprite)
 
@@ -36,13 +37,49 @@ function Checkpoint:init()
 	sampleplayer:addSample("set", kAssetsSounds.checkpointSet)
 	
 	self:setUpdatesEnabled(false)
+	
+	-- Loading update
+	
+	self._loadTimer = nil
+	self._loadFinished = false
 end
 
 function Checkpoint:isSet()
 	return self.config.isSet
 end
 
+function Checkpoint:loadCheckpoint()
+	print("Loading")
+	if self._loadTimer == nil then
+		self._loadTimer = timer.new(800, function()
+			self._loadFinished = true
+		end)
+	end
+end
+
+function Checkpoint:stopLoading()
+	print("Stop loading")
+	
+	if self._loadTimer ~= nil then
+		self._loadTimer:remove()
+		self._loadTimer = nil
+	end
+end
+
+function Checkpoint:loadFinished()
+	return self._loadFinished
+end
+
 function Checkpoint:set()
+	print("Set")
+	
+	if self._loadTimer ~= nil then
+		-- Reset (for recycling purposes)
+		self._loadTimer:remove()
+		self._loadTimer = nil
+		self._loadFinished = false
+	end
+	
 	sampleplayer:playSample("set")
 	
 	self.config.isSet = true

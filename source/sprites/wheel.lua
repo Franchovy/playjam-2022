@@ -103,6 +103,8 @@ function Wheel:resetValues()
 	self.hasTouchedNewCheckpoint = false
 	self.hasJustTouchedGround = false
 	self._recentCheckpoint = nil
+	self._recentLoadingCheckpoint = nil
+	self._isLoadingCheckpoint = false
 	self._coinCountUpdate = 0
 	self.isFrozen = false
 	self.normal = {
@@ -211,6 +213,7 @@ function Wheel:update()
 	
 	self.touchingGround = false
 	self._coinCountUpdate = 0
+	self._isLoadingCheckpoint = false
 	
 	self.normalPrevious.x = self.normal.x
 	self.normalPrevious.y = self.normal.y
@@ -259,11 +262,19 @@ function Wheel:update()
 			end
 		elseif target.type == kSpriteTypes.checkpoint then
 			if not target:isSet() then
-				target:set()
-				self.hasTouchedNewCheckpoint = true
-				self._recentCheckpoint = {x = target.x, y = target.y}
+				target:loadCheckpoint()
 				
-				self.signals.onTouchCheckpoint()
+				self._recentLoadingCheckpoint = target
+				self._isLoadingCheckpoint = true
+				
+				if target:loadFinished() == true then
+					target:set()
+					
+					self.hasTouchedNewCheckpoint = true
+					self._recentCheckpoint = {x = target.x, y = target.y}
+					
+					self.signals.onTouchCheckpoint()
+				end
 			end
 		elseif target.type == kSpriteTypes.levelEnd then
 			if self:alphaCollision(target) then
@@ -274,6 +285,12 @@ function Wheel:update()
 				self.hasReachedLevelEnd = true
 			end
 		end
+	end
+	
+	if self._recentLoadingCheckpoint ~= nil and self._isLoadingCheckpoint == false then
+		-- Cancel loading checkpoint
+		self._recentLoadingCheckpoint:stopLoading()
+		self._recentLoadingCheckpoint = nil
 	end
 	
 	if self.hasJustDied == false then	

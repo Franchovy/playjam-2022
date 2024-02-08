@@ -64,6 +64,8 @@ function WidgetPlay:_load()
 	end
 	
 	self.children.level.signals.onCheckpoint = function()
+		print("Show flashy checkpoint signal")
+		
 		table.insert(self.data.checkpoints, {
 			time = self.data.time + self.timers.levelTimer.currentTime,
 			coins = self.data.coins
