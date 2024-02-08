@@ -44,7 +44,7 @@ function WidgetPlay:init(config)
 end
 
 function WidgetPlay:_load()
-	self.children.transition = Widget.new(WidgetTransition)
+	self.children.transition = Widget.new(WidgetTransition, { showLoading = false })
 	self.children.transition:load()
 	self.children.transition:setVisible(false)
 	
@@ -176,7 +176,7 @@ function WidgetPlay:_load()
 	self.children.hud:setState(self.children.hud.kStates.onScreen)
 	
 -- DEBUG: Timer to trigger level complete
-	-- --[[ 
+	--[[ 
 	timer.performAfterDelay(5000, function()
 		self:setState(self.kStates.levelComplete)
 	end)
