@@ -27,7 +27,8 @@ kAssetsImages = {
 }
 
 kAssetsSounds = {
-	checkpointSet = dirSounds.."checkpoint",
+	checkpointLoad = dirSounds.."checkpoint-load",
+	checkpointSet = dirSounds.."checkpoint-set",
 	coin = dirSounds.."coin",
 	death1 = dirSounds.."death1",
 	death2 = dirSounds.."death2",

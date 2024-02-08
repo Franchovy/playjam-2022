@@ -34,6 +34,7 @@ function Checkpoint:init()
 	
 	-- Sound effects
 	
+	sampleplayer:addSample("load", kAssetsSounds.checkpointLoad)
 	sampleplayer:addSample("set", kAssetsSounds.checkpointSet)
 	
 	self:setUpdatesEnabled(false)
@@ -42,6 +43,7 @@ function Checkpoint:init()
 	
 	self._loadTimer = nil
 	self._loadFinished = false
+	self._loadPlayer = nil
 end
 
 function Checkpoint:isSet()
@@ -49,20 +51,24 @@ function Checkpoint:isSet()
 end
 
 function Checkpoint:loadCheckpoint()
-	print("Loading")
 	if self._loadTimer == nil then
 		self._loadTimer = timer.new(800, function()
 			self._loadFinished = true
 		end)
+		
+		self._loadPlayer = sampleplayer:playSample("load")
 	end
 end
 
 function Checkpoint:stopLoading()
-	print("Stop loading")
-	
 	if self._loadTimer ~= nil then
 		self._loadTimer:remove()
 		self._loadTimer = nil
+	end
+	
+	if self._loadPlayer ~= nil then
+		self._loadPlayer:stop()
+		self._loadPlayer = nil
 	end
 end
 
@@ -78,6 +84,7 @@ function Checkpoint:set()
 		self._loadTimer:remove()
 		self._loadTimer = nil
 		self._loadFinished = false
+		self._loadPlayer = nil
 	end
 	
 	sampleplayer:playSample("set")

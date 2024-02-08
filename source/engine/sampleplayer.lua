@@ -43,6 +43,8 @@ function sampleplayer:playSample(key, callback)
 	end
 	
 	player:play()
+	
+	return player
 end
 
 function sampleplayer:getSample(key)
