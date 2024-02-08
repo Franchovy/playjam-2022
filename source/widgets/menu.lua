@@ -302,7 +302,9 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 				self.children.menuHome:setVisible(true)
 				self.children.menuHome:animate(self.children.menuHome.kAnimations.intro)
 				
-				self.children.scoreDisplay:setVisible(true)
+				if self.config.coins > 0 then
+					self.children.scoreDisplay:setVisible(true)
+				end
 			end
 		end)
 	end
@@ -366,7 +368,9 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		self.children.menuHome:load()
 		self.children.menuHome:setVisible(true)
 		
-		self.children.scoreDisplay:setVisible(true)
+		if self.config.coins > 0 then
+			self.children.scoreDisplay:setVisible(true)
+		end
 		
 		self.children.menuHome:animate(self.children.menuHome.kAnimations.intro)
 	end
