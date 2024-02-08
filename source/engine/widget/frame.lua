@@ -22,6 +22,8 @@ function frame(widget, config)
 		if self.sprite ~= nil then
 			self.sprite:setBounds(rect.x, rect.y, rect.w, rect.h)
 		end
+		
+		self._state.needsLayout = true
 	end
 	
 	function widget:createSprite(zIndex)
@@ -98,11 +100,10 @@ function frame(widget, config)
 		end
 		
 		if self._state.needsLayout == true then
-			if self._performLayout == nil then
-				error("Layout was needed but no _layout() function exists for this widget.", 2)
+			if self._performLayout ~= nil then
+				self:_performLayout()
 			end
-			
-			self:_performLayout()
+
 			self._state.needsLayout = false
 		end
 	end)

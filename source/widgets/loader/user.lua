@@ -11,11 +11,21 @@ function WidgetLoaderUser:_load()
 	local userData
 	
 	local loadUserFile = function()
-		userData = json.decodeFile(filePath) or { coinCount = 0 }
+		if file.exists(filePath) then
+			local file = file.open(filePath, file.kFileRead)
+			userData = json.decodeFile(file)
+		else
+			userData = { coinCount = 0 }
+		end
 	end
 	
 	local writeUserFile = function()
-		json.encodeToFile(filePath, userData)
+		if file.exists(kFilePath.user) == false then
+			file.mkdir(kFilePath.user)
+		end
+		
+		local file = file.open(filePath, file.kFileWrite)
+		json.encodeToFile(file, userData)
 	end
 	
 	self.getCoinCount = function()
@@ -26,5 +36,7 @@ function WidgetLoaderUser:_load()
 	
 	self.onPlaythroughComplete = function(data)
 		userData.coinCount += data.coins
+		
+		writeUserFile()
 	end
 end

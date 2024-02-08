@@ -3,9 +3,12 @@ import "utils/rect"
 import "menu/previewMenu"
 import "menu/title"
 import "menu/settings"
+import "menu/score"
 
 local gfx <const> = playdate.graphics
 local timer <const> = playdate.timer
+local disp <const> = playdate.display
+local geo <const> = playdate.geometry
 local disp <const> = playdate.display
 
 class("WidgetMenu").extends(Widget)
@@ -19,7 +22,7 @@ function WidgetMenu:init(config)
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.fileplayer)
-	self:supply(Widget.deps.frame)
+	self:supply(Widget.deps.frame, { needsLayout = true })
 	
 	self:setFrame(disp.getRect())
 	
@@ -46,6 +49,10 @@ function WidgetMenu:_load()
 		gfx.setDitherPattern(0.1, gfx.image.kDitherTypeBayer4x4)
 		gfx.fillRect(0, 0, rect.w, rect.h)
 	end)
+	
+	self.children.scoreDisplay = Widget.new(WidgetMenuScore, { coins = self.config.coins })	
+	self.children.scoreDisplay:load()
+	self.children.scoreDisplay:setVisible(false)
 	
 	-- Pre-load sub-menus
 	
@@ -228,6 +235,7 @@ function WidgetMenu:_draw(frame, rect)
 	self.painters.background:draw(frame)
 	self.children.title:draw(rect)
 	self.children.menuHome:draw(rect)
+	self.children.scoreDisplay:draw(rect)
 	
 	if self.state == self.kStates.subMenu then
 		if self.currentMenu == self.children.menuSettings then
@@ -266,6 +274,20 @@ function WidgetMenu:_handleInput(input)
 	end
 end
 
+function WidgetMenu:_performLayout()
+	local scoreDisplaySizeW, scoreDisplaySizeH = 100, 24
+	local rightMargin, topMargin = 8, 6
+	
+	self.rects.scoreDisplay = geo.rect.new(
+		disp.getWidth() - scoreDisplaySizeW - rightMargin, 
+		topMargin, 
+		scoreDisplaySizeW, 
+		scoreDisplaySizeH
+	)
+	
+	self.children.scoreDisplay:setFrame(self.rects.scoreDisplay)
+end
+
 function WidgetMenu:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.default and (stateTo == self.kStates.menu) then
 		self:playSample(kAssetsSounds.menuAccept)
@@ -279,6 +301,8 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 				
 				self.children.menuHome:setVisible(true)
 				self.children.menuHome:animate(self.children.menuHome.kAnimations.intro)
+				
+				self.children.scoreDisplay:setVisible(true)
 			end
 		end)
 	end
@@ -288,6 +312,8 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		
 		self.children.menuHome:setVisible(false)
 		self.children.menuHome:unload()
+		
+		self.children.scoreDisplay:setVisible(false)
 		
 		self.children.title:load()
 		self.children.title:setVisible(true)
@@ -302,6 +328,8 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 			if not animationChanged then
 				self.children.menuHome:setVisible(false)
 				self.children.menuHome:unload()
+				
+				self.children.scoreDisplay:setVisible(false)
 				
 				if self.currentMenu:isLoaded() == false then
 					self.currentMenu:load()
@@ -337,6 +365,8 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		
 		self.children.menuHome:load()
 		self.children.menuHome:setVisible(true)
+		
+		self.children.scoreDisplay:setVisible(true)
 		
 		self.children.menuHome:animate(self.children.menuHome.kAnimations.intro)
 	end

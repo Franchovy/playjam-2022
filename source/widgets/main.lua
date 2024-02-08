@@ -158,9 +158,10 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 			
 			self.children.loaderLevel:refresh()
 			
+			local coins = self.children.loaderUser:getCoinCount()
 			local levels = self.children.loaderLevel:getLevels()
 			
-			self.children.menu = Widget.new(WidgetMenu, { levels = levels })
+			self.children.menu = Widget.new(WidgetMenu, { levels = levels, coins = coins })
 			self.children.menu:load()
 			
 			self.children.menu.signals.loadLevel = self.onMenuPressedPlay

@@ -25,8 +25,9 @@ function Widget.init(self)
 	self._state = {}
 end
 
-function Widget.new(class, ...)
-	local widget = class(...)
+function Widget.new(class, config)
+	local widget = class(config)
+	widget.config = config
 	
 	ifNil(widget._state, 
 		function()
