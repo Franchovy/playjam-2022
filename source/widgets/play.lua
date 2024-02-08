@@ -34,7 +34,6 @@ function WidgetPlay:init(config)
 		start = 1,
 		playing = 2,
 		gameOver = 3,
-		checkpoint = 4,
 		levelComplete = 5
 	}, 1)
 	
@@ -101,7 +100,8 @@ function WidgetPlay:_load()
 	self.children.gameOver:setVisible(false)
 	
 	self.children.gameOver.signals.restartCheckpoint = function() 
-		self:setState(self.kStates.checkpoint)
+		self.isRestartingCheckpoint = true
+		self:setState(self.kStates.start)
  	end
 
 	 self.children.systemMenu = Widget.new(WidgetSystem)
@@ -219,30 +219,6 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		self.children.level:setState(self.children.level.kStates.playing)
 		self.timers.levelTimer:start()
 		self.children.hud:setState(self.children.hud.kStates.onScreen)
-	elseif stateFrom == self.kStates.gameOver and (stateTo == self.kStates.checkpoint) then
-		self.children.transition:setVisible(true)
-		self.children.transition:setState(self.children.transition.kStates.closed)
-		
-		self.children.transition.signals.animationFinished = function()
-			self.children.gameOver:setVisible(false)
-			
-			self.children.level:setState(self.children.level.kStates.restartCheckpoint)
-			self.children.level:setState(self.children.level.kStates.ready)
-
-			collectgarbage("collect")
-			
-			timer.performAfterDelay(10, function()
-				if AppConfig.enableBackgroundMusic == true then
-					self.filePlayer:play()
-				end
-
-				self.children.transition:setState(self.children.transition.kStates.open)
-				
-				self.children.transition.signals.animationFinished = function()
-					self:setState(self.kStates.playing)
-				end
-			end)
-		end
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.gameOver) then
 		if AppConfig.enableBackgroundMusic == true then
 			self.filePlayer:stop()
@@ -257,7 +233,8 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			self.children.transition.signals.animationFinished = function()
 				local checkpointData = table.last(self.data.checkpoints)
 				self.data.coins = checkpointData.coins
-				self.data.time = checkpointData.time
+				self.data.time = checkpointData.time + self.timers.levelTimer.currentTime
+				
 				self.timers.levelTimer:reset()
 				
 				self.children.level:setState(self.children.level.kStates.unloaded)
@@ -355,15 +332,23 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				self.children.gameOver:setVisible(false)
 			end
 			
-			self.resetData()
+			if self.isRestartingCheckpoint ~= true then
+				self.resetData()
+			end
 			
 			self.children.level:setState(self.children.level.kStates.unloaded)
 			
+			-- TODO: We really need sub-states for this...
 			if stateFrom == self.kStates.levelComplete then
 				self.loadTheme()
 				self.children.level:setState(self.children.level.kStates.nextLevel)
-			else
-				self.children.level:setState(self.children.level.kStates.restartLevel)
+			elseif stateFrom == self.kStates.gameOver then
+				if self.restartCheckpoint == true then
+					self.children.level:setState(self.children.level.kStates.restartCheckpoint)
+					self.isRestartingCheckpoint = nil
+				else
+					self.children.level:setState(self.children.level.kStates.restartLevel)
+				end
 			end
 			
 			self.children.hud:setState(self.children.hud.kStates.offScreen)
