@@ -38,8 +38,8 @@ function WidgetMenu:init(config)
 end
 
 function WidgetMenu:_load()
-	self:loadSample(kAssetsSounds.menuAccept)
-	self:loadSample(kAssetsSounds.intro)
+	self:loadSample(kAssetsSounds.menuAccept, 0.7)
+	self:loadSample(kAssetsSounds.intro, 0.7)
 	
 	self.painters.background = Painter(function(rect)
 		gfx.setColor(gfx.kColorWhite)

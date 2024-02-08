@@ -17,14 +17,15 @@ function WidgetMenuSettings:init(config)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.samples)
 	
-	self:setStateInitial(nil, 1)
-	
-	self.painters = {}
-	self.entries = {}
 	self.signals = {}
 end
 
 function WidgetMenuSettings:_load()
+	self.painters = {}
+	self.entries = {}
+	
+	self:setStateInitial(nil, 1)
+
 	self.painters.frame = Painter(function(rect)
 		gfx.setColor(gfx.kColorWhite)
 		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
@@ -140,5 +141,4 @@ function WidgetMenuSettings:_unload()
 	self.painters = nil
 	
 	for _, child in pairs(self.children) do child:unload() end
-	self.children = nil
 end
