@@ -314,6 +314,8 @@ function WidgetLevel:_unload()
 	self.configHandler = nil
 	
 	self.periodicBlinker:stop()
+	self.periodicBlinker = nil
+	
 	self.wheel.sprite:remove()
 	
 	for _, sprite in pairs(self.sprites) do sprite:remove() end

@@ -31,9 +31,7 @@ function KillBlock:init(periodicBlinker)
 	self:setCollideRect(0, 0, self:getSize())
 	self:setCenter(0, 0)
 	
-	if periodicBlinkerKillblock == nil then
-		periodicBlinkerKillblock = periodicBlinker
-	end
+	periodicBlinkerKillblock = periodicBlinker
 	
 	self:setGroupMask(kCollisionGroups.static)
 	
