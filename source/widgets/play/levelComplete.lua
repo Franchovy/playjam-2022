@@ -136,7 +136,7 @@ function LevelComplete:_load()
 	end)
 	
 	self.stars = {}
-	for i=1, math.min(self.config.objectives.stars, 1) do
+	for i=1, self.config.objectives.stars do
 		local star = Widget.new(WidgetStar, { initialDelay = 100 + i * 700 })
 		star:load()
 		table.insert(self.stars, star)

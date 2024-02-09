@@ -14,8 +14,6 @@ function WidgetHUD:_init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animators)
 	self:supply(Widget.deps.frame, { isVisible = false })
-	
-	self:createSprite(kZIndex.overlay)
 		
 	self:setStateInitial(2, { "onScreen", "offScreen" })
 	
@@ -69,9 +67,17 @@ function WidgetHUD:_update()
 	self.data.coinsLabelText = ""..self.data.coins
 	
 	if self:isAnimating() == true then
-		self:setNeedsLayout()
-		self:setVisible(true)
+		local animatorValue = self:getAnimatorValue(self.animators.hideAnimator)
+		local coinImageSize = self.images.coin:getSize()
+		local _rects = self.rects
+		local _frame = self.frame
+		_rects.frame = _tOffset(_assign(_rects.frame, _frame), 0, animatorValue)
+		_rects.timeText = _tOffset(_assign(_rects.timeText, _rects.frame), 10, 7)
+		_rects.coinsText = _tOffset(_assign(_rects.coinsText, _rects.frame), _rects.frame.w - 10 - coinImageSize, 7)
+		_rects.coinImage = _tOffset(_assign(_rects.coinImage, _rects.frame), _rects.frame.w - 10 - coinImageSize, 3)
+		
 		gfx.sprite.addDirtyRect(0, 0, self.frame.x + self.frame.w, self.frame.y + self.frame.h)
+		self:setVisible(true)
 	else	
 		local labelWidth = 150
 		
@@ -83,16 +89,6 @@ function WidgetHUD:_update()
 			gfx.sprite.addDirtyRect(self.frame.x + 10, self.frame.y, labelWidth, self.frame.h)
 		end
 	end
-end
-
-function WidgetHUD:_performLayout(frame)
-	local animatorValue = self:getAnimatorValue(self.animators.hideAnimator)
-	local coinImageSize = self.images.coin:getSize()
-	local _rects = self.rects
-	_rects.frame = _tOffset(_assign(_rects.frame, frame), 0, animatorValue)
-	_rects.timeText = _tOffset(_assign(_rects.timeText, _rects.frame), 10, 7)
-	_rects.coinsText = _tOffset(_assign(_rects.coinsText, _rects.frame), _rects.frame.w - 10 - coinImageSize, 7)
-	_rects.coinImage = _tOffset(_assign(_rects.coinImage, _rects.frame), _rects.frame.w - 10 - coinImageSize, 3)
 end
 
 function WidgetHUD:_changeState(stateFrom, stateTo)
