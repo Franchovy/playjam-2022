@@ -7,11 +7,7 @@ local timer <const> = playdate.timer
 
 class("LevelComplete").extends(Widget)
 
-function LevelComplete:init(config)
-	LevelComplete.super.init(self)
-	
-	self.config = config
-	
+function LevelComplete:_init()
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animators)

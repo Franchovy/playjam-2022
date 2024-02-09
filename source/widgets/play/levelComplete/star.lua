@@ -2,7 +2,7 @@ local gfx <const> = playdate.graphics
 local timer <const> = playdate.timer
 class("WidgetStar").extends(Widget)
 
-function WidgetStar:init(config)
+function WidgetStar:_init(config)
 	local initialDelay = config.initialDelay
 	
 	self.imagetables = {}

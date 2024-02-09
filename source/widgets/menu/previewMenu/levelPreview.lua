@@ -4,9 +4,7 @@ local gfx <const> = playdate.graphics
 
 class("WidgetMenuLevelPreview").extends(Widget)
 
-function WidgetMenuLevelPreview:init(config)
-	self.config = config
-	
+function WidgetMenuLevelPreview:_init(config)
 	self.images = {}
 	self.painters = {}
 	

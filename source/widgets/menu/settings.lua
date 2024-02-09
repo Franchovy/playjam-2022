@@ -10,9 +10,7 @@ WidgetMenuSettings.type = {
 	button = 2
 }
 
-function WidgetMenuSettings:init(config)
-	self.config = config
-	
+function WidgetMenuSettings:_init(config)	
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.samples)

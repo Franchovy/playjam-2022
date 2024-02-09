@@ -1,13 +1,16 @@
 import "widgets/common/entriesMenu"
 
 local gfx <const> = playdate.graphics
+local disp <const> = playdate.display
 
 class("WidgetGameOver").extends(Widget)
 
-function WidgetGameOver:init(config)
-	self.config = config
+function WidgetGameOver:_init()
 	
 	self:supply(Widget.deps.input)
+	self:supply(Widget.deps.frame)
+	
+	self:setFrame(disp.getRect())
 	
 	self.painters = {}
 	self.images = {}
@@ -79,6 +82,8 @@ end
 function WidgetGameOver:_update()
 	self:passInput(self.children.entriesMenu)
 end
+
+
 
 function WidgetGameOver:_unload()
 	self.sprite:remove()

@@ -12,9 +12,7 @@ local _sign <const> = math.sign
 
 class("WidgetLevel").extends(Widget)
 
-function WidgetLevel:init(config)
-	self.config = config
-	
+function WidgetLevel:_init()
 	self:supply(Widget.deps.state)
 	
 	self:setStateInitial(1, {

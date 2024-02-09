@@ -3,9 +3,7 @@ class("WidgetMenuSettingsEntry").extends(Widget)
 
 -- Special chars: ◁ ◀ ▶ ▷
 
-function WidgetMenuSettingsEntry:init(config)
-	self.config = config
-	
+function WidgetMenuSettingsEntry:_init(config)
 	self:supply(Widget.deps.keyValueState)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.samples)

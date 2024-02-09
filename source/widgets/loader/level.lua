@@ -7,9 +7,7 @@ local STAR_SCORING = 3
 
 class("WidgetLoaderLevel").extends(Widget)
 
-function WidgetLoaderLevel:init()
-	WidgetLoaderLevel.super.init(self)
-	
+function WidgetLoaderLevel:_init()
 	self.levels = nil
 end
 

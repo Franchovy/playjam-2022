@@ -15,9 +15,7 @@ local function _loadLevelFromFile(filepath)
 	return json.decodeFile(filepath)
 end
 
-function WidgetMain:init()
-	WidgetMain.super.init(self)
-	
+function WidgetMain:_init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.frame)

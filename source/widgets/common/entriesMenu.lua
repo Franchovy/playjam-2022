@@ -5,9 +5,7 @@ local filter <const> = playdate.kButtonA | playdate.kButtonB | playdate.kButtonU
 
 class("WidgetEntriesMenu").extends(Widget)
 
-function WidgetEntriesMenu:init(config)
-	self.config = config
-	
+function WidgetEntriesMenu:_init(config)
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.input)

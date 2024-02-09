@@ -27,7 +27,12 @@ end
 
 function Widget.new(class, config)
 	local widget = class(config)
+	class.super.init(widget)
 	widget.config = config
+	
+	if widget._init ~= nil then 
+		widget:_init(config)
+	end
 	
 	ifNil(widget._state, 
 		function()

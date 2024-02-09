@@ -11,10 +11,7 @@ local _screenPainterDark <const> = Painter.commonPainters.darkScreenFillPainter(
 local _fillPainterLight <const> = Painter.commonPainters.fillPainterLight()
 class("LevelSelectEntry").extends(Widget)
 
-function LevelSelectEntry:init(config)
-	LevelSelectEntry.super.init(self)
-	
-	self.config = config
+function LevelSelectEntry:_init(config)
 	
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.frame, { needsLayout = true })

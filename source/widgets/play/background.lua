@@ -15,9 +15,7 @@ local _kImageUnflipped <const> = gfx.kImageUnflipped
 
 class("WidgetBackground").extends(Widget)
 
-function WidgetBackground:init(config)
-	WidgetBackground.super.init(self)
-	
+function WidgetBackground:_init(config)
 	self.theme = config.theme
 	
 	self:supply(Widget.deps.frame)

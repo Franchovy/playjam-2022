@@ -24,11 +24,7 @@ WidgetLevelSelect.kMenuActionType = {
 	menu = "menu"
 }
 
-function WidgetLevelSelect:init(config)
-	WidgetLevelSelect.super.init(self)
-	
-	self.config = config
-	
+function WidgetLevelSelect:_init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animations)
 	self:supply(Widget.deps.samples)

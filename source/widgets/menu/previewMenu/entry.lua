@@ -11,11 +11,7 @@ local _screenPainterDark <const> = Painter.commonPainters.darkScreenFillPainter(
 local _fillPainterLight <const> = Painter.commonPainters.fillPainterLight()
 class("WidgetMenuEntry").extends(Widget)
 
-function WidgetMenuEntry:init(config)
-	WidgetMenuEntry.super.init(self)
-	
-	self.config = config
-	
+function WidgetMenuEntry:_init(config)
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.frame, { needsLayout = true })
 	

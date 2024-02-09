@@ -2,7 +2,7 @@ local gfx <const> = playdate.graphics
 local easing <const> = playdate.easingFunctions
 class("WidgetTransition").extends(Widget)
 
-function WidgetTransition:init()	
+function WidgetTransition:_init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animators)
 	self:supply(Widget.deps.samples)

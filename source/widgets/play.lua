@@ -19,11 +19,7 @@ local _convertMsTimeToString <const> = convertMsTimeToString
 
 class("WidgetPlay").extends(Widget)
 
-function WidgetPlay:init(config)
-	WidgetPlay.super.init(self)
-	
-	self.config = config
-	
+function WidgetPlay:_init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.frame)

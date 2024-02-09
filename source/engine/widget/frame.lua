@@ -13,7 +13,7 @@ function frame(widget, config)
 	if config.needsLayout ~= nil then
 		widget._state.needsLayout = config.needsLayout
 	else
-		widget._state.needsLayout = false
+		widget._state.needsLayout = true
 	end
 	
 	function widget:setFrame(rect)

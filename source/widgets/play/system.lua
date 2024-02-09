@@ -2,7 +2,7 @@ class("WidgetSystem").extends(Widget)
 
 local menu <const> = playdate.getSystemMenu()
 
-function WidgetSystem:init()
+function WidgetSystem:_init()
     self.signals = {}
 end
 

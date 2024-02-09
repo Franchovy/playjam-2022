@@ -10,9 +10,7 @@ local _tOffset <const> = geo.rect.tOffset
 
 class("WidgetHUD").extends(Widget)
 
-function WidgetHUD:init()
-	WidgetHUD.super.init(self)
-	
+function WidgetHUD:_init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animators)
 	self:supply(Widget.deps.frame, { isVisible = false })

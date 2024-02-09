@@ -2,7 +2,7 @@ local file <const> = playdate.file
 
 class("WidgetLoaderUser").extends(Widget)
 
-function WidgetLoaderUser:init()
+function WidgetLoaderUser:_init()
 	self.user = "user"
 end
 

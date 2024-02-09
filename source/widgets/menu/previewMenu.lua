@@ -24,11 +24,7 @@ WidgetPreviewMenu.kMenuActionType = {
 	menu = "menu"
 }
 
-function WidgetPreviewMenu:init(config)
-	WidgetPreviewMenu.super.init(self)
-	
-	self.config = config
-	
+function WidgetPreviewMenu:_init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animations)
 	self:supply(Widget.deps.samples)

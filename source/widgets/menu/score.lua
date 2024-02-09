@@ -6,9 +6,7 @@ class("WidgetMenuScore").extends(Widget)
 local cornerRadius <const> = 12
 local paddingRight <const> = 8
 
-function WidgetMenuScore:init()
-	WidgetMenuScore.super.init(self)
-	
+function WidgetMenuScore:_init()
 	self:supply(Widget.deps.frame)
 end
 

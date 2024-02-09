@@ -3,9 +3,7 @@ local gfx <const> = playdate.graphics
 
 class("WidgetEntriesMenuEntry").extends(Widget)
 
-function WidgetEntriesMenuEntry:init(config)
-	self.config = config
-	
+function WidgetEntriesMenuEntry:_init(config)
 	self:supply(Widget.deps.state)
 	self:setStateInitial(self.config.selected and 2 or 1, { "unselected", "selected" })
 	
