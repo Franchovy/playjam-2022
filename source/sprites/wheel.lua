@@ -9,27 +9,8 @@ local gfx <const> = playdate.graphics
 
 class("Wheel").extends(ColliderSprite)
 
-local maxFallSpeed <const> = 14
-local gravity <const> = 1.4
-local crankTicksPerCircle <const> = 72
-
-local jumpSpeed <const> = 18
-local smallJumpSpeed <const> = 4.5
-
-local smallJumpMaxTicks <const> = 10
-local jumpMaxTicks <const> = 14
-
-local crankTickMultiplier <const> = 3
-local accelerationManual <const> = 1.0
-local maxSpeedManual <const> = 8.0
-
-local speedUpAcceleration <const> = 0.01
-local speedUpDragAcceleration <const> = 0.1
-local speedUpBrakeAcceleration <const> = 1.5
-
-local velocityDragStep <const> = 0.1
-local velocityBrakeStep <const> = 0.2
-local maxVelocityX <const> = 11
+local gravity <const> = 10
+local dt <const> = 1 / 30
 
 function Wheel.new() 
 	return Wheel()
@@ -49,15 +30,6 @@ function Wheel:init()
 	self:setCollider(kColliderType.circle, circleNew(x + w / 2, y + h / 2, w / 2))
 	self:setCollisionType(kCollisionType.dynamic)
 	self:readyToCollide()
-
-	--[[
-	DebugCanvas.instance():addPersistentDrawCall(function ()
-		local x, y, w, h = self:getBounds()
-		gfx.setColor(gfx.kColorWhite)
-		gfx.setLineWidth(3)
-		gfx.drawCircleAtPoint(x + w / 2, y + h / 2, w / 2)
-	end)
-	]]
 	
 	self.collisionResponse = function(self, other)
 		if other.type == kSpriteTypes.platform then
@@ -101,8 +73,16 @@ function Wheel:init()
 	self:resetValues()
 end
 
-function Wheel:resetValues() 
+function Wheel:resetValues()
+	self.mass = 1
+
+	self.useGravity = true
+	self.maxJumpCount = 1
+	self.currentJumpCount = 0
+	self.jumpForce = 200
 	self.isJumping = false
+	self.appliedForces = {}
+	
 	self.hasJumpedFinished = nil
 	self.jumpTimeInTicks = nil
 	self.velocityX = 0
@@ -163,34 +143,101 @@ function Wheel:setAwaitingInput()
 	self.isAwaitingInput = true
 end
 
-local previousTicks = 0
-local currentTicks = 0
+function Wheel:collisionWith(other, resolutionX, resolutionY)
+	-- nullify velocity in case of collision
+	if resolutionX ~= 0 then
+		self.velocityX = 0
+	end
 
+	if resolutionY ~= 0 then
+		self.velocityY = 0
+	end
 
-function Wheel:collisionWith(other)
-	--[[
-	local x, y, w, h = other:getBounds()
-	DebugCanvas.instance():addDrawCall(function()
-		gfx.pushContext()
-			gfx.setColor(gfx.kColorWhite)
-			gfx.setLineWidth(3)
-			gfx.drawRect(x, y, w, h)
-		gfx.popContext()
-	end)
-	]]
+	if other:getCollisionType() == kCollisionType.static then
+		if self.isJumping and other.y > self.y then
+			self:hitGround()
+		end
+	end
 end
--- Movement
 
+function Wheel:hitGround()
+	self.currentJumpCount = 0
+	self.isJumping = false
+end
+
+function Wheel:checkDeadzone()
+	if self.y > 260 and not self.hasJustDied then
+		self:setIsDead()
+		return
+	end
+end
+
+function Wheel:shouldJump()
+	local jumpButtonPressed = playdate.buttonJustPressed(playdate.kButtonUp) or playdate.buttonJustPressed(playdate.kButtonB)
+	return jumpButtonPressed and self.currentJumpCount < self.maxJumpCount
+end
+
+function Wheel:jump()
+	self.currentJumpCount += 1
+	self.isJumping = true
+
+	-- remove velocity if falling, otherwise the jump would be attenuated by the fall
+	if self.velocityY > 0 then
+		self.velocityY = 0
+	end
+	
+	table.insert(self.appliedForces, {x = 0, y = -self.jumpForce})
+end
+
+function Wheel:calculateAcceleration()
+	local accelX, accelY = 0, 0
+	if self.useGravity then
+		accelY += gravity
+	end
+
+	for _, force in pairs(self.appliedForces) do
+		if (self.mass == 1) then
+			accelX += force.x
+			accelY += force.y
+		else
+			accelX += force.x / self.mass
+			accelY += force.y / self.mass
+		end
+	end
+
+	return accelX, accelY
+end
+
+function Wheel:updateVelocity(accelX, accelY)
+	self.velocityX += accelX
+	self.velocityY += accelY
+end
+
+function Wheel:updatePosition(velocityX, velocityY)
+	self:moveTo(self.x + velocityX * dt, self.y + velocityY * dt)
+end
+
+function Wheel:clearAppliedForces()
+	self.appliedForces = {}
+end
+
+-- Movement
 function Wheel:update()
 	-- important, update the physics
 	Wheel.super:update()
 
-	self:moveTo(self.x + 1.5, self.y + gravity)
-	
-	if self.y > 260 and (self.hasJustDied == false) then
-		self:setIsDead()
-		return
+	-- kill the wheel when out of map
+	self:checkDeadzone();
+
+	if self:shouldJump() then
+		self:jump()
 	end
+
+	local accelX, accelY = self:calculateAcceleration()
+	self:updateVelocity(accelX, accelY)
+	self:updatePosition(self.velocityX, self.velocityY)
+
+	self:clearAppliedForces()
 
 	--[[
 	local input = self.input
@@ -351,85 +398,4 @@ function Wheel:update()
 		gfx.sprite.addDirtyRect(currentBounds[1] + drawOffsetX, currentBounds[2], currentBounds[3], currentBounds[4])
 	end
 	]]
-end
-
--- Movement / Speed
-
-function Wheel:calculateSpeed(crankTicks, speedPreviousActual)
-	local crankTicks = crankTicks * crankTickMultiplier
-	
-	-- Handle update manual
-	
-	local speedManualBounded = math.clamp(crankTicks, -maxSpeedManual, maxSpeedManual)
-	local speedPreviousBounded = math.clamp(speedPreviousActual, -maxSpeedManual, maxSpeedManual)
-	local speedManualActual = math.approach(
-		speedPreviousBounded, 
-		speedManualBounded, 
-		accelerationManual
-	)
-	
-	-- Handle speed-up
-	
-	local speedUpActual = 0
-	
-	if math.abs(speedPreviousActual) >= maxSpeedManual then
-		local speedUpPreviousActual = math.sign(speedPreviousActual) * (math.abs(speedPreviousActual) - maxSpeedManual)
-		
-		if math.sign(speedManualActual) == math.sign(speedPreviousActual) then
-			-- Apply Speed up
-			
-			speedUpActual = speedUpPreviousActual + crankTicks * speedUpAcceleration 
-		end
-	end
-	
-	-- Assign actual speed
-	
-	local speedActual = speedManualActual + speedUpActual
-	
-	-- Return speed limited by max speed
-	
-	if speedActual < 0 then
-		return math.max(speedActual, -maxVelocityX)
-	else 
-		return math.min(speedActual, maxVelocityX)
-	end
-end
-
--- Jump
-
-function Wheel:resetJumpState()
-	self.isJumping = false
-	self.hasJumpedFinished = false
-	self.jumpTimeInTicks = 0
-end
-
-function Wheel:applyJump()
-	if self.hasJumpedFinished then
-		return
-	end
-	
-	self.isJumping = self.touchingGround or self.jumpTimeInTicks > 0
-	
-	if self.isJumping then
-		self.jumpTimeInTicks += 1
-		
-		if self.touchingGround then
-			self.velocityY = -jumpSpeed
-			
-			sampleplayer:playSample("jump")
-		end
-	end
-	
-	if self.jumpTimeInTicks > jumpMaxTicks then
-		self.hasJumpedFinished = true
-	end
-end
-
-function Wheel:endJump()	
-	if self.isJumping and self.jumpTimeInTicks < smallJumpMaxTicks then
-		self.velocityY = -smallJumpSpeed
-	end
-	
-	self.isJumping = false
-	self.hasJumpedFinished = true
 end

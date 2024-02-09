@@ -166,18 +166,25 @@ function CollisionSolver:_checkAndResolve(colliderA, colliderB)
     if overlaps then
         local resolutionX, resolutionY = resolutionFunction(overlapInfo)
 
+        local collisionTypeA = colliderA:getCollisionType()
+        local collisionTypeB = colliderB:getCollisionType()
+
         -- calculate the actual resolution amount depending on collision types
         local resolutionAX, resolutionAY, resolutionBX, resolutionBY = self:_determineResolutionMvt(
-            colliderA:getCollisionType(),
-            colliderB:getCollisionType(),
+            collisionTypeA,
+            collisionTypeB,
             resolutionX, resolutionY
         )
 
-        colliderA:moveTo(colliderA.x + resolutionAX, colliderA.y + resolutionAY)
-        colliderB:moveTo(colliderB.x + resolutionBX, colliderB.y + resolutionBY)
+        if collisionTypeA == kCollisionType.dynamic then
+            colliderA:moveTo(colliderA.x + resolutionAX, colliderA.y + resolutionAY)
+        end
+        if collisionTypeB == kCollisionType.dynamic then
+            colliderB:moveTo(colliderB.x + resolutionBX, colliderB.y + resolutionBY)
+        end
 
-        colliderA:collisionWith(colliderB)
-        colliderB:collisionWith(colliderA)
+        colliderA:collisionWith(colliderB, resolutionAX, resolutionAY)
+        colliderB:collisionWith(colliderA, resolutionBX, resolutionBY)
     end
 end
 
@@ -205,21 +212,30 @@ function CollisionSolver:_checkAndResolveGrid(collider, gridColliders)
     for _, gridCollider in pairs(gridColliders) do
         local overlaps, overlapInfo, resolutionFunction = gridCollider:overlapsWith(collider)
 
+        
         if overlaps then
             local resolutionX, resolutionY = resolutionFunction(overlapInfo)
             
+            local gridCollisionType = gridCollider:getCollisionType()
+            local colliderCollisionType = collider:getCollisionType()
+
             -- calculate the actual resolution amount depending on collision types
             local resolutionAX, resolutionAY, resolutionBX, resolutionBY = self:_determineResolutionMvt(
-                gridCollider:getCollisionType(),
-                collider:getCollisionType(),
+                gridCollisionType,
+                colliderCollisionType,
                 resolutionX, resolutionY
             )
 
-            gridCollider:moveTo(gridCollider.x + resolutionAX, gridCollider.y + resolutionAY)
-            collider:moveTo(collider.x + resolutionBX, collider.y + resolutionBY)
+            if gridCollisionType == kCollisionType.dynamic then
+                gridCollider:moveTo(gridCollider.x + resolutionAX, gridCollider.y + resolutionAY)
+            end
 
-            gridCollider:collisionWith(collider)
-            collider:collisionWith(gridCollider)
+            if colliderCollisionType == kCollisionType.dynamic then
+                collider:moveTo(collider.x + resolutionBX, collider.y + resolutionBY)
+            end
+
+            gridCollider:collisionWith(collider, resolutionAX, resolutionAY)
+            collider:collisionWith(gridCollider, resolutionBX, resolutionBY)
         end
     end
 end

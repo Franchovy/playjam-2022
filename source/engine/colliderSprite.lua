@@ -86,6 +86,8 @@ end
 
 -- returns by how much the circle should move to resolve the collision
 ColliderSprite.aabbToCircleResolution = function(overlapInfo)
+    if overlapInfo.sqDistance < 0.1 then return 0, 0 end
+
     local distance = math.sqrt(overlapInfo.sqDistance)
     local overlap = overlapInfo.circle[3] - distance
 
@@ -191,6 +193,6 @@ function ColliderSprite:overlapsWith(other)
     return collisionFunctions[self._colliderType * 10 + other._colliderType](self._collider, other._collider)
 end
 
-function ColliderSprite:collisionWith(other)
+function ColliderSprite:collisionWith(other, resolutionX, resolutionY)
     -- Function called by the collisionsolver when a collision is detected. Children should implement
 end
