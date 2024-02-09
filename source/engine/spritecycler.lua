@@ -11,7 +11,7 @@ local _removevalue <const> = table.removevalue
 local _removekey <const> = table.removekey
 local _create <const> = table.create
 
-local generationConfig = { left = 1, right = 2 }
+local generationConfig = { left = 1, right = 1 }
 
 local function _loadChunk(self, chunk, shouldLoad)
 	local _chunkData = self.data[chunk]
@@ -138,7 +138,7 @@ end
 
 function SpriteCycler:update(drawOffsetX, drawOffsetY)
 	-- Convert to grid coordinates
-	local drawOffsetX, drawOffsetY = (-drawOffsetX / kGame.gridSize), (drawOffsetY / kGame.gridSize)
+	local drawOffsetX, drawOffsetY = ((-drawOffsetX + 200) / kGame.gridSize), (drawOffsetY / kGame.gridSize)
 	
 	local currentChunk = _ceil(drawOffsetX / self.chunkLength)
 	local chunksShouldLoad = _range(currentChunk - generationConfig.left, currentChunk + generationConfig.right)
