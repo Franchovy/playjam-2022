@@ -196,13 +196,14 @@ function WidgetPlay:_load()
 	self.timers.levelTimer = timer.new(999000)
 	self.timers.levelTimer:pause()
 	
-	self.children.hud:setState(self.children.hud.kStates.onScreen)
-	
 	self.levelStartCountdown = function()
 		timer.performAfterDelay(600, function()
 			print("3")
 			timer.performAfterDelay(600, function()
 				print("2")
+				
+				self.children.hud:setState(self.children.hud.kStates.onScreen)
+				
 				timer.performAfterDelay(600, function()
 					print("1")
 					timer.performAfterDelay(600, function()
@@ -218,7 +219,7 @@ function WidgetPlay:_load()
 	self.levelStartCountdown()
 	
 -- DEBUG: Timer to trigger level complete
-	--[[ 
+	-- --[[ 
 	timer.performAfterDelay(5000, function()
 		self:setState(self.kStates.levelComplete)
 	end)
@@ -377,7 +378,6 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				self.children.level:setState(self.children.level.kStates.frozen)
 				
 				self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
-				self.children.level:unloadLevel() -- TODO: Capture screenshot of level before unloading and draw
 			end)
 		end)
 	end
