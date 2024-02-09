@@ -23,8 +23,6 @@ function LevelComplete:_init()
 	self.images = {}
 	self.blinkers = {}
 	
-	self.previousBlink = false
-	
 	self.signals = {}
 end
 
@@ -223,17 +221,13 @@ end
 
 function LevelComplete:_update()
 	if self.state == self.kStates.text then
-		if self.blinkers.blinkerTitle ~= self.previousBlinkTitle then
+		local _blinkerTitle = self.blinkers.blinkerTitle
+		if _blinkerTitle.hasJustChanged then
 			gfx.sprite.addDirtyRect(10, 100, 380, 40)
-		end
 		
-		if self.blinkers.blinkerTitle.on then
-			if self.previousBlinkTitle == false then
+			if _blinkerTitle.on == true then
 				self:playSample(kAssetsSounds.levelCompleteBlink)
-				self.previousBlinkTitle = true
 			end
-		else 
-			self.previousBlinkTitle = false
 		end
 	end
 	

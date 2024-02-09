@@ -3,15 +3,13 @@ local timer <const> = playdate.timer
 class("WidgetStar").extends(Widget)
 
 function WidgetStar:_init(config)
-	local initialDelay = config.initialDelay
-	
 	self.imagetables = {}
 	self.timers = {}
 	
 	self.tick = 1
 	
 	local tickValues = {
-		initialDelay, 90, 90, 120, 360
+		config.initialDelay, 90, 90, 120, 360
 	}
 	local tickValuesSum = {}
 	local sum = 0
