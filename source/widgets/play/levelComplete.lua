@@ -17,11 +17,11 @@ function LevelComplete:init(config)
 	self:supply(Widget.deps.animators)
 	self:supply(Widget.deps.input)
 	
-	self:setStateInitial({
-		text = 1,
-		overlay = 2,
-		menu = 3
-	}, 1)
+	self:setStateInitial(1, {
+		"text",
+		"overlay",
+		"menu",
+	})
 	
 	self.painters = {}
 	self.images = {}

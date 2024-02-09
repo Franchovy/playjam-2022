@@ -24,7 +24,7 @@ function WidgetMenuSettings:_load()
 	self.painters = {}
 	self.entries = {}
 	
-	self:setStateInitial(nil, 1)
+	self:setStateInitial(1)
 
 	self.painters.frame = Painter(function(rect)
 		gfx.setColor(gfx.kColorWhite)

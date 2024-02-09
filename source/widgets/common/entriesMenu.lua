@@ -12,7 +12,7 @@ function WidgetEntriesMenu:init(config)
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.input)
 	
-	self:setStateInitial(self.config, 1)
+	self:setStateInitial(1, #self.config.entries)
 	
 	self.signals = {}
 	self.painters = {}

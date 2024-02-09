@@ -30,12 +30,12 @@ function WidgetPlay:init(config)
 	
 	self:setFrame(disp.getRect())
 	
-	self:setStateInitial({
-		start = 1,
-		playing = 2,
-		gameOver = 3,
-		levelComplete = 5
-	}, 1)
+	self:setStateInitial(1, {
+		"start",
+		"playing",
+		"gameOver",
+		"levelComplete",
+	})
 	
 	self.timers = {}
 	self.data = {}

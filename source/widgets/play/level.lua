@@ -17,18 +17,17 @@ function WidgetLevel:init(config)
 	
 	self:supply(Widget.deps.state)
 	
-	self:setStateInitial({
-		ready = 1,
-		playing = 2,
-		frozen = 3,
-		unloaded = 4,
-		restartCheckpoint = 5,
-		restartLevel = 6,
-		nextLevel = 7
-	}, 1)
+	self:setStateInitial(1, {
+		"ready",
+		"playing",
+		"frozen",
+		"unloaded",
+		"restartCheckpoint",
+		"restartLevel",
+		"nextLevel"
+	})
 	
 	self.sprites = {}
-	self.children = {}
 	self.signals = {}
 end
 
@@ -261,7 +260,6 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 		self.periodicBlinker:stop()
 
 		self.spriteCycler:unloadAll()
-		print("Sprite cycler unload")
 		
 		self.spriteCycler:discardLoadConfig(false)
 		self.loadIndex -= 1

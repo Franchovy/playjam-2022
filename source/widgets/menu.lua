@@ -29,7 +29,7 @@ function WidgetMenu:init(config)
 	self.painters = {}
 	self.signals = {}
 	
-	self:setStateInitial({default = 1, menu = 2, subMenu = 3}, 1)
+	self:setStateInitial(1, { "default", "menu", "subMenu" })
 	
 	self.index = 0
 	self.tick = 0

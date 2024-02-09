@@ -49,16 +49,13 @@ function WidgetPreviewMenu:init(config)
 end
 
 function WidgetPreviewMenu:_load()
-	local states = {}
-	for i, entry in ipairs(self.config.entries) do
-		table.insert(states, i)
-	end
+	local numStates = #self.config.entries
 	
 	if self.config.enableBackButton == true then
-		table.insert(states, #states + 1)
+		numStates += 1
 	end
 	
-	self:setStateInitial(states, 1)
+	self:setStateInitial(1, numStates)
 	
 	self:loadSample(kAssetsSounds.menuSelect, 0.6)
 	self:loadSample(kAssetsSounds.menuSelectFail, 0.8)

@@ -17,7 +17,7 @@ function WidgetHUD:init()
 	self:supply(Widget.deps.animators)
 	self:supply(Widget.deps.frame, { isVisible = false })
 		
-	self:setStateInitial({onScreen = 1, offScreen = 2}, 2)
+	self:setStateInitial(2, { "onScreen", "offScreen" })
 	
 	self.images = {}
 	self.painters = {}

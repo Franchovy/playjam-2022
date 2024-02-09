@@ -43,7 +43,7 @@ function WidgetLevelSelect:init(config)
 		outro = 3
 	})
 	
-	self:setStateInitial({1, 2, 3, 4}, 1)
+	self:setStateInitial(1, 4)
 	
 	self.painters = {}
 	self.images = {}

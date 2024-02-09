@@ -9,7 +9,7 @@ function WidgetTransition:init()
 	
 	self:createSprite(kZIndex.transition)
 	
-	self:setStateInitial({ open = 1, closed = 2 }, 1)
+	self:setStateInitial(1, { "open", "closed" })
 
 	self.images = {}	
 	self.painters = {}

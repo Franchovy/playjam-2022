@@ -7,7 +7,7 @@ function WidgetEntriesMenuEntry:init(config)
 	self.config = config
 	
 	self:supply(Widget.deps.state)
-	self:setStateInitial({ unselected = 1, selected = 2 }, self.config.selected and 2 or 1)
+	self:setStateInitial(self.config.selected and 2 or 1, { "unselected", "selected" })
 	
 	self.images = {}
 	self.painters = {}

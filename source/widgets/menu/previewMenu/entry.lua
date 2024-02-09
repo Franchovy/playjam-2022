@@ -20,7 +20,7 @@ function WidgetMenuEntry:init(config)
 	self:supply(Widget.deps.frame, { needsLayout = true })
 	
 	local isSelected = config.isSelected == true
-	self:setStateInitial({ selected = 1, unselected = 2}, isSelected and 1 or 2)
+	self:setStateInitial(isSelected and 1 or 2, { "selected", "unselected" })
 	
 	self.images = {}
 	self.painters = {}
