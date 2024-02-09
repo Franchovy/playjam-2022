@@ -52,6 +52,25 @@ function WidgetTransition:_load()
 	self:loadSample(kAssetsSounds.transitionSwoosh, 0.8, "swoosh")
 	self:loadSample(kAssetsSounds.transitionSlam, 0.8, "slam")
 	self:loadSample(kAssetsSounds.transitionOut, 0.8, "out")
+	
+	self.cover = function(callback)
+		self:setVisible(true)
+		self:setState(self.kStates.closed)
+		
+		self.signals.animationFinished = callback
+	end
+	
+	self.uncover = function(callback)
+		self:setState(self.kStates.open)
+		
+		self.signals.animationFinished = function()
+			self:setVisible(false)
+			
+			if callback ~= nil then
+				callback()
+			end
+		end
+	end
 end
 
 function WidgetTransition:_draw(frame)

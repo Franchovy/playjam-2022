@@ -113,10 +113,7 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.menu and (stateTo == self.kStates.play) then
 		assert(self.data.currentLevel ~= nil, "Error: Cannot play without setting a level!")
 		
-		self.children.transition:setVisible(true)
-		self.children.transition:setState(self.children.transition.kStates.closed)
-		
-		self.children.transition.signals.animationFinished = function()
+		self.children.transition.cover(function()
 			self.children.menu:setVisible(false)
 			local levelConfig = _loadLevelFromFile(self.data.currentLevel.filepath)
 			assert(levelConfig ~= nil, "Error: Missing level data!")
@@ -134,19 +131,11 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 				self.children.play.signals.returnToMenu = self.onReturnToMenu
 				self.children.play.signals.getNextLevelConfig = self.getNextLevelConfig
 				
-				timer.performAfterDelay(100, function()
-					self.children.transition:setState(self.children.transition.kStates.open)
-					self.children.transition.signals.animationFinished = function()
-						self.children.transition:setVisible(false)
-					end
-				end)
+				self.children.transition.uncover()
 			end
-		end
+		end)
 	elseif stateFrom == self.kStates.play and (stateTo == self.kStates.menu) then
-		self.children.transition:setVisible(true)
-		self.children.transition:setState(self.children.transition.kStates.closed)
-		
-		self.children.transition.signals.animationFinished = function()
+		self.children.transition.cover(function()
 			self.children.play:setVisible(false)
 			
 			self.children.play:unload()
@@ -164,12 +153,7 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 			
 			self.children.menu.signals.loadLevel = self.onMenuPressedPlay
 			
-			timer.performAfterDelay(100, function()
-				self.children.transition:setState(self.children.transition.kStates.open)
-				self.children.transition.signals.animationFinished = function()
-					self.children.transition:setVisible(false)
-				end
-			end)
-		end
+			self.children.transition.uncover()
+		end)
 	end
 end

@@ -20,7 +20,7 @@ local _convertMsTimeToString <const> = convertMsTimeToString
 class("WidgetPlay").extends(Widget)
 
 function WidgetPlay:_init()
-	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.state, { substates = true })
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.frame)
 	
@@ -104,6 +104,23 @@ function WidgetPlay:_load()
 
 	 self.children.systemMenu = Widget.new(WidgetSystem)
 	 self.children.systemMenu:load()
+	
+	function self.loadNextLevel()
+		local configNextLevel = self.signals.getNextLevelConfig()
+		
+		if configNextLevel == nil then
+			self.returnToMenu()
+			return
+		end
+		
+		self.config.level = configNextLevel.level
+		self.config.levelInfo = configNextLevel.levelInfo
+		
+		self.children.level.config.objects = self.config.level.objects
+		self.children.level.config.objectives = self.config.level.objectives
+		
+		self:setState(self.kStates.start)
+	end
 	
 	function self.restartLevel() 
 		self.resetData()
@@ -225,10 +242,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		self.timers.levelTimer:pause()
 		
 		timer.performAfterDelay(1200, function()
-			self.children.transition:setVisible(true)
-			self.children.transition:setState(self.children.transition.kStates.closed)
-			
-			self.children.transition.signals.animationFinished = function()
+			self.children.transition.cover(function()
 				local checkpointData = table.last(self.data.checkpoints)
 				self.data.coins = checkpointData.coins
 				self.data.time = checkpointData.time + self.timers.levelTimer.currentTime
@@ -242,11 +256,8 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				
 				collectgarbage("collect")
 				
-				self.children.transition:setState(self.children.transition.kStates.open)
-				self.children.transition.signals.animationFinished = function()
-					self.children.transition:setVisible(false)
-				end
-			end
+				self.children.transition.uncover()
+			end)
 		end)
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.levelComplete) then
 		self.timers.levelTimer:pause()
@@ -280,23 +291,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		})
 		self.children.levelComplete:load()
 		
-		self.children.levelComplete.signals.nextLevel = function()
-			local configNextLevel = self.signals.getNextLevelConfig()
-			
-			if configNextLevel == nil then
-				self.returnToMenu()
-				return
-			end
-			
-			self.config.level = configNextLevel.level
-			self.config.levelInfo = configNextLevel.levelInfo
-			
-			self.children.level.config.objects = self.config.level.objects
-			self.children.level.config.objectives = self.config.level.objectives
-			
-			self:setState(self.kStates.start)
-		end
-		
+		self.children.levelComplete.signals.nextLevel = self.loadNextLevel
 		self.children.levelComplete.signals.restartLevel = self.restartLevel
 		self.children.levelComplete.signals.returnToMenu = self.returnToMenu
 		
@@ -310,9 +305,6 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
 		end)
 	elseif stateTo == self.kStates.start then
-		self.children.transition:setVisible(true)
-		self.children.transition:setState(self.children.transition.kStates.closed)
-		
 		self.timers.levelTimer:pause()
 		
 		self.children.level:setState(self.children.level.kStates.frozen)
@@ -321,16 +313,16 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			self.filePlayer:stop()
 		end
 		
-		self.children.transition.signals.animationFinished = function()
-			if self.children.levelComplete ~= nil and (self.children.levelComplete:isVisible() == true) then
+		self.children.transition.cover(function()
+			if self.children.levelComplete ~= nil and (self.children.levelComplete:isVisible() == true) then -- from level complete
 				self.children.levelComplete:setVisible(false)
 			end
 			
-			if self.children.gameOver ~= nil and (self.children.gameOver:isVisible() == true) then
+			if self.children.gameOver ~= nil and (self.children.gameOver:isVisible() == true) then -- from game over
 				self.children.gameOver:setVisible(false)
 			end
 			
-			if self.isRestartingCheckpoint ~= true then
+			if self.isRestartingCheckpoint ~= true then -- start / checkpoint
 				self.resetData()
 			end
 			
@@ -339,13 +331,13 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			timer.performAfterDelay(10, function()
 				
 				-- TODO: We really need sub-states for this...
-				if stateFrom == self.kStates.levelComplete then
+				if stateFrom == self.kStates.levelComplete then -- from level complete
 					self.loadTheme()
 					self.children.level:setState(self.children.level.kStates.nextLevel)
-				elseif self.restartCheckpoint == true then
+				elseif self.restartCheckpoint == true then -- start / checkpoint
 					self.children.level:setState(self.children.level.kStates.restartCheckpoint)
 					self.isRestartingCheckpoint = nil
-				else
+				else -- game over / restart level
 					self.children.level:setState(self.children.level.kStates.restartLevel)
 				end
 				
@@ -358,20 +350,16 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				timer.performAfterDelay(10, function()
 					self.children.level:setState(self.children.level.kStates.ready)
 					
-					self.children.transition:setState(self.children.transition.kStates.open)
-					
-					self.children.transition.signals.animationFinished = function()
-						self.children.transition:setVisible(false)
-						
+					self.children.transition.uncover(function()						
 						self.children.hud:setState(self.children.hud.kStates.onScreen)
 						
 						if AppConfig.enableBackgroundMusic == true then
 							self.filePlayer:play()
 						end
-					end
+					end)
 				end)
 			end)
-		end
+		end)
 	end
 end
 
