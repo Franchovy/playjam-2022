@@ -11,7 +11,7 @@ local topLevelWidget
 -- Globals table -- Use sparingly!
 g = {
 	showCrankIndicator = false,
-	runTests = false	-- run some tests before initializing the game
+	runTests = false,	-- run some tests before initializing the game,
 }
 
 function initialize()

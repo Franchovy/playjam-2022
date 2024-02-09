@@ -208,6 +208,8 @@ function WidgetPlay:_load()
 						print("GO!")
 						
 						self:setState(self.kStates.playing)
+						
+						self.signals.enableInGameOptimizations()
 					end)
 				end)
 			end)
@@ -234,8 +236,6 @@ function WidgetPlay:_draw(frame, rect)
 	if self.state == self.kStates.gameOver then
 		self.children.gameOver:draw(frame:toLegacyRect())
 	end
-	
-	self.children.hud:draw(rect)
 end
 
 function WidgetPlay:_update()
@@ -258,6 +258,7 @@ end
 function WidgetPlay:_changeState(stateFrom, stateTo)
 	if stateTo == self.kStates.start then
 		self.timers.levelTimer:pause()
+		self.signals.enableInGameOptimizations()
 		
 		if AppConfig.enableBackgroundMusic == true then
 			self.filePlayer:stop()
@@ -312,6 +313,8 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		self.timers.levelTimer:start()
 		self.children.hud:setState(self.children.hud.kStates.onScreen)
 	elseif stateFrom == self.kStates.playing and stateTo == self.kStates.gameOver then
+		self.signals.disableInGameOptimizations()
+		
 		if AppConfig.enableBackgroundMusic == true then
 			self.filePlayer:stop()
 		end
@@ -338,6 +341,8 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			end)
 		end)
 	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.levelComplete) then
+		self.signals.disableInGameOptimizations()
+		
 		self.timers.levelTimer:pause()
 		
 		-- Calculate objectives reached
