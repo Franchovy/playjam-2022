@@ -386,9 +386,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 	end
 end
 
-function WidgetPlay:_unload()
-	self.signals.disableInGameOptimizations()
-	
+function WidgetPlay:_unload()	
 	self.painters = nil
 	self.fileplayer = nil
 	
