@@ -72,6 +72,12 @@ function WidgetLevel:_load()
 		_logicalPositionWheel = self.wheel.position
 	end
 	
+	self.resetCheckpoints = function()
+		self.spriteCycler:discardLoadConfig(true)
+		self.loadIndex = 1
+		self.previousLoadPoint = nil
+	end
+	
 	-- Sprite Cycler
 	
 	local chunkLength = AppConfig["chunkLength"]
@@ -149,9 +155,13 @@ function WidgetLevel:_load()
 	
 	-- Load level into spritecycler
 	
-	self.levelObjects = LogicalSprite.loadObjects(self.config.objects)
-	self.spriteCycler:load(self.levelObjects)
-	self.configHandler:load(self.levelObjects)
+	self.loadLevelObjects = function()
+		self.levelObjects = LogicalSprite.loadObjects(self.config.objects)
+		self.spriteCycler:load(self.levelObjects)
+		self.configHandler:load(self.levelObjects)
+	end
+	
+	self.loadLevelObjects()
 	
 	--
 	
@@ -264,24 +274,15 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.restartCheckpoint) then
 		self.loadIndex += 1
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.restartLevel) then
-		self.spriteCycler:discardLoadConfig(true)
-		self.loadIndex = 1
-		self.previousLoadPoint = nil
-		self.wheel.position = self.wheel.positionInitial
-		self:setNeutralDrawOffset()
+		self.resetCheckpoints()
 	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.nextLevel) then
-		self.spriteCycler:discardLoadConfig(true)
-		self.loadIndex = 1
-		self.previousLoadPoint = nil
+		self.resetCheckpoints()
 		
 		self.wheel.sprite:remove()
 		self.wheel.sprite = nil
 		self.wheel = nil
-		self.levelObjects = nil
 		
-		self.levelObjects = LogicalSprite.loadObjects(self.config.objects)
-		self.spriteCycler:load(self.levelObjects)
-		self.configHandler:load(self.levelObjects)
+		self.loadLevelObjects()
 		
 		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
 		self.spriteCycler:loadChunk(initialChunk, self.loadIndex)
