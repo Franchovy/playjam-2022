@@ -30,7 +30,7 @@ function WidgetPlay:_init()
 		"start",
 		"playing",
 		"gameOver",
-		"levelComplete",
+		"levelComplete"
 	})
 	
 	self.timers = {}
@@ -98,7 +98,8 @@ function WidgetPlay:_load()
 	self.children.gameOver:setVisible(false)
 	
 	self.children.gameOver.signals.restartCheckpoint = function() 
-		self.isRestartingCheckpoint = true
+		self.substate = "checkpoint"
+		
 		self:setState(self.kStates.start)
  	end
 
@@ -106,12 +107,17 @@ function WidgetPlay:_load()
 	 self.children.systemMenu:load()
 	
 	function self.loadNextLevel()
+		self.resetData()
 		local configNextLevel = self.signals.getNextLevelConfig()
 		
 		if configNextLevel == nil then
 			self.returnToMenu()
 			return
 		end
+		
+		self.loadTheme()
+		
+		self.substate = "nextLevel"
 		
 		self.config.level = configNextLevel.level
 		self.config.levelInfo = configNextLevel.levelInfo
@@ -124,6 +130,8 @@ function WidgetPlay:_load()
 	
 	function self.restartLevel() 
 		self.resetData()
+		
+		self.substate = "restartLevel"
 		
 		self:setState(self.kStates.start)
  	end
@@ -190,8 +198,27 @@ function WidgetPlay:_load()
 	
 	self.children.hud:setState(self.children.hud.kStates.onScreen)
 	
+	self.levelStartCountdown = function()
+		timer.performAfterDelay(600, function()
+			print("3")
+			timer.performAfterDelay(600, function()
+				print("2")
+				timer.performAfterDelay(600, function()
+					print("1")
+					timer.performAfterDelay(600, function()
+						print("GO!")
+						
+						self:setState(self.kStates.playing)
+					end)
+				end)
+			end)
+		end)
+	end
+	
+	self.levelStartCountdown()
+	
 -- DEBUG: Timer to trigger level complete
-	-- --[[ 
+	--[[ 
 	timer.performAfterDelay(5000, function()
 		self:setState(self.kStates.levelComplete)
 	end)
@@ -230,16 +257,65 @@ function WidgetPlay:_update()
 end
 
 function WidgetPlay:_changeState(stateFrom, stateTo)
-	if stateTo == self.kStates.playing then
+	if stateTo == self.kStates.start then
+		self.timers.levelTimer:pause()
+		
+		if AppConfig.enableBackgroundMusic == true then
+			self.filePlayer:stop()
+		end
+		
+		self.children.transition.cover(function()
+			if self.children.levelComplete ~= nil then
+				self.children.levelComplete:setVisible(false)
+			end
+			
+			if self.children.gameOver ~= nil then
+				self.children.gameOver:setVisible(false)
+			end
+			
+			if self.children.level.isLevelLoaded == true then
+				self.children.level:unloadLevel()
+			end
+			
+			self.children.level:setState(self.children.level.kStates.frozen)
+			self.children.hud:setState(self.children.hud.kStates.offScreen)
+			
+			if self.substate == "checkpoint" then
+				self.children.level.loadCheckpoint()
+			elseif self.substate == "nextLevel" then
+				self.children.level.loadNextLevel()
+			elseif self.substate == "restartLevel" then
+				self.children.level.loadLevelRestart()
+			end
+			
+			self.timers.levelTimer:reset()
+			
+			collectgarbage("collect")
+					
+			self.children.transition.uncover(function()
+				if self.substate == "checkpoint" then
+					self:setState(self.kStates.playing)
+				else
+					self.levelStartCountdown()
+				end
+				
+				if AppConfig.enableBackgroundMusic == true then
+					self.filePlayer:play()
+				end
+			end)
+		end)
+	elseif stateTo == self.kStates.playing then
 		self.children.level:setState(self.children.level.kStates.playing)
 		self.timers.levelTimer:start()
 		self.children.hud:setState(self.children.hud.kStates.onScreen)
-	elseif stateFrom == self.kStates.playing and (stateTo == self.kStates.gameOver) then
+	elseif stateFrom == self.kStates.playing and stateTo == self.kStates.gameOver then
 		if AppConfig.enableBackgroundMusic == true then
 			self.filePlayer:stop()
 		end
 		
 		self.timers.levelTimer:pause()
+		
+		self.children.level:setState(self.children.level.kStates.frozen)
 		
 		timer.performAfterDelay(1200, function()
 			self.children.transition.cover(function()
@@ -249,8 +325,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				
 				self.timers.levelTimer:reset()
 				
-				self.children.level:setState(self.children.level.kStates.unloaded)
-				
+				self.children.level:unloadLevel()
 				self.children.gameOver:setVisible(true)
 				self.children.hud:setState(self.children.hud.kStates.offScreen)
 				
@@ -297,67 +372,12 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		
 		timer.performAfterDelay(2500, function()
 			self.children.hud:setState(self.children.hud.kStates.offScreen)
-		end)
-		
-		timer.performAfterDelay(3000, function()
-			self.children.level:setState(self.children.level.kStates.frozen)
 			
-			self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
-		end)
-	elseif stateTo == self.kStates.start then
-		self.timers.levelTimer:pause()
-		
-		self.children.level:setState(self.children.level.kStates.frozen)
-		
-		if AppConfig.enableBackgroundMusic == true then
-			self.filePlayer:stop()
-		end
-		
-		self.children.transition.cover(function()
-			if self.children.levelComplete ~= nil and (self.children.levelComplete:isVisible() == true) then -- from level complete
-				self.children.levelComplete:setVisible(false)
-			end
-			
-			if self.children.gameOver ~= nil and (self.children.gameOver:isVisible() == true) then -- from game over
-				self.children.gameOver:setVisible(false)
-			end
-			
-			if self.isRestartingCheckpoint ~= true then -- start / checkpoint
-				self.resetData()
-			end
-			
-			self.children.level:setState(self.children.level.kStates.unloaded)
-			
-			timer.performAfterDelay(10, function()
+			timer.performAfterDelay(500, function()
+				self.children.level:setState(self.children.level.kStates.frozen)
 				
-				-- TODO: We really need sub-states for this...
-				if stateFrom == self.kStates.levelComplete then -- from level complete
-					self.loadTheme()
-					self.children.level:setState(self.children.level.kStates.nextLevel)
-				elseif self.restartCheckpoint == true then -- start / checkpoint
-					self.children.level:setState(self.children.level.kStates.restartCheckpoint)
-					self.isRestartingCheckpoint = nil
-				else -- game over / restart level
-					self.children.level:setState(self.children.level.kStates.restartLevel)
-				end
-				
-				self.children.hud:setState(self.children.hud.kStates.offScreen)
-				
-				self.timers.levelTimer:reset()
-				
-				collectgarbage("collect")
-			
-				timer.performAfterDelay(10, function()
-					self.children.level:setState(self.children.level.kStates.ready)
-					
-					self.children.transition.uncover(function()						
-						self.children.hud:setState(self.children.hud.kStates.onScreen)
-						
-						if AppConfig.enableBackgroundMusic == true then
-							self.filePlayer:play()
-						end
-					end)
-				end)
+				self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
+				self.children.level:unloadLevel() -- TODO: Capture screenshot of level before unloading and draw
 			end)
 		end)
 	end
