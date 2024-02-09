@@ -115,8 +115,6 @@ function WidgetPlay:_load()
 			return
 		end
 		
-		self.loadTheme()
-		
 		self.substate = "nextLevel"
 		
 		self.config.level = configNextLevel.level
@@ -219,7 +217,7 @@ function WidgetPlay:_load()
 	self.levelStartCountdown()
 	
 -- DEBUG: Timer to trigger level complete
-	-- --[[ 
+	--[[ 
 	timer.performAfterDelay(5000, function()
 		self:setState(self.kStates.levelComplete)
 	end)
@@ -287,6 +285,10 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				self.children.level.loadNextLevel()
 			elseif self.substate == "restartLevel" then
 				self.children.level.loadLevelRestart()
+			end
+			
+			if self.theme ~= kThemes[self.config.level.theme] then
+				self.loadTheme()
 			end
 			
 			self.timers.levelTimer:reset()
