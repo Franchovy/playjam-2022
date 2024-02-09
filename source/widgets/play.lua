@@ -340,38 +340,40 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			
 			self.children.level:setState(self.children.level.kStates.unloaded)
 			
-			-- TODO: We really need sub-states for this...
-			if stateFrom == self.kStates.levelComplete then
-				self.loadTheme()
-				self.children.level:setState(self.children.level.kStates.nextLevel)
-			elseif stateFrom == self.kStates.gameOver then
-				if self.restartCheckpoint == true then
+			timer.performAfterDelay(10, function()
+				
+				-- TODO: We really need sub-states for this...
+				if stateFrom == self.kStates.levelComplete then
+					self.loadTheme()
+					self.children.level:setState(self.children.level.kStates.nextLevel)
+				elseif self.restartCheckpoint == true then
 					self.children.level:setState(self.children.level.kStates.restartCheckpoint)
 					self.isRestartingCheckpoint = nil
 				else
 					self.children.level:setState(self.children.level.kStates.restartLevel)
 				end
-			end
-			
-			self.children.hud:setState(self.children.hud.kStates.offScreen)
-			
-			self.timers.levelTimer:reset()
-			self.children.level:setState(self.children.level.kStates.ready)
-			
-			collectgarbage("collect")
-			
-			timer.performAfterDelay(10, function()
-				self.children.transition:setState(self.children.transition.kStates.open)
 				
-				self.children.transition.signals.animationFinished = function()
-					self.children.transition:setVisible(false)
+				self.children.hud:setState(self.children.hud.kStates.offScreen)
+				
+				self.timers.levelTimer:reset()
+				
+				collectgarbage("collect")
+			
+				timer.performAfterDelay(10, function()
+					self.children.level:setState(self.children.level.kStates.ready)
 					
-					self.children.hud:setState(self.children.hud.kStates.onScreen)
+					self.children.transition:setState(self.children.transition.kStates.open)
 					
-					if AppConfig.enableBackgroundMusic == true then
-						self.filePlayer:play()
+					self.children.transition.signals.animationFinished = function()
+						self.children.transition:setVisible(false)
+						
+						self.children.hud:setState(self.children.hud.kStates.onScreen)
+						
+						if AppConfig.enableBackgroundMusic == true then
+							self.filePlayer:play()
+						end
 					end
-				end
+				end)
 			end)
 		end
 	end

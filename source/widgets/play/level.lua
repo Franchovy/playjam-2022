@@ -20,10 +20,11 @@ function WidgetLevel:init(config)
 	self:setStateInitial({
 		ready = 1,
 		playing = 2,
-		freeze = 3,
+		frozen = 3,
 		unloaded = 4,
 		restartCheckpoint = 5,
 		restartLevel = 6,
+		nextLevel = 7
 	}, 1)
 	
 	self.sprites = {}
@@ -260,6 +261,7 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 		self.periodicBlinker:stop()
 
 		self.spriteCycler:unloadAll()
+		print("Sprite cycler unload")
 		
 		self.spriteCycler:discardLoadConfig(false)
 		self.loadIndex -= 1
@@ -291,14 +293,10 @@ function WidgetLevel:_changeState(stateFrom, stateTo)
 		self.wheel.positionInitial = self.wheel.position 
 		self.resetWheel()
 		self:setNeutralDrawOffset()
-	elseif (stateFrom == self.kStates.restartCheckpoint or (stateFrom == self.kStates.restartLevel)) and (stateTo == self.kStates.ready) then
+	elseif (stateFrom == self.kStates.restartCheckpoint or stateFrom == self.kStates.restartLevel) and (stateTo == self.kStates.ready) then
 		self.periodicBlinker:start()
 		
 		-- Initialize sprite cycling using initial wheel position
-		
-		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
-		
-		self.spriteCycler:loadChunk(initialChunk, self.loadIndex)
 		
 		self.wheel.sprite:moveTo(self.wheel.position.x * kGame.gridSize, self.wheel.position.y * kGame.gridSize)
 		self.resetWheel()
