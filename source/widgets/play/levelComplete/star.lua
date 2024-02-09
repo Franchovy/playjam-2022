@@ -3,8 +3,10 @@ local timer <const> = playdate.timer
 class("WidgetStar").extends(Widget)
 
 function WidgetStar:_init(config)
+	self:supply(Widget.deps.samples)
+	self:supply(Widget.deps.timers)
+	
 	self.imagetables = {}
-	self.timers = {}
 	
 	self.tick = 1
 	
@@ -29,9 +31,13 @@ function WidgetStar:_init(config)
 end
 
 function WidgetStar:_load()
+	self:loadSample(kAssetsSounds.levelCompleteStar)
 	self.imagetables.star = gfx.imagetable.new(kAssetsImages.star)
 	
-	self.timers.timer = timer.new(self.timerDuration)
+	self.timers.timer = timer.new(self.timerDuration, function()
+		self:playSample(kAssetsSounds.levelCompleteStar, 0.7)
+	end)
+	
 	self.timers.timer:pause()
 	
 	function self:isAnimating()
@@ -57,5 +63,4 @@ end
 
 function WidgetStar:_unload()
 	self.imageTables = nil
-	self.timers = nil
 end

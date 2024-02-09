@@ -31,6 +31,7 @@ function LevelComplete:_load()
 	
 	self:loadSample(kAssetsSounds.levelCompleteBlink, 0.7)
 	self:loadSample(kAssetsSounds.levelCompleteCard, 0.7)
+	self:loadSample(kAssetsSounds.levelCompleteStar, 0.7)
 	self:loadSample(kAssetsSounds.menuAccept, 0.7)
 	
 	local drawMode = getColorDrawModeFill(self.config.titleColor)

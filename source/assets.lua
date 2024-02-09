@@ -49,7 +49,8 @@ kAssetsSounds = {
 	tick = dirSounds.."tick",
 	transitionSwoosh = dirSounds.."transition-swoosh",
 	transitionSlam = dirSounds.."transition-slam",
-	transitionOut = dirSounds.."transition-out"
+	transitionOut = dirSounds.."transition-out",
+	levelCompleteStar = dirSounds.."level-complete-star"
 }
 
 kAssetsTracks = {

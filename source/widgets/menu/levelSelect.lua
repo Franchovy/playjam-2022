@@ -48,7 +48,7 @@ function WidgetLevelSelect:_init()
 end
 
 function WidgetLevelSelect:_load()
-	self:loadSample(kAssetsSounds.menuSelect)
+	self:loadSample(kAssetsSounds.menuSelect, 0.6)
 	self:loadSample(kAssetsSounds.menuSelectFail, 0.8)
 	
 	self.entries = {}
