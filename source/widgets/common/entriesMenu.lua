@@ -46,7 +46,7 @@ function WidgetEntriesMenu:_load()
 	
 	self:loadSample(kAssetsSounds.menuSelect, 0.6)
 	self:loadSample(kAssetsSounds.menuSelectFail, 0.8)
-	self:loadSample(kAssetsSounds.menuAccept, 0.8)
+	self:loadSample(kAssetsSounds.menuAccept, 0.7)
 end
 
 function WidgetEntriesMenu:_draw(frame)

@@ -52,9 +52,9 @@ function WidgetMenuSettingsEntry:_load()
 		end)
 	end
 	
-	self:loadSample(kAssetsSounds.menuSelect)
-	self:loadSample(kAssetsSounds.menuSelectFail)
-	self:loadSample(kAssetsSounds.menuAccept)
+	self:loadSample(kAssetsSounds.menuSelect, 0.6)
+	self:loadSample(kAssetsSounds.menuSelectFail, 0.8)
+	self:loadSample(kAssetsSounds.menuAccept, 0.7)
 end
 
 function WidgetMenuSettingsEntry:_draw(frame, rect)

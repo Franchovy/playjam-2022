@@ -49,7 +49,7 @@ end
 
 function WidgetLevelSelect:_load()
 	self:loadSample(kAssetsSounds.menuSelect)
-	self:loadSample(kAssetsSounds.menuSelectFail)
+	self:loadSample(kAssetsSounds.menuSelectFail, 0.8)
 	
 	self.entries = {}
 	self.previews = {}
