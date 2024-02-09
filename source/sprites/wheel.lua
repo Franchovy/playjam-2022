@@ -7,6 +7,8 @@ import "engine/debugCanvas"
 
 local gfx <const> = playdate.graphics
 
+-- The wheel itself contains lots of physical parameters and interactions that should be placed in some kind of "Rigidbody" class
+-- for simplicity everything was stuffed inside wheel since it's supposed to be the only dynamic element of the game
 class("Wheel").extends(ColliderSprite)
 
 local gravity <const> = 10
@@ -73,13 +75,19 @@ function Wheel:init()
 	self:resetValues()
 end
 
+function Wheel:setParametersFromJson()
+	local wheelParams = json.decodeFile("assets/gameplay/wheel_config.json")
+	self.mass = wheelParams.mass
+	self.maxJumpCount = wheelParams.maxJumpCount
+	self.jumpForce = wheelParams.jumpForce
+	print("loaded wheel parameters")
+end
+
 function Wheel:resetValues()
-	self.mass = 1
+	self:setParametersFromJson()
 
 	self.useGravity = true
-	self.maxJumpCount = 1
 	self.currentJumpCount = 0
-	self.jumpForce = 200
 	self.isJumping = false
 	self.appliedForces = {}
 	
@@ -209,6 +217,7 @@ function Wheel:calculateAcceleration()
 end
 
 function Wheel:updateVelocity(accelX, accelY)
+	-- we'd normally multiply accel by dt but we are bypassing that otherwise force values would have to be quite large
 	self.velocityX += accelX
 	self.velocityY += accelY
 end
