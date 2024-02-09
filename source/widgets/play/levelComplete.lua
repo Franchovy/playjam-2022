@@ -12,6 +12,7 @@ function LevelComplete:_init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animators)
 	self:supply(Widget.deps.input)
+	self:supply(Widget.deps.timers)
 	
 	self:setStateInitial(1, {
 		"text",
@@ -291,17 +292,12 @@ function LevelComplete:_changeState(stateFrom, stateTo)
 			star.timers.timer:start()
 		end
 		
-		timer.performAfterDelay(100 + #self.stars * 700 + 700, function()
-		-- Safeguard in case of unloading before timer callback
-			if self.blinkers == nil then
-				return
-			end
-			
+		self:performAfterDelay(100 + #self.stars * 700 + 700, function()
 			self.blinkers.blinkerPressAButton1:startLoop()
 			self.blinkers.blinkerPressAButton2:startLoop()
 		end)
 	elseif stateFrom == self.kStates.overlay and (stateTo == self.kStates.menu) then
-		timer.performAfterDelay(100, function()
+		self:performAfterDelay(100, function()
 			self.children.menu:setVisible(true)
 		end)
 	end

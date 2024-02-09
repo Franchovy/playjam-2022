@@ -19,6 +19,7 @@ function WidgetMenu:_init()
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.fileplayer)
 	self:supply(Widget.deps.frame, { needsLayout = true })
+	self:supply(Widget.deps.timers)
 	
 	self:setFrame(disp.getRect())
 	
@@ -218,10 +219,10 @@ function WidgetMenu:_load()
 
 	self:loadFilePlayer(kAssetsTracks.menu)
 	
-	timer.performAfterDelay(10, function()
+	self:performAfterDelay(10, function()
 		self:playSample(kAssetsSounds.intro)
 		
-		timer.performAfterDelay(300, function()
+		self:performAfterDelay(300, function()
 			self:playFilePlayer()
 		end)
 	end)

@@ -17,6 +17,7 @@ import "widget/frame"
 import "widget/keyValueState"
 import "widget/samples"
 import "widget/fileplayer"
+import "widget/timers"
 
 local disp <const> = playdate.display
 local gfx <const> = playdate.graphics

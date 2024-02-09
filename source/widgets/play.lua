@@ -23,6 +23,7 @@ function WidgetPlay:_init()
 	self:supply(Widget.deps.state, { substates = true })
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.frame)
+	self:supply(Widget.deps.timers)
 	
 	self:setFrame(disp.getRect())
 	
@@ -195,16 +196,16 @@ function WidgetPlay:_load()
 	self.timers.levelTimer:pause()
 	
 	self.levelStartCountdown = function()
-		timer.performAfterDelay(600, function()
+		self:performAfterDelay(600, function()
 			print("3")
-			timer.performAfterDelay(600, function()
+			self:performAfterDelay(600, function()
 				print("2")
 				
 				self.children.hud:setState(self.children.hud.kStates.onScreen)
 				
-				timer.performAfterDelay(600, function()
+				self:performAfterDelay(600, function()
 					print("1")
-					timer.performAfterDelay(600, function()
+					self:performAfterDelay(600, function()
 						print("GO!")
 						
 						self:setState(self.kStates.playing)
@@ -220,7 +221,7 @@ function WidgetPlay:_load()
 	
 -- DEBUG: Timer to trigger level complete
 	--[[ 
-	timer.performAfterDelay(5000, function()
+	self:performAfterDelay(5000, function()
 		self:setState(self.kStates.levelComplete)
 	end)
 	--]]
@@ -323,7 +324,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		
 		self.children.level:setState(self.children.level.kStates.frozen)
 		
-		timer.performAfterDelay(1200, function()
+		self:performAfterDelay(1200, function()
 			self.children.transition.cover(function()
 				local checkpointData = table.last(self.data.checkpoints)
 				self.data.coins = checkpointData.coins
@@ -378,10 +379,10 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		self.children.levelComplete.signals.restartLevel = self.restartLevel
 		self.children.levelComplete.signals.returnToMenu = self.returnToMenu
 		
-		timer.performAfterDelay(2500, function()
+		self:performAfterDelay(2500, function()
 			self.children.hud:setState(self.children.hud.kStates.offScreen)
 			
-			timer.performAfterDelay(500, function()
+			self:performAfterDelay(500, function()
 				self.children.level:setState(self.children.level.kStates.frozen)
 				
 				self.children.levelComplete:setState(self.children.levelComplete.kStates.overlay)
@@ -393,7 +394,6 @@ end
 function WidgetPlay:_unload()
 	self.painters = nil
 	self.fileplayer = nil
-	self.timers = nil
 	
 	for _, child in pairs(self.children) do child:unload() end
 	self.children = nil
