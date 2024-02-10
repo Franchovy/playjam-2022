@@ -27,6 +27,6 @@ end
 
 function LevelEnd:collisionWith(other)
 	if other.className == "Wheel" then
-		-- end level here
+		other:levelComplete()
 	end
 end

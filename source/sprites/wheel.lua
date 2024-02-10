@@ -136,6 +136,16 @@ end
 function Wheel:hitCheckpoint(checkpoint)
 	self.hasTouchedNewCheckpoint = true
 	self._recentCheckpoint = checkpoint
+
+	if self.signals.onTouchCheckpoint ~= nil then
+		self.signals.onTouchCheckpoint()
+	end
+end
+
+function Wheel:levelComplete()
+	if self.signals.onLevelComplete ~= nil then
+		self.signals.onLevelComplete()
+	end
 end
 
 function Wheel:startGame()

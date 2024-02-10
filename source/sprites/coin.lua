@@ -39,6 +39,12 @@ end
 
 function Coin:loadConfig(config)
 	self.config.isPicked = config.isPicked
+
+	if self.config.isPicked then
+		self:setCollisionType(kCollisionType.ignore)
+	else
+		self:setCollisionType(kCollisionType.trigger)
+	end
 	
 	self:updateImage()
 end
