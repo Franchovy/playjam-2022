@@ -390,6 +390,8 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 end
 
 function WidgetPlay:_unload()
+	CollisionSolver:unload()
+	
 	self.samples = nil
 	self.painters = nil
 	self.fileplayer = nil

@@ -25,6 +25,10 @@ function CollisionSolver.instance()
     return instance
 end
 
+function CollisionSolver:unload()
+    instance = nil
+end
+
 function dump(o)
 
     if type(o) == 'table' then
