@@ -148,6 +148,10 @@ function Wheel:levelComplete()
 	end
 end
 
+function Wheel:pickedUpCoin()
+	self._coinCountUpdate += 1
+end
+
 function Wheel:startGame()
 	self.ignoresPlayerInput = false
 end

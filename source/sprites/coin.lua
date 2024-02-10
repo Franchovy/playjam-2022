@@ -79,5 +79,6 @@ end
 function Coin:collisionWith(other)
 	if other.className == "Wheel" then
 		self:isGrabbed()
+		other:pickedUpCoin()
 	end
 end
