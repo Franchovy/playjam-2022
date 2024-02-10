@@ -36,13 +36,22 @@ end
 
 -- collisionType is expected to be a kCollisionType constant — !! kCollisionType and kColliderType are not the same
 function ColliderSprite:setCollisionType(collisionType)
+
+    local oldType = self._collisionType
     -- TODO: add failsafe if collision type is invalid
     self._collisionType = collisionType
+
+    -- warn the solver that type has changed
+    local solverInstance = CollisionSolver.instance()
+    if solverInstance and self._addedToSolver then
+        solverInstance:changeCollisionType(self, self._collisionType, oldType)
+    end
 end
 
 function ColliderSprite:readyToCollide()
     local solverInstance = CollisionSolver.instance()
     if solverInstance then
+        self._addedToSolver = true
         solverInstance:addCollider(self)
     end
 end

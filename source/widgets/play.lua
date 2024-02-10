@@ -394,6 +394,7 @@ function WidgetPlay:_unload()
 	self.painters = nil
 	self.fileplayer = nil
 	self.timers = nil
+	CollisionSolver.instance():free()
 	
 	for _, child in pairs(self.children) do child:unload() end
 	self.children = nil

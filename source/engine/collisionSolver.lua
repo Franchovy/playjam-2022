@@ -25,6 +25,10 @@ function CollisionSolver.instance()
     return instance
 end
 
+function CollisionSolver:free()
+    instance = nil
+end
+
 function dump(o)
 
     if type(o) == 'table' then
@@ -104,6 +108,33 @@ function CollisionSolver:addCollider(colliderSprite)
 
 end
 
+function CollisionSolver:changeCollisionType(colliderSprite, newType, oldType)
+    assert(oldType ~= kCollisionType.static, "CollisionSolver does not support changing type of static collider yet")
+
+    if oldType == kCollisionType.ignore then
+        -- add directly
+        self:addCollider(colliderSprite)
+        return
+    end
+
+    -- search and destroy
+    local index = nil
+    for i, value in pairs(self.colliders[oldType]) do
+        if value == colliderSprite then
+            index = i
+            break
+        end
+    end
+
+    if index then
+        table.remove(self.colliders[oldType], index)
+    end
+
+    if newType ~= kCollisionType.ignore then
+        self:addCollider(colliderSprite)
+    end
+end
+
 -- removes nil colliders from the collider list
 function CollisionSolver:cleanUpColliderList()
     for _, colliderList in pairs(self.colliders) do
@@ -127,7 +158,14 @@ local overlapTruthTable = {
     [kCollisionType.dynamic | kCollisionType.trigger] = true,
     [kCollisionType.static | kCollisionType.trigger] = false,
     [kCollisionType.static | kCollisionType.static] = false,
-    [kCollisionType.trigger | kCollisionType.trigger] = true,
+    [kCollisionType.trigger | kCollisionType.trigger] = false,
+}
+
+-- only relevant keys are the ones that are true above
+local resolutionTruthTable = {
+    [kCollisionType.dynamic | kCollisionType.dynamic] = true,
+    [kCollisionType.dynamic | kCollisionType.static] = true,
+    [kCollisionType.dynamic | kCollisionType.trigger] = false,
 }
 
 -- given two collision types, returns true if we should check overlap between both colliders
@@ -135,6 +173,16 @@ function CollisionSolver:shouldCheckOverlap(firstCollisionType, secondCollisionT
     local mask = firstCollisionType | secondCollisionType
 
     return overlapTruthTable[mask]
+end
+
+function CollisionSolver:shouldResolveCollisions(firstCollisionType, secondCollisionType)
+    local mask = firstCollisionType | secondCollisionType
+    local shouldResolve = resolutionTruthTable[mask]
+
+    -- defaults to true if nok ey
+    if shouldResolve == nil then return true end
+
+    return shouldResolve
 end
 
 -- given a calculated resolution movement amount, determines how collider A and collider B should move and by what amount
@@ -164,27 +212,33 @@ function CollisionSolver:_checkAndResolve(colliderA, colliderB)
     local overlaps, overlapInfo, resolutionFunction = colliderA:overlapsWith(colliderB)
     
     if overlaps then
-        local resolutionX, resolutionY = resolutionFunction(overlapInfo)
 
         local collisionTypeA = colliderA:getCollisionType()
         local collisionTypeB = colliderB:getCollisionType()
 
-        -- calculate the actual resolution amount depending on collision types
-        local resolutionAX, resolutionAY, resolutionBX, resolutionBY = self:_determineResolutionMvt(
-            collisionTypeA,
-            collisionTypeB,
-            resolutionX, resolutionY
-        )
+        if self:shouldResolveCollisions(collisionTypeA, collisionTypeB) then
+            local resolutionX, resolutionY = resolutionFunction(overlapInfo)
 
-        if collisionTypeA == kCollisionType.dynamic then
-            colliderA:moveTo(colliderA.x + resolutionAX, colliderA.y + resolutionAY)
-        end
-        if collisionTypeB == kCollisionType.dynamic then
-            colliderB:moveTo(colliderB.x + resolutionBX, colliderB.y + resolutionBY)
+            -- calculate the actual resolution amount depending on collision types
+            local resolutionAX, resolutionAY, resolutionBX, resolutionBY = self:_determineResolutionMvt(
+                collisionTypeA,
+                collisionTypeB,
+                resolutionX, resolutionY
+            )
+
+            if collisionTypeA == kCollisionType.dynamic then
+                colliderA:moveTo(colliderA.x + resolutionAX, colliderA.y + resolutionAY)
+            end
+            if collisionTypeB == kCollisionType.dynamic then
+                colliderB:moveTo(colliderB.x + resolutionBX, colliderB.y + resolutionBY)
+            end
+    
+            colliderA:collisionWith(colliderB, resolutionAX, resolutionAY)
+            colliderB:collisionWith(colliderA, resolutionBX, resolutionBY)
         end
 
-        colliderA:collisionWith(colliderB, resolutionAX, resolutionAY)
-        colliderB:collisionWith(colliderA, resolutionBX, resolutionBY)
+        colliderA:collisionWith(colliderB, 0, 0)
+        colliderB:collisionWith(colliderA, 0, 0)
     end
 end
 
@@ -212,7 +266,7 @@ function CollisionSolver:_checkAndResolveGrid(collider, gridColliders)
     for _, gridCollider in pairs(gridColliders) do
         local overlaps, overlapInfo, resolutionFunction = gridCollider:overlapsWith(collider)
 
-        
+        -- TODO: implement "shouldResolveCollisions" like in checkAndResolve
         if overlaps then
             local resolutionX, resolutionY = resolutionFunction(overlapInfo)
             

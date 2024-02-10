@@ -2,10 +2,11 @@ import "engine"
 import "constant"
 import "utils/images"
 import "playdate"
+import "engine/colliderSprite"
 
 local gfx <const> = playdate.graphics
 
-class("Checkpoint").extends(gfx.sprite)
+class("Checkpoint").extends(ColliderSprite)
 
 local kStateKeys = { isSet = "isSet" }
 
@@ -28,14 +29,18 @@ function Checkpoint:init()
 	-- Set Image
 	
 	self:updateImage()
-	self:setCollideRect(0, -240, 24, 480)
-	self:setGroupMask(kCollisionGroups.static)
+	self:setCollider(kColliderType.rect, rectNew(0, 0, self:getSize()))
+	self:setCollisionType(kCollisionType.trigger)
+	self:readyToCollide()
 	
 	-- Sound effects
 	
 	sampleplayer:addSample("set", kAssetsSounds.checkpointSet)
 	
 	self:setUpdatesEnabled(false)
+end
+
+function Checkpoint:ready()
 end
 
 function Checkpoint:isSet()
@@ -78,4 +83,13 @@ function Checkpoint:updateImage()
 	end
 	
 	self:setImage(gfx.image.new(imagePath))
+end
+
+function Checkpoint:collisionWith(other)
+	if other.className == "Wheel" then
+		if not self:isSet() then
+			self:set()
+			other:hitCheckpoint(self)
+		end
+	end
 end

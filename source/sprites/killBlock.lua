@@ -2,10 +2,11 @@ import "engine"
 import "constant"
 import "playdate"
 import "utils/periodicBlinker"
+import "engine/colliderSprite"
 
 local gfx <const> = playdate.graphics
 
-class('KillBlock').extends(gfx.sprite)
+class('KillBlock').extends(ColliderSprite)
 
 local image
 local imageInverted
@@ -27,7 +28,8 @@ function KillBlock:init(periodicBlinker)
 	end
 	
 	self:setImage(image)
-	self:setCollideRect(0, 0, self:getSize())
+	self:setCollider(kColliderType.rect, rectNew(0, 0, self:getSize()))
+	self:setCollisionType(kCollisionType.static)
 	self:setCenter(0, 0)
 	
 	self.periodicBlinker = periodicBlinker
@@ -49,5 +51,15 @@ function KillBlock:update()
 		end
 		
 		self:markDirty()
+	end
+end
+
+function KillBlock:ready()
+	self:readyToCollide()
+end
+
+function KillBlock:collisionWith(other)
+	if other.className == "Wheel" then
+		other:setIsDead()
 	end
 end

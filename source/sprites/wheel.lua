@@ -103,16 +103,9 @@ function Wheel:resetValues()
 	self.isAwaitingInput = false
 	self.ignoresPlayerInput = true
 	self.hasReachedLevelEnd = false
-	self.hasTouchedNewCheckpoint = false
-	self.hasJustTouchedGround = false
 	self._recentCheckpoint = nil
 	self._coinCountUpdate = 0
 	self.isFrozen = false
-	self.normal = {
-		x = 0,
-		y = 0
-	}
-	self.normalPrevious = table.shallowcopy(self.normal)
 end
 
 function Wheel:getCoinCountUpdate()
@@ -140,6 +133,11 @@ function Wheel:getRecentCheckpoint()
 	return self._recentCheckpoint
 end
 
+function Wheel:hitCheckpoint(checkpoint)
+	self.hasTouchedNewCheckpoint = true
+	self._recentCheckpoint = checkpoint
+end
+
 function Wheel:startGame()
 	self.ignoresPlayerInput = false
 end
@@ -161,11 +159,12 @@ function Wheel:collisionWith(other, resolutionX, resolutionY)
 			self.velocityX = 0
 		elseif absResoY >= 0.1 and absResoY > absResoX then
 			self.velocityY = 0
+
+			if self._isJumping and other.y > self.y then
+				self:hitGround()
+			end
 		end
 		
-		if self._isJumping and other.y > self.y then
-			self:hitGround()
-		end
 	end
 end
 

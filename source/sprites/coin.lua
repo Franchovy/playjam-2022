@@ -1,9 +1,10 @@
 import "engine"
 import "constant"
+import "engine/colliderSprite"
 
 local gfx <const> = playdate.graphics
 
-class('Coin').extends(gfx.sprite)
+class('Coin').extends(ColliderSprite)
 
 function Coin.new() 
 	return Coin()
@@ -22,8 +23,11 @@ function Coin:init()
 		coinEmptyImage:clear(gfx.kColorClear)
 	end
 	self:setImage(coinImage)
+
+	self:setCollider(kColliderType.rect, rectNew(0, 0, self:getSize()))
+	self:setCollisionType(kCollisionType.trigger)
+	self:readyToCollide()
 	self:setCenter(0, 0)
-	self:setCollideRect(self:getBounds())
 	
 	self.config = {
 		isPicked = false
@@ -45,13 +49,14 @@ end
 
 function Coin:reset()
 	self.config.isPicked = false
+	self:setCollisionType(kCollisionType.trigger)
 	
 	self:updateImage()
 end
 
 function Coin:isGrabbed()
 	self.config.isPicked = true
-	
+	self:setCollisionType(kCollisionType.ignore)
 	self:updateImage()
 end
 
@@ -63,4 +68,10 @@ function Coin:updateImage()
 	end
 	
 	self:markDirty()
+end
+
+function Coin:collisionWith(other)
+	if other.className == "Wheel" then
+		self:isGrabbed()
+	end
 end
