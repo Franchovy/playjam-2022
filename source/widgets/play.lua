@@ -5,6 +5,7 @@ import "play/gameOver"
 import "play/background"
 import "play/hud"
 import "play/system"
+import "play/countdown"
 import "utils/themes"
 
 local gfx <const> = playdate.graphics
@@ -18,6 +19,7 @@ local _tSet <const> = geo.rect.tSet
 local _convertMsTimeToString <const> = convertMsTimeToString
 
 class("WidgetPlay").extends(Widget)
+
 
 function WidgetPlay:_init()
 	self:supply(Widget.deps.state, { substates = true })
@@ -40,6 +42,7 @@ function WidgetPlay:_init()
 end
 
 function WidgetPlay:_load()
+
 	self.children.transition = Widget.new(WidgetTransition, { showLoading = false })
 	self.children.transition:load()
 	self.children.transition:setVisible(false)
@@ -195,28 +198,12 @@ function WidgetPlay:_load()
 	self.timers.levelTimer = timer.new(999000)
 	self.timers.levelTimer:pause()
 	
-	self.levelStartCountdown = function()
-		self:performAfterDelay(600, function()
-			print("3")
-			self:performAfterDelay(600, function()
-				print("2")
-				
-				self.children.hud:setState(self.children.hud.kStates.onScreen)
-				
-				self:performAfterDelay(600, function()
-					print("1")
-					self:performAfterDelay(600, function()
-						print("GO!")
-						
-						self:setState(self.kStates.playing)
-					end)
-				end)
-			end)
-		end)
+	self.children.countdown = Widget.new(WidgetCountdown, {})
+	self.children.countdown:load()
+	
+	self.children.countdown.signals.finished = function() 
+		self:setState(self.kStates.playing)
 	end
-	
-	self.levelStartCountdown()
-	
 -- DEBUG: Timer to trigger level complete
 	--[[ 
 	self:performAfterDelay(5000, function()
@@ -235,7 +222,7 @@ function WidgetPlay:_draw(frame, rect)
 	if self.state == self.kStates.gameOver then
 		self.children.gameOver:draw(frame:toLegacyRect())
 	end
-	
+
 	self.children.hud:draw(rect)
 end
 
@@ -300,7 +287,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				if self.substate == "checkpoint" then
 					self:setState(self.kStates.playing)
 				else
-					self.levelStartCountdown()
+					self.children.countdown.levelStartCountdown()
 				end
 				
 				if AppConfig.enableBackgroundMusic == true then
