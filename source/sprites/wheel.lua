@@ -11,7 +11,7 @@ local gfx <const> = playdate.graphics
 -- for simplicity everything was stuffed inside wheel since it's supposed to be the only dynamic element of the game
 class("Wheel").extends(ColliderSprite)
 
-local gravity <const> = 400
+local gravity <const> = 900
 local dt <const> = 1 / 30
 
 function Wheel.new() 
