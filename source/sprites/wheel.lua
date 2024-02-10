@@ -13,6 +13,7 @@ class("Wheel").extends(ColliderSprite)
 
 local gravity <const> = 900
 local dt <const> = 1 / 30
+local wheelGraphicsSpinSpeed <const> = 2
 
 function Wheel.new() 
 	return Wheel()
@@ -276,7 +277,7 @@ function Wheel:updateGraphics()
 	local numImages<const> = 12
 	local sliceAngle<const> = 360 / numImages
 
-	local angularVelocity = (self.velocityX / self._radius) * 180 / 3.14
+	local angularVelocity = (self.velocityX / self._radius) * 180 / 3.14 * wheelGraphicsSpinSpeed
 	self.angle -= angularVelocity * dt
 
 	if self.angle > 360 then
