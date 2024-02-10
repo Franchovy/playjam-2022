@@ -11,7 +11,7 @@ local gfx <const> = playdate.graphics
 -- for simplicity everything was stuffed inside wheel since it's supposed to be the only dynamic element of the game
 class("Wheel").extends(ColliderSprite)
 
-local gravity <const> = 10
+local gravity <const> = 400
 local dt <const> = 1 / 30
 
 function Wheel.new() 
@@ -29,7 +29,8 @@ function Wheel:init()
 	self.type = kSpriteTypes.player
 	
 	local x, y, w, h = self:getBounds()
-	self:setCollider(kColliderType.circle, circleNew(x + w / 2, y + h / 2, w / 2))
+	self._radius = w / 2
+	self:setCollider(kColliderType.circle, circleNew(x + w / 2, y + h / 2, self._radius))
 	self:setCollisionType(kCollisionType.dynamic)
 	self:readyToCollide()
 	
@@ -77,22 +78,24 @@ end
 
 function Wheel:setParametersFromJson()
 	local wheelParams = json.decodeFile("assets/gameplay/wheel_config.json")
+	self._maxLinearSpeed = wheelParams.maxLinearSpeed
+	self._frictionCoeff = wheelParams.frictionCoeff
+	self._maxFallSpeed = wheelParams.maxFallSpeed
 	self.mass = wheelParams.mass
+	self._crankLength = wheelParams.crankLength
 	self.maxJumpCount = wheelParams.maxJumpCount
 	self.jumpForce = wheelParams.jumpForce
-	print("loaded wheel parameters")
 end
 
 function Wheel:resetValues()
 	self:setParametersFromJson()
 
 	self.useGravity = true
-	self.currentJumpCount = 0
-	self.isJumping = false
-	self.appliedForces = {}
+	self._currentJumpCount = 0
+	self._isJumping = false
+	self._jumpHeldTime = 0
+	self._appliedForces = {}
 	
-	self.hasJumpedFinished = nil
-	self.jumpTimeInTicks = nil
 	self.velocityX = 0
 	self.velocityY = 0
 	self.angle = 0
@@ -124,8 +127,6 @@ function Wheel:setIsDead()
 	local random = math.random(3)
 	sampleplayer:playSample("death"..random)
 	
-	-- Freeze all wheel behaviour, no movement or accepted input
-	self.ignoresPlayerInput = true
 	self.hasJustDied = true
 	self.isFrozen = true
 	
@@ -152,25 +153,26 @@ function Wheel:setAwaitingInput()
 end
 
 function Wheel:collisionWith(other, resolutionX, resolutionY)
-	-- nullify velocity in case of collision
-	if resolutionX ~= 0 then
-		self.velocityX = 0
-	end
-
-	if resolutionY ~= 0 then
-		self.velocityY = 0
-	end
-
 	if other:getCollisionType() == kCollisionType.static then
-		if self.isJumping and other.y > self.y then
+		local absResoX = math.abs(resolutionX)
+		local absResoY = math.abs(resolutionY)
+		-- nullify velocity
+		if absResoX >= 0.1 and absResoX > absResoY then
+			self.velocityX = 0
+		elseif absResoY >= 0.1 and absResoY > absResoX then
+			self.velocityY = 0
+		end
+		
+		if self._isJumping and other.y > self.y then
 			self:hitGround()
 		end
 	end
 end
 
 function Wheel:hitGround()
-	self.currentJumpCount = 0
-	self.isJumping = false
+	self._currentJumpCount = 0
+	self._isJumping = false
+	self._jumpHeldTime = 0
 end
 
 function Wheel:checkDeadzone()
@@ -180,30 +182,50 @@ function Wheel:checkDeadzone()
 	end
 end
 
+function Wheel:moveWheel()
+	-- this line prevents the wheel from accumulating acceleration forces despite already being at max spd
+	if math.abs(self.velocityX) >= self._maxLinearSpeed then return end
+
+	local rotationalChange = playdate.getCrankChange()
+
+	table.insert(self._appliedForces, {x=rotationalChange * self._radius * self._crankLength, y=0})
+end
+
 function Wheel:shouldJump()
-	local jumpButtonPressed = playdate.buttonJustPressed(playdate.kButtonUp) or playdate.buttonJustPressed(playdate.kButtonB)
-	return jumpButtonPressed and self.currentJumpCount < self.maxJumpCount
+	local jumpButtonPressed = playdate.buttonIsPressed(playdate.kButtonUp) or playdate.buttonIsPressed(playdate.kButtonB)
+	return jumpButtonPressed and self._currentJumpCount < self.maxJumpCount
 end
 
 function Wheel:jump()
-	self.currentJumpCount += 1
-	self.isJumping = true
+	self._currentJumpCount += 1
+	self._isJumping = true
 
 	-- remove velocity if falling, otherwise the jump would be attenuated by the fall
 	if self.velocityY > 0 then
 		self.velocityY = 0
 	end
 	
-	table.insert(self.appliedForces, {x = 0, y = -self.jumpForce})
+	table.insert(self._appliedForces, {x = 0, y = -self.jumpForce})
 end
 
 function Wheel:calculateAcceleration()
 	local accelX, accelY = 0, 0
+
+	-- apply gravity as an acceleration
 	if self.useGravity then
 		accelY += gravity
 	end
 
-	for _, force in pairs(self.appliedForces) do
+	-- apply friction
+	if math.abs(self.velocityX) > 1 then
+		local frictionDirection = -math.sign(self.velocityX)
+		table.insert(self._appliedForces, {x=frictionDirection * self._frictionCoeff * gravity, y=0})
+	else
+		-- rounded to 0
+		self.velocityX = 0
+	end
+	
+	for _, force in pairs(self._appliedForces) do
 		if (self.mass == 1) then
 			accelX += force.x
 			accelY += force.y
@@ -212,22 +234,68 @@ function Wheel:calculateAcceleration()
 			accelY += force.y / self.mass
 		end
 	end
-
+	
 	return accelX, accelY
 end
 
 function Wheel:updateVelocity(accelX, accelY)
 	-- we'd normally multiply accel by dt but we are bypassing that otherwise force values would have to be quite large
-	self.velocityX += accelX
-	self.velocityY += accelY
+	self.velocityX += accelX * dt
+	self.velocityY += accelY * dt
 end
 
 function Wheel:updatePosition(velocityX, velocityY)
+	velocityX = math.clamp(velocityX, -self._maxLinearSpeed, self._maxLinearSpeed)
+
+	if velocityY > self._maxFallSpeed then
+		velocityY = self._maxFallSpeed
+	end
+
 	self:moveTo(self.x + velocityX * dt, self.y + velocityY * dt)
 end
 
 function Wheel:clearAppliedForces()
-	self.appliedForces = {}
+	self._appliedForces = {}
+end
+
+function Wheel:updateMovements()
+	if self:shouldJump() then
+		self:jump()
+	end
+
+	self:moveWheel()
+
+	local accelX, accelY = self:calculateAcceleration()
+	self:updateVelocity(accelX, accelY)
+	self:updatePosition(self.velocityX, self.velocityY)
+
+	self:clearAppliedForces()
+end
+
+function Wheel:updateGraphics()
+	local numImages<const> = 12
+	local sliceAngle<const> = 360 / numImages
+
+	local angularVelocity = (self.velocityX / self._radius) * 180 / 3.14
+	self.angle -= angularVelocity * dt
+
+	if self.angle > 360 then
+		self.angle = self.angle % 360
+	elseif self.angle < 0 then
+		self.angle += 360
+	end
+	
+	local imageIndex = math.floor(self.angle / sliceAngle) + 1 -- +1 indices start at 1 and not 0
+	self:setImage(self.imagetable[imageIndex])
+end
+
+function Wheel:playRevSound()
+	local velocityFactor = math.abs(self.velocityX) / self._maxLinearSpeed
+	
+	local frequencyFactor = (velocityFactor + 1) * 2.5
+	local volumeFactor = (velocityFactor + 1)
+	
+	synth:play(kAssetsSounds.rev, frequencyFactor, volumeFactor)
 end
 
 -- Movement
@@ -236,175 +304,14 @@ function Wheel:update()
 	Wheel.super:update()
 
 	-- kill the wheel when out of map
-	self:checkDeadzone();
+	self:checkDeadzone()
 
-	if self:shouldJump() then
-		self:jump()
-	end
-
-	local accelX, accelY = self:calculateAcceleration()
-	self:updateVelocity(accelX, accelY)
-	self:updatePosition(self.velocityX, self.velocityY)
-
-	self:clearAppliedForces()
-
-	--[[
-	local input = self.input
-	
-	-- Update if player has died
-	
-	
-	-- Ignore input 
-	
-	local crankTicks
-	
-	if self.ignoresPlayerInput == false then
-		-- Player Input
-		
-		-- Has just pressed jump
-		-- Is holding jump (Jump timer)
-
-		if (playdate.buttonJustReleased(playdate.kButtonUp) or playdate.buttonJustReleased(playdate.kButtonB)) and self.isJumping then
-			self:endJump()
-		end
-		
-		if (playdate.buttonIsPressed(playdate.kButtonUp) or playdate.buttonIsPressed(playdate.kButtonB)) then
-			self:applyJump()
-		end
-		
-		crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
-		
-		local ticks = crankTicks / 12
-		currentTicks += ticks
-		
-		if math.abs(previousTicks - currentTicks) >= 1 then
-			sampleplayer:playSample(kAssetsSounds.tick)
-			previousTicks = currentTicks
-		end
-	else
-		crankTicks = 0
+	if not self.isFrozen then
+		self:updateMovements()
+		self:updateGraphics()
 	end
 	
-	local previousBounds = { self:getBounds() }
-	
-	-- Reset values that get re-calculated
-	
-	self.touchingGround = false
-	self._coinCountUpdate = 0
-	
-	self.normalPrevious.x = self.normal.x
-	self.normalPrevious.y = self.normal.y
-	
-	-- Update position according to velocity
-	
-	local actualX, actualY, collisions, length = self:moveWithCollisions(
-		self.x + self.velocityX, 
-		self.y + self.velocityY
-	)
-
-	-- Collisions-based updates
-	
-	local normalUpdate = { x = 0, y = 0 }
-	
-	for _, collision in pairs(collisions) do
-		local target = collision.other
-		if target.type == kSpriteTypes.platform then
-			if collision.normal.x ~= 0 then 
-				--horizontal collision
-				self.velocityX = 0
-				normalUpdate.x = collision.normal.x
-			end
-			
-			if collision.normal.y == -1 then 
-				--top collision
-				self.touchingGround = true
-				
-				self:resetJumpState()
-			end
-			
-			if collision.normal.y ~= 0 then
-				normalUpdate.y = collision.normal.y
-			end
-		elseif target.type == kSpriteTypes.coin then
-			if target:isVisible() and self:alphaCollision(target) then
-				-- Win some points
-				sampleplayer:playSample("coin")
-				target:isGrabbed()
-				self._coinCountUpdate += 1
-			end
-		elseif target.type == kSpriteTypes.killBlock then
-			if self:alphaCollision(target) then
-				-- Die
-				self:setIsDead()
-			end
-		elseif target.type == kSpriteTypes.checkpoint then
-			if not target:isSet() then
-				target:set()
-				self.hasTouchedNewCheckpoint = true
-				self._recentCheckpoint = {x = target.x, y = target.y}
-				
-				self.signals.onTouchCheckpoint()
-			end
-		elseif target.type == kSpriteTypes.levelEnd then
-			if self:alphaCollision(target) then
-				if self.hasReachedLevelEnd then
-					self.signals.onLevelComplete()
-				end
-				
-				self.hasReachedLevelEnd = true
-			end
-		end
+	if not self.hasJustDied then
+		self:playRevSound()
 	end
-	
-	if self.hasJustDied == false then	
-		self.normal.x = normalUpdate.x
-		self.normal.y = normalUpdate.y
-		
-		if self.normal.x ~= 0 and self.normalPrevious.x == 0 then
-			sampleplayer:playSample("bump")
-		end
-		
-		if self.normal.y == -1 and self.normalPrevious.y == 0 then
-			sampleplayer:playSample("land")
-		end
-		
-		if self.normal.y == 1 and self.normalPrevious.y == 0 then
-			sampleplayer:playSample("bump")
-		end
-		
-		-- Play sounds based on movement
-		local maxVelocityX = 11 -- this has been copied from speed.lua
-		local velocityFactor = math.abs(self.velocityX) / maxVelocityX
-		
-		local frequencyFactor = (velocityFactor + 1) * 2.5
-		local volumeFactor = (velocityFactor + 1)
-		
-		synth:play(kAssetsSounds.rev, frequencyFactor, volumeFactor)
-	end
-	
-	-- Update graphics
-	
-	self.angle = self.angle - self.velocityX / 5
-	
-	if self.angle > 12 then 
-		self.angle = self.angle % 12 
-	end
-	if self.angle < 1 then 
-		self.angle += 12 
-	end
-	
-	local imageIndex = math.floor(self.angle)
-
-	self:setImage(self.imagetable[imageIndex])
-	
-	local currentBounds = { self:getBounds() }
-	if (previousBounds[1] ~= currentBounds[1]) or 
-		(previousBounds[2] ~= currentBounds[2]) or 
-		(previousBounds[3] ~= currentBounds[3]) or 
-		(previousBounds[4] ~= currentBounds[4]) then
-		local drawOffsetX, _ = gfx.getDrawOffset()
-		gfx.sprite.addDirtyRect(previousBounds[1] + drawOffsetX, previousBounds[2], previousBounds[3], previousBounds[4])
-		gfx.sprite.addDirtyRect(currentBounds[1] + drawOffsetX, currentBounds[2], currentBounds[3], currentBounds[4])
-	end
-	]]
 end

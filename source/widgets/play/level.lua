@@ -207,7 +207,7 @@ function WidgetLevel:_load()
 			velocityOffset *= 2
 		end
 		
-		local drawOffsetTarget = -_spriteWheel.x + 100 - velocityOffset
+		local drawOffsetTarget = -_spriteWheel.x + 100 --- velocityOffset
 		local newOffset = (drawOffsetCurrentX - drawOffsetTarget) / _cameraVelocity
 		
 		local cielY = 72
