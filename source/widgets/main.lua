@@ -2,9 +2,11 @@ import "constant"
 import "engine"
 import "menu"
 import "play"
+import "loader/level"
+import "loader/user"
+import "loader/settings"
 
 local timer <const> = playdate.timer
-local file <const> = playdate.file
 local disp <const> = playdate.display
 
 class("WidgetMain").extends(Widget)
@@ -13,13 +15,12 @@ local function _loadLevelFromFile(filepath)
 	return json.decodeFile(filepath)
 end
 
-function WidgetMain:init()
+function WidgetMain:_init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.frame)
 	
-	self.kStates = { menu = 1, play = 2 }
-	self.state = self.kStates.menu
+	self:setStateInitial(1, { "menu", "play" })
 	
 	self:setFrame(disp.getRect())
 	self:createSprite(kZIndex.main)
@@ -30,120 +31,58 @@ function WidgetMain:init()
 end
 
 function WidgetMain:_load()
-	if Settings:existsSettingsFile() then
-		Settings:readFromFile()
-	else 
-		Settings:setDefaultValues()
-	end
-	
-	self.onPlaythroughComplete = function(data)
-		-- TODO: if stats enabled, write (append) playthrough data into an existing or new file
-		
-		-- Write data into high-scores file
-		
-		if not file.exists(kFilePath.saves) then
-			file.mkdir(kFilePath.saves)
-		end
-		
-		local filePath = kFilePath.saves.. "/".. self.level.title
-		
-		local saveFileRead = file.open(filePath, file.kFileRead)
-		
-		local shouldWriteToFile
-		local existingContents
-		
-		if saveFileRead ~= nil then
-			existingContents = json.decodeFile(saveFileRead)
-		end
-		
-		if saveFileRead == nil or (existingContents == nil) then	
-			shouldWriteToFile = true
-		else
-			function scoreCalculation(coinCount, time, timeObjective)
-			    function timeStringToNumber(timeString)
-					if timeString:find(":")  then
-						local minutes, seconds = timeString:match("(%d+):(%d+)")
-						return tonumber(minutes) * 60 + tonumber(seconds)
-					else
-						return tonumber(timeString)
-					end
-				end
-				
-				return coinCount + (timeStringToNumber(timeObjective) - timeStringToNumber(time)) * 50
-			end
-			
-			local previousScore = scoreCalculation(existingContents.coinCount, existingContents.timeString, existingContents.timeStringObjective)
-			local currentScore = scoreCalculation(data.coinCount, data.timeString, data.timeStringObjective)
-			
-			shouldWriteToFile = previousScore < currentScore
-		end
-		
-		if saveFileRead ~= nil then
-			saveFileRead:close()
-		end
-		
-		if shouldWriteToFile then
-			local saveFileWrite = file.open(filePath, file.kFileWrite)
-			json.encodeToFile(saveFileWrite, true, data)
-			saveFileWrite:close()
-		end
-		
-		self:loadHighscores()
-	end
+	self.children.loaderSettings = Widget.new(WidgetLoaderSettings)
+	self.children.loaderSettings:load()
 	
 	self.onReturnToMenu = function()
 		self:setState(self.kStates.menu)
 	end
 	
-	self.onMenuPressedPlay = function(level)
-		self.level = level
+	self.onMenuPressedPlay = function(config)
+		self.data.currentLevel = {
+			worldTitle = config.worldTitle,
+			levelTitle = config.levelTitle,
+			filepath = config.filepath
+		}
+		
 		self:setState(self.kStates.play)
 	end
 	
 	self.getNextLevelConfig = function()
-		for _, v in pairs(kLevels) do
-			if self.level == nil then
-				self.level = v
-				break
-			elseif v.path == self.level.path then
-				self.level = nil
-			end
+		local level, world = self.children.loaderLevel:getNextLevel(self.data.currentLevel)
+		
+		if world ~= nil then
+			self.data.currentLevel.worldTitle = world.title
 		end
 		
-		if self.level ~= nil then
-			return _loadLevelFromFile(self.level.path)
-		end
+		self.data.currentLevel.levelTitle = level.title
+		self.data.currentLevel.filePath = level.path
+		
+		local levelConfig = _loadLevelFromFile(level.path)
+		
+		return { level = levelConfig, levelInfo = self.data.currentLevel }
 	end
 	
-	-- High Scores
-	
-	function self:loadHighscores()
-		if not file.exists(kFilePath.saves) then
-			file.mkdir(kFilePath.saves)
-		end
-		
-		local data = {}
-		local saveFiles = file.listFiles(kFilePath.saves)
-		for _, fileName in pairs(saveFiles) do
-			local path = kFilePath.saves.. "/".. fileName
-			local saveFile = file.open(path, file.kFileRead)
-			
-			if saveFile ~= nil then
-				data[fileName] = json.decodeFile(saveFile)
-			end
-		end
-		
-		self.data.highscores = data
+	self.onPlaythroughComplete = function(playthroughData)
+		self.children.loaderUser.onPlaythroughComplete(playthroughData)
+		self.children.loaderLevel.onPlaythroughComplete(playthroughData)
 	end
 	
-	self:loadHighscores()
+	self.children.loaderUser = Widget.new(WidgetLoaderUser)
+	self.children.loaderUser:load()
 	
-	--
+	local coins = self.children.loaderUser:getCoinCount()
 	
-	self.children.menu = Widget.new(WidgetMenu, { levels = kLevels, scores = self.data.highscores })
+	self.children.loaderLevel = Widget.new(WidgetLoaderLevel)
+	self.children.loaderLevel:load()
+	self.children.loaderLevel:refresh()
+	
+	local levels = self.children.loaderLevel:getLevels()
+	
+	self.children.menu = Widget.new(WidgetMenu, { levels = levels, coins = coins })
 	self.children.menu:load()
 	
-	self.children.menu.signals.play = self.onMenuPressedPlay
+	self.children.menu.signals.loadLevel = self.onMenuPressedPlay
 	
 	self.children.transition = Widget.new(WidgetTransition, { showLoading = true })
 	self.children.transition:load()
@@ -165,17 +104,19 @@ function WidgetMain:_update()
 	
 	if self.state == self.kStates.menu and (self.children.menu ~= nil) then
 		self:passInput(self.children.menu)
+	elseif self.state == self.kStates.play and (self.children.play ~= nil) then
+		self:passInput(self.children.play)
 	end
 end
 
 function WidgetMain:_changeState(stateFrom, stateTo)
 	if stateFrom == self.kStates.menu and (stateTo == self.kStates.play) then
-		self.children.transition:setVisible(true)
-		self.children.transition:setState(self.children.transition.kStates.closed)
+		assert(self.data.currentLevel ~= nil, "Error: Cannot play without setting a level!")
 		
-		self.children.transition.signals.animationFinished = function()
+		self.children.transition.cover(function()
 			self.children.menu:setVisible(false)
-			local levelConfig = _loadLevelFromFile(self.level.path)
+			local levelConfig = _loadLevelFromFile(self.data.currentLevel.filepath)
+			assert(levelConfig ~= nil, "Error: Missing level data!")
 			
 			if self.children.play == nil then
 				self.children.menu:unload()
@@ -183,26 +124,18 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 				
 				collectgarbage("collect")
 				
-				self.children.play = Widget.new(WidgetPlay, levelConfig)
+				self.children.play = Widget.new(WidgetPlay, { level = levelConfig, levelInfo = self.data.currentLevel })
 				self.children.play:load()
 				
 				self.children.play.signals.saveLevelScore = self.onPlaythroughComplete
 				self.children.play.signals.returnToMenu = self.onReturnToMenu
 				self.children.play.signals.getNextLevelConfig = self.getNextLevelConfig
 				
-				timer.performAfterDelay(100, function()
-					self.children.transition:setState(self.children.transition.kStates.open)
-					self.children.transition.signals.animationFinished = function()
-						self.children.transition:setVisible(false)
-					end
-				end)
+				self.children.transition.uncover()
 			end
-		end
+		end)
 	elseif stateFrom == self.kStates.play and (stateTo == self.kStates.menu) then
-		self.children.transition:setVisible(true)
-		self.children.transition:setState(self.children.transition.kStates.closed)
-		
-		self.children.transition.signals.animationFinished = function()
+		self.children.transition.cover(function()
 			self.children.play:setVisible(false)
 			
 			self.children.play:unload()
@@ -210,17 +143,17 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 			
 			collectgarbage("collect")
 			
-			self.children.menu = Widget.new(WidgetMenu, { levels = kLevels, scores = self.data.highscores })
+			self.children.loaderLevel:refresh()
+			
+			local coins = self.children.loaderUser:getCoinCount()
+			local levels = self.children.loaderLevel:getLevels()
+			
+			self.children.menu = Widget.new(WidgetMenu, { levels = levels, coins = coins })
 			self.children.menu:load()
 			
-			self.children.menu.signals.play = self.onMenuPressedPlay
+			self.children.menu.signals.loadLevel = self.onMenuPressedPlay
 			
-			timer.performAfterDelay(100, function()
-				self.children.transition:setState(self.children.transition.kStates.open)
-				self.children.transition.signals.animationFinished = function()
-					self.children.transition:setVisible(false)
-				end
-			end)
-		end
+			self.children.transition.uncover()
+		end)
 	end
 end

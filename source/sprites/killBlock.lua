@@ -5,6 +5,7 @@ import "utils/periodicBlinker"
 import "engine/colliderSprite"
 
 local gfx <const> = playdate.graphics
+local periodicBlinkerKillblock
 
 class('KillBlock').extends(ColliderSprite)
 
@@ -32,7 +33,8 @@ function KillBlock:init(periodicBlinker)
 	self:setCollisionType(kCollisionType.static)
 	self:setCenter(0, 0)
 	
-	self.periodicBlinker = periodicBlinker
+	periodicBlinkerKillblock = periodicBlinker
+	
 	self:setGroupMask(kCollisionGroups.static)
 	
 	self.isImageInverted = false
@@ -41,8 +43,8 @@ end
 function KillBlock:update()
 	KillBlock.super.update(self)
 	
-	if self.periodicBlinker.hasChanged then
-		self.isImageInverted = not self.isImageInverted
+	if periodicBlinkerKillblock.hasChanged then
+		self.isImageInverted = periodicBlinkerKillblock.blinker.on
 		
 		if self.isImageInverted == true then
 			self:setImage(imageInverted)

@@ -13,9 +13,9 @@ local _tCenter <const> = geo.rect.tCenter
 
 class("WidgetTitle").extends(Widget)
 
-function WidgetTitle:init()
+function WidgetTitle:_init()
 	self:supply(Widget.deps.animations)
-	self:supply(Widget.deps.frame)
+	self:supply(Widget.deps.frame, { isVisible = false })
 	
 	self:setFrame(disp.getRect())
 	
@@ -25,15 +25,17 @@ function WidgetTitle:init()
 		fromLevelSelect = 3
 	})
 	
-	self.images = {}
-	self.imagetables = {}
-	self.painters = {}
-	
 	self.index = 0
 	self.tick = 0
 end
 
 function WidgetTitle:_load()
+	setCurrentFont(kAssetsFonts.twinbee)
+	
+	self.images = {}
+	self.imagetables = {}
+	self.painters = {}
+	
 	self.imagetables.particles = gfx.imagetable.new(kAssetsImages.particles)
 	self.imagetables.wheel = gfx.imagetable.new(kAssetsImages.wheel):scaled(2)
 	self.images.backgroundImage = gfx.image.new(kAssetsImages.background)
@@ -165,65 +167,18 @@ function WidgetTitle:_load()
 		
 		self.imagetables.wheel:getImage((-state.index % 12) + 1):draw(140, 0)
 	end)
-end
-
-function WidgetTitle:_animate(animation, queueFinishedCallback)
-	if animation == self.kAnimations.onFirstOpen then
-		self.animators.animator1 = gfx.animator.new(800, 240, 0, easing.outExpo, 100)
-		self.animators.animator2 = gfx.animator.new(800, 150, 0, easing.outExpo, 500)
-		self.animators.animator3 = gfx.animator.new(800, 150, 0, easing.outCirc, 1000)
-		self.animators.animatorWheel = gfx.animator.new(
-			800, 
-			geo.point.new(-200, -30), 
-			geo.point.new(0, 0), 
-			easing.outQuad, 
-			800
-		)
-		
-		queueFinishedCallback(1800)
-	elseif animation == self.kAnimations.fromLevelSelect then
-		self.animators.animatorOut = gfx.animator.new(
-			800, 
-			math.min(240, self.animators.animatorOut:currentValue()), 
-			0, 
-			easing.outExpo, 
-			200
-		)
-		self.animators.animatorOutWheel = gfx.animator.new(0, geo.point.new(0, 0), geo.point.new(0, 0), easing.outCirc, 0)
-		self.animators.animatorWheel:reset()
-		
-		queueFinishedCallback(1000)
-	elseif animation == self.kAnimations.toLevelSelect then
-		local animatorValue = self:getAnimatorValue(self.animators.animatorOut)
-		self.animators.animatorOut = gfx.animator.new(
-			800, 
-			math.max(0, animatorValue), 
-			240, 
-			easing.inExpo, 200
-		)
-		self.animators.animatorOutWheel = gfx.animator.new(
-			800, 
-			geo.point.new(0, 0), 
-			geo.point.new(450, 100),  
-			easing.inQuad, 
-			500
-		)
-		
-		queueFinishedCallback(1300)
-	end
+	
+	self.animators.animatorWheel = gfx.animator.new(
+		800, 
+		geo.point.new(-200, -30), 
+		geo.point.new(0, 0), 
+		easing.outQuad, 
+		800
+	)
 end
 
 function WidgetTitle:_draw(frame, rect)
 	local _rects = self.rects
-	
-	-- Warning: This is a Work-around! What should really happen is: 
-	-- 1) in _animate, toggle :setVisible to true.
-	-- 2) setting visible should only take effect NEXT frame, not current frame. and 
-	-- 3) draw happens once a full round of update() has been called, performing the layout as needed.
-	-- ... But for now, we just check if the layout has been performed by checking this rect.
-	if _rects.top == nil then
-		return
-	end
 	
 	self.painterBackground1:draw(_rects.top)
 	self.painterBackground2:draw(_rects.right)
@@ -252,11 +207,7 @@ function WidgetTitle:_update()
 	self.painters.painterWheel:markDirty()
 	self.painters.painterButton:markDirty()
 	
-	if self:isAnimating() == true then
-		gfx.sprite.addDirtyRect(0, 0, 400, 240)
-		
-		-- animation update: perform layout
-		
+	if self:hasAnimationChanged() == true then
 		local _animators = self.animators
 		local _rects = self.rects
 		local frame = self.frame
@@ -273,6 +224,50 @@ function WidgetTitle:_update()
 		_rects.wheel = _assign(_rects.wheel, animatorValueWheel.x - 60, 30 + animatorValueWheel.y, 280, 120)
 		_rects.title = _tSet(_tOffset(_assign(_rects.title, frame), 0, 130 + animatorValueTitle), nil, nil, nil, 57)
 		_rects.button = _tOffset(_tSet(_tCenter(_assign(_rects.button, 0, 0, 160, 27), frame), nil, 200), 0, animatorValueButton)
+		
+		gfx.sprite.addDirtyRect(0, 0, 400, 240)
+		self:setVisible(true)
+	end
+end
+
+function WidgetTitle:_animate(animation, queueFinishedCallback)
+	if animation == self.kAnimations.onFirstOpen then
+		self.animators.animator1 = gfx.animator.new(800, 240, 0, easing.outExpo, 100)
+		self.animators.animator2 = gfx.animator.new(800, 150, 0, easing.outExpo, 500)
+		self.animators.animator3 = gfx.animator.new(800, 150, 0, easing.outCirc, 1000)
+		self.animators.animatorWheel:reset()
+		
+		queueFinishedCallback(1800)
+	elseif animation == self.kAnimations.fromLevelSelect then
+		local animatorValue = self.animators.animatorOut ~= nil and self.animators.animatorOut:currentValue() or 240
+		self.animators.animatorOut = gfx.animator.new(
+			800, 
+			math.min(240, animatorValue), 
+			0, 
+			easing.outExpo, 
+			200
+		)
+		self.animators.animatorOutWheel = gfx.animator.new(0, geo.point.new(0, 0), geo.point.new(0, 0), easing.outCirc, 0)
+		self.animators.animatorWheel:reset()
+		
+		queueFinishedCallback(1000)
+	elseif animation == self.kAnimations.toLevelSelect then
+		local animatorValue = self:getAnimatorValue(self.animators.animatorOut)
+		self.animators.animatorOut = gfx.animator.new(
+			800, 
+			math.max(0, animatorValue), 
+			240, 
+			easing.inExpo, 200
+		)
+		self.animators.animatorOutWheel = gfx.animator.new(
+			800, 
+			geo.point.new(0, 0), 
+			geo.point.new(450, 100),  
+			easing.inQuad, 
+			500
+		)
+		
+		queueFinishedCallback(1300)
 	end
 end
 
@@ -280,5 +275,4 @@ function WidgetTitle:_unload()
 	self.imagetables = nil
 	self.images = nil
 	self.painters = nil
-	self.animators = nil
 end

@@ -1,4 +1,22 @@
 
+-- Global methods
+
+function ifNil(valueToCheck, callback, elseCallback)
+	if valueToCheck == nil then
+		callback()
+	elseif elseCallback ~= nil then
+		elseCallback()
+	end
+end
+
+function ifNotNil(valueToCheck, callback, elseCallback)
+	if valueToCheck ~= nil then
+		callback()
+	elseif elseCallback ~= nil then
+		elseCallback()
+	end
+end
+
 -- Extensions on "table"
 
 function table.last(t)

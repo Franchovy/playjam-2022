@@ -12,23 +12,18 @@ local _sign <const> = math.sign
 
 class("WidgetLevel").extends(Widget)
 
-function WidgetLevel:init(config)
-	self.config = config
-	
+function WidgetLevel:_init()
 	self:supply(Widget.deps.state)
 	
-	self:setStateInitial({
-		ready = 1,
-		playing = 2,
-		freeze = 3,
-		unloaded = 4,
-		restartCheckpoint = 5,
-		restartLevel = 6,
-	}, 1)
+	self:setStateInitial(1, {
+		"frozen",
+		"playing",
+	})
 	
 	self.sprites = {}
-	self.children = {}
 	self.signals = {}
+	
+	self.isLevelLoaded = false
 end
 
 function WidgetLevel:_load()
@@ -66,13 +61,6 @@ function WidgetLevel:_load()
 	
 	local _logicalPositionWheel = nil
 	local _spriteWheel = nil
-	
-	self.resetWheel = function()
-		self.wheel.sprite:resetValues()
-		self.wheel.sprite:setAwaitingInput()
-		_spriteWheel = self.wheel.sprite
-		_logicalPositionWheel = self.wheel.position
-	end
 	
 	-- Sprite Cycler
 	
@@ -153,11 +141,83 @@ function WidgetLevel:_load()
 		_loadConfig(_configHandler, levelObject, self.loadIndex)
 	end)
 	
+	-- Loading/Unloading
+	
+	self.resetWheel = function()
+		self.wheel.sprite:resetValues()
+		self.wheel.sprite:setAwaitingInput()
+		_spriteWheel = self.wheel.sprite
+		_logicalPositionWheel = self.wheel.position
+		
+		self.wheel.sprite:moveTo(self.wheel.position.x * kGame.gridSize, self.wheel.position.y * kGame.gridSize)
+	end
+	
+	self.resetCheckpoints = function()
+		self.spriteCycler:discardLoadConfig(true)
+		self.loadIndex = 1
+		self.previousLoadPoint = nil
+		
+		self.wheel.sprite:remove()
+		self.wheel.sprite = nil
+		self.wheel = nil
+	end
+	
+	self.unloadLevel = function()
+		self.spriteCycler:unloadAll()
+		self.spriteCycler:discardLoadConfig(false)
+		self.loadIndex -= 1
+		
+		self.isLevelLoaded = false
+	end
+	
+	local _loadLevel = function()
+		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
+		self.spriteCycler:loadChunk(initialChunk, 0)
+		
+		self.isLevelLoaded = true
+	end
+	
+	self.loadCheckpoint = function()
+		self.loadIndex += 1
+		
+		_loadLevel()
+		
+		self.resetWheel()
+		self:setNeutralDrawOffset()
+	end
+	
+	self.loadLevelRestart = function()
+		self.wheel.position = self.wheel.positionInitial
+		
+		self.resetCheckpoints()
+		
+		_loadLevel()
+		
+		self.resetWheel()
+		self:setNeutralDrawOffset()
+	end
+	
+	self.loadNextLevel = function()
+		self.resetCheckpoints()
+		
+		self.loadLevelObjects()
+		
+		_loadLevel()
+		
+		self.wheel.positionInitial = self.wheel.position 
+		self.resetWheel()
+		self:setNeutralDrawOffset()
+	end
+	
 	-- Load level into spritecycler
 	
-	self.levelObjects = LogicalSprite.loadObjects(self.config.objects)
-	self.spriteCycler:load(self.levelObjects)
-	self.configHandler:load(self.levelObjects)
+	self.loadLevelObjects = function()
+		self.levelObjects = LogicalSprite.loadObjects(self.config.objects)
+		self.spriteCycler:load(self.levelObjects)
+		self.configHandler:load(self.levelObjects)
+	end
+	
+	self.loadLevelObjects()
 	
 	--
 	
@@ -179,8 +239,7 @@ function WidgetLevel:_load()
 	
 	self.loadIndex = 1
 	
-	local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
-	self.spriteCycler:loadChunk(initialChunk, 0)
+	_loadLevel()
 	
 	--
 	
@@ -225,24 +284,14 @@ function WidgetLevel:_load()
 end
 
 function WidgetLevel:_update()
-	if self.state == self.kStates.unloaded then
-		return
+	if self.isLevelLoaded == true then
+		local drawOffsetX, drawOffsetY = gfx.getDrawOffset()
+		self.spriteCycler:update(drawOffsetX, drawOffsetY, self.loadIndex)	
 	end
-	
-	if self.state == self.kStates.ready then
-		self:setNeutralDrawOffset()
-		
-		if playdate.buttonIsPressed(playdate.kButtonA) or (math.abs(playdate.getCrankChange()) > 5) then
-			self.signals.startPlaying()
-		end
-	end
-	
-	self.periodicBlinker:update()
-	
-	local drawOffsetX, drawOffsetY = gfx.getDrawOffset()
-	self.spriteCycler:update(drawOffsetX, drawOffsetY, self.loadIndex)
 	
 	if self.state == self.kStates.playing then
+		self.periodicBlinker:update()
+		
 		local updatedCoinCount = self.wheel.sprite:getCoinCountUpdate()
 		
 		if updatedCoinCount > 0 then
@@ -254,57 +303,12 @@ function WidgetLevel:_update()
 end
 
 function WidgetLevel:_changeState(stateFrom, stateTo)
-	self.wheel.sprite.isFrozen = not (stateTo == self.kStates.playing)
-	
-	if stateFrom == self.kStates.ready and (stateTo == self.kStates.playing) then
+	if stateFrom == self.kStates.frozen and (stateTo == self.kStates.playing) then
 		self.wheel.sprite.ignoresPlayerInput = false
-	elseif stateTo == self.kStates.unloaded then
-		self.periodicBlinker:stop()
-
-		self.spriteCycler:unloadAll()
-		
-		self.spriteCycler:discardLoadConfig(false)
-		self.loadIndex -= 1
-	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.restartCheckpoint) then
-		self.loadIndex += 1
-	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.restartLevel) then
-		self.spriteCycler:discardLoadConfig(true)
-		self.loadIndex = 1
-		self.previousLoadPoint = nil
-		self.wheel.position = self.wheel.positionInitial
-		self:setNeutralDrawOffset()
-	elseif stateFrom == self.kStates.unloaded and (stateTo == self.kStates.nextLevel) then
-		self.spriteCycler:discardLoadConfig(true)
-		self.loadIndex = 1
-		self.previousLoadPoint = nil
-		
-		self.wheel.sprite:remove()
-		self.wheel.sprite = nil
-		self.wheel = nil
-		self.levelObjects = nil
-		
-		self.levelObjects = LogicalSprite.loadObjects(self.config.objects)
-		self.spriteCycler:load(self.levelObjects)
-		self.configHandler:load(self.levelObjects)
-		
-		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
-		self.spriteCycler:loadChunk(initialChunk, self.loadIndex)
-		
-		self.wheel.positionInitial = self.wheel.position 
-		self.resetWheel()
-		self:setNeutralDrawOffset()
-	elseif (stateFrom == self.kStates.restartCheckpoint or (stateFrom == self.kStates.restartLevel)) and (stateTo == self.kStates.ready) then
 		self.periodicBlinker:start()
-		
-		-- Initialize sprite cycling using initial wheel position
-		
-		local initialChunk = self.spriteCycler:getFirstInstanceChunk("player")
-		
-		self.spriteCycler:loadChunk(initialChunk, self.loadIndex)
-		
-		self.wheel.sprite:moveTo(self.wheel.position.x * kGame.gridSize, self.wheel.position.y * kGame.gridSize)
-		self.resetWheel()
-		self:setNeutralDrawOffset()
+	elseif stateFrom == self.kStates.playing and stateTo == self.kStates.frozen then
+		self.periodicBlinker:stop()
+		self.wheel.sprite.ignoresPlayerInput = true
 	end
 end
 
@@ -314,6 +318,8 @@ function WidgetLevel:_unload()
 	self.configHandler = nil
 	
 	self.periodicBlinker:stop()
+	self.periodicBlinker = nil
+	
 	self.wheel.sprite:remove()
 	
 	for _, sprite in pairs(self.sprites) do sprite:remove() end

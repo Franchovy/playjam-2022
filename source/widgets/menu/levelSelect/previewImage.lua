@@ -1,16 +1,17 @@
 local gfx <const> = playdate.graphics
 class("LevelSelectPreviewImage").extends(Widget)
 
-function Widget:init(config)
+function LevelSelectPreviewImage:init(config)
 	self.config = config
 	
 	self.images = {}
 	self.painters = {}
 end
 
-function Widget:_load()
+function LevelSelectPreviewImage:_load()
 	self.images.image = gfx.image.new(self.config.path)
-	self.images.title = gfx.imageWithText(self.config.title, 100, 20):scaledImage(1.5)
+	setCurrentFont(kAssetsFonts.twinbee15x)
+	self.images.title = gfx.imageWithText(self.config.title, 100, 20)
 	
 	self.painters.title = Painter(function(rect)
 		gfx.setColor(gfx.kColorBlack)
@@ -24,18 +25,14 @@ function Widget:_load()
 	end)
 end
 
-function Widget:_draw(frame, rect)
+function LevelSelectPreviewImage:_draw(frame, rect)
 	self.images.image:drawCentered(frame.x + frame.w / 2, frame.y + frame.h / 2 - 15)
 	
 	local rectTitle = Rect.with(Rect.center(Rect.size(125, 30), frame), { y = 170 })
 	self.painters.title:draw(rectTitle)
 end
 
-function Widget:_update()
-	
-end
-
-function Widget:_unload()
+function LevelSelectPreviewImage:_unload()
 	self.painters = nil
 	self.images = nil
 end

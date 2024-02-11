@@ -26,8 +26,6 @@ function initialize()
 	playdate.timer.performAfterDelay(1, function()
 		topLevelWidget:load()
 	end)
-	
-	playdate.setMinimumGCTime(2)
 end
 
 function playdate.update()
@@ -48,8 +46,12 @@ function playdate.update()
 		g.showCrankIndicator = false
 	end
 	
+	--[[
 	playdate.drawFPS(10, 10)
+	--]]
+	--[[
 	DebugCanvas.instance():draw()
+	--]]
 end
 
 -- Start game

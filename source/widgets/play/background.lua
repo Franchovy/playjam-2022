@@ -1,9 +1,25 @@
 local gfx <const> = playdate.graphics
+local disp <const> = playdate.display
+local geo <const> = playdate.geometry
+
+local _insert <const> = table.insert
+local _new <const> = geo.rect.new
+local _create <const> = table.create
+local _getSize <const> = gfx.image.getSize
+local _draw <const> = gfx.image.draw
+local _floor <const> = math.floor
+local _tSet <const> = geo.rect.tSet
+local _intersection <const> = geo.rect.intersection
+local _tOffset <const> = geo.rect.tOffset
+local _kImageUnflipped <const> = gfx.kImageUnflipped
 
 class("WidgetBackground").extends(Widget)
 
-function WidgetBackground:init(config)
+function WidgetBackground:_init(config)
 	self.theme = config.theme
+	
+	self:supply(Widget.deps.frame)
+	self:setFrame(disp.getRect())
 	
 	self:createSprite(kZIndex.background)
 end
@@ -20,47 +36,53 @@ function WidgetBackground:_load()
 	
 	self.paralaxRatios = {}
 	self.imageOffsets = {}
+	self.rectsImagesRight = _create(#self.images, 0)
+	self.rectsImagesLeft = _create(#self.images, 0)
 	
-	for i=1,#self.images do
-		self.paralaxRatios[i] = i / 50
-		self.imageOffsets[i] = 0
+	for i, image in ipairs(self.images) do
+		_insert(self.paralaxRatios, i / 50)
+		_insert(self.imageOffsets, 0)
+		
+		local imageWidth, imageHeight = _getSize(image)
+		_insert(self.rectsImagesRight, _new(0, 0, imageWidth, imageHeight))
+		_insert(self.rectsImagesLeft, _new(-400, 0, imageWidth, imageHeight))
 	end
 end
 
 function WidgetBackground:_draw(frame, rect)
-	if rect == nil then 
-		self.backgroundImage:draw(frame.x, frame.y)
-	else
-		self.backgroundImage:draw(frame.x, frame.y, gfx.kImageUnflipped, rect.x, rect.y, rect.w, rect.h)
+	local _frameX = frame.x
+	local _frameY = frame.y
+	local _frameW = frame.w
+	local _frameH = frame.h
+	
+	if rect == nil then
+		rect = frame
 	end
 	
+	local _rectX = rect.x
+	local _rectY = rect.y
+	local _rectW = rect.w
+	local _rectH = rect.h
+	
+	self.backgroundImage:draw(_frameX + _rectX, _frameY + _rectY, _kImageUnflipped, rect)
+	
+	local _imageOffsets = self.imageOffsets
+	local _rectsImagesRight = self.rectsImagesRight
+	local _rectsImagesLeft = self.rectsImagesLeft
+	
 	for i, image in ipairs(self.images) do
-		local imageOffset = math.floor(self.imageOffsets[i])
-		local imageWidth, imageHeight = image:getSize()
-		
-		local imageRightRect = Rect.make(imageOffset, 0, imageWidth, imageHeight)
-		local imageLeftRect = Rect.make(imageOffset - 400, 0, imageWidth, imageHeight)
-		local screenRect = Rect.make(0, 0, 400, 240)
+		local imageOffset = _floor(_imageOffsets[i])
+		local imageRightRect = _tSet(_rectsImagesRight[i], imageOffset)
+		local imageLeftRect = _tSet(_rectsImagesLeft[i], imageOffset - 400)
 		
 		-- Draw 2 copies of the image, one before and one after
-		local imageRightOverlapRect
-		if rect == nil then
-			imageRightOverlapRect = Rect.overlap(imageRightRect, screenRect)
-		else
-			imageRightOverlapRect = Rect.overlap(Rect.overlap(imageRightRect, screenRect), rect)
-		end
-		local imageRightSourceRect = Rect.offset(imageRightOverlapRect, -imageOffset, 0)
-		image:draw(frame.x + imageOffset, frame.y, gfx.kImageUnflipped, imageRightSourceRect.x, imageRightSourceRect.y, imageRightSourceRect.w, imageRightSourceRect.h)
+		local imageRightSourceRect = _tOffset(_intersection(imageRightRect, rect), -imageOffset, 0)
+		_draw(image, _frameX + imageOffset + _rectX, _frameY + _rectY, _kImageUnflipped, imageRightSourceRect)
 		
-		local imageLeftOverlapRect
-		if rect == nil then
-			imageLeftOverlapRect = Rect.overlap(imageLeftRect, screenRect)
-		else
-			imageLeftOverlapRect = Rect.overlap(Rect.overlap(imageLeftRect, screenRect), rect)
-		end
-		local imageLeftSourceRect = Rect.offset(imageLeftOverlapRect, imageWidth - imageOffset, 0)
-		image:draw(frame.x + imageOffset - imageOffset, frame.y, gfx.kImageUnflipped, imageLeftSourceRect.x, imageLeftSourceRect.y, imageLeftSourceRect.w, imageLeftSourceRect.h)
+		local imageLeftSourceRect = _tOffset(_intersection(imageLeftRect, rect), _rectsImagesLeft[i].w - imageOffset, 0)
+		_draw(image, _frameX + _rectX, _frameY + _rectY, _kImageUnflipped, imageLeftSourceRect)
 	end
+	
 end
 
 function WidgetBackground:_update()

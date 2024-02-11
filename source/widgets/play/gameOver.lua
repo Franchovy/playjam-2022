@@ -1,11 +1,16 @@
 import "widgets/common/entriesMenu"
 
 local gfx <const> = playdate.graphics
+local disp <const> = playdate.display
 
 class("WidgetGameOver").extends(Widget)
 
-function WidgetGameOver:init(config)
-	self.config = config
+function WidgetGameOver:_init()
+	
+	self:supply(Widget.deps.input)
+	self:supply(Widget.deps.frame)
+	
+	self:setFrame(disp.getRect())
 	
 	self.painters = {}
 	self.images = {}
@@ -13,13 +18,15 @@ function WidgetGameOver:init(config)
 	self:createSprite(kZIndex.overlay)
 	
 	self.signals = {}
-
 end
 
 function WidgetGameOver:_load()
 	gfx.setColor(gfx.kColorBlack)
-	self.images.gameOverText = gfx.imageWithText("GAME OVER", 100, 70):scaledImage(3)
-	self.images.gameOverReason = gfx.imageWithText(self.config.reason, 150, 70)
+	
+	setCurrentFont(kAssetsFonts.twinbee2x)
+	self.images.gameOverText = gfx.imageWithText("GAME OVER", 250, 70):scaledImage(1.5)
+	setCurrentFont(kAssetsFonts.twinbee15x)
+	self.images.gameOverReason = gfx.imageWithText(self.config.reason, 250, 70)
 	
 	self.painters.background = Painter(function(rect)
 		gfx.setColor(gfx.kColorBlack)
@@ -31,14 +38,15 @@ function WidgetGameOver:_load()
 		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
 		gfx.setColor(gfx.kColorBlack)
+		local margin = 12
 		local gameOverTextSizeW, gameOverTextSizeH = self.images.gameOverText:getSize()
 		local gameOverTextCenterRect = Rect.center(Rect.size(gameOverTextSizeW, gameOverTextSizeH), rect)
-		self.images.gameOverText:draw(gameOverTextCenterRect.x, rect.y + 12)
+		self.images.gameOverText:draw(gameOverTextCenterRect.x, rect.y + margin)
 		
 		local gameOverReasonSizeW, gameOverReasonSizeH = self.images.gameOverReason:getSize()
 		local gameOverReasonCenterRect = Rect.center(Rect.size(gameOverReasonSizeW, gameOverReasonSizeH), rect)
 		gfx.setColor(gfx.kColorBlack)
-		self.images.gameOverReason:draw(gameOverReasonCenterRect.x, rect.y + 47)
+		self.images.gameOverReason:draw(gameOverReasonCenterRect.x, rect.y + gameOverTextSizeH + margin * 2)
 	end)
 	
 	self.children.entriesMenu = Widget.new(WidgetEntriesMenu, {
@@ -72,8 +80,10 @@ function WidgetGameOver:_draw(rect)
 end
 
 function WidgetGameOver:_update()
-	
+	self:passInput(self.children.entriesMenu)
 end
+
+
 
 function WidgetGameOver:_unload()
 	self.sprite:remove()

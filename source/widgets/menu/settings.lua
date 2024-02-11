@@ -1,6 +1,7 @@
 import "settings/entry"
 
 local gfx <const> = playdate.graphics
+local _painterMenuCard = Painter.commonPainters.menuCard()
 
 class("WidgetMenuSettings").extends(Widget)
 
@@ -9,21 +10,20 @@ WidgetMenuSettings.type = {
 	button = 2
 }
 
-function WidgetMenuSettings:init(config)
-	self.config = config
-	
+function WidgetMenuSettings:_init(config)	
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.samples)
 	
-	self.state = 1
-	
-	self.painters = {}
-	self.entries = {}
 	self.signals = {}
 end
 
 function WidgetMenuSettings:_load()
+	self.painters = {}
+	self.entries = {}
+	
+	self:setStateInitial(1)
+
 	self.painters.frame = Painter(function(rect)
 		gfx.setColor(gfx.kColorWhite)
 		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
@@ -33,41 +33,6 @@ function WidgetMenuSettings:_load()
 		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
 		
 		gfx.drawTextAligned("SETTINGS MENU", rect.x + rect.w / 2, rect.y + rect.h / 2, kTextAlignment.center)
-	end)
-	
-	local imageScrew1 = gfx.image.new(kAssetsImages.screw)
-	
-	local painterCardOutline = Painter(function(rect)
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.7, gfx.image.kDitherTypeDiagonalLine)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		local rectBorder = Rect.inset(rect, 10, 14)
-		local rectBorderInner = Rect.inset(rectBorder, 4, 6)
-		local rectBorderInnerShadow = Rect.offset(rectBorderInner, -1, -1)
-		
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.3, gfx.image.kDitherTypeDiagonalLine)
-		gfx.setLineWidth(3)
-		gfx.drawRoundRect(rectBorderInnerShadow.x, rectBorderInnerShadow.y, rectBorderInnerShadow.w, rectBorderInnerShadow.h, 6)
-		
-		gfx.setColor(gfx.kColorWhite)
-		gfx.fillRoundRect(rectBorderInner.x, rectBorderInner.y, rectBorderInner.w, rectBorderInner.h, 6)
-		
-		local size = imageScrew1:getSize()
-		imageScrew1:rotatedImage(90):draw(rect.x + 4, rect.y + 4)
-		imageScrew1:rotatedImage(45):draw(rect.x + rect.w - size - 4, rect.y + 4)
-		imageScrew1:draw(rect.x + 4, rect.y + rect.h - size - 4)
-		imageScrew1:draw(rect.x + rect.w - size - 4, rect.y + rect.h - size - 4)
-	end)
-	
-	self.painters.card = Painter(function(rect)
-		-- Painter background
-		
-		gfx.setColor(gfx.kColorWhite)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		painterCardOutline:draw(rect)
 	end)
 	
 	local function entryCallback(entry, key, value)
@@ -101,9 +66,9 @@ function WidgetMenuSettings:_load()
 		end
 	end
 	
-	self:loadSample(kAssetsSounds.menuSelect)
-	self:loadSample(kAssetsSounds.menuSelectFail)
-	self:loadSample(kAssetsSounds.menuAccept)
+	self:loadSample(kAssetsSounds.menuSelect, 0.6)
+	self:loadSample(kAssetsSounds.menuSelectFail, 0.8)
+	self:loadSample(kAssetsSounds.menuAccept, 0.7)
 	
 	for i, entryConfig in ipairs(self.config.entries) do
 		
@@ -127,7 +92,7 @@ end
 
 function WidgetMenuSettings:_draw(frame, rect)
 	local insetRect = Rect.inset(frame, 12, 6)
-	self.painters.card:draw(insetRect)
+	_painterMenuCard:draw(insetRect)
 	
 	local entryHeight = 32
 	local margin = 4
@@ -171,9 +136,7 @@ function WidgetMenuSettings:_changeState(stateFrom, stateTo)
 end
 
 function WidgetMenuSettings:_unload()
-	self.samples = nil
 	self.painters = nil
 	
 	for _, child in pairs(self.children) do child:unload() end
-	self.children = nil
 end

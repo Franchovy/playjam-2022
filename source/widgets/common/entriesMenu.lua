@@ -1,16 +1,16 @@
 import "entriesMenu/entry"
 
 local gfx <const> = playdate.graphics
+local filter <const> = playdate.kButtonA | playdate.kButtonB | playdate.kButtonUp | playdate.kButtonDown
 
 class("WidgetEntriesMenu").extends(Widget)
 
-function WidgetEntriesMenu:init(config)
-	self.config = config
-	
+function WidgetEntriesMenu:_init(config)
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.samples)
+	self:supply(Widget.deps.input)
 	
-	self:setStateInitial(self.config, 1)
+	self:setStateInitial(1, #self.config.entries)
 	
 	self.signals = {}
 	self.painters = {}
@@ -44,9 +44,9 @@ function WidgetEntriesMenu:_load()
 		end)
 	end
 	
-	self:loadSample(kAssetsSounds.menuSelect)
-	self:loadSample(kAssetsSounds.menuSelectFail)
-	self:loadSample(kAssetsSounds.menuAccept)
+	self:loadSample(kAssetsSounds.menuSelect, 0.6)
+	self:loadSample(kAssetsSounds.menuSelectFail, 0.8)
+	self:loadSample(kAssetsSounds.menuAccept, 0.7)
 end
 
 function WidgetEntriesMenu:_draw(frame)
@@ -65,33 +65,29 @@ function WidgetEntriesMenu:_draw(frame)
 end
 
 function WidgetEntriesMenu:_update()
-	if playdate.buttonJustPressed(playdate.kButtonA) or (playdate.buttonJustPressed(playdate.kButtonB)) then
+	self:filterInput(filter)
+end
+
+function WidgetEntriesMenu:_handleInput(input)
+	if input.pressed & (playdate.kButtonA | playdate.kButtonB) ~= 0 then
 		self:playSample(kAssetsSounds.menuAccept)
-				
+		
 		self.signals.entrySelected(self.state)
 	end
 	
-	if playdate.buttonJustPressed(playdate.kButtonDown) then
+	if input.pressed & playdate.kButtonDown ~= 0 then
 		if self.state < #self.entries then
 			self:playSample(kAssetsSounds.menuSelect)
 			self:setState(self.state + 1)
-			
-			if self.frame ~= nil then
-				gfx.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
-			end
 		else
 			self:playSample(kAssetsSounds.menuSelectFail)
 		end
 	end
 	
-	if playdate.buttonJustPressed(playdate.kButtonUp) then
+	if input.pressed & playdate.kButtonUp ~= 0 then
 		if self.state > 1 then
 			self:playSample(kAssetsSounds.menuSelect)
 			self:setState(self.state - 1)
-			
-			if self.frame ~= nil then
-				gfx.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
-			end
 		else
 			self:playSample(kAssetsSounds.menuSelectFail)
 		end
@@ -101,6 +97,10 @@ end
 function WidgetEntriesMenu:_changeState(_, stateTo)
 	for i, entry in ipairs(self.entries) do
 		entry:setState(stateTo == i and entry.kStates.selected or entry.kStates.unselected)
+		
+		if self.frame ~= nil then
+			gfx.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+		end
 	end
 end
 

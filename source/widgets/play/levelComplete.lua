@@ -7,24 +7,22 @@ local timer <const> = playdate.timer
 
 class("LevelComplete").extends(Widget)
 
-function LevelComplete:init(config)
-	self.config = config
-	
+function LevelComplete:_init()
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animators)
+	self:supply(Widget.deps.input)
+	self:supply(Widget.deps.timers)
 	
-	self:setStateInitial({
-		text = 1,
-		overlay = 2,
-		menu = 3
-	}, 1)
+	self:setStateInitial(1, {
+		"text",
+		"overlay",
+		"menu",
+	})
 	
 	self.painters = {}
 	self.images = {}
 	self.blinkers = {}
-	
-	self.previousBlink = false
 	
 	self.signals = {}
 end
@@ -33,7 +31,8 @@ function LevelComplete:_load()
 	
 	self:loadSample(kAssetsSounds.levelCompleteBlink, 0.7)
 	self:loadSample(kAssetsSounds.levelCompleteCard, 0.7)
-	self:loadSample(kAssetsSounds.menuAccept)
+	self:loadSample(kAssetsSounds.levelCompleteStar, 0.7)
+	self:loadSample(kAssetsSounds.menuAccept, 0.7)
 	
 	local drawMode = getColorDrawModeFill(self.config.titleColor)
 	gfx.setImageDrawMode(drawMode)
@@ -128,8 +127,8 @@ function LevelComplete:_load()
 		local textHeight2 = getFont(kAssetsFonts.twinbee2x):getHeight()
 		local topTextRect = Rect.with(rect, { y = topTextRect.y + textHeight15 + 3, h = textHeight2 })
 		
-		local coinsLabelText = self.config.objectives.coinCount .. "/".. self.config.objectives.coinCountObjective
-		local timeLabelText = self.config.objectives.timeString .. "/".. self.config.objectives.timeStringObjective
+		local coinsLabelText = self.config.objectives.coinsString
+		local timeLabelText = self.config.objectives.timeString
 		
 		setCurrentFont(kAssetsFonts.twinbee2x)
 		gfx.drawTextAligned(coinsLabelText, rectLeft.x + rectLeft.w / 2, topTextRect.y + topTextRect.h / 2, kTextAlignment.center)
@@ -216,7 +215,7 @@ function LevelComplete:_draw(rect)
 				inverted = (not blinker1 and blinker2) or (not blinker2 and blinker1) 
 			})
 		elseif self.state == self.kStates.menu then
-			local rectMenu = Rect.with(Rect.offset(rectContentBottom, 70, 8), { w = 180, h = 70 })
+			local rectMenu = Rect.with(Rect.offset(rectContentBottom, 70, 2), { w = 180, h = 70 })
 			self.children.menu:draw(rectMenu)
 		end
 	end
@@ -224,17 +223,13 @@ end
 
 function LevelComplete:_update()
 	if self.state == self.kStates.text then
-		if self.blinkers.blinkerTitle ~= self.previousBlinkTitle then
+		local _blinkerTitle = self.blinkers.blinkerTitle
+		if _blinkerTitle.hasJustChanged then
 			gfx.sprite.addDirtyRect(10, 100, 380, 40)
-		end
 		
-		if self.blinkers.blinkerTitle.on then
-			if self.previousBlinkTitle == false then
+			if _blinkerTitle.on == true then
 				self:playSample(kAssetsSounds.levelCompleteBlink)
-				self.previousBlinkTitle = true
 			end
-		else 
-			self.previousBlinkTitle = false
 		end
 	end
 	
@@ -251,6 +246,8 @@ function LevelComplete:_update()
 	end
 	
 	if self.state == self.kStates.overlay then
+		self:filterInput(playdate.kButtonA | playdate.kButtonB)
+		
 		local blinker1 = self.blinkers.blinkerPressAButton1.on
 		local blinker2 = self.blinkers.blinkerPressAButton2.on
 		
@@ -262,20 +259,25 @@ function LevelComplete:_update()
 	end
 	
 	if self.state == self.kStates.menu then
+		self:passInput(self.children.menu)
 		
 		local menuIsVisible = self.children.menu:isVisible()
-		if menuIsVisible ~= self.previousVisibleMenu then
+		if menuIsVisible ~= self.menuWasVisible then
 			gfx.sprite.addDirtyRect(37, 130, 326, 85)
 		end
-		self.previousVisibleMenu = menuIsVisible
+		self.menuWasVisible = menuIsVisible
 	end
-	
-	if playdate.buttonJustPressed(playdate.kButtonA) or (playdate.buttonJustPressed(playdate.kButtonB)) then
-		if self.state == self.kStates.overlay then
-			self:playSample(kAssetsSounds.menuAccept)
-			
-			self:setState(self.kStates.menu)
-		end
+end
+
+function LevelComplete:_handleInput(input)
+	if self.state ~= self.kStates.overlay then
+		return
+	end
+		
+	if input.pressed & (playdate.kButtonA | playdate.kButtonB) ~= 0 then
+		self:playSample(kAssetsSounds.menuAccept)
+		
+		self:setState(self.kStates.menu)
 	end
 end
 
@@ -291,17 +293,12 @@ function LevelComplete:_changeState(stateFrom, stateTo)
 			star.timers.timer:start()
 		end
 		
-		timer.performAfterDelay(100 + #self.stars * 700 + 700, function()
-		-- Safeguard in case of unloading before timer callback
-			if self.blinkers == nil then
-				return
-			end
-			
+		self:performAfterDelay(100 + #self.stars * 700 + 700, function()
 			self.blinkers.blinkerPressAButton1:startLoop()
 			self.blinkers.blinkerPressAButton2:startLoop()
 		end)
 	elseif stateFrom == self.kStates.overlay and (stateTo == self.kStates.menu) then
-		timer.performAfterDelay(100, function()
+		self:performAfterDelay(100, function()
 			self.children.menu:setVisible(true)
 		end)
 	end
@@ -310,7 +307,6 @@ end
 function LevelComplete:_unload()
 	self.images = nil
 	self.blinkers = nil
-	self.samples = nil
 	self.painters = nil
 	
 	for _, child in pairs(self.children) do child:unload() end

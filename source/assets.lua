@@ -13,23 +13,22 @@ kAssetsImages = {
 	levelEnd = dirImages.."sprites/portal",
 	wheel = dirImages.."sprites/wheel/wheel",
 	star = dirImages.."sprites/star/star",
-	starMenu = dirImages.."sprites/menu/star",
+	starMenu = dirImages.."menu/star",
 	particles = dirImages.."sprites/particles",
-	background = dirImages.."sprites/background",
-	background2 = dirImages.."sprites/background2",
-	background3 = dirImages.."sprites/background3",
-	background4 = dirImages.."sprites/background4",
-	menuMountain = dirImages.."backgrounds/menu-mountain",
-	menuSpace = dirImages.."backgrounds/menu-space",
-	menuCity = dirImages.."backgrounds/menu-city",
+	background = dirImages.."menu/title",
+	background2 = dirImages.."menu/title2",
+	background3 = dirImages.."menu/title3",
+	background4 = dirImages.."menu/title4",
 	screw = dirImages.."menu/screw",
 	transitionBackground = dirImages.."transition/background",
 	transitionForeground = dirImages.."transition/foreground",
-	menuSettings = dirImages.."menu/settings"
+	menuSettings = dirImages.."menu/settings",
+	lock = dirImages.."menu/lock"
 }
 
 kAssetsSounds = {
-	checkpointSet = dirSounds.."checkpoint",
+	checkpointLoad = dirSounds.."checkpoint-load",
+	checkpointSet = dirSounds.."checkpoint-set",
 	coin = dirSounds.."coin",
 	death1 = dirSounds.."death1",
 	death2 = dirSounds.."death2",
@@ -50,7 +49,8 @@ kAssetsSounds = {
 	tick = dirSounds.."tick",
 	transitionSwoosh = dirSounds.."transition-swoosh",
 	transitionSlam = dirSounds.."transition-slam",
-	transitionOut = dirSounds.."transition-out"
+	transitionOut = dirSounds.."transition-out",
+	levelCompleteStar = dirSounds.."level-complete-star"
 }
 
 kAssetsTracks = {
@@ -62,10 +62,4 @@ kAssetsFonts = {
 	twinbee2x = dirFonts.."Twinbee_2x",
 	twinbee15x = dirFonts.."Twinbee_1.5x",
 	marbleMadness = dirFonts.."Marble Madness"
-}
-
-kAssetsLevels = {
-	mountain = dirLevels.."1_mountain.json",
-	space = dirLevels.."2_space.json",
-	city = dirLevels.."3_city.json",
 }

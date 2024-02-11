@@ -5,6 +5,7 @@ import "playdate"
 import "engine/colliderSprite"
 
 local gfx <const> = playdate.graphics
+local timer <const> = playdate.timer
 
 class("Checkpoint").extends(ColliderSprite)
 
@@ -34,9 +35,16 @@ function Checkpoint:init()
 	
 	-- Sound effects
 	
+	sampleplayer:addSample("load", kAssetsSounds.checkpointLoad)
 	sampleplayer:addSample("set", kAssetsSounds.checkpointSet)
 	
 	self:setUpdatesEnabled(false)
+	
+	-- Loading update
+	
+	self._loadTimer = nil
+	self._loadFinished = false
+	self._loadPlayer = nil
 end
 
 function Checkpoint:ready()
@@ -47,7 +55,43 @@ function Checkpoint:isSet()
 	return self.config.isSet
 end
 
+function Checkpoint:loadCheckpoint()
+	if self._loadTimer == nil then
+		self._loadTimer = timer.new(800, function()
+			self._loadFinished = true
+		end)
+		
+		self._loadPlayer = sampleplayer:playSample("load")
+	end
+end
+
+function Checkpoint:stopLoading()
+	if self._loadTimer ~= nil then
+		self._loadTimer:remove()
+		self._loadTimer = nil
+	end
+	
+	if self._loadPlayer ~= nil then
+		self._loadPlayer:stop()
+		self._loadPlayer = nil
+	end
+end
+
+function Checkpoint:loadFinished()
+	return self._loadFinished
+end
+
 function Checkpoint:set()
+	print("Set")
+	
+	if self._loadTimer ~= nil then
+		-- Reset (for recycling purposes)
+		self._loadTimer:remove()
+		self._loadTimer = nil
+		self._loadFinished = false
+		self._loadPlayer = nil
+	end
+	
 	sampleplayer:playSample("set")
 	
 	self.config.isSet = true

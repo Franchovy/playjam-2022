@@ -4,7 +4,19 @@ local gfx <const> = playdate.graphics
 
 class("Painter").extends()
 
-function Painter:init(drawFunction)
+function Painter.factory(drawFunction)
+	return function(...)
+		local args = {...}
+		return Painter(drawFunction, table.unpack(args))
+	end
+end
+
+function Painter:init(drawFunction, ...)
+	local args = {...}
+	if #args > 0 then
+		self.args = args
+	end
+	
 	self.drawFunction = drawFunction
 	
 	self.stateImages = {}
@@ -18,7 +30,7 @@ function Painter:draw(frame, state)
 		image = gfx.image.new(frame.w, frame.h)
 		
 		gfx.pushContext(image)
-		self.drawFunction({x = 0, y = 0, w = frame.w, h = frame.h }, state)
+		self.drawFunction({x = 0, y = 0, w = frame.w, h = frame.h }, state, self.args ~= nil and table.unpack(self.args) or nil)
 		gfx.popContext()
 		
 		self:_setImage(image, state)

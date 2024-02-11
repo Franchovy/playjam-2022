@@ -1,0 +1,52 @@
+name: Upload to Itch.io
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Butler (itch.io)
+      run: | # download butler
+        echo "Downloading butler CI tool..."
+        curl --silent -L -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+        echo "Unzipping butler..."
+        unzip butler.zip
+        chmod +x butler
+        echo "Checking valid install:"
+        ./butler -V
+
+    - name: Set up Playdate SDK
+      run: | 
+        curl -L -o playdateSDK https://download.panic.com/playdate_sdk/Linux/PlaydateSDK-latest.tar.gz
+        mkdir _pd-sdk
+        tar -zxf playdateSDK -C _pd-sdk
+        cd _pd-sdk/*/
+        # sudo chown runner setup.sh && chmod +x setup.sh
+        sudo ./setup.sh || true
+        echo "PLAYDATE_SDK_PATH=$PWD" >> $GITHUB_ENV
+        echo "$PWD/bin" >> $GITHUB_PATH
+
+    - name: Build PDX
+      run: |
+        chmod +x ./scripts/build.sh
+        ./scripts/build.sh
+
+    - name: Get Build Number
+      run: | 
+        echo "BUILD_VERSION=$(cat ./source/pdxinfo | grep -o 'buildNumber=[0-9]*' | awk -F= '{print $2}')" >> $GITHUB_ENV
+
+    - name: Upload to Itch.io
+      env:
+        BUTLER_API_KEY: ${{ secrets.BUTLERAPIKEY }}
+      run: |
+        zip -r Wheel\ Runner.pdx.zip Wheel\ Runner.pdx
+        ./butler push ./Wheel\ Runner.pdx.zip franchovy/wheel-runner:channel --userversion $BUILD_VERSION
+

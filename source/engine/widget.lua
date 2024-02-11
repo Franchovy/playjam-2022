@@ -17,24 +17,48 @@ import "widget/frame"
 import "widget/keyValueState"
 import "widget/samples"
 import "widget/fileplayer"
+import "widget/timers"
 
 local disp <const> = playdate.display
 local gfx <const> = playdate.graphics
 
-function Widget.new(class, ...)
-	local widget = class(...)
+function Widget.init(self)
+	self._state = {}
+end
+
+function Widget.new(class, config)
+	local widget = class(config)
+	class.super.init(widget)
+	widget.config = config
 	
-	widget._state = {
-		isLoaded = false,
-		isVisible = true
-	}
+	if widget._init ~= nil then 
+		widget:_init(config)
+	end
+	
+	ifNil(widget._state, 
+		function()
+			widget._state = {
+				isLoaded = false,
+				isVisble = true
+			}
+		end,
+		function()
+			ifNil(widget._state.isLoaded, function()
+				widget._state.isLoaded = false
+			end)
+			
+			ifNil(widget._state.isVisible, function()
+				widget._state.isVisible = true
+			end)
+		end
+	)
 	
 	widget.children = table.create(0, 4)
 	
 	return widget
 end
 
-function Widget:supply(dep)
+function Widget:supply(dep, config)
 	if dep._config ~= nil then
 		if dep._config.dependsOn ~= nil then
 			for _, dep in pairs(dep._config.dependsOn) do
@@ -45,7 +69,7 @@ function Widget:supply(dep)
 		end
 	end
 	
-	dep._supply(self)
+	dep._supply(self, config)
 end
 
 function Widget:createSprite(zIndex)
@@ -66,18 +90,17 @@ function Widget:createSprite(zIndex)
 		sprite.draw = function(s, x, y, w, h)
 			local frame = Rect.make(s.x, s.y, s.width, s.height)
 			local drawRect = Rect.make(x, y, w, h)
-			self:draw(frame, self.state, drawRect)
+			self:draw(frame, drawRect)
 		end
 		
 		sprite:add()
 		self.sprite = sprite
+		
+		self:_addUnloadCallback(function()
+			self.sprite:remove()
+			self.sprite = nil
+		end)
 	end
-end
-
-function Widget.load(self)
-	self:_load()
-	
-	self._state.isLoaded = true
 end
 
 function Widget.setVisible(self, isVisible)
@@ -94,15 +117,37 @@ function Widget.isVisible(self)
 	return self._state.isVisible
 end
 
+function Widget.load(self)
+	if self._state.isLoaded == true then
+		return
+	end
+	
+	self:_load()
+	
+	self._state.isLoaded = true
+	
+	if self._loadCallbacks ~= nil then
+		for _, callback in pairs(self._loadCallbacks) do
+			callback(self)
+		end
+	end
+end
+
 function Widget.unload(self)
 	if self._state.isLoaded == false then
 		return
 	end
 	
-	self._state.isLoaded = false
-	
 	if self._unload ~= nil then
 		self:_unload()
+	end
+	
+	self._state.isLoaded = false
+	
+	if self._unloadCallbacks ~= nil then
+		for _, callback in pairs(self._unloadCallbacks) do
+			callback(self)
+		end
 	end
 end
 
@@ -111,11 +156,13 @@ function Widget:isLoaded()
 end
 
 function Widget:update()
-	if self._state.isLoaded == false or (self._state.isVisible == false) then
+	if self._state.isLoaded == false then
 		return
 	end
 	
-	self:_update()
+	if self._update ~= nil then
+		self:_update()
+	end
 	
 	if self.children ~= nil then
 		for _, child in pairs(self.children) do
@@ -128,6 +175,22 @@ function Widget:update()
 			callback(self)
 		end
 	end
+end
+
+function Widget:_addLoadCallback(callback)
+	if self._loadCallbacks == nil then
+		self._loadCallbacks = {}
+	end
+	
+	table.insert(self._loadCallbacks, callback)
+end
+
+function Widget:_addUnloadCallback(callback)
+	if self._unloadCallbacks == nil then
+		self._unloadCallbacks = {}
+	end
+	
+	table.insert(self._unloadCallbacks, callback)
 end
 
 function Widget:_addUpdateCallback(callback)

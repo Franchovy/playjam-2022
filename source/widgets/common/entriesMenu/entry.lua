@@ -1,14 +1,11 @@
-import "utils/value"
 
 local gfx <const> = playdate.graphics
 
 class("WidgetEntriesMenuEntry").extends(Widget)
 
-function WidgetEntriesMenuEntry:init(config)
-	self.config = config
-	
+function WidgetEntriesMenuEntry:_init(config)
 	self:supply(Widget.deps.state)
-	self:setStateInitial({ unselected = 1, selected = 2 }, self.config.selected and 2 or 1)
+	self:setStateInitial(self.config.selected and 2 or 1, { "unselected", "selected" })
 	
 	self.images = {}
 	self.painters = {}
@@ -52,6 +49,8 @@ function WidgetEntriesMenuEntry:_draw(rect)
 		local circleRect = Rect.with(Rect.size(circleSize, circleSize), { x = math.ceil(rect.x + (marginLeft - circleSize) / 2), y = math.ceil(rect.y + marginVert) })
 		self.painters.circle:draw(circleRect)
 	end
+	
+	self.frame = rect
 end
 
 function WidgetEntriesMenuEntry:_update()
@@ -69,5 +68,7 @@ function WidgetEntriesMenuEntry:setState(state)
 end
 
 function WidgetEntriesMenuEntry:_changeState(stateFrom, stateTo)
-	
+	if self.frame ~= nil then
+		gfx.sprite.addDirtyRect(self.frame.x, self.frame.y, self.frame.w, self.frame.h)
+	end
 end

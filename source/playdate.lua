@@ -35,6 +35,7 @@ import "playdate/extensions/geometry"
 
 import "CoreLibs/animation"
 
+import "playdate/extensions/blinker"
 import "playdate/extensions/animator"
 
 -- Timers

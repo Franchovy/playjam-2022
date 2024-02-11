@@ -2,16 +2,14 @@ local gfx <const> = playdate.graphics
 local easing <const> = playdate.easingFunctions
 class("WidgetTransition").extends(Widget)
 
-function WidgetTransition:init(config)
-	self.config = config or {}
-	
+function WidgetTransition:_init()
 	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.animators)
 	self:supply(Widget.deps.samples)
 	
 	self:createSprite(kZIndex.transition)
 	
-	self:setStateInitial({ open = 1, closed = 2 }, 1)
+	self:setStateInitial(1, { "open", "closed" })
 
 	self.images = {}	
 	self.painters = {}
@@ -23,7 +21,9 @@ function WidgetTransition:_load()
 	self.images.background = gfx.image.new(kAssetsImages.transitionBackground)
 	self.images.foreground = gfx.image.new(kAssetsImages.transitionForeground)
 	self.images.wheel = gfx.imagetable.new(kAssetsImages.wheel):getImage(1):invertedImage()
-	self.images.text = gfx.imageWithText("LOADING...", 250, 25):scaledImage(2):invertedImage()
+	
+	setCurrentFont(kAssetsFonts.twinbee2x)
+	self.images.text = gfx.imageWithText("LOADING...", 250, 25):invertedImage()
 	
 	self.painters.screen = Painter(function(rect)
 		gfx.setColor(gfx.kColorBlack)
@@ -52,6 +52,25 @@ function WidgetTransition:_load()
 	self:loadSample(kAssetsSounds.transitionSwoosh, 0.8, "swoosh")
 	self:loadSample(kAssetsSounds.transitionSlam, 0.8, "slam")
 	self:loadSample(kAssetsSounds.transitionOut, 0.8, "out")
+	
+	self.cover = function(callback)
+		self:setVisible(true)
+		self:setState(self.kStates.closed)
+		
+		self.signals.animationFinished = callback
+	end
+	
+	self.uncover = function(callback)
+		self:setState(self.kStates.open)
+		
+		self.signals.animationFinished = function()
+			self:setVisible(false)
+			
+			if callback ~= nil then
+				callback()
+			end
+		end
+	end
 end
 
 function WidgetTransition:_draw(frame)

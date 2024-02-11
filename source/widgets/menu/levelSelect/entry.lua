@@ -1,62 +1,68 @@
-import "utils/value"
+import "widgets/common/painters"
 
 local gfx <const> = playdate.graphics
+local geo <const> = playdate.geometry
 
+local _assign <const> = geo.rect.assign
+local _tInset <const> = geo.rect.tInset
+
+local _outlinePainterThick <const> = Painter.commonPainters.outlinePainterThick()
+local _screenPainterDark <const> = Painter.commonPainters.darkScreenFillPainter()
+local _fillPainterLight <const> = Painter.commonPainters.fillPainterLight()
 class("LevelSelectEntry").extends(Widget)
 
-function LevelSelectEntry:init(config)
-	self.config = config
+function LevelSelectEntry:_init(config)
 	
 	self:supply(Widget.deps.state)
+	self:supply(Widget.deps.frame, { needsLayout = true })
 	
 	local isSelected = config.isSelected == true
-	self:setStateInitial({ selected = 1, unselected = 2}, isSelected and 1 or 2)
+	self:setStateInitial(isSelected and 1 or 2, { "selected", "unselected" })
 	
 	self.images = {}
 	self.painters = {}
 end
 
 function LevelSelectEntry:_load()
-	self.images.title = gfx.imageWithText(self.config.text, 200, 70):scaledImage(2)
-	
-	self.painters.outline = Painter(function(rect, state)
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
-		gfx.setLineWidth(1)
-		gfx.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
+	self.painters.painter = Painter(function(rect, state)
+		setCurrentFont(kAssetsFonts.twinbee2x)
+		local fontHeight = gfx.getFont():getHeight()
+		local margin = 10
+
+		gfx.drawText(self.config.text, rect.x + margin, rect.y + (rect.h - fontHeight) / 2)
 		
-		gfx.setDitherPattern(0.8, gfx.image.kDitherTypeScreen)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
-	end)
-	
-	self.painters.outlineSelected = Painter(function(rect, state)
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setLineWidth(3)
-		gfx.setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
-		gfx.drawRoundRect(rect.x, rect.y, rect.w, rect.h, 12)
-	end)
-end
-
-function LevelSelectEntry:_draw(rect)
-	local outlineRect = Rect.inset(rect, 20, 0)
-	
-	self.images.title:draw(outlineRect.x + 10, outlineRect.y + 12)
-	
-	if self.state == self.kStates.unselected then
-		if self.config.showOutline then	
-			self.painters.outline:draw(outlineRect)
+		if self.config.locked == true then
+			_fillPainterLight:draw(rect)
+			_screenPainterDark:draw(rect)
+			
+			local imageLock = gfx.image.new(kAssetsImages.lock)
+			local imageLockW, imageLockH = imageLock:getSize()
+			local imageRect = geo.rect.new(rect.x + (rect.w - imageLockW) / 2, rect.y + (rect.h - imageLockH) / 2, imageLockW, imageLockH)
+			
+			gfx.setColor(gfx.kColorWhite)
+			gfx.fillRoundRect(imageRect:insetBy(-8, -2), 4)
+			
+			gfx.setColor(gfx.kColorBlack)
+			gfx.setDitherPattern(0.2, gfx.image.kDitherTypeDiagonalLine)
+			gfx.fillRoundRect(imageRect:insetBy(-6, 0), 4)
+			
+			imageLock:draw(imageRect.x, imageRect.y)
 		end
-	else
-		self.painters.outlineSelected:draw(outlineRect)
-	end
+		
+		if state.selected == true then
+			_outlinePainterThick:draw(rect)
+		end
+	end)
 end
 
-function LevelSelectEntry:_update()
-	
+function LevelSelectEntry:_draw(frame, rect)
+	self.painters.painter:draw(self.rects.painter, { selected = (self.state == self.kStates.selected) })
 end
 
-function LevelSelectEntry:_changeState(stateFrom, stateTo)
-	
+function LevelSelectEntry:_performLayout()
+	local _rects = self.rects
+	local _frame = self.frame
+	_rects.painter = _tInset(_assign(_rects.painter, _frame), 20, 2)
 end
 
 function LevelSelectEntry:_unload()

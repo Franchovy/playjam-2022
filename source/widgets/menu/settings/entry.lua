@@ -3,9 +3,7 @@ class("WidgetMenuSettingsEntry").extends(Widget)
 
 -- Special chars: ◁ ◀ ▶ ▷
 
-function WidgetMenuSettingsEntry:init(config)
-	self.config = config
-	
+function WidgetMenuSettingsEntry:_init(config)
 	self:supply(Widget.deps.keyValueState)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.samples)
@@ -54,9 +52,9 @@ function WidgetMenuSettingsEntry:_load()
 		end)
 	end
 	
-	self:loadSample(kAssetsSounds.menuSelect)
-	self:loadSample(kAssetsSounds.menuSelectFail)
-	self:loadSample(kAssetsSounds.menuAccept)
+	self:loadSample(kAssetsSounds.menuSelect, 0.6)
+	self:loadSample(kAssetsSounds.menuSelectFail, 0.8)
+	self:loadSample(kAssetsSounds.menuAccept, 0.7)
 end
 
 function WidgetMenuSettingsEntry:_draw(frame, rect)
@@ -108,6 +106,5 @@ function WidgetMenuSettingsEntry:_handleInput(input)
 end
 
 function WidgetMenuSettingsEntry:_unload()
-	self.samples = nil
 	self.painters = nil
 end
