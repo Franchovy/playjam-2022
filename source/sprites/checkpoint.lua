@@ -30,8 +30,7 @@ function Checkpoint:init()
 	
 	self:updateImage()
 	self:setCollider(kColliderType.rect, rectNew(0, 0, self:getSize()))
-	self:setCollisionType(kCollisionType.trigger)
-	self:readyToCollide()
+	self:setCollisionType(kCollisionType.triggerStatic)
 	
 	-- Sound effects
 	
@@ -41,6 +40,7 @@ function Checkpoint:init()
 end
 
 function Checkpoint:ready()
+	self:readyToCollide()
 end
 
 function Checkpoint:isSet()

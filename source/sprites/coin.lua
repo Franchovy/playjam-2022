@@ -25,8 +25,7 @@ function Coin:init()
 	self:setImage(coinImage)
 
 	self:setCollider(kColliderType.rect, rectNew(0, 0, self:getSize()))
-	self:setCollisionType(kCollisionType.trigger)
-	self:readyToCollide()
+	self:setCollisionType(kCollisionType.triggerStatic)
 	self:setCenter(0, 0)
 	
 	self.config = {
@@ -37,13 +36,17 @@ function Coin:init()
 	self:setGroupMask(kCollisionGroups.static)
 end
 
+function Coin:ready()
+	self:readyToCollide()
+end
+
 function Coin:loadConfig(config)
 	self.config.isPicked = config.isPicked
 
 	if self.config.isPicked then
 		self:setCollisionType(kCollisionType.ignore)
 	else
-		self:setCollisionType(kCollisionType.trigger)
+		self:setCollisionType(kCollisionType.triggerStatic)
 	end
 	
 	self:updateImage()
@@ -55,7 +58,7 @@ end
 
 function Coin:reset()
 	self.config.isPicked = false
-	self:setCollisionType(kCollisionType.trigger)
+	self:setCollisionType(kCollisionType.triggerStatic)
 	
 	self:updateImage()
 end

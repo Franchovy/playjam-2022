@@ -18,11 +18,14 @@ function LevelEnd:init()
 	self:setImage(image)
 	self:setCenter(0, 0)
 	self:setCollider(kColliderType.rect, rectNew(0, 0, self:getSize()))
-	self:setCollisionType(kCollisionType.trigger)
-	self:readyToCollide()
+	self:setCollisionType(kCollisionType.triggerStatic)
 	
 	self:setUpdatesEnabled(false)
 	self:setGroupMask(kCollisionGroups.static)
+end
+
+function LevelEnd:ready()
+	self:readyToCollide()
 end
 
 function LevelEnd:collisionWith(other)

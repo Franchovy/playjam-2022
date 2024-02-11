@@ -48,24 +48,86 @@ function dump(o)
 end
 
 function CollisionSolver:_addColliderToGridPosition(collisionType, collider)
+    local addColliderToGrid = function(gridPosX, gridPosY)
+        -- grid is represented as a dynamic 2D array, meaning only the required pair of coordinates are added
+        local gridContent = self.colliders[collisionType]
+
+        local gridX = gridContent[gridPosX]
+        if gridX == nil then
+            gridContent[gridPosX] = {}
+            gridX = gridContent[gridPosX]
+        end
+
+        local gridY = gridX[gridPosY]
+        if gridY == nil then
+            gridX[gridPosY] = {}
+            gridY = gridX[gridPosY]
+        end
+
+        if not self:_findColliderInTable(gridY, collider) then -- no dupes
+            table.insert(gridY, collider)
+        end
+    end
+
+    local eligibleToMultigrid = collisionType == kCollisionType.static and collider:getCollider().type == kColliderType.rect
+
+    -- add directly to grid, don't support multiple grid positions for now
+    if not eligibleToMultigrid then
+        local gridPosX, gridPosY = kGame.worldPosToGrid(collider.x, collider.y)
+        addColliderToGrid(gridPosX, gridPosY)
+    -- a rect may exist in multiple grid cells at once
+    else
+        local tlX, tlY, trX, trY, brX, brY, blX, blY = self:_getCornersGridCoordinates(collider)
+        -- top edge
+        for gridPosX=tlX, trX do
+            addColliderToGrid(gridPosX, tlY)
+        end
+        -- right edge
+        for gridPosY=trY, brY do
+            addColliderToGrid(trX, gridPosY)
+        end
+        --bottom edge
+        for gridPosX=blX, brX do
+            addColliderToGrid(gridPosX, blY)
+        end
+        --left edge
+        for gridPosY=tlY, blY do
+            addColliderToGrid(tlX, gridPosY)
+        end
+    end
+end
+
+function CollisionSolver:_findColliderInTable(table, collider)
+    for i, value in pairs(table) do
+        if value == collider then
+            return i
+        end
+    end
+
+    return nil
+end
+
+function CollisionSolver:_removeColliderAtGridPosition(collisionType, collider)
     local gridPosX, gridPosY = kGame.worldPosToGrid(collider.x, collider.y)
 
-    -- grid is represented as a dynamic 2D array, meaning only the required pair of coordinates are added
     local gridContent = self.colliders[collisionType]
 
     local gridX = gridContent[gridPosX]
-    if gridX == nil then
-        gridContent[gridPosX] = {}
-        gridX = gridContent[gridPosX]
-    end
-
+    if gridX == nil then return end
+    
     local gridY = gridX[gridPosY]
-    if gridY == nil then
-        gridX[gridPosY] = {}
-        gridY = gridX[gridPosY]
-    end
+    if gridY == nil then return end
 
-    table.insert(gridY, collider)
+    if #gridY == 1 then -- only one element, delete the whole table
+        gridX[gridPosY] = nil
+    else
+        -- search and destroy
+        local index = self:_findColliderInTable(gridY, collider)
+
+        if index then
+            table.remove(gridY, index)
+        end
+    end
 end
 
 function CollisionSolver:_getCollidersAtGridPosition(collisionType, gridPosX, gridPosY)
@@ -82,9 +144,14 @@ function CollisionSolver:_getCollidersAtGridPosition(collisionType, gridPosX, gr
 end
 
 function CollisionSolver:_getCornersGridCoordinates(collider)
-    -- this function makes a huge assumption: the collider hitbox has the size of the image
-    -- this is unaccurate and may lead to issues in the future
-    local x,y,w,h = collider:getBounds()
+    local colliderInfo = collider:getCollider()
+
+    local x,y,w,h = 0,0,0,0
+    if colliderInfo.type == kColliderType.rect then
+        x,y,w,h = colliderInfo.collider[1], colliderInfo.collider[2], colliderInfo.collider[3], colliderInfo.collider[4]
+    else
+        x,y,w,h = collider:getBounds()
+    end
 
     local tlX, tlY = kGame.worldPosToGrid(x, y);
     local trX, trY = kGame.worldPosToGrid(x+w, y);
@@ -94,14 +161,24 @@ function CollisionSolver:_getCornersGridCoordinates(collider)
     return tlX, tlY, trX, trY, brX, brY, blX, blY
 end
 
+function CollisionSolver:isStatic(collisionType)
+    return collisionType == kCollisionType.static or collisionType == kCollisionType.triggerStatic
+end
+
 function CollisionSolver:addCollider(colliderSprite)
     local collisionType = colliderSprite:getCollisionType()
 
     if collisionType == kCollisionType.ignore then return end -- not added
 
-    -- store by position on grid
     if collisionType == kCollisionType.static then
-        self:_addColliderToGridPosition(kCollisionType.static, colliderSprite)
+        assert(colliderSprite:getCollider().type == kColliderType.rect, "Static colliders only support rect collider type for now")
+    end
+
+    assert(collisionType ~= nil, "Tried to add a collider with invalid (nil) collision type")
+
+    -- store by position on grid
+    if self:isStatic(collisionType) then
+        self:_addColliderToGridPosition(collisionType, colliderSprite)
     else
         table.insert(self.colliders[collisionType], colliderSprite)
     end
@@ -109,7 +186,6 @@ function CollisionSolver:addCollider(colliderSprite)
 end
 
 function CollisionSolver:changeCollisionType(colliderSprite, newType, oldType)
-    assert(oldType ~= kCollisionType.static, "CollisionSolver does not support changing type of static collider yet")
 
     if oldType == kCollisionType.ignore then
         -- add directly
@@ -117,55 +193,38 @@ function CollisionSolver:changeCollisionType(colliderSprite, newType, oldType)
         return
     end
 
-    -- search and destroy
-    local index = nil
-    for i, value in pairs(self.colliders[oldType]) do
-        if value == colliderSprite then
-            index = i
-            break
+    if self:isStatic(oldType) then
+        self:_removeColliderAtGridPosition(oldType, colliderSprite)
+    else
+        -- search and destroy
+        local index = self:_findColliderInTable(self.colliders[oldType], colliderSprite)
+
+        if index then
+            table.remove(self.colliders[oldType], index)
         end
     end
 
-    if index then
-        table.remove(self.colliders[oldType], index)
-    end
-
-    if newType ~= kCollisionType.ignore then
-        self:addCollider(colliderSprite)
-    end
-end
-
--- removes nil colliders from the collider list
-function CollisionSolver:cleanUpColliderList()
-    for _, colliderList in pairs(self.colliders) do
-        local deleteIndices = {}
-
-        for pos, col in pairs(colliderList) do
-            if col == nil then
-                table.insert(deleteIndices, pos)
-            end
-        end
-
-        for _, pos in pairs(deleteIndices) do
-            table.remove(colliderList, pos)
-        end
-    end
+    self:addCollider(colliderSprite)
 end
 
 local overlapTruthTable = {
     [kCollisionType.dynamic | kCollisionType.dynamic] = true,
     [kCollisionType.dynamic | kCollisionType.static] = true,
-    [kCollisionType.dynamic | kCollisionType.trigger] = true,
-    [kCollisionType.static | kCollisionType.trigger] = false,
+    [kCollisionType.dynamic | kCollisionType.triggerStatic] = true,
+    [kCollisionType.dynamic | kCollisionType.triggerDynamic] = true,
+    [kCollisionType.static | kCollisionType.triggerStatic] = false,
+    [kCollisionType.static | kCollisionType.triggerDynamic] = false,
     [kCollisionType.static | kCollisionType.static] = false,
-    [kCollisionType.trigger | kCollisionType.trigger] = false,
+    [kCollisionType.triggerStatic | kCollisionType.triggerDynamic] = true,
+    [kCollisionType.triggerStatic | kCollisionType.triggerStatic] = false,
 }
 
 -- only relevant keys are the ones that are true above
 local resolutionTruthTable = {
     [kCollisionType.dynamic | kCollisionType.dynamic] = true,
     [kCollisionType.dynamic | kCollisionType.static] = true,
-    [kCollisionType.dynamic | kCollisionType.trigger] = false,
+    [kCollisionType.dynamic | kCollisionType.triggerDynamic] = false,
+    [kCollisionType.dynamic | kCollisionType.triggerStatic] = false,
 }
 
 -- given two collision types, returns true if we should check overlap between both colliders
@@ -260,37 +319,48 @@ function CollisionSolver:checkCollisions(colliders, otherColliders)
     end
 end
 
-function CollisionSolver:_checkAndResolveGrid(collider, gridColliders)
+function CollisionSolver:_checkAndResolveGrid(collider, gridColliders, testedColliders)
     if gridColliders == nil then return end
 
     for _, gridCollider in pairs(gridColliders) do
+        -- flag as tested or pass
+        if testedColliders[gridCollider] then goto continue
+        else testedColliders[gridCollider] = true end
+
         local overlaps, overlapInfo, resolutionFunction = gridCollider:overlapsWith(collider)
 
-        -- TODO: implement "shouldResolveCollisions" like in checkAndResolve
         if overlaps then
-            local resolutionX, resolutionY = resolutionFunction(overlapInfo)
-            
             local gridCollisionType = gridCollider:getCollisionType()
             local colliderCollisionType = collider:getCollisionType()
 
-            -- calculate the actual resolution amount depending on collision types
-            local resolutionAX, resolutionAY, resolutionBX, resolutionBY = self:_determineResolutionMvt(
-                gridCollisionType,
-                colliderCollisionType,
-                resolutionX, resolutionY
-            )
+            if self:shouldResolveCollisions(gridCollisionType, colliderCollisionType) then
+                local resolutionX, resolutionY = resolutionFunction(overlapInfo)
+                
 
-            if gridCollisionType == kCollisionType.dynamic then
-                gridCollider:moveTo(gridCollider.x + resolutionAX, gridCollider.y + resolutionAY)
+                -- calculate the actual resolution amount depending on collision types
+                local resolutionAX, resolutionAY, resolutionBX, resolutionBY = self:_determineResolutionMvt(
+                    gridCollisionType,
+                    colliderCollisionType,
+                    resolutionX, resolutionY
+                )
+
+                if gridCollisionType == kCollisionType.dynamic then
+                    gridCollider:moveTo(gridCollider.x + resolutionAX, gridCollider.y + resolutionAY)
+                end
+
+                if colliderCollisionType == kCollisionType.dynamic then
+                    collider:moveTo(collider.x + resolutionBX, collider.y + resolutionBY)
+                end
+
+                gridCollider:collisionWith(collider, resolutionAX, resolutionAY)
+                collider:collisionWith(gridCollider, resolutionBX, resolutionBY)
             end
-
-            if colliderCollisionType == kCollisionType.dynamic then
-                collider:moveTo(collider.x + resolutionBX, collider.y + resolutionBY)
-            end
-
-            gridCollider:collisionWith(collider, resolutionAX, resolutionAY)
-            collider:collisionWith(gridCollider, resolutionBX, resolutionBY)
+            
+            gridCollider:collisionWith(collider,0,0)
+            collider:collisionWith(gridCollider,0,0)
         end
+
+        ::continue::
     end
 end
 
@@ -301,28 +371,29 @@ function CollisionSolver:checkCollisionsOnGrid(colliders, collisionTypeForGrid)
         local tlX, tlY, trX, trY, brX, brY, blX, blY = self:_getCornersGridCoordinates(collider)
 
         local gridColliders = {}
+        local testedColliders = {}
         -- check along the bottom range first 
         for i=blX,brX do
             gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, blY)
-            self:_checkAndResolveGrid(collider, gridColliders)
+            self:_checkAndResolveGrid(collider, gridColliders, testedColliders)
         end
         
         -- do the same thing but along the right range
         for i=trY,brY do
             gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, trX, i)
-            self:_checkAndResolveGrid(collider, gridColliders)
+            self:_checkAndResolveGrid(collider, gridColliders, testedColliders)
         end
 
         -- top range
         for i=tlX,trX do
             gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, i, tlY)
-            self:_checkAndResolveGrid(collider, gridColliders)
+            self:_checkAndResolveGrid(collider, gridColliders, testedColliders)
         end
         
         -- left range
         for i=tlY,blY do
             gridColliders = self:_getCollidersAtGridPosition(collisionTypeForGrid, tlX, i)
-            self:_checkAndResolveGrid(collider, gridColliders)
+            self:_checkAndResolveGrid(collider, gridColliders, testedColliders)
         end
     end
 end
@@ -344,14 +415,12 @@ function CollisionSolver:update()
                 self:checkCollisions(self.colliders[collisionTypeA]) -- same collider type, pass the colliders list directly
             else
                 
-                -- its not super scalable nor clean to enforce checking static collision type 
-                -- but unless we add some flag to tell which collision type should be checked in grid mode and which shouldn't we have to do it that way
-                -- 😴
-                if collisionTypeB == kCollisionType.static or collisionTypeA == kCollisionType.static then
+                if self:isStatic(collisionTypeB) or self:isStatic(collisionTypeA) then
                     
                     -- i was tired ...
-                    local theOneThatIsntStatic = collisionTypeA == kCollisionType.static and collisionTypeB or collisionTypeA
-                    self:checkCollisionsOnGrid(self.colliders[theOneThatIsntStatic], kCollisionType.static)
+                    local theOneThatIsntStatic = self:isStatic(collisionTypeA) and collisionTypeB or collisionTypeA
+                    local theOneThatIsStatic = theOneThatIsntStatic == collisionTypeA and collisionTypeB or collisionTypeA
+                    self:checkCollisionsOnGrid(self.colliders[theOneThatIsntStatic], theOneThatIsStatic)
                 
                 else
                     self:checkCollisions(self.colliders[collisionTypeA], self.colliders[collisionTypeB])
