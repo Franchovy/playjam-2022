@@ -1,12 +1,12 @@
 {
-    "maxFallSpeed": 200,
-    "maxLinearSpeed": 200,
-    "frictionCoeff": 1.0,
+    "maxFallSpeed": 600,
+    "maxLinearSpeed": 300,
+    "frictionCoeff": 0.1,
     "description": "The mass is a parameter used in a lot of physical calculation. A greater mass basically means the wheel is harder (requires more energy) to move and change direction",
     "mass": 1,
     "description": "A virtual cranck length for moving the wheel. Greater value means greater lever effect and a wheel easier to move",
-    "crankLength": 1.5,
+    "crankLength": 0.7,
     "description": "How many consecutive jumps can be performed before landing",
     "maxJumpCount": 1,
-    "jumpForce": 5500
+    "jumpForce": 11000
 }

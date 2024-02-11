@@ -1,6 +1,7 @@
 import "utils/screenShake"
 
 local gfx <const> = playdate.graphics
+local disp <const> = playdate.display
 
 local _gridSize <const> = kGame.gridSize
 local _getDrawOffset <const> = gfx.getDrawOffset
@@ -250,24 +251,27 @@ function WidgetLevel:_load()
 		_setDrawOffset(-_logicalPositionWheel.x * _gridSize + 100, 0)
 	end
 	
-	local _cameraVelocity = 12
+	local cameraOffsetAtRest = 150
+	local cameraOffsetAtMaxSpeed = 10
+	local cameraOffsetAtMaxSpeedReverse = disp:getWidth() - 50
+	local cameraApproachFactor = 0.6
 	self.setMovingDrawOffset = function()
 		local drawOffsetCurrentX, drawOffsetCurrentY = _getDrawOffset()
 		
-		local velocityOffset = _pow(_abs(_spriteWheel.velocityX), 2) * _sign(_spriteWheel.velocityX)
-		
-		if _abs(velocityOffset) > 10 then
-			_cameraVelocity = _approach(_cameraVelocity, 6, 0.1)
-		else 
-			_cameraVelocity = _approach(_cameraVelocity, 12, 1.5)
+		local wheelVelocityX = _spriteWheel.velocityX
+		local newOffset
+		if wheelVelocityX > 0 then
+			local proportion = _abs(wheelVelocityX) / _spriteWheel._maxLinearSpeed
+			
+			newOffset = cameraOffsetAtRest * (1 - proportion) + cameraOffsetAtMaxSpeed * proportion
+		else
+			local proportion = _abs(wheelVelocityX) / _spriteWheel._maxLinearSpeed
+			
+			newOffset = cameraOffsetAtRest * (1 - proportion) + cameraOffsetAtMaxSpeedReverse * proportion
 		end
 		
-		if _spriteWheel.velocityX < 0 then
-			velocityOffset *= 2
-		end
-		
-		local drawOffsetTarget = -_spriteWheel.x + 100 --- velocityOffset
-		local newOffset = (drawOffsetCurrentX - drawOffsetTarget) / _cameraVelocity
+		local drawOffsetTargetX = -_spriteWheel.x + newOffset
+		local drawOffsetX = drawOffsetCurrentX + (drawOffsetTargetX - drawOffsetCurrentX) * cameraApproachFactor
 		
 		local cielY = 72
 		local newOffsetY = 0
@@ -277,7 +281,9 @@ function WidgetLevel:_load()
 			newOffsetY = math.approach(0, drawOffsetCurrentY, 4)
 		end
 
-		_setDrawOffset(drawOffsetCurrentX - newOffset, newOffsetY)
+		
+
+		_setDrawOffset(drawOffsetX, newOffsetY)
 	end
 
 	self:setNeutralDrawOffset()

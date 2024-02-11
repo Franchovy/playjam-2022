@@ -244,7 +244,9 @@ function WidgetPlay:_update()
 	
 	_rects.levelComplete = _tInset(_assign(_rects.levelComplete, _frame), 30, 20)
 
-	CollisionSolver.instance():update()
+	if self.state == self.kStates.playing or self.state == self.kStates.start or self.state == self.kStates.levelComplete then
+		CollisionSolver.instance():update()
+	end
 
 	if self.state == self.kStates.levelComplete then
 		self:passInput(self.children.levelComplete)
