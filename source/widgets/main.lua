@@ -68,6 +68,14 @@ function WidgetMain:_load()
 		self.children.loaderLevel.onPlaythroughComplete(playthroughData)
 	end
 	
+	self.reloadLevels = function()
+		self.children.loaderLevel:refresh()
+		
+		self.children.menu:unload()
+		self.children.menu.config.levels = self.children.loaderLevel:getLevels()
+		self.children.menu:load()
+	end
+	
 	self.children.loaderUser = Widget.new(WidgetLoaderUser)
 	self.children.loaderUser:load()
 	
@@ -83,6 +91,7 @@ function WidgetMain:_load()
 	self.children.menu:load()
 	
 	self.children.menu.signals.loadLevel = self.onMenuPressedPlay
+	self.children.menu.signals.reloadLevels = self.reloadLevels
 	
 	self.children.transition = Widget.new(WidgetTransition, { showLoading = true })
 	self.children.transition:load()

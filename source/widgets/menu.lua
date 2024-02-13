@@ -18,16 +18,12 @@ function WidgetMenu:_init()
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.fileplayer)
-	self:supply(Widget.deps.frame, { needsLayout = true })
+	self:supply(Widget.deps.frame)
 	self:supply(Widget.deps.timers)
-	
-	self:setFrame(disp.getRect())
 	
 	self.painters = {}
 	self.signals = {}
-	
-	self:setStateInitial(1, { "default", "menu", "subMenu" })
-	
+
 	self.index = 0
 	self.tick = 0
 	
@@ -35,6 +31,9 @@ function WidgetMenu:_init()
 end
 
 function WidgetMenu:_load()
+	self:setFrame(disp.getRect())
+	self:setStateInitial(1, { "default", "menu", "subMenu" })
+	
 	self:loadSample(kAssetsSounds.menuAccept, 0.7)
 	self:loadSample(kAssetsSounds.intro, 0.7)
 	
@@ -65,6 +64,12 @@ function WidgetMenu:_load()
 			loopValues = true
 		},
 		{
+			title = "SCORES",
+			type = WidgetMenuSettings.type.options,
+			values = { "3-STAR", "4-STAR" },
+			key = kSettingsKeys.scoring
+		},
+		{
 			title = "SFX VOLUME",
 			type = WidgetMenuSettings.type.options,
 			values = valuesMenuEntriesTypeOptions,
@@ -85,8 +90,14 @@ function WidgetMenu:_load()
 	self.children.menuSettings:load()
 	self.children.menuSettings:setVisible(false)
 	
+	local levelsNeedReload = false
+	local starScoring = Settings:getValue(kSettingsKeys.scoring)
 	self.children.menuSettings.signals.close = function()
-		self:setState(self.kStates.menu)
+		if starScoring ~= Settings:getValue(kSettingsKeys.scoring) then
+			self.signals.reloadLevels()
+		else
+			self:setState(self.kStates.menu)
+		end
 	end
 	
 	-- Level Select sub-menus, one for each world
@@ -383,9 +394,11 @@ end
 function WidgetMenu:_unload()
 	self:stopFilePlayer()
 	
-	self.painters = nil
+	for i=1, #self.painters do
+		table.remove(self.painters)
+	end
+	
 	self.fileplayer = nil
 	
 	for _, child in pairs(self.children) do child:unload() end
-	self.children = nil
 end

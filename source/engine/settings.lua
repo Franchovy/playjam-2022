@@ -6,6 +6,7 @@ Settings._callbackFunctions = {}
 
 local defaultValues = {
 	[kSettingsKeys.controlType] = "CRANK",
+	[kSettingsKeys.scoring] = "3-STAR",
     [kSettingsKeys.sfxVolume] = 1,
     [kSettingsKeys.musicVolume] = 1,
 }

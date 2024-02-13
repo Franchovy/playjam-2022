@@ -2,9 +2,6 @@
 local file <const> = playdate.file
 local _convertMsTimeToString <const> = convertMsTimeToString
 
--- Default number of stars to score by, usually 3 but can be 4 for expert players.
-local STAR_SCORING = 3
-
 class("WidgetLoaderLevel").extends(Widget)
 
 function WidgetLoaderLevel:_init()
@@ -16,6 +13,9 @@ function WidgetLoaderLevel:_load()
 	-- Load level objectives 
 	
 	local loadObjectivesFile = function(filePath)
+		-- Default number of stars to score by, usually 3 but can be 4 for expert players.
+		local starScoringType = Settings:getValue(kSettingsKeys.scoring) == "3-STAR" and 3 or 4
+		
 		local contents = json.decodeFile(filePath)
 		local worldObjectives = { stars = 0, levels = 0 }
 		local levelObjectives = table.create(0, #contents)
@@ -23,10 +23,10 @@ function WidgetLoaderLevel:_load()
 		for levelName, objectives in pairs(contents) do
 			levelObjectives[levelName:upper()] = {
 				all = objectives,
-				time = objectives[STAR_SCORING],
-				timeString = _convertMsTimeToString(objectives[STAR_SCORING] * 10, 1)
+				time = objectives[starScoringType],
+				timeString = _convertMsTimeToString(objectives[starScoringType] * 10, 1)
 			}
-			worldObjectives.stars += STAR_SCORING
+			worldObjectives.stars += starScoringType
 			worldObjectives.levels += 1
 		end
 		
