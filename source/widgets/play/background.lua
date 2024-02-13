@@ -14,9 +14,7 @@ local _tOffset <const> = geo.rect.tOffset
 local _kImageUnflipped <const> = gfx.kImageUnflipped
 local _fast_intersection <const> = geo.rect.fast_intersection
 
--- local paralaxRatio = 1 / 50
- -- debug purposes: 
-local paralaxRatio = 1 / 15
+local paralaxRatio = 1 / 50
 local images = table.create(5, 0)
 local imageRectsX, imageRectsY, imageRectsW, imageRectsH = table.create(5, 0), table.create(5, 0), table.create(5, 0), table.create(5, 0)
 local imagesCount = nil
@@ -37,7 +35,9 @@ function WidgetBackground:_init(config)
 end
 
 function WidgetBackground:_load()
-	local themeImages = getParalaxImagesForTheme(kThemes[self.theme])
+	local themeData = kThemes[self.theme]
+	local themeImages = getParalaxImagesForTheme(themeData)
+	local opaqueRects, drawRects = themeData.opaque, themeData.draw
 	
 	-- Initialize Properties
 	
@@ -54,15 +54,20 @@ function WidgetBackground:_load()
 		gfx.popContext()
 		
 		table.insert(images, doubleImage)
-		
-		table.insert(imageRectsX, 0)
-		table.insert(imageRectsY, 0)
-		table.insert(imageRectsW, 400)
-		table.insert(imageRectsH, 240)
 	end
 	
 	imagesCount = #images
 	maxParallax = -(imagesCount * 400)
+	
+	-- Build draw rects for each layer, using draw rect and avoiding to redraw any opaque zones from previous ones
+	
+	for i=1, imagesCount do
+		local x, y, w, h = table.unpack(drawRects[i])
+		table.insert(imageRectsX, x)
+		table.insert(imageRectsY, y)
+		table.insert(imageRectsW, w)
+		table.insert(imageRectsH, h)
+	end
 	
 	-- Build a table with ratios from 0 to 1 for multiplying the offset
 	
@@ -114,5 +119,9 @@ function WidgetBackground:_unload()
 	for _, _ in pairs(images) do
 		table.remove(images)
 		table.remove(paralaxRatios)
+		table.remove(imageRectsX)
+		table.remove(imageRectsY)
+		table.remove(imageRectsW)
+		table.remove(imageRectsH)
 	end
 end
