@@ -30,14 +30,14 @@ function WidgetBackground:_init(config)
 	
 	self:supply(Widget.deps.frame)
 	self:setFrame(disp.getRect())
-	
-	self:createSprite(kZIndex.background)
 end
 
 function WidgetBackground:_load()
+	self:createSprite(kZIndex.background)
+	
 	local themeData = kThemes[self.theme]
 	local themeImages = getParalaxImagesForTheme(themeData)
-	local opaqueRects, drawRects = themeData.opaque, themeData.draw
+	local drawRects = themeData.draw
 	
 	-- Initialize Properties
 	
@@ -116,9 +116,9 @@ end
 function WidgetBackground:_unload()
 	self.sprite:remove()
 	
-	for _, _ in pairs(images) do
+	for i=1, #images do
 		table.remove(images)
-		table.remove(paralaxRatios)
+		table.remove(paralaxOffsets)
 		table.remove(imageRectsX)
 		table.remove(imageRectsY)
 		table.remove(imageRectsW)

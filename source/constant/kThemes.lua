@@ -18,13 +18,26 @@ kThemes = {
 		"assets/tracks/space",
 		"assets/images/backgrounds/space", 
 		5,
-		false
+		false,
+		draw = {
+			{ 0, 0, 400, 171 },
+			{ 0, 117, 400, 169 },
+			{ 0, 141, 400, 197 },
+			{ 0, 174, 400, 218 },
+			{ 0, 173, 400, 240 }
+		}
 	},
 	{
 		"CITY",
 		"assets/tracks/city",
 		"assets/images/backgrounds/city", 
 		4,
-		false
+		false,
+		draw = {
+			{ 0, 0, 400, 171 },
+			{ 0, 117, 400, 169 },
+			{ 0, 141, 400, 197 },
+			{ 0, 174, 400, 218 }
+		}
 	}
 }
