@@ -177,11 +177,13 @@ function WidgetPlay:_load()
 		
 		if AppConfig.enableParalaxBackground and (self.config.level.theme ~= nil) then
 			if self.children.background ~= nil then
-				self.children.background.sprite:remove()
-				self.children.background = nil
+				self.children.background:unload()
+				
+				self.children.background.theme = self.config.level.theme
+			else
+				self.children.background = Widget.new(WidgetBackground, { theme = self.config.level.theme })
 			end
 			
-			self.children.background = Widget.new(WidgetBackground, { theme = self.config.level.theme })
 			self.children.background:load()
 		end
 		
