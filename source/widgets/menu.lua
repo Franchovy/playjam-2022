@@ -58,6 +58,12 @@ function WidgetMenu:_load()
 	local valuesMenuEntriesTypeOptions = {"OFF","1","2","3","4","5","6","7","8","9","10"}
 	local entries = {
 		{
+			title = "CONTROLS",
+			type = WidgetMenuSettings.type.options,
+			values = { "CRANK", "D-PAD" },
+			key = kSettingsKeys.controlType
+		},
+		{
 			title = "SFX VOLUME",
 			type = WidgetMenuSettings.type.options,
 			values = valuesMenuEntriesTypeOptions,

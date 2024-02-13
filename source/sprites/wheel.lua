@@ -91,7 +91,7 @@ function Wheel:init()
 	
 	self:resetValues()
 	
-	
+	isDPadControlsEnabled = Settings:getValue(kSettingsKeys.controlType) == "D-PAD"
 end
 
 function Wheel:resetValues() 

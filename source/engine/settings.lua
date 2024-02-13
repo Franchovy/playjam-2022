@@ -5,8 +5,9 @@ Settings._data = {}
 Settings._callbackFunctions = {}
 
 local defaultValues = {
+	[kSettingsKeys.controlType] = "CRANK",
     [kSettingsKeys.sfxVolume] = 1,
-    [kSettingsKeys.musicVolume] = 1
+    [kSettingsKeys.musicVolume] = 1,
 }
 
 function Settings:getValue(key)
@@ -14,6 +15,7 @@ function Settings:getValue(key)
 end
 
 function Settings:setValue(key, value)
+	print("Set settings value: ", key, ": ", value)
 	self._data[key] = value
 	
 	if self._callbackFunctions[key] == nil then
@@ -51,7 +53,9 @@ end
 
 function Settings:setDefaultValues()
 	for k, v in pairs(defaultValues) do
-		self:setValue(k, v)
+		if self:getValue(k) == nil then
+			self:setValue(k, v)
+		end
 	end
 	
 	self:writeToFile()

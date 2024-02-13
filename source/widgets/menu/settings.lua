@@ -24,26 +24,20 @@ function WidgetMenuSettings:_load()
 	
 	self:setStateInitial(1)
 
-	self.painters.frame = Painter(function(rect)
-		gfx.setColor(gfx.kColorWhite)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		gfx.setColor(gfx.kColorBlack)
-		gfx.setDitherPattern(0.7, gfx.image.kDitherTypeDiagonalLine)
-		gfx.fillRoundRect(rect.x, rect.y, rect.w, rect.h, 8)
-		
-		gfx.drawTextAligned("SETTINGS MENU", rect.x + rect.w / 2, rect.y + rect.h / 2, kTextAlignment.center)
-	end)
-	
 	local function entryCallback(entry, key, value)
 		if entry.config.type == WidgetMenuSettings.type.options then
+			-- Option changed
 			if value == "OFF" then
 				value = 0
 			end
 			
-			local settingsValue = tonumber(value) / 10
+			local settingsValue
+			if type(settingsValue) == "number" then
+				settingsValue = tonumber(value) / 10
+			else
+				settingsValue = value
+			end
 			
-			-- Option changed
 			Settings:setValue(key, settingsValue)
 		elseif entry.config.type == WidgetMenuSettings.type.button then 
 			-- Button pressed
@@ -55,13 +49,15 @@ function WidgetMenuSettings:_load()
 		end
 	end
 	
-	local function getEntryValue(type, key)
-		if type == WidgetMenuSettings.type.options then
+	local function getEntryValue(entryType, key)
+		if entryType == WidgetMenuSettings.type.options then
 			local settingsValue = Settings:getValue(key)
 			if settingsValue == 0 then
 				return "OFF"
-			else 
+			elseif type(settingsValue) == "number" then
 				return string.format("%d", settingsValue * 10)
+			else
+				return string.format("%s", settingsValue)
 			end
 		end
 	end
