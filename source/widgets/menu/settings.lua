@@ -73,6 +73,7 @@ function WidgetMenuSettings:_load()
 			isSelected = i == 1 and true or false, 
 			type = entryConfig.type, 
 			options = entryConfig.values, 
+			loop = entryConfig.loopValues,
 			value = getEntryValue(entryConfig.type, entryConfig.key)
 		})
 		

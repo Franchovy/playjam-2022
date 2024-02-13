@@ -76,31 +76,38 @@ function WidgetMenuSettingsEntry:_handleInput(input)
 		end
 	end
 	
+	if input.pressed == 0 then
+		return
+	end
+		
 	if self.config.type == WidgetMenuSettings.type.options then
+		local index = table.indexOfElement(self.config.options, self.state.value)
+		local newIndex
+		
 		if input.pressed & playdate.kButtonLeft ~= 0 then
-			local index = table.indexOfElement(self.config.options, self.state.value)
 			if index > 1 then
-				self:setState(self.kStateKeys.value, self.kStates.value[index - 1])
-				self.signals.onChanged(self.kStates.value[index - 1])
-				
-				gfx.sprite.addDirtyRect(0, 0, 400, 240)
-				
-				self:playSample(kAssetsSounds.menuSelect)
-			else
-				self:playSample(kAssetsSounds.menuSelectFail)
+				newIndex = index - 1
+			elseif self.config.loop then
+				newIndex = #self.config.options
 			end
 		elseif input.pressed & playdate.kButtonRight ~= 0 then
 			local index = table.indexOfElement(self.config.options, self.state.value)
 			if index < #self.config.options then
-				self:setState(self.kStateKeys.value, self.kStates.value[index + 1])
-				self.signals.onChanged(self.kStates.value[index + 1])
-				
-				gfx.sprite.addDirtyRect(0, 0, 400, 240)
-				
-				self:playSample(kAssetsSounds.menuSelect)
-			else
-				self:playSample(kAssetsSounds.menuSelectFail)
+				newIndex = index + 1
+			elseif self.config.loop then
+				newIndex = 1
 			end
+		end
+		
+		if newIndex ~= nil then
+			self:setState(self.kStateKeys.value, self.kStates.value[newIndex])
+			self.signals.onChanged(self.kStates.value[newIndex])
+			
+			gfx.sprite.addDirtyRect(0, 0, 400, 240)
+			
+			self:playSample(kAssetsSounds.menuSelect)
+		else
+			self:playSample(kAssetsSounds.menuSelectFail)
 		end
 	end
 end

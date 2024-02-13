@@ -61,7 +61,8 @@ function WidgetMenu:_load()
 			title = "CONTROLS",
 			type = WidgetMenuSettings.type.options,
 			values = { "CRANK", "D-PAD" },
-			key = kSettingsKeys.controlType
+			key = kSettingsKeys.controlType,
+			loopValues = true
 		},
 		{
 			title = "SFX VOLUME",
