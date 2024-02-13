@@ -96,17 +96,11 @@ function WidgetBackground:_draw(frame, rect)
 		local imageX = imageRectsX[i] + paralaxOffsets[i]
 		local x,y,w,h
 		if imageX < 0 then
-			-- If part of the image is left of the screen, then two draw calls draw the two different images
-			x, y, w, h = _fast_intersection(_rectX, _rectY, _rectW, _rectH, 0, imageRectsY[i], imageX + imageRectsW[i], imageRectsH[i])
-			_draw(image, x, y, _kImageUnflipped, -paralaxOffsets[i] + x, y, w, h)
-			
-			x, y, w, h = _fast_intersection(_rectX + 400 + imageX, _rectY, _rectW, _rectH, 400 + imageX, imageRectsY[i], -imageX, imageRectsH[i])
-			_draw(image, x, y, _kImageUnflipped, -paralaxOffsets[i] + x, y, w, h)
+			x, y, w, h = _fast_intersection(_rectX, _rectY, _rectW, _rectH, 0, imageRectsY[i], 400, imageRectsH[i])
 		else
 			x, y, w, h = _fast_intersection(_rectX, _rectY, _rectW, _rectH, imageX, imageRectsY[i], imageRectsW[i], imageRectsH[i])
-			_draw(image, x, y, _kImageUnflipped, -paralaxOffsets[i] + x, y, w, h)
 		end
-		
+		_draw(image, x, y, _kImageUnflipped, -paralaxOffsets[i] + x, y, w, h)
 	end
 end
 
