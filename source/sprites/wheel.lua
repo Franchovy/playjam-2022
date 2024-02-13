@@ -29,6 +29,9 @@ local velocityDragStep <const> = 0.1
 local velocityBrakeStep <const> = 0.2
 local maxVelocityX <const> = 11
 
+local isDPadControlsEnabled = nil
+local dPadSensitivity <const> = 5
+
 function Wheel.new() 
 	return Wheel()
 end
@@ -87,6 +90,8 @@ function Wheel:init()
 	-- Create Properties
 	
 	self:resetValues()
+	
+	
 end
 
 function Wheel:resetValues() 
@@ -186,14 +191,18 @@ function Wheel:update()
 			self:applyJump()
 		end
 		
-		crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
-		
-		local ticks = crankTicks / 12
-		currentTicks += ticks
-		
-		if math.abs(previousTicks - currentTicks) >= 1 then
-			sampleplayer:playSample(kAssetsSounds.tick)
-			previousTicks = currentTicks
+		if not isDPadControlsEnabled then
+			crankTicks = playdate.getCrankTicks(crankTicksPerCircle)
+			
+			local ticks = crankTicks / 12
+			currentTicks += ticks
+			
+			if math.abs(previousTicks - currentTicks) >= 1 then
+				sampleplayer:playSample(kAssetsSounds.tick)
+				previousTicks = currentTicks
+			end
+		else
+			crankTicks = playdate.buttonIsPressed(playdate.kButtonRight) and dPadSensitivity or playdate.buttonIsPressed(playdate.kButtonLeft) and -dPadSensitivity or 0
 		end
 	else
 		crankTicks = 0
