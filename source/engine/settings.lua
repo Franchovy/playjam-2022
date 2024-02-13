@@ -15,7 +15,6 @@ function Settings:getValue(key)
 end
 
 function Settings:setValue(key, value)
-	print("Set settings value: ", key, ": ", value)
 	self._data[key] = value
 	
 	if self._callbackFunctions[key] == nil then
