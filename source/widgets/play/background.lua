@@ -12,6 +12,18 @@ local _tSet <const> = geo.rect.tSet
 local _intersection <const> = geo.rect.intersection
 local _tOffset <const> = geo.rect.tOffset
 local _kImageUnflipped <const> = gfx.kImageUnflipped
+local _fast_intersection <const> = geo.rect.fast_intersection
+
+-- local paralaxRatio = 1 / 50
+ -- debug purposes: 
+local paralaxRatio = 1 / 15
+local images = table.create(5, 0)
+local imageRectsX, imageRectsY, imageRectsW, imageRectsH = table.create(5, 0), table.create(5, 0), table.create(5, 0), table.create(5, 0)
+local imagesCount = nil
+local ratio = nil
+local paralaxOffsets = nil
+local maxParallax = nil
+local offset = 0
 
 class("WidgetBackground").extends(Widget)
 
@@ -25,80 +37,82 @@ function WidgetBackground:_init(config)
 end
 
 function WidgetBackground:_load()
-	local images = getParalaxImagesForTheme(kThemes[self.theme])
-	
-	-- Assign background Image (to draw on)
-	self.backgroundImage = images.background
+	local themeImages = getParalaxImagesForTheme(kThemes[self.theme])
 	
 	-- Initialize Properties
 	
-	self.images = images.images
-	
-	self.paralaxRatios = {}
-	self.imageOffsets = {}
-	self.rectsImagesRight = _create(#self.images, 0)
-	self.rectsImagesLeft = _create(#self.images, 0)
-	
-	for i, image in ipairs(self.images) do
-		_insert(self.paralaxRatios, i / 50)
-		_insert(self.imageOffsets, 0)
+	for i, image in ipairs(themeImages) do
+		local width, height = image:getSize()
+		assert(width == 400 and height == 240, "Only images with size 400x240 are supported for the parallax background.")
 		
-		local imageWidth, imageHeight = _getSize(image)
-		_insert(self.rectsImagesRight, _new(0, 0, imageWidth, imageHeight))
-		_insert(self.rectsImagesLeft, _new(-400, 0, imageWidth, imageHeight))
+		-- Draw image twice
+		
+		local doubleImage = gfx.image.new(800, 240)
+		gfx.pushContext(doubleImage)
+		gfx.drawImage(image, 0, 0)
+		gfx.drawImage(image, 400, 0)
+		gfx.popContext()
+		
+		table.insert(images, doubleImage)
+		
+		table.insert(imageRectsX, 0)
+		table.insert(imageRectsY, 0)
+		table.insert(imageRectsW, 400)
+		table.insert(imageRectsH, 240)
+	end
+	
+	imagesCount = #images
+	maxParallax = -(imagesCount * 400)
+	
+	-- Build a table with ratios from 0 to 1 for multiplying the offset
+	
+	ratio = table.create(imagesCount, 0)
+	for i=imagesCount, 1, -1 do
+		table.insert(ratio, i == imagesCount and 0 or 1 / i)
+	end
+	
+	-- Build a table with parallax offsets
+	
+	paralaxOffsets = table.create(imagesCount, 0)
+	for i=imagesCount, 1, -1 do
+		table.insert(paralaxOffsets, 0)
 	end
 end
 
 function WidgetBackground:_draw(frame, rect)
-	local _frameX = frame.x
-	local _frameY = frame.y
-	local _frameW = frame.w
-	local _frameH = frame.h
-	
 	if rect == nil then
 		rect = frame
 	end
 	
-	local _rectX = rect.x
-	local _rectY = rect.y
-	local _rectW = rect.w
-	local _rectH = rect.h
+	local _rectX, _rectY, _rectW, _rectH = rect:unpack()
 	
-	self.backgroundImage:draw(_frameX + _rectX, _frameY + _rectY, _kImageUnflipped, rect)
-	
-	local _imageOffsets = self.imageOffsets
-	local _rectsImagesRight = self.rectsImagesRight
-	local _rectsImagesLeft = self.rectsImagesLeft
-	
-	for i, image in ipairs(self.images) do
-		local imageOffset = _floor(_imageOffsets[i])
-		local imageRightRect = _tSet(_rectsImagesRight[i], imageOffset)
-		local imageLeftRect = _tSet(_rectsImagesLeft[i], imageOffset - 400)
-		
-		-- Draw 2 copies of the image, one before and one after
-		local imageRightSourceRect = _tOffset(_intersection(imageRightRect, rect), -imageOffset, 0)
-		_draw(image, _frameX + imageOffset + _rectX, _frameY + _rectY, _kImageUnflipped, imageRightSourceRect)
-		
-		local imageLeftSourceRect = _tOffset(_intersection(imageLeftRect, rect), _rectsImagesLeft[i].w - imageOffset, 0)
-		_draw(image, _frameX + _rectX, _frameY + _rectY, _kImageUnflipped, imageLeftSourceRect)
+	local imageOffset
+	for i, image in ipairs(images) do
+		local x,y,w,h = _fast_intersection(_rectX, _rectY, _rectW, _rectH, imageRectsX[i], imageRectsY[i], imageRectsW[i], imageRectsH[i])
+		_draw(image, x, y, _kImageUnflipped, -paralaxOffsets[i] + x, y, w, h)
 	end
-	
 end
 
 function WidgetBackground:_update()
-	local previousOffset <const> = self.drawOffset
-	self.drawOffset = gfx.getDrawOffset()
+	local previousOffset <const> = offset
+	--offset -= 1 -- debug
+	offset = gfx.getDrawOffset() * paralaxRatio
+	offset = offset % maxParallax
 	
-	for i, image in pairs(self.images) do
-		local originalOffset = self.drawOffset * self.paralaxRatios[i]
-		self.imageOffsets[i] = originalOffset % 400
+	for i=1, imagesCount do
+		paralaxOffsets[i] = (i - 1) * offset % 400 - 400
 	end
 	
-	if self.drawOffset ~= previousOffset then
+	if offset ~= previousOffset then
 		self.sprite:markDirty()
 	end
 end
 
 function WidgetBackground:_unload()
 	self.sprite:remove()
+	
+	for _, _ in pairs(images) do
+		table.remove(images)
+		table.remove(paralaxRatios)
+	end
 end

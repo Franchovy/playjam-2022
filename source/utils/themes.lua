@@ -7,19 +7,15 @@ class("Theme").extends()
 
 function getParalaxImagesForTheme(theme)
 	local filePath = theme[3]
-	local backgroundImage = gfx.image.new(filePath.. "/".. 0)
 	
 	local imageCount = theme[4]
 	local images = {}
-	for i=1,(imageCount-1) do
+	for i=0, imageCount do
 		local image = gfx.image.new(filePath.. "/".. i)
 		table.insert(images, image)
 	end
 	
-	return {
-		images = images,
-		background = backgroundImage
-	}
+	return images
 end
 
 function getMusicFilepathsForTheme(theme)
