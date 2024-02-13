@@ -93,7 +93,13 @@ function WidgetBackground:_draw(frame, rect)
 	
 	local imageOffset
 	for i, image in ipairs(images) do
-		local x,y,w,h = _fast_intersection(_rectX, _rectY, _rectW, _rectH, imageRectsX[i], imageRectsY[i], imageRectsW[i], imageRectsH[i])
+		local imageX = imageRectsX[i] + paralaxOffsets[i]
+		local x,y,w,h
+		if imageX < 0 then
+			x, y, w, h = _fast_intersection(_rectX, _rectY, _rectW, _rectH, 0, imageRectsY[i], 400, imageRectsH[i])
+		else
+			x, y, w, h = _fast_intersection(_rectX, _rectY, _rectW, _rectH, imageX, imageRectsY[i], imageRectsW[i], imageRectsH[i])
+		end
 		_draw(image, x, y, _kImageUnflipped, -paralaxOffsets[i] + x, y, w, h)
 	end
 end
