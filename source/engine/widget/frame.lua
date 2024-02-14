@@ -16,11 +16,14 @@ function frame(widget, config)
 		widget._state.needsLayout = true
 	end
 	
+	local _spriteFrame -- frame for relative use within _draw(), only initialized if sprite is created
+	
 	function widget:setFrame(rect)
 		self.frame:set(rect)
 		
 		if self.sprite ~= nil then
 			self.sprite:setBounds(rect.x, rect.y, rect.w, rect.h)
+			geo.rect.tSet(_spriteFrame, nil, nil, rect.w, rect.h)
 		end
 		
 		self._state.needsLayout = true
@@ -42,6 +45,7 @@ function frame(widget, config)
 			self:draw(_drawRect)
 		end
 		
+		_spriteFrame = geo.rect.new(0, 0, frame.w, frame.h)
 		self.sprite = sprite
 		
 		self:_addUnloadCallback(function()
@@ -80,12 +84,12 @@ function frame(widget, config)
 			return
 		end
 	
-		_draw(self, _frame, rect)
+		_draw(self, _spriteFrame or _frame, rect)
 	end
 	
 	function widget:performLayout()
 		if self._performLayout ~= nil then
-			self:_performLayout()
+			self:_performLayout(_spriteFrame or _frame)
 			self._state.needsLayout = false
 		end
 	end
@@ -101,7 +105,7 @@ function frame(widget, config)
 		
 		if self._state.needsLayout == true then
 			if self._performLayout ~= nil then
-				self:_performLayout()
+				self:_performLayout(_spriteFrame or _frame)
 			end
 
 			self._state.needsLayout = false
