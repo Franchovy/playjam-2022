@@ -9,16 +9,13 @@ function PlatformCollision.new()
 end
 
 function PlatformCollision:init()
-    PlatformCollision.super.init()
+    PlatformCollision.super.init(self)
 
     self:setCenter(0, 0)
-    print('inited')
+    self:setCollisionType(kCollisionType.static)
 end
 
-function PlatformCollision:ready()
-    print('ready')
-end
-
-function PlatformCollision:loadConfig(config)
-    print('config load')
+function PlatformCollision:ready(config)
+    self:setCollider(kColliderType.rect, rectNew(self.x, self.y, kGame.gridSize * config.w, kGame.gridSize * config.h))
+    self:readyToCollide()
 end

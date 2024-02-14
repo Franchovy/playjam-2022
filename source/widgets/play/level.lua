@@ -75,9 +75,9 @@ function WidgetLevel:_load()
 	LogicalSprite.setCreateSpriteFromIdCallback(function(id)
 		local spriteClass = LogicalSprite.idSpriteTable[id]
 		if spriteClass then
-			if spriteClass.className == "KillBlock" then
+			if spriteClass.className == kSpriteTypes.killBlock then
 				return KillBlock.new(self.periodicBlinker)
-			elseif spriteClass.className == "Wheel" then
+			elseif spriteClass.className == kSpriteTypes.player then
 				local sprite = Wheel.new()
 				_setupWheelSpriteSignals(sprite)
 				return sprite
@@ -95,7 +95,6 @@ function WidgetLevel:_load()
 	LogicalSprite.setCreateSpriteCallback(function(levelObject, spriteToRecycle)
 		assert(levelObject.sprite == nil, "Level object already has a sprite!")
 		local sprite
-		
 		if spriteToRecycle == nil then
 			sprite = _createSpriteFromId(levelObject.id)
 			
@@ -118,7 +117,7 @@ function WidgetLevel:_load()
 		end
 		
 		if sprite.ready ~= nil then
-			sprite:ready()
+			sprite:ready(levelObject.config)
 		end
 
 		return sprite

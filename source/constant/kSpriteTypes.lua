@@ -5,5 +5,6 @@ kSpriteTypes = {
 	platform = "Platform",
 	killBlock = "KillBlock",
 	levelEnd = "LevelEnd",
-	checkpoint = "Checkpoint"
+	checkpoint = "Checkpoint",
+	platformCollision = "PlatformCollision"
 }

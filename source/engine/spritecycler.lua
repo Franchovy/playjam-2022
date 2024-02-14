@@ -20,9 +20,6 @@ local function _loadChunk(self, chunk, shouldLoad)
 	end
 	
 	local _spritesToRecycle = self.spritesToRecycle
-	local _spritesWithConfig = self.spritesWithConfig
-	local _createSpriteCallback = self.createSpriteCallback
-	local _recycleSprite = self.recycleSprite
 	local _spritesPersisted = self.spritesPersisted
 	
 	for _, object in pairs(_chunkData) do
@@ -64,7 +61,8 @@ function SpriteCycler:init(chunkLength, recycledSpriteIds)
 	end
 	
 	self.spritesWithConfig = { ["coin"] = true, ["checkpoint"] = true }
-	self.spritesPersisted = { ["player"] = true, ["platformCollision"] = true }
+	self.spritesPersisted = { ["player"] = true }
+	self.spritesAutoload = {["platformCollision"] = true} -- sprites which are all loaded immediatly and stay loaded at all time
 end
 
 -- Level Data
@@ -91,16 +89,21 @@ function SpriteCycler:load(levelObjects)
 	local _chunkLength = self.chunkLength
 	
 	for _, levelObject in pairs(levelObjects) do
-		-- Create chunk if needed
-		local _chunkIndex = _ceil((levelObject.position.x) / _chunkLength)
-		
-		if data[_chunkIndex] == nil then
-			data[_chunkIndex] = _create(60, 0)
-			setmetatable(data[_chunkIndex], table.weakValuesMetatable)
+		if self.spritesAutoload[levelObject.id] then
+			levelObject:createSprite(nil)
+			levelObject:loadConfig()
+		else
+			-- Create chunk if needed
+			local _chunkIndex = _ceil((levelObject.position.x) / _chunkLength)
+			
+			if data[_chunkIndex] == nil then
+				data[_chunkIndex] = _create(60, 0)
+				setmetatable(data[_chunkIndex], table.weakValuesMetatable)
+			end
+			
+			-- Insert level object into chunk data
+			_insert(data[_chunkIndex], levelObject)
 		end
-		
-		-- Insert level object into chunk data
-		_insert(data[_chunkIndex], levelObject)
 	end
 	
 	self.data = data
