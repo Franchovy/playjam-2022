@@ -48,6 +48,7 @@ function dump(o)
 end
 
 function CollisionSolver:_addColliderToGridPosition(collisionType, collider)
+    -- this is a helper function
     local addColliderToGrid = function(gridPosX, gridPosY)
         -- grid is represented as a dynamic 2D array, meaning only the required pair of coordinates are added
         local gridContent = self.colliders[collisionType]
@@ -69,13 +70,13 @@ function CollisionSolver:_addColliderToGridPosition(collisionType, collider)
         end
     end
 
+    -- we have certain conditions for which colliders can be on multiple grid cells or not
     local eligibleToMultigrid = collisionType == kCollisionType.static and collider:getCollider().type == kColliderType.rect
 
     -- add directly to grid, don't support multiple grid positions for now
     if not eligibleToMultigrid then
         local gridPosX, gridPosY = kGame.worldPosToGrid(collider.x, collider.y)
         addColliderToGrid(gridPosX, gridPosY)
-    -- a rect may exist in multiple grid cells at once
     else
         local tlX, tlY, trX, trY, brX, brY, blX, blY = self:_getCornersGridCoordinates(collider)
         -- top edge

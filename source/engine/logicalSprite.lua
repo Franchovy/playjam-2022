@@ -13,9 +13,11 @@ import "sprites/coin"
 import "sprites/checkpoint"
 import "sprites/wheel"
 import "sprites/levelEnd"
+import "sprites/platformCollision"
 
 LogicalSprite.idSpriteTable = {
 	platform = Platform,
+	platformCollision = PlatformCollision,
 	killBlock = KillBlock,
 	coin = Coin,
 	checkpoint = Checkpoint,

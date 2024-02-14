@@ -1,10 +1,9 @@
 import "engine"
 import "constant"
-import "engine/colliderSprite"
 
 local gfx <const> = playdate.graphics
 
-class('Platform').extends(ColliderSprite)
+class('Platform').extends(gfx.sprite)
 
 local platformImage
 
@@ -22,16 +21,7 @@ function Platform:init()
 	self:setImage(platformImage)
 	
 	self.type = kSpriteTypes.platform
-	
-	self:setCollider(kColliderType.rect, rectNew(0, 0, self:getSize()))
-	self:setCollisionType(kCollisionType.static)
 	self:setCenter(0, 0)
-	
 	self:setOpaque(true)
-	
 	self:setUpdatesEnabled(false)
-end
-
-function Platform:ready()
-	self:readyToCollide()
 end

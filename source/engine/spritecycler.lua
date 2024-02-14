@@ -64,7 +64,7 @@ function SpriteCycler:init(chunkLength, recycledSpriteIds)
 	end
 	
 	self.spritesWithConfig = { ["coin"] = true, ["checkpoint"] = true }
-	self.spritesPersisted = { ["player"] = true }
+	self.spritesPersisted = { ["player"] = true, ["platformCollision"] = true }
 end
 
 -- Level Data
