@@ -17,10 +17,6 @@ function ColliderSprite:init()
     self._collisionType = kCollisionType.ignore -- Defaults to ignore to preserve computation
 end
 
-function ColliderSprite:update()
-    ColliderSprite.super:update()
-end
-
 -- colliderType is expected to be a kColliderType constant and collider the corresponding playdate.geometry object
 function ColliderSprite:setCollider(colliderType, collider)
     assert(colliderType ~= kColliderType.none, "Passed colliderType can't be none") -- should we allow no collider ?

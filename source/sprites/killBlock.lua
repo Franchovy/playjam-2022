@@ -41,7 +41,7 @@ function KillBlock:init(periodicBlinker)
 end
 
 function KillBlock:update()
-	KillBlock.super.update(self)
+	gfx.sprite.update(self)
 	
 	if periodicBlinkerKillblock.hasChanged then
 		self.isImageInverted = periodicBlinkerKillblock.blinker.on

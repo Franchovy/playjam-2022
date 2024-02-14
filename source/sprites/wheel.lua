@@ -316,8 +316,7 @@ end
 
 -- Movement
 function Wheel:update()
-	-- important, update the physics
-	Wheel.super:update()
+	gfx.sprite.update(self)
 
 	-- kill the wheel when out of map
 	self:checkDeadzone()
