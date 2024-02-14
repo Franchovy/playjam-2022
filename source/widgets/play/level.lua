@@ -1,4 +1,5 @@
 import "utils/screenShake"
+import "engine/logicalSprite"
 
 local gfx <const> = playdate.graphics
 local disp <const> = playdate.display
@@ -72,22 +73,20 @@ function WidgetLevel:_load()
 	self.configHandler = ConfigHandler({"coin", "checkpoint"})
 	
 	LogicalSprite.setCreateSpriteFromIdCallback(function(id)
-		if id == "platform" then
-			return Platform.new()
-		elseif id == "killBlock" then
-			return KillBlock.new(self.periodicBlinker)
-		elseif id == "coin" then
-			return Coin.new()
-		elseif id == "checkpoint" then
-			return Checkpoint.new()
-		elseif id == "player" then
-			local sprite = Wheel.new()
-			_setupWheelSpriteSignals(sprite)
-			return sprite
-		elseif id == "levelEnd" then
-			return LevelEnd.new()
-		else 
+		local spriteClass = LogicalSprite.idSpriteTable[id]
+		if spriteClass then
+			if spriteClass.className == "KillBlock" then
+				return KillBlock.new(self.periodicBlinker)
+			elseif spriteClass.className == "Wheel" then
+				local sprite = Wheel.new()
+				_setupWheelSpriteSignals(sprite)
+				return sprite
+			else
+				return spriteClass.new()
+			end
+		else
 			print("Unrecognized ID: ".. id)
+			return nil
 		end
 	end)
 	
@@ -100,18 +99,20 @@ function WidgetLevel:_load()
 		if spriteToRecycle == nil then
 			sprite = _createSpriteFromId(levelObject.id)
 			
-			if levelObject.id == "player" then
-				assert(self.wheel == nil)
-				self.wheel = levelObject
+			if sprite ~= nil then
+				if levelObject.id == "player" then
+					assert(self.wheel == nil)
+					self.wheel = levelObject
+				end
+				
+				sprite:setZIndex(kZIndex.level)
 			end
-			
-			sprite:setZIndex(kZIndex.level)
 		else
 			sprite = spriteToRecycle
 		end
 		
 		local position = levelObject.position
-		if position ~= nil then
+		if position ~= nil and sprite ~= nil then
 			sprite:moveTo(kGame.gridSize * position.x, kGame.gridSize * position.y)
 			sprite:add()
 		end

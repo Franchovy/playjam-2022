@@ -6,10 +6,10 @@ local gfx <const> = playdate.graphics
 class("Theme").extends()
 
 function getParalaxImagesForTheme(theme)
-	local filePath = theme[3]
-	local backgroundImage = gfx.image.new(filePath.. "/".. 0)
+	local filePath = (theme ~= nil and #theme >= 3) and theme[3] or nil
+	local backgroundImage = filePath and gfx.image.new(filePath.. "/".. 0) or nil
 	
-	local imageCount = theme[4]
+	local imageCount =(theme ~= nil and #theme >= 4) and theme[4] or 0
 	local images = {}
 	for i=1,(imageCount-1) do
 		local image = gfx.image.new(filePath.. "/".. i)
@@ -35,6 +35,8 @@ function getForegroundColorForTheme(theme)
 end
 
 function getBackgroundColorForTheme(theme)
+	if theme == nil then return gfx.kColorWhite end
+
 	if theme[5] == true then
 		return gfx.kColorWhite
 	else

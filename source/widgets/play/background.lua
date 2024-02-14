@@ -64,7 +64,9 @@ function WidgetBackground:_draw(frame, rect)
 	local _rectW = rect.w
 	local _rectH = rect.h
 	
-	self.backgroundImage:draw(_frameX + _rectX, _frameY + _rectY, _kImageUnflipped, rect)
+	if self.backgroundImage then
+		self.backgroundImage:draw(_frameX + _rectX, _frameY + _rectY, _kImageUnflipped, rect)
+	end
 	
 	local _imageOffsets = self.imageOffsets
 	local _rectsImagesRight = self.rectsImagesRight

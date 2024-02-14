@@ -117,8 +117,10 @@ function SpriteCycler:preloadSprites(...)
 		
 		for i=1,count do
 			local sprite = _createSpriteFromId(id)
-			
-			_insert(_spritesToRecycle[id], sprite)
+
+			if sprite ~= nil then
+				_insert(_spritesToRecycle[id], sprite)
+			end
 		end
 	end
 end

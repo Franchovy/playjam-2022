@@ -6,6 +6,23 @@ local _saveConfigCallback = function() error("Not implemented") end
 local _discardConfigCallback = function() error("Not implemented") end
 local _loadConfigCallback = function() error("Not implemented") end
 
+-- tedious ... but required 😔
+import "sprites/platform"
+import "sprites/killBlock"
+import "sprites/coin"
+import "sprites/checkpoint"
+import "sprites/wheel"
+import "sprites/levelEnd"
+
+LogicalSprite.idSpriteTable = {
+	platform = Platform,
+	killBlock = KillBlock,
+	coin = Coin,
+	checkpoint = Checkpoint,
+	player = Wheel,
+	levelEnd = LevelEnd
+}
+
 function LogicalSprite.setCreateSpriteCallback(callback)
 	_createSpriteCallback = callback
 end
@@ -47,10 +64,12 @@ function LogicalSprite:saveConfig()
 end
 
 function LogicalSprite.loadObjects(levelObjects)
-	local objects = table.create(#levelObjects, 0)
+	local objects = {}
 	local _insert = table.insert
 	for _, object in pairs(levelObjects) do
-		_insert(objects, LogicalSprite(object))
+		if LogicalSprite.idSpriteTable[object.id] then -- check if there is a valid id for this guy
+			_insert(objects, LogicalSprite(object))
+		end
 	end
 	return objects
 end
