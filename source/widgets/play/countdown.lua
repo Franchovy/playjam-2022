@@ -14,15 +14,15 @@ class("WidgetCountdown").extends(Widget)
 
 countdown_table = gfx.imagetable.new('assets/images/sprites/countdown.gif')
 countdown_image = countdown_table:getImage(1)
-countdown = true
 
-function WidgetCountdown:init(config)
-	self.config = config
+function WidgetCountdown:_init()
+	self:supply(Widget.deps.frame)
+	self:supply(Widget.deps.timers)
+	
+	self:setFrame(disp.getRect())
 	
 	self.painters = {}
 	self.images = {}
-
-	self:supply(Widget.deps.timers)
 	
 	self:createSprite(kZIndex.overlay)
 	
@@ -32,35 +32,34 @@ end
 function WidgetCountdown:_load()
 
 	self.levelStartCountdown = function()
-		countdown = true
+		self:setVisible(true)
 		self:performAfterDelay(600, function()
 			countdown_image = countdown_table:getImage(1)
 			gfx.sprite.addDirtyRect(168, 72, 64, 96)
 			screenShake(100, 2)
-			print("3")
+			
 			self:performAfterDelay(600, function()
 				countdown_image = countdown_table:getImage(2)
 				gfx.sprite.addDirtyRect(108, 72, 184, 96)
 				screenShake(100, 2)
-				print("2")
 				
 				self:performAfterDelay(600, function()
 					countdown_image = countdown_table:getImage(3)
 					gfx.sprite.addDirtyRect(108, 72, 184, 96)
 					screenShake(100, 2)
-					print("1")
+					
 					self:performAfterDelay(600, function()
 						countdown_image = countdown_table:getImage(4)
 						gfx.sprite.addDirtyRect(108, 72, 184, 96)
 						screenShake(100, 2)
-						print("GO")
-						self:performAfterDelay(300, function()
-							countdown = false
-							countdown_image = countdown_table:getImage(5)
-
-						end)
-						self.signals.finished()
 						
+						self:performAfterDelay(500, function()
+							self:setVisible(false)
+							gfx.sprite.addDirtyRect(108, 72, 184, 96)
+							countdown_image = countdown_table:getImage(5)
+						end)
+						
+						self.signals.finished()
 					end)
 				end)
 			end)
@@ -71,9 +70,7 @@ function WidgetCountdown:_load()
 end
 
 function WidgetCountdown:_draw(rect)
-	if countdown then
-		countdown_image:drawCentered(200,120)
-	end
+	countdown_image:drawCentered(200,120)
 end
 
 function WidgetCountdown:_update()
