@@ -53,7 +53,7 @@ function frame(widget, config)
 			self.sprite = nil
 		end)
 	end
-		
+	
 	function widget:setNeedsLayout()
 		self._state.needsLayout = true
 	end

@@ -14,7 +14,7 @@ class("WidgetLevel").extends(Widget)
 
 function WidgetLevel:_init()
 	self:supply(Widget.deps.state)
-	
+
 	self:setStateInitial(1, {
 		"frozen",
 		"playing",
@@ -45,7 +45,7 @@ function WidgetLevel:_load()
 			
 			self.loadIndex += 1
 			
-			self.signals.onCheckpoint()
+			self.signals.onCheckpoint({ x = position.x, y = position.y - 25})
 		end
 		
 		wheel.signals.onDeath = function()

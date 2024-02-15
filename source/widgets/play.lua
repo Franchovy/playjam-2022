@@ -6,6 +6,7 @@ import "play/background"
 import "play/hud"
 import "play/system"
 import "play/countdown"
+import "common/textAnimator"
 import "utils/themes"
 
 local gfx <const> = playdate.graphics
@@ -63,8 +64,14 @@ function WidgetPlay:_load()
 		self:setState(self.kStates.levelComplete)
 	end
 	
-	self.children.level.signals.onCheckpoint = function()
-		print("Show flashy checkpoint signal")
+	self.children.level.signals.onCheckpoint = function(checkpointData)
+		self.children.checkpoint:setVisible(true)
+		self.children.checkpoint.setPositionCentered(checkpointData.x, checkpointData.y)
+		self.children.checkpoint.beginAnimation()
+		
+		self.timers.checkpoint = timer.performAfterDelay(5000, function()
+			self.children.checkpoint:setVisible(false)
+		end)
 		
 		table.insert(self.data.checkpoints, {
 			time = self.data.time + self.timers.levelTimer.currentTime,
@@ -94,6 +101,10 @@ function WidgetPlay:_load()
 	self.children.level.signals.collectCoin = function(coinCount)
 		self.data.coins += coinCount
 	end
+	
+	self.children.checkpoint = Widget.new(WidgetTextAnimator, { text = "CHECKPOINT!"} )
+	self.children.checkpoint:load()
+	self.children.checkpoint:setVisible(false)
 	
 	self.children.gameOver = Widget.new(WidgetGameOver, { 
 		reason = "YOU WERE KILLED"
