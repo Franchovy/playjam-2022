@@ -28,8 +28,17 @@ function WidgetTextAnimator:_load()
 	
 	self.images.textInverted = self.images.text:invertedImage()
 	
+	self.blinker = gfx.animation.blinker.new(200, 50, true)
+	self.blinker:stop()
+	
 	self.beginAnimation = function()
-		self.animators.highlightOffset = gfx.animator.new(5000, self.images.text:getSize(), -highlightWidth)
+		self:setVisible(true)
+		self.blinker:startLoop()
+	end
+	
+	self.endAnimation = function()
+		self:setVisible(false)
+		self.blinker:stop()
 	end
 	
 	self.setPositionCentered = function(x, y)
@@ -38,14 +47,15 @@ function WidgetTextAnimator:_load()
 end
 
 function WidgetTextAnimator:_draw(frame, rect)
-	local animatorValue = self:getAnimatorValue(self.animators.highlightOffset)
-	print(animatorValue)
-	self.images.text:draw(frame.x, frame.y)
-	self.images.textInverted:draw(frame.x + animatorValue, frame.y, _kImageUnflipped, 0, 0, 200, 100)
+	if self.blinker.on then
+		self.images.text:draw(frame.x, frame.y)
+	else
+		self.images.textInverted:draw(frame.x, frame.y)
+	end
 end
 
 function WidgetTextAnimator:_update()
-	if self:isAnimating() == true then
+	if self.blinker.hasJustChanged then
 		self.sprite:markDirty()
 	end	
 end

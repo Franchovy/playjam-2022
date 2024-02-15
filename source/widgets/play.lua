@@ -69,8 +69,8 @@ function WidgetPlay:_load()
 		self.children.checkpoint.setPositionCentered(checkpointData.x, checkpointData.y)
 		self.children.checkpoint.beginAnimation()
 		
-		self.timers.checkpoint = timer.performAfterDelay(5000, function()
-			self.children.checkpoint:setVisible(false)
+		self.timers.checkpoint = timer.performAfterDelay(3000, function()
+			self.children.checkpoint.endAnimation()
 		end)
 		
 		table.insert(self.data.checkpoints, {
