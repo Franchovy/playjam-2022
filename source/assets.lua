@@ -6,7 +6,8 @@ local dirLevels = "assets/levels/"
 
 kAssetsImages = {
 	checkpoint = dirImages.."sprites/checkpoint/checkpoint",
-	checkpointSet = dirImages.."sprites/checkpoint/checkpoint_isSet",
+	checkpointLoad = dirImages.."sprites/checkpoint/checkpoint_load",
+	checkpointSet = dirImages.."sprites/checkpoint/checkpoint_flag",
 	coin = dirImages.."sprites/coin",
 	killBlock = dirImages.."sprites/killBlock",
 	platform = dirImages.."sprites/platform",
