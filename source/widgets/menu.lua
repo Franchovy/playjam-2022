@@ -28,6 +28,7 @@ function WidgetMenu:_init()
 	self.tick = 0
 	
 	self.transitioningOut = true
+	self.previousAnimation = nil
 end
 
 function WidgetMenu:_load()
@@ -309,10 +310,24 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 		
 		self.children.menuHome:load()
 		
+		self.previousAnimation = {
+			from = stateFrom,
+			to = stateTo,
+			time = playdate.getCurrentTimeMilliseconds()
+		}
+		local _animation = self.previousAnimation
 		self.children.title:animate(self.children.title.kAnimations.toLevelSelect, function(animationChanged)
 			if not animationChanged then
 				self.children.title:setVisible(false)
 				self.children.title:unload()
+				
+				if self.state ~= self.kStates.menu then
+					return
+				end
+				
+				if table.shallowEqual(_animation, self.previousAnimation) == false then
+					return
+				end
 				
 				self.children.menuHome:setVisible(true)
 				self.children.menuHome:animate(self.children.menuHome.kAnimations.intro)
@@ -340,6 +355,14 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 	
 	if stateFrom == self.kStates.menu and (stateTo == self.kStates.subMenu) then
 		self:playSample(kAssetsSounds.menuAccept)
+		local _currentMenu = self.currentMenu
+		
+		self.previousAnimation = {
+			from = stateFrom,
+			to = stateTo,
+			time = playdate.getCurrentTimeMilliseconds()
+		}
+		local _animation = self.previousAnimation
 		
 		self.children.menuHome:animate(self.children.menuHome.kAnimations.outro, function(animationChanged)
 			if not animationChanged then
@@ -348,17 +371,21 @@ function WidgetMenu:_changeState(stateFrom, stateTo)
 				
 				self.children.scoreDisplay:setVisible(false)
 				
-				if self.currentMenu:isLoaded() == false then
-					self.currentMenu:load()
+				if table.shallowEqual(_animation, self.previousAnimation) == false then
+					return
 				end
 				
-				self.currentMenu:setVisible(true)
+				if _currentMenu:isLoaded() == false then
+					_currentMenu:load()
+				end
+				
+				_currentMenu:setVisible(true)
 				
 				-- TODO: Add animation to sub menu
-				if self.currentMenu == self.children.menuSettings then
+				if _currentMenu == self.children.menuSettings then
 					gfx.sprite.addDirtyRect(0, 0, 400, 240)
 				else
-					self.currentMenu:animate(self.currentMenu.kAnimations.intro)
+					_currentMenu:animate(_currentMenu.kAnimations.intro)
 				end
 			end
 		end)
