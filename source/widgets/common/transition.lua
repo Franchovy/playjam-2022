@@ -42,7 +42,7 @@ function WidgetTransition:_load()
 	end)
 	
 	self.painters.wheel = Painter(function(rect)
-		gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+		gfx.setImageDrawMode(gfx.kDrawModeBlackTransparent)
 		self.images.wheel:draw(rect.x, rect.y)
 		gfx.setImageDrawMode(gfx.kDrawModeCopy)
 	end)
