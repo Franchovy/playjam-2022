@@ -136,8 +136,9 @@ function WidgetMain:_changeState(stateFrom, stateTo)
 				self.children.play = Widget.new(WidgetPlay, { level = levelConfig, levelInfo = self.data.currentLevel })
 				self.children.play:load()
 				
-				self.children.play.signals.enableInGameOptimizations = function() self:setVisible(false); playdate.setCollectsGarbage(false) end
-				self.children.play.signals.disableInGameOptimizations = function() self:setVisible(true); playdate.setCollectsGarbage(true) end
+				self.children.play.signals.enableInGameOptimizations = function() self:setVisible(false); --[[playdate.setCollectsGarbage(false)--]] end
+				self.children.play.signals.disableInGameOptimizations = function() self:setVisible(true); --[[playdate.setCollectsGarbage(true)--]] end
+
 				self.children.play.signals.saveLevelScore = self.onPlaythroughComplete
 				self.children.play.signals.returnToMenu = self.onReturnToMenu
 				self.children.play.signals.getNextLevelConfig = self.getNextLevelConfig
