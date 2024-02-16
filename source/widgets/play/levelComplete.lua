@@ -197,7 +197,7 @@ function LevelComplete:_draw(rect)
 		
 		self.painters.containerBackgroundStars:draw(rectStarContainer)
 		
-		for i, star in ipairs(self.stars) do
+		for i=1, self.config.objectives.stars do
 			self.stars[i]:draw(starRects[i])
 		end
 		
