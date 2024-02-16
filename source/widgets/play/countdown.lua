@@ -78,8 +78,6 @@ function WidgetCountdown:_update()
 end
 
 function WidgetCountdown:_unload()
-	self.sprite:remove()
-	
 	self.images = nil
 	self.painters = nil
 	

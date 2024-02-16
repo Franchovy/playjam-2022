@@ -120,8 +120,6 @@ function WidgetBackground:_update()
 end
 
 function WidgetBackground:_unload()
-	self.sprite:remove()
-	
 	for i=1, #images do
 		table.remove(images)
 		table.remove(paralaxOffsets)

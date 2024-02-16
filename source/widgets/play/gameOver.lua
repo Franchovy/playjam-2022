@@ -86,8 +86,6 @@ end
 
 
 function WidgetGameOver:_unload()
-	self.sprite:remove()
-	
 	self.images = nil
 	self.painters = nil
 	
