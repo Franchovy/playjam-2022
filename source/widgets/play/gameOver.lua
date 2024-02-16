@@ -53,7 +53,7 @@ function WidgetGameOver:_load()
 		entries = {
 			"CHECKPOINT",
 			"RESTART LEVEL",
-			"LEVEL SELECT"
+			"MAIN MENU"
 		},
 		scale = 2
 	})

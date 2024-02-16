@@ -127,8 +127,8 @@ function LevelComplete:_load()
 		local textHeight2 = getFont(kAssetsFonts.twinbee2x):getHeight()
 		local topTextRect = Rect.with(rect, { y = topTextRect.y + textHeight15 + 3, h = textHeight2 })
 		
-		local coinsLabelText = self.config.objectives.coinsString
-		local timeLabelText = self.config.objectives.timeString
+		local coinsLabelText = "⚪️"..self.config.objectives.coinsString
+		local timeLabelText = "⌛"..self.config.objectives.timeString
 		
 		setCurrentFont(kAssetsFonts.twinbee2x)
 		gfx.drawTextAligned(coinsLabelText, rectLeft.x + rectLeft.w / 2, topTextRect.y + topTextRect.h / 2, kTextAlignment.center)
