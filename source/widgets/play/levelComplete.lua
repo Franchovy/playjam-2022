@@ -146,12 +146,16 @@ function LevelComplete:_load()
 	
 	self.animators.card = gfx.animator.new(0, 0, 0)	
 	
+	local entries = table.create(3, 0)
+	
+	if self.config.showNextLevel then
+		table.insert(entries, "NEXT LEVEL")
+	end
+	table.insert(entries, "RESTART")
+	table.insert(entries, "MAIN MENU")
+	
 	self.children.menu = Widget.new(WidgetEntriesMenu, {
-		entries = {
-			"NEXT LEVEL",
-			"RESTART",
-			"MAIN MENU"
-		},
+		entries = entries,
 		scale = 1.5,
 		shouldDrawFrame = true
 	})
@@ -290,8 +294,14 @@ function LevelComplete:_changeState(stateFrom, stateTo)
 		
 		self.blinkers.blinkerTitle:remove()
 		
-		for _, star in pairs(self.stars) do
+		for i, star in ipairs(self.stars) do
+			if i > self.config.objectives.stars then
+				goto continue
+			end
+			
 			star.timers.timer:start()
+			
+			::continue::
 		end
 		
 		self:performAfterDelay(100 + #self.stars * 700 + 700, function()
