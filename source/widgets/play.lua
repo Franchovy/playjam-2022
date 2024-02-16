@@ -48,6 +48,54 @@ function WidgetPlay:_load()
 	self.children.transition:load()
 	self.children.transition:setVisible(false)
 	
+	
+	-- Level Theme
+	
+	self.loadTheme = function()
+		if self.config.level.theme ~= nil then
+			self.theme = kThemes[self.config.level.theme]
+		end
+		
+		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
+			local introFilePath, loopFilePath = getMusicFilepathsForTheme(self.theme)
+			
+			if self.filePlayer ~= nil then
+				self.filePlayer:stop()
+				self.filePlayer = nil
+			end
+			
+			self.filePlayer = FilePlayer(loopFilePath, introFilePath)
+			self.filePlayer:play()
+		end
+		
+		if AppConfig.enableParalaxBackground and (self.config.level.theme ~= nil) then
+			if self.children.background ~= nil then
+				self.children.background:unload()
+				
+				self.children.background.theme = self.config.level.theme
+			else
+				self.children.background = Widget.new(WidgetBackground, { theme = self.config.level.theme })
+			end
+			
+			self.children.background:load()
+		end
+		
+		if self.children.checkpoint ~= nil then
+			self.children.checkpoint:unload()
+			self.children.checkpoint.config.inverted = self.theme[5] == false
+			self.children.checkpoint:load()
+		end
+		
+		collectgarbage("collect")
+		
+		local backgroundColor = getBackgroundColorForTheme(self.theme)
+		gfx.setBackgroundColor(backgroundColor)
+	end
+	
+	self.loadTheme()
+	
+	-- Level
+	
 	self.children.level = Widget.new(WidgetLevel, { objects = self.config.level.objects, objectives = self.config.level.objectives })
 
 	self.children.level.signals.startPlaying = function()
@@ -102,7 +150,7 @@ function WidgetPlay:_load()
 		self.data.coins += coinCount
 	end
 	
-	self.children.checkpoint = Widget.new(WidgetTextAnimator, { text = "CHECKPOINT!"} )
+	self.children.checkpoint = Widget.new(WidgetTextAnimator, { text = "CHECKPOINT!", font = kAssetsFonts.twinBee15x, inverted = self.theme[5] == false } )
 	self.children.checkpoint:load()
 	self.children.checkpoint:setVisible(false)
 	
@@ -166,45 +214,6 @@ function WidgetPlay:_load()
 	-- Level complete (layout only)
 	
 	self.rects.levelComplete = _tInset(_assign(self.rects.levelComplete, self.frame), 30, 20)
-	
-	-- Level Theme
-	
-	self.loadTheme = function()
-		if self.config.level.theme ~= nil then
-			self.theme = kThemes[self.config.level.theme]
-		end
-		
-		if AppConfig.enableBackgroundMusic and self.theme ~= nil then
-			local introFilePath, loopFilePath = getMusicFilepathsForTheme(self.theme)
-			
-			if self.filePlayer ~= nil then
-				self.filePlayer:stop()
-				self.filePlayer = nil
-			end
-			
-			self.filePlayer = FilePlayer(loopFilePath, introFilePath)
-			self.filePlayer:play()
-		end
-		
-		if AppConfig.enableParalaxBackground and (self.config.level.theme ~= nil) then
-			if self.children.background ~= nil then
-				self.children.background:unload()
-				
-				self.children.background.theme = self.config.level.theme
-			else
-				self.children.background = Widget.new(WidgetBackground, { theme = self.config.level.theme })
-			end
-			
-			self.children.background:load()
-		end
-		
-		collectgarbage("collect")
-		
-		local backgroundColor = getBackgroundColorForTheme(self.theme)
-		gfx.setBackgroundColor(backgroundColor)
-	end
-	
-	self.loadTheme()
 	
 	-- Level Timer
 	

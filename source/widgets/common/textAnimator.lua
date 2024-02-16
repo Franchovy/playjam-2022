@@ -12,16 +12,24 @@ function WidgetTextAnimator:_init()
 	self:supply(Widget.deps.frame)
 	
 	self.images = {}
-	
-	self:createSprite(kZIndex.overlay)
-	self.sprite:setIgnoresDrawOffset(false)
 end
 
 function WidgetTextAnimator:_load()
+	self:createSprite(kZIndex.overlay)
+	self.sprite:setIgnoresDrawOffset(false)
+	
+	if self.config.font ~= nil then
+		setCurrentFont(self.config.font)
+	end
+	
 	local text = self.config.text
 	textHeight = gfx.getFont():getHeight()
 	
 	self.images.text = gfx.imageWithText(text, 400, textHeight)
+	
+	if self.config.inverted == true then
+		self.images.text:setInverted(true)
+	end
 	
 	local frame = geo.rect.new(0, 0, self.images.text:getSize())
 	self:setFrame(frame)
@@ -57,5 +65,10 @@ end
 function WidgetTextAnimator:_update()
 	if self.blinker.hasJustChanged then
 		self.sprite:markDirty()
-	end	
+	end
+end
+
+function WidgetTextAnimator:_unload()
+	self.blinker:stop()
+	self.images = {}
 end
