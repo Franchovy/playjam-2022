@@ -41,6 +41,7 @@ function Wheel:init()
 	
 	self.imagetable = gfx.imagetable.new(kAssetsImages.wheel)
 	
+	self:setSize(48, 48)
 	self:setImage(self.imagetable[1])
 	self:setCenter(0, 0)
 	

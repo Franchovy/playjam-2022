@@ -37,7 +37,7 @@ function WidgetTitle:_load()
 	self.painters = {}
 	
 	self.imagetables.particles = gfx.imagetable.new(kAssetsImages.particles)
-	self.imagetables.wheel = gfx.imagetable.new(kAssetsImages.wheel):scaled(2)
+	self.imagetables.wheel = gfx.imagetable.new(kAssetsImages.wheelMenu):scaled(2)
 	self.images.backgroundImage = gfx.image.new(kAssetsImages.background)
 	self.images.backgroundImage2 = gfx.image.new(kAssetsImages.background2)
 	self.images.backgroundImage3 = gfx.image.new(kAssetsImages.background3)
