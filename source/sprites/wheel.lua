@@ -272,10 +272,12 @@ function Wheel:update()
 			end
 		elseif target.type == kSpriteTypes.checkpoint then
 			if not target:isSet() then
-				target:loadCheckpoint()
+				local progress, started, complete = target:loadCheckpoint()
 				
 				self._recentLoadingCheckpoint = target
 				self._isLoadingCheckpoint = true
+				
+				self.signals.onCheckpointLoad(target.x + target.width / 2, target.y, progress, started, false, complete)
 				
 				if target:loadFinished() == true then
 					target:set()
@@ -283,7 +285,7 @@ function Wheel:update()
 					self.hasTouchedNewCheckpoint = true
 					self._recentCheckpoint = {x = target.x, y = target.y}
 					
-					self.signals.onTouchCheckpoint()
+					self.signals.onTouchCheckpoint(target.x + target.width / 2, target.y)
 				end
 			end
 		elseif target.type == kSpriteTypes.levelEnd then
@@ -301,6 +303,8 @@ function Wheel:update()
 		-- Cancel loading checkpoint
 		self._recentLoadingCheckpoint:stopLoading()
 		self._recentLoadingCheckpoint = nil
+		
+		self.signals.onCheckpointLoad(nil, nil, nil, nil, true, nil)
 	end
 	
 	if self.hasJustDied == false then	

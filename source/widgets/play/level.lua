@@ -35,8 +35,20 @@ function WidgetLevel:_load()
 	
 	-- Wheel setup
 	
-	function _setupWheelSpriteSignals(wheel)		
-		wheel.signals.onTouchCheckpoint = function()
+	function _setupWheelSpriteSignals(wheel)
+		local checkpointData = {}
+		wheel.signals.onCheckpointLoad = function(x, y, progress, started, cancelled, complete)
+			checkpointData.x = x
+			checkpointData.y = y
+			checkpointData.progress = progress
+			checkpointData.started = started
+			checkpointData.cancelled = cancelled
+			checkpointData.complete = complete
+			
+			self.signals.onCheckpointLoad(checkpointData)
+		end
+		
+		wheel.signals.onTouchCheckpoint = function(x, y)
 			local position = wheel:getRecentCheckpoint()
 			self.previousLoadPoint = { x = position.x / kGame.gridSize, y = position.y / kGame.gridSize }
 			self.wheel.position = self.previousLoadPoint
@@ -45,7 +57,10 @@ function WidgetLevel:_load()
 			
 			self.loadIndex += 1
 			
-			self.signals.onCheckpoint({ x = position.x, y = position.y - 25})
+			checkpointData.x = x
+			checkpointData.y = y
+			
+			self.signals.onCheckpoint(checkpointData)
 		end
 		
 		wheel.signals.onDeath = function()

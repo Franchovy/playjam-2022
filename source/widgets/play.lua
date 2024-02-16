@@ -6,6 +6,7 @@ import "play/background"
 import "play/hud"
 import "play/system"
 import "play/countdown"
+import "common/loadingCircle"
 import "common/textAnimator"
 import "utils/themes"
 
@@ -21,9 +22,8 @@ local _convertMsTimeToString <const> = convertMsTimeToString
 
 class("WidgetPlay").extends(Widget)
 
-
 function WidgetPlay:_init()
-	self:supply(Widget.deps.state, { substates = true })
+	self:supply(Widget.deps.state)
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.frame)
 	self:supply(Widget.deps.timers)
@@ -86,6 +86,13 @@ function WidgetPlay:_load()
 			self.children.checkpoint:load()
 		end
 		
+		if self.children.checkpointLoadingIndicator ~= nil then
+			self.children.checkpointLoadingIndicator:unload()
+			self.children.checkpointLoadingIndicator.config.color = getForegroundColorForTheme(self.theme)
+			self.children.checkpointLoadingIndicator.config.backgroundColor = getBackgroundColorForTheme(self.theme)
+			self.children.checkpointLoadingIndicator:load()
+		end
+		
 		collectgarbage("collect")
 		
 		local backgroundColor = getBackgroundColorForTheme(self.theme)
@@ -112,9 +119,24 @@ function WidgetPlay:_load()
 		self:setState(self.kStates.levelComplete)
 	end
 	
+	self.children.level.signals.onCheckpointLoad = function(checkpointData)
+		if checkpointData.started then
+			self.children.checkpointLoadingIndicator:setVisible(true)
+			self.children.checkpointLoadingIndicator.setPositionCentered(checkpointData.x - 5, checkpointData.y - 15)
+		end
+		
+		if checkpointData.progress then
+			self.children.checkpointLoadingIndicator.setProgress(checkpointData.progress)
+		end
+		
+		if checkpointData.cancelled or checkpointData.complete then
+			self.children.checkpointLoadingIndicator:setVisible(false)
+		end
+	end
+	
 	self.children.level.signals.onCheckpoint = function(checkpointData)
 		self.children.checkpoint:setVisible(true)
-		self.children.checkpoint.setPositionCentered(checkpointData.x, checkpointData.y)
+		self.children.checkpoint.setPositionCentered(checkpointData.x, checkpointData.y - 16)
 		self.children.checkpoint.beginAnimation()
 		
 		self.timers.checkpoint = timer.performAfterDelay(3000, function()
@@ -153,6 +175,10 @@ function WidgetPlay:_load()
 	self.children.checkpoint = Widget.new(WidgetTextAnimator, { text = "CHECKPOINT!", font = kAssetsFonts.twinBee15x, inverted = self.theme[5] == false } )
 	self.children.checkpoint:load()
 	self.children.checkpoint:setVisible(false)
+	
+	self.children.checkpointLoadingIndicator = Widget.new(WidgetLoadingCircle, { size = 24, color = getForegroundColorForTheme(self.theme), backgroundColor = getBackgroundColorForTheme(self.theme) })
+	self.children.checkpointLoadingIndicator:load()
+	self.children.checkpointLoadingIndicator:setVisible(false)
 	
 	self.children.gameOver = Widget.new(WidgetGameOver, { 
 		reason = "YOU WERE KILLED"

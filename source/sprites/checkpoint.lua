@@ -95,6 +95,15 @@ function Checkpoint:isSet()
 end
 
 function Checkpoint:loadCheckpoint()
+	local started = self._loadTimer == nil
+	local progress = started and 0 or self._loadTimer.currentTime / checkPointLoadDuration
+	local complete
+	if started == false then
+		complete = self._loadTimer.currentTime > checkPointLoadDuration - 0.1
+	else
+		complete = false
+	end
+	
 	if self._loadTimer == nil then
 		self._loadTimer = timer.new(checkPointLoadDuration, function()
 			self._loadFinished = true
@@ -109,6 +118,8 @@ function Checkpoint:loadCheckpoint()
 		self._loadPlayer = sampleplayer:playSample("load")
 		self:setState(kStates.load)
 	end
+	
+	return progress, started, complete
 end
 
 function Checkpoint:stopLoading()
