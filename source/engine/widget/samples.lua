@@ -4,7 +4,7 @@ local config = {
 	sampleplayers = table.create(0, 24)
 }
 
-setmetatable(config.sampleplayers, table.weakValuesMetatable)
+setmetatable(config.sampleplayers, table.weakKeysMetatable)
 
 function samples(widget)
 	function widget:loadSample(path, volume, key)
@@ -22,10 +22,7 @@ function samples(widget)
 		
 		self.samples[key] = player
 		
-		table.insert(config.sampleplayers, {
-			player = self.samples[key],
-			volume = volume * config.volume
-		})
+		config.sampleplayers[player] = volume * config.volume
 	end
 	
 	function widget:playSample(key, finishedCallback)
@@ -41,7 +38,7 @@ function samples(widget)
 		
 		self.samples[key] = nil
 		
-		table.removevalue(config.sampleplayers, player)
+		config.sampleplayers[player] = nil
 	end
 	
 	widget.samples = {}
@@ -54,8 +51,8 @@ end
 Settings:addCallback(kSettingsKeys.sfxVolume, function(value)
 	config.volume = value
 	
-	for _, configSampleplayer in pairs(config.sampleplayers) do
-		configSampleplayer.player:setVolume(configSampleplayer.volume * value)
+	for samplePlayer, volume in pairs(config.sampleplayers) do
+		samplePlayer:setVolume(volume * value)
 	end
 end)
 

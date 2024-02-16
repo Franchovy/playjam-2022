@@ -32,7 +32,7 @@ function WidgetMenuSettings:_load()
 			end
 			
 			local settingsValue
-			if type(settingsValue) == "number" then
+			if tonumber(value) ~= nil then
 				settingsValue = tonumber(value) / 10
 			else
 				settingsValue = value
