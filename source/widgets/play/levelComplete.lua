@@ -7,6 +7,12 @@ local timer <const> = playdate.timer
 
 class("LevelComplete").extends(Widget)
 
+local kEntriesTitles <const> = {
+	nextLevel = "NEXT LEVEL",
+	restartLevel = "RESTART",
+	mainMenu = "MAIN MENU"
+}
+
 function LevelComplete:_init()
 	self:supply(Widget.deps.samples)
 	self:supply(Widget.deps.state)
@@ -33,6 +39,8 @@ function LevelComplete:_load()
 	self:loadSample(kAssetsSounds.levelCompleteCard, 0.7)
 	self:loadSample(kAssetsSounds.levelCompleteStar, 0.7)
 	self:loadSample(kAssetsSounds.menuAccept, 0.7)
+	
+	setCurrentFont(kAssetsFonts.twinbee)
 	
 	local drawMode = getColorDrawModeFill(self.config.titleColor)
 	gfx.setImageDrawMode(drawMode)
@@ -149,10 +157,10 @@ function LevelComplete:_load()
 	local entries = table.create(3, 0)
 	
 	if self.config.showNextLevel then
-		table.insert(entries, "NEXT LEVEL")
+		table.insert(entries, kEntriesTitles.nextLevel)
 	end
-	table.insert(entries, "RESTART")
-	table.insert(entries, "MAIN MENU")
+	table.insert(entries, kEntriesTitles.restartLevel)
+	table.insert(entries, kEntriesTitles.mainMenu)
 	
 	self.children.menu = Widget.new(WidgetEntriesMenu, {
 		entries = entries,
@@ -163,12 +171,12 @@ function LevelComplete:_load()
 	self.children.menu:load()
 	self.children.menu:setVisible(false)
 	
-	self.children.menu.signals.entrySelected = function(entry)
-		if entry == 1 then
+	self.children.menu.signals.entrySelected = function(entry, title)
+		if title == kEntriesTitles.nextLevel then
 			self.signals.nextLevel()
-		elseif entry == 2 then
+		elseif title == kEntriesTitles.restartLevel then
 			self.signals.restartLevel()
-		elseif entry == 3 then
+		elseif title == kEntriesTitles.mainMenu then
 			self.signals.returnToMenu()
 		end
 	end

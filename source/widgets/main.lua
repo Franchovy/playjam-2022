@@ -42,7 +42,8 @@ function WidgetMain:_load()
 		self.data.currentLevel = {
 			worldTitle = config.worldTitle,
 			levelTitle = config.levelTitle,
-			filepath = config.filepath
+			filepath = config.filepath,
+			hasNextLevel = config.hasNextLevel
 		}
 		
 		self:setState(self.kStates.play)

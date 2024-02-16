@@ -45,8 +45,10 @@ function frame(widget, config)
 		self.sprite = sprite
 		
 		self:_addUnloadCallback(function()
-			self.sprite:remove()
-			self.sprite = nil
+			if self.sprite ~= nil then
+				self.sprite:remove()
+				self.sprite = nil
+			end
 		end)
 	end
 	

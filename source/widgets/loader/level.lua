@@ -122,8 +122,9 @@ function WidgetLoaderLevel:_load()
 					end
 				end
 				
-				for _, level in ipairs(levels) do
+				for j, level in ipairs(levels) do
 					level.objectives = levelObjectives[level.title]
+					level.hasNextLevel = (j < #levels) == true or (i < #pathsWorlds)
 				end
 				
 				levelsData[worldIndex] = {

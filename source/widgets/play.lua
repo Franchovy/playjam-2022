@@ -181,10 +181,11 @@ function WidgetPlay:_load()
 	self.children.checkpointLoadingIndicator:setVisible(false)
 	
 	self.children.gameOver = Widget.new(WidgetGameOver, { 
-		reason = "YOU WERE KILLED"
+		reason = "YOU WERE KILLED",
+		canRestartCheckpoint = false
 	})
-	self.children.gameOver:load()
-	self.children.gameOver:setVisible(false)
+	--self.children.gameOver:load()
+	--self.children.gameOver:setVisible(false)
 	
 	self.children.gameOver.signals.restartCheckpoint = function() 
 		self.substate = "checkpoint"
@@ -306,6 +307,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 			
 			if self.children.gameOver ~= nil then
 				self.children.gameOver:setVisible(false)
+				self.children.gameOver:unload()
 			end
 			
 			if self.children.level.isLevelLoaded == true then
@@ -365,6 +367,11 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 				self.timers.levelTimer:reset()
 				
 				self.children.level:unloadLevel()
+				
+				self.children.gameOver.config.reason = "YOU WERE KILLED"
+				self.children.gameOver.config.canRestartCheckpoint = #self.data.checkpoints > 1
+				
+				self.children.gameOver:load()
 				self.children.gameOver:setVisible(true)
 				self.children.hud:setState(self.children.hud.kStates.offScreen)
 				
@@ -396,6 +403,7 @@ function WidgetPlay:_changeState(stateFrom, stateTo)
 		}
 		
 		self.children.levelComplete = Widget.new(LevelComplete, {
+			showNextLevel = self.config.levelInfo.hasNextLevel,
 			objectives = {
 				stars = stars,
 				timeString = _convertMsTimeToString(timeValue * 10, 1).."/".._convertMsTimeToString(objectives[3] * 10, 1),

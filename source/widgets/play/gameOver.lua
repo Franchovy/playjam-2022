@@ -5,11 +5,20 @@ local disp <const> = playdate.display
 
 class("WidgetGameOver").extends(Widget)
 
+local kEntriesTitles <const> = {
+	checkpoint = "CHECKPOINT",
+	restartLevel = "RESTART LEVEL",
+	mainMenu = "MAIN MENU"
+}
+
 function WidgetGameOver:_init()
-	
 	self:supply(Widget.deps.input)
 	self:supply(Widget.deps.frame)
 	
+	self.signals = {}
+end
+
+function WidgetGameOver:_load()
 	self:setFrame(disp.getRect())
 	
 	self.painters = {}
@@ -17,10 +26,6 @@ function WidgetGameOver:_init()
 	
 	self:createSprite(kZIndex.overlay)
 	
-	self.signals = {}
-end
-
-function WidgetGameOver:_load()
 	gfx.setColor(gfx.kColorBlack)
 	
 	setCurrentFont(kAssetsFonts.twinbee2x)
@@ -49,22 +54,25 @@ function WidgetGameOver:_load()
 		self.images.gameOverReason:draw(gameOverReasonCenterRect.x, rect.y + gameOverTextSizeH + margin * 2)
 	end)
 	
+	local entries = table.create(3, 0)
+	if self.config.canRestartCheckpoint == true then
+		table.insert(entries, kEntriesTitles.checkpoint)
+	end
+	table.insert(entries, kEntriesTitles.restartLevel)
+	table.insert(entries, kEntriesTitles.mainMenu)
+	
 	self.children.entriesMenu = Widget.new(WidgetEntriesMenu, {
-		entries = {
-			"CHECKPOINT",
-			"RESTART LEVEL",
-			"MAIN MENU"
-		},
+		entries = entries,
 		scale = 2
 	})
 	self.children.entriesMenu:load()
 	
-	self.children.entriesMenu.signals.entrySelected = function(entry)
-		if entry == 1 then
+	self.children.entriesMenu.signals.entrySelected = function(entry, title)
+		if title == kEntriesTitles.checkpoint then
 			self.signals.restartCheckpoint()
-		elseif entry == 2 then
+		elseif title == kEntriesTitles.restartLevel then
 			self.signals.restartLevel()
-		elseif entry == 3 then
+		elseif title == kEntriesTitles.mainMenu then
 			self.signals.returnToMenu()
 		end
 	end
@@ -83,12 +91,9 @@ function WidgetGameOver:_update()
 	self:passInput(self.children.entriesMenu)
 end
 
-
-
 function WidgetGameOver:_unload()
 	self.images = nil
 	self.painters = nil
 	
 	for _, child in pairs(self.children) do child:unload() end
-	self.children = nil
 end

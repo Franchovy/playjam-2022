@@ -121,7 +121,8 @@ function WidgetMenu:_load()
 			local config = {
 				title = level.title,
 				path = level.path,
-				locked = level.locked
+				locked = level.locked,
+				hasNextLevel = level.hasNextLevel
 			}
 			table.insert(entries, {
 				class = class,
@@ -144,7 +145,8 @@ function WidgetMenu:_load()
 			self.signals.loadLevel {
 				levelTitle = entry.config.title,
 				worldTitle = world.title,
-				filepath = entry.config.path
+				filepath = entry.config.path,
+				hasNextLevel = entry.config.hasNextLevel
 			}
 			
 			return true

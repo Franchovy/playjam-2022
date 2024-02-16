@@ -72,7 +72,7 @@ function WidgetEntriesMenu:_handleInput(input)
 	if input.pressed & (playdate.kButtonA | playdate.kButtonB) ~= 0 then
 		self:playSample(kAssetsSounds.menuAccept)
 		
-		self.signals.entrySelected(self.state)
+		self.signals.entrySelected(self.state, self.entries[self.state].config.text)
 	end
 	
 	if input.pressed & playdate.kButtonDown ~= 0 then
