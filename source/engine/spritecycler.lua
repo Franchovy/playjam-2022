@@ -20,6 +20,7 @@ local _saveConfig <const> = LogicalSprite.saveConfig
 
 local generationConfig = { left = 1, right = 1 }
 
+local _spritesMultichunk
 local _spritesToRecycle
 local _spritesWithConfig
 local _spritesPersisted
@@ -32,11 +33,19 @@ local function _loadChunk(self, chunk, shouldLoad)
 	end
 	
 	for _, object in _pairs(_chunkData) do
-		if _spritesPersisted[object.id] ~= true or (object.sprite == nil) then
+		local id = object.id
+		local needsSprite = object.sprite == nil
+		if _spritesPersisted[id] ~= true or needsSprite then
 			--[[_assert(object.sprite == nil == shouldLoad, 
-				"A chunk's sprite did not correspond to its loaded state. Are you trying to load/unload an already loaded/unloaded chunk?")]]
+				"A chunk's sprite did not correspond to its loaded state. Are you trying to load/unload an already loaded/unloaded chunk?")--]]
 			
-			local _objectPool = _spritesToRecycle[object.id]
+			local _objectPool = _spritesToRecycle[id]
+			
+			local _multichunkData, _multichunkDataObject = _spritesMultichunk[id]
+			if _multichunkData then
+				_multichunkDataObject = _spritesMultichunk[id][object]
+				_multichunkDataObject[chunk] = shouldLoad
+			end
 			
 			if shouldLoad then
 				-- LOAD SPRITE
@@ -45,9 +54,21 @@ local function _loadChunk(self, chunk, shouldLoad)
 					spriteToRecycle = _remove(_objectPool)
 				end
 				
-				_createSprite(object, spriteToRecycle)
-				_loadConfig(object)
-			else
+				if not _multichunkData or (_multichunkData ~= nil and needsSprite) then
+					_createSprite(object, spriteToRecycle)
+					_loadConfig(object)
+				end
+			elseif not needsSprite then
+				if _multichunkData then
+					-- Unload multichunk object if all chunks have been unloaded.
+					
+					for _, chunkLoaded in pairs(_multichunkDataObject) do
+						if chunkLoaded then
+							goto continue
+						end
+					end
+				end
+				
 				-- UNLOAD SPRITE
 				_saveConfig(object)
 				
@@ -59,6 +80,7 @@ local function _loadChunk(self, chunk, shouldLoad)
 				end
 			end
 		end
+		::continue::
 	end
 end
 
@@ -74,10 +96,12 @@ function SpriteCycler:init(chunkLength, recycledSpriteIds)
 	self.spritesToIgnore = { ["platform"] = true }
 	self.spritesWithConfig = { ["coin"] = true, ["checkpoint"] = true, ["platformCollision"] = true }
 	self.spritesPersisted = { ["player"] = true }
+	self.spritesMultichunk = { ["platformCollision"] = _create(0, 30) }
 	
 	_spritesToRecycle = self.spritesToRecycle
 	_spritesWithConfig = self.spritesWithConfig
 	_spritesPersisted = self.spritesPersisted
+	_spritesMultichunk = self.spritesMultichunk
 end
 
 -- Level Data
@@ -104,20 +128,41 @@ function SpriteCycler:load(levelObjects)
 	local _chunkLength = self.chunkLength
 	
 	for _, levelObject in pairs(levelObjects) do
-		if self.spritesToIgnore[levelObject.id] then
+		local id = levelObject.id
+		
+		if self.spritesToIgnore[id] then
 			goto continue
 		end
 		
 		-- Create chunk if needed
-		local _chunkIndex = _ceil((levelObject.position.x) / _chunkLength)
+		local _chunkIndex = _ceil(levelObject.position.x / _chunkLength)
 		
-		if data[_chunkIndex] == nil then
-			data[_chunkIndex] = _create(60, 0)
-			setmetatable(data[_chunkIndex], table.weakValuesMetatable)
+		local multichunkData = _spritesMultichunk[id]
+		local endChunk
+		if multichunkData then
+			-- Add to any further chunks if needed
+			local endPosition = levelObject.position.x + levelObject.config.w
+			endChunk = _ceil(endPosition / _chunkLength)
+			
+			multichunkData[levelObject] = table.create(0, 3)
+		else
+			endChunk = _chunkIndex
 		end
-		
-		-- Insert level object into chunk data
-		_insert(data[_chunkIndex], levelObject)
+			
+		for chunk=_chunkIndex,endChunk do
+			if data[chunk] == nil then
+				data[chunk] = _create(60, 0)
+				setmetatable(data[chunk], table.weakValuesMetatable)
+			end
+			
+			-- Insert level object into chunk data
+			_insert(data[chunk], levelObject)
+			
+			-- Add level object reference and chunk data to multichunk data
+			if multichunkData then
+				multichunkData[levelObject][chunk] = false
+			end
+		end
 		
 		::continue::
 	end
