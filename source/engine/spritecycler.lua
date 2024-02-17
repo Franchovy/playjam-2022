@@ -2,6 +2,7 @@ import "logicalSprite"
 
 class("SpriteCycler").extends()
 
+local gfx <const> = playdate.graphics
 local _ceil <const> = math.ceil
 local _range <const> = table.range
 local _contains <const> = table.contains
@@ -10,44 +11,51 @@ local _remove <const> = table.remove
 local _removevalue <const> = table.removevalue
 local _removekey <const> = table.removekey
 local _create <const> = table.create
+local _assert <const> = assert
+local _pairs <const> = pairs
+local _spriteRemove <const> = gfx.sprite.remove
+local _loadConfig <const> = LogicalSprite.loadConfig
+local _createSprite <const> = LogicalSprite.createSprite
+local _saveConfig <const> = LogicalSprite.saveConfig
 
 local generationConfig = { left = 1, right = 1 }
 
+local _spritesToRecycle
+local _spritesWithConfig
+local _spritesPersisted
+local _data
+
 local function _loadChunk(self, chunk, shouldLoad)
-	local _chunkData = self.data[chunk]
+	local _chunkData = _data[chunk]
 	if _chunkData == nil then
 		return
 	end
 	
-	local _spritesToRecycle = self.spritesToRecycle
-	local _spritesWithConfig = self.spritesWithConfig
-	local _createSpriteCallback = self.createSpriteCallback
-	local _recycleSprite = self.recycleSprite
-	local _spritesPersisted = self.spritesPersisted
-	
-	for _, object in pairs(_chunkData) do
+	for _, object in _pairs(_chunkData) do
 		if _spritesPersisted[object.id] ~= true or (object.sprite == nil) then
-			assert(object.sprite == nil == shouldLoad, 
-				"A chunk's sprite did not correspond to its loaded state. Are you trying to load/unload an already loaded/unloaded chunk?")
+			--[[_assert(object.sprite == nil == shouldLoad, 
+				"A chunk's sprite did not correspond to its loaded state. Are you trying to load/unload an already loaded/unloaded chunk?")]]
+			
+			local _objectPool = _spritesToRecycle[object.id]
 			
 			if shouldLoad then
 				-- LOAD SPRITE
 				local spriteToRecycle
-				if _spritesToRecycle[object.id] ~= nil then
-					spriteToRecycle = table.remove(_spritesToRecycle[object.id])
+				if _objectPool ~= nil then
+					spriteToRecycle = _remove(_objectPool)
 				end
 				
-				object:createSprite(spriteToRecycle)
-				object:loadConfig()
+				_createSprite(object, spriteToRecycle)
+				_loadConfig(object)
 			else
 				-- UNLOAD SPRITE
-				object:saveConfig()
+				_saveConfig(object)
 				
 				local sprite = _removekey(object, "sprite")
-				sprite:remove()
+				_spriteRemove(sprite)
 				
-				if _spritesToRecycle[object.id] ~= nil then
-					table.insert(self.spritesToRecycle[object.id], sprite)
+				if _objectPool ~= nil then
+					_insert(_objectPool, sprite)
 				end
 			end
 		end
@@ -66,6 +74,10 @@ function SpriteCycler:init(chunkLength, recycledSpriteIds)
 	self.spritesToIgnore = { ["platform"] = true }
 	self.spritesWithConfig = { ["coin"] = true, ["checkpoint"] = true, ["platformCollision"] = true }
 	self.spritesPersisted = { ["player"] = true }
+	
+	_spritesToRecycle = self.spritesToRecycle
+	_spritesWithConfig = self.spritesWithConfig
+	_spritesPersisted = self.spritesPersisted
 end
 
 -- Level Data
@@ -111,6 +123,7 @@ function SpriteCycler:load(levelObjects)
 	end
 	
 	self.data = data
+	_data = self.data
 end
 
 function SpriteCycler:preloadSprites(...)
