@@ -27,7 +27,6 @@ function Platform:init()
 	
 	self:setUpdatesEnabled(false)
 	self:setGroupMask(kCollisionGroups.static)
-	self:setAlwaysRedraw(true)
 	
 	local _, drawBoundsW, drawBoundsH
 	function self:draw()
