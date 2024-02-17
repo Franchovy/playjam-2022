@@ -63,7 +63,8 @@ function SpriteCycler:init(chunkLength, recycledSpriteIds)
 		self.spritesToRecycle[spriteId] = _create(32, 0)
 	end
 	
-	self.spritesWithConfig = { ["coin"] = true, ["checkpoint"] = true }
+	self.spritesToIgnore = { ["platform"] = true }
+	self.spritesWithConfig = { ["coin"] = true, ["checkpoint"] = true, ["platformCollision"] = true }
 	self.spritesPersisted = { ["player"] = true }
 end
 
@@ -91,6 +92,10 @@ function SpriteCycler:load(levelObjects)
 	local _chunkLength = self.chunkLength
 	
 	for _, levelObject in pairs(levelObjects) do
+		if self.spritesToIgnore[levelObject.id] then
+			goto continue
+		end
+		
 		-- Create chunk if needed
 		local _chunkIndex = _ceil((levelObject.position.x) / _chunkLength)
 		
@@ -101,6 +106,8 @@ function SpriteCycler:load(levelObjects)
 		
 		-- Insert level object into chunk data
 		_insert(data[_chunkIndex], levelObject)
+		
+		::continue::
 	end
 	
 	self.data = data

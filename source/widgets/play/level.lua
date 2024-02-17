@@ -83,10 +83,10 @@ function WidgetLevel:_load()
 	local recycleSpriteIds = {"platform", "killBlock", "coin", "checkpoint", "levelEnd"}
 	
 	self.spriteCycler = SpriteCycler(chunkLength, recycleSpriteIds)
-	self.configHandler = ConfigHandler({"coin", "checkpoint"})
+	self.configHandler = ConfigHandler({"coin", "checkpoint", "platformCollision"})
 	
 	LogicalSprite.setCreateSpriteFromIdCallback(function(id)
-		if id == "platform" then
+		if id == "platformCollision" then
 			return Platform.new()
 		elseif id == "killBlock" then
 			return KillBlock.new(self.periodicBlinker)
@@ -100,8 +100,6 @@ function WidgetLevel:_load()
 			return sprite
 		elseif id == "levelEnd" then
 			return LevelEnd.new()
-		else 
-			print("Unrecognized ID: ".. id)
 		end
 	end)
 	
